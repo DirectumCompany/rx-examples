@@ -140,7 +140,8 @@
 &lt;col &gt;
 &lt;/colgroup&gt;
 &lt;tr&gt;
-  &lt;td colspan="2"&gt;  
+  &lt;td colspan="2"&gt; 
+&lt;img align = left src = "data:image/jpg;base64,iVBORw0KGgoAAAANSUhEUgAAABoAAAAZCAIAAACgvKk3AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAANtSURBVEhLpZXJTxNRHMdn6bSdblIoUBaBspMoKMhyccHoQWNi4tF48GriyaMH48HEv8DowcTEg4kXL3gQ0WiURECQACKlZZ+C0Ba6MW2n7cz4hRmwLS3E+Mkc3u/3Xr7vvd/yhvwyufjs7bBGQxP/B0kQD25dJJ/2DQ/+XLp7vSeeSKkz/46Ooe+/GHh0+zKBoz18+UH+b24+fo1jUap+fmSCCPPC8kZg1L36cXx+YGxucnFdnTtAXjlZJrxB/od77d1314jLsxHgbWZDV3PluVbH/NqmL8Sr6zLJIZdIiZML61CZXvaaDbrettpLp+sgVGO3kiQ5NLNSaDYUWQzq6kyy5YLbcQilJOlCm6O3zdFQUaTXauDHHqMuz+eJheqSgvOtDopEJnOQLTfs5M40VrTXl7M6RvFIkvxr2ds/6jLqtVc7m6xm9teK9+vU0qeJhbm1TWXNPhlyfDxBUWR5kUW1CSIlSgPjc+GocKm9ATftH3OPuVdJgmypKk4kRY8vpK7bI0OOoWlRkiCh2gTh8YfMrK6n5ThuivwiAhdP1SFw35xcqdWEtKjr9qAEVO9eILQMbdAxkFBMQFM7+0myHIkJnc2VrJZZ2giOOLmzJ6pP1ZUdjCD1pG9Iz+wEW+FETamT86kGQdgLzYFIDAMtTft3i2MzzDdW2gqM7O58NtSda93x5N/2QhHotQy3FxSGpgrNLMzmqhKlemtKrZwvqMwehNrJIEo2jbZa+1Ra3ddXFLlX/ZU2Syol/d6KIHDJlBSJCup0JtmFAqwm1mLUOzm/YhYfM4qijOR2NJSPz63BgwjsHz+LHHLgdF3ZLOdD6Som+mGG89qOGbETGga1nZ6udHLLoWJry6zKWYDDbvUHo6IoodVWfEF/OAonH0sos+nklgMnHfbNcHR9K4KxVkNbTfoVXwh1gxbGwYWkyDA5Xty8cqC7+fjwrEe5MhKytB7AAAe/3NFwrbsJe+yuyuAwOSSxscKG9sS4pMAkpMSokMQYtYuG212SzWFyAL1pYrWfJxdFSWY0FHpDncjDEXIAVy4tML4fdeE8KHLVm4ej5UBLVcmVriY0P5pEdeWBQkdsxxMxIYk8HvIFtmN4WbOc+x9eNihAinwzOP3o1Sebhc3stAwQ+BAfx7uCMsZPS/WmgTgE+Pjzezf+AAWP5P2ZbX7JAAAAAElFTkSuQmCC"/&gt;  
     &lt;div class="tg3" style ="margin-bottom: 3px"&gt;Документ подписан&lt;br&gt;электронной подписью в DirectumRX&lt;/div&gt;
   &lt;/td&gt;
 &lt;/tr&gt;
