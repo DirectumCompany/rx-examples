@@ -31,7 +31,9 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples",
-  "ResourcesKeys": [],
+  "ResourcesKeys": [
+    "HtmlStampTemplate"
+  ],
   "ServerAssemblyName": "Sungero.Examples.Server",
   "ServerNamespace": "Sungero.Examples.Server",
   "SharedAssemblyName": "Sungero.Examples.Shared",

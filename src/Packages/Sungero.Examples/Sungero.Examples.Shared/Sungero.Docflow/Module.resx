@@ -117,18 +117,18 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="HtmlStampTemplate" xml:space="preserve">
+  <data name="HtmlStampTemplateCustom" xml:space="preserve">
     <value>&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
 &lt;head&gt;
 &lt;style type="text/css"&gt;
 .box1 {
   padding: 3px;
   border: 1px solid #d7d7d7;
-  border-color: #003f75;
+  border-color: #9400D3;
 }
-.tg1{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #003f75}
-.tg2{font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #003f75}
-.tg3{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:8pt;color: #003f75}
+.tg1{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #9400D3}
+.tg2{font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #9400D3}
+.tg3{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:8pt;color: #9400D3}
  
 &lt;/style&gt;
 &lt;/head&gt;

@@ -117,47 +117,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="HtmlStampTemplate" xml:space="preserve">
-    <value>&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
-&lt;head&gt;
-&lt;style type="text/css"&gt;
-.box1 {
-  padding: 3px;
-  border: 1px solid #d7d7d7;
-  border-color: #003f75;
-}
-.tg1{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #003f75}
-.tg2{font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #003f75}
-.tg3{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:8pt;color: #003f75}
- 
-&lt;/style&gt;
-&lt;/head&gt;
-&lt;body style="margin: 0"&gt;
- 
-&lt;table class="box1"&gt;
-&lt;colgroup&gt;
-&lt;col &gt;
-&lt;col &gt;
-&lt;/colgroup&gt;
-&lt;tr&gt;
-  &lt;td colspan="2"&gt;  
-    &lt;div class="tg3" style ="margin-bottom: 3px"&gt;Документ подписан&lt;br&gt;электронной подписью в DirectumRX&lt;/div&gt;
-  &lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;td class="tg2"&gt;Владелец&lt;/td&gt;
-  &lt;td class="tg1"&gt;{SignatoryFullName}&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;td class="tg2"&gt;Сертификат&lt;/td&gt;
-  &lt;td class="tg2"&gt;{Thumbprint}&lt;/td&gt;
-&lt;/tr&gt;
-&lt;tr&gt;
-  &lt;td class="tg2"&gt;Действителен&lt;/td&gt;
-  &lt;td class="tg2"&gt;{Validity}&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/table&gt;
-&lt;/body&gt;
-&lt;/html&gt;</value>
-  </data>
 </root>
