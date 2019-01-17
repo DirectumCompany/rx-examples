@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<DevelopmentPackageInfo xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <PackageModules>
+    <PackageModuleItem>
+      <Id>15234f2e-0858-4733-a9cb-eaa6ed2b2a5e</Id>
+      <Name>Sungero.Examples</Name>
+      <Version>0.0.1.0</Version>
+      <IncludeAssemblies>true</IncludeAssemblies>
+      <IncludeSources>true</IncludeSources>
+      <IsSolution>true</IsSolution>
+      <IsPreviousLayerModule>true</IsPreviousLayerModule>
+    </PackageModuleItem>
+  </PackageModules>
+</DevelopmentPackageInfo>
