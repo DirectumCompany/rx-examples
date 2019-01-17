@@ -156,6 +156,14 @@
   &lt;td class="tg2"&gt;Действителен&lt;/td&gt;
   &lt;td class="tg2"&gt;{Validity}&lt;/td&gt;
 &lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class="tg2"&gt;Дата подписи&lt;/td&gt;
+  &lt;td class="tg2"&gt;{SignDate}&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td class="tg2"&gt;Время подписи&lt;/td&gt;
+  &lt;td class="tg2"&gt;{SignTime}&lt;/td&gt;
+&lt;/tr&gt;
 &lt;/table&gt;
 &lt;/body&gt;
 &lt;/html&gt;</value>
