@@ -23,10 +23,22 @@
     }
   },
   "DesktopViews": [],
+  "ExplorerTreeOrder": [
+    {
+      "ItemId": "898d40b5-d515-4f4e-96c6-3f08ee2c209b"
+    }
+  ],
   "IconResourcesKeys": [],
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Examples",
+  "Libraries": [
+    {
+      "NameGuid": "b8f9f512-a1be-437a-8c2b-cce18f2b3981",
+      "Name": "Aspose",
+      "Scope": "Both"
+    }
+  ],
   "OrderedSpecialFolders": [],
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",

@@ -23,7 +23,6 @@ namespace Sungero.Examples.Module.Docflow.Server
       #warning Заглушка, убрать в процессе реализации отметки для ПЭП.
       if (signature.SignCertificate == null)
         throw new Exception("Отсутствует сертификат");
-      
       var certificateSubject = this.GetCertificateSubject(signature);      
       var signatoryName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
       if (string.IsNullOrEmpty(signatoryName))
