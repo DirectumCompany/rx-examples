@@ -12,11 +12,11 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// Получить отметку о подписании документа.
     /// </summary>
     /// <returns>Строка в формате html.</returns>
-    public override string GetSignatureMark(Sungero.Docflow.IOfficialDocument document, int versionId)
+    public override string GetSignatureMarkAsHtml(Sungero.Docflow.IOfficialDocument document, int versionId)
     {
       string html = Resources.HtmlStampTemplateCustom;
       
-      var signature = Sungero.Docflow.PublicFunctions.OfficialDocument.GetSignatureForStamp(document, versionId);
+      var signature = Sungero.Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(document, versionId);
       if (signature == null)
         throw new Exception(Sungero.Docflow.OfficialDocuments.Resources.LastVersionNotApproved);
       
