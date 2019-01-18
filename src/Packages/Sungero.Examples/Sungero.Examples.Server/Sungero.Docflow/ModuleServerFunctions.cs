@@ -24,10 +24,10 @@ namespace Sungero.Examples.Module.Docflow.Server
       if (signature.SignCertificate == null)
         throw new Exception("Отсутствует сертификат");
       
-      var signatureInfo = this.ParseSignatureSubject(signature);      
-      var signatoryName = string.Format("{0} {1}", signatureInfo.Surname, signatureInfo.GivenName).Trim();
+      var certificateSubject = this.GetCertificateSubject(signature);      
+      var signatoryName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
       if (string.IsNullOrEmpty(signatoryName))
-        signatoryName = signatureInfo.CounterpartyName;
+        signatoryName = certificateSubject.CounterpartyName;
       
       html = html.Replace("{SignatoryFullName}", signatoryName);
       html = html.Replace("{Thumbprint}", signature.SignCertificate.Thumbprint.ToLower());
