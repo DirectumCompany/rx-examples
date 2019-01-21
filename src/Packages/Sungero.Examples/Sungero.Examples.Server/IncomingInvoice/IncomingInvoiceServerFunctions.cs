@@ -40,8 +40,7 @@ namespace Sungero.Examples.Server
                                                       Company.Resources.To,
                                                       signature.SignCertificate.NotAfter.Value.ToShortDateString())
                          );
-      html = html.Replace("{SignDate}", signature.SigningDate.ToString("d"));
-      html = html.Replace("{SignTime}", signature.SigningDate.ToString("t"));
+      html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
       
       return html;
     }
