@@ -31,7 +31,7 @@ namespace Sungero.Examples.Server
           var extension = version.BodyAssociatedApplication.Extension;
           var pdfDocument = pdfConverter.GeneratePdfDocument(inputStream, extension);
           var htmlStampString = signatureMark;
-          var pdfStamp = pdfConverter.CreatePageStampFromHtmlString(htmlStampString);
+          var pdfStamp = pdfConverter.CreatePageMarkFromHtmlString(htmlStampString);
           pdfStamp.XIndent = 5;
           pdfStamp.YIndent = pdfDocument.Pages[1].Rect.Height - pdfStamp.PdfPage.PageInfo.Height - 5;
           var pages = new int[] {pdfDocument.Pages.Count};
