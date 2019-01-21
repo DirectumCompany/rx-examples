@@ -13,7 +13,7 @@ namespace Sungero.Examples.Server
     /// Получить отметку о подписании документа.
     /// </summary>
     /// <returns>Строка в формате html.</returns>
-    public override string GetSignatureMark(int versionId)
+    public override string GetSignatureMarkAsHtml(int versionId)
     {
       return Examples.IncomingInvoices.Resources.HtmlStampTemplate;
     }
