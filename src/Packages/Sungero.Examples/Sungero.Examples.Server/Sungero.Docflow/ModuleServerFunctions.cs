@@ -9,9 +9,12 @@ namespace Sungero.Examples.Module.Docflow.Server
   partial class ModuleFunctions
   {
     /// <summary>
-    /// Получить отметку о подписании документа.
+    /// Получить отметку об ЭП.
     /// </summary>
-    /// <returns>Строка в формате html.</returns>
+    /// <returns>Изображение отметки об ЭП в виде html.</returns>
+    /// <remarks>
+    /// В отметку об ЭП добавлены логотип, дата и время подписания, цвет отметки изменён на фиолетовый.
+    /// </remarks>
     public override string GetSignatureMarkAsHtml(Sungero.Docflow.IOfficialDocument document, int versionId)
     {
       string html = Resources.HtmlStampTemplateCustom;
