@@ -117,4 +117,14 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="Action_ConvertToPdf" xml:space="preserve">
+    <value>Создать PDF с отметкой об оплате</value>
+  </data>
+  <data name="Action_ConvertToPdfHint" xml:space="preserve">
+    <value>Преобразовать документ в формат PDF с отметкой об оплате</value>
+  </data>
+  <data name="Action_ConvertToPdfDescription" xml:space="preserve">
+    <value>Преобразование документа в формат PDF с отметкой о том, что документ принят к оплате.
+После преобразования документа оригинал доступен по действию "Открыть оригинал" на вкладке "Версии".</value>
+  </data>
 </root>
