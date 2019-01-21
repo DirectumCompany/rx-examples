@@ -10,7 +10,7 @@ namespace Sungero.Examples.Server
   partial class IncomingInvoiceFunctions
   {
     /// <summary>
-    /// Получить отметку о подписании документа.
+    /// Получить отметку "Принят к оплате".
     /// </summary>
     /// <returns>Строка в формате html.</returns>
     public override string GetSignatureMarkAsHtml(int versionId)
