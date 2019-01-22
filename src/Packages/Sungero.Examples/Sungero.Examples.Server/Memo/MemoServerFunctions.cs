@@ -9,6 +9,13 @@ namespace Sungero.Examples.Server
 {
   partial class MemoFunctions
   {
+  	/// <summary>
+    /// Поставить отметку об ЭП.
+    /// </summary>
+    /// <remarks>
+    /// Для служебной записки отметка ставится в верхнем левом углу последней страницы.
+	/// Отметка состоит из всех утверждающих подписей документа.    
+    /// </remarks>
 	public override Sungero.Docflow.Structures.OfficialDocument.GeneratePublicBodyInfo GeneratePublicBodyWithSignatureMark(int versionId, string signatureMark)
 	{	 		
       var info = Docflow.Structures.OfficialDocument.GeneratePublicBodyInfo.Create();
