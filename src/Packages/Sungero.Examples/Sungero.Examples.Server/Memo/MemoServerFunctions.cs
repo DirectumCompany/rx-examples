@@ -29,15 +29,16 @@ namespace Sungero.Examples.Server
         {
           var pdfConverter = new AsposeExtensions.Converter();
           var extension = version.BodyAssociatedApplication.Extension;
+          // Конвертация в pdf документ. 
           var pdfDocument = pdfConverter.GeneratePdfDocument(inputStream, extension);
           var htmlStampString = signatureMark;
+          // Создание штампа в левом верхнем углу последней страницы.
           var pdfStamp = pdfConverter.CreatePageMarkFromHtmlString(htmlStampString);
+          // Координаты отсчитываются от левого нижнего угла.
           pdfStamp.XIndent = 5;
           pdfStamp.YIndent = pdfDocument.Pages[1].Rect.Height - pdfStamp.PdfPage.PageInfo.Height - 5;
           var pages = new int[] {pdfDocument.Pages.Count};
           var doc = pdfConverter.AddStampToDocument(pdfDocument, pdfStamp, pages);
-          pdfStamp.YIndent = pdfDocument.Pages[1].Rect.Height - 2*pdfStamp.PdfPage.PageInfo.Height - 5;          
-          doc = pdfConverter.AddStampToDocument(doc, pdfStamp, pages);
           doc.Save(pdfDocumentStream);
           }
         catch (Exception e)
@@ -82,5 +83,54 @@ namespace Sungero.Examples.Server
       
       return info;
 	}
+	
+	/// <summary>
+    /// Получить отметку об ЭП.
+    /// </summary>
+    /// <returns>Изображение отметки об ЭП в виде html.</returns>
+    /// <remarks>Отметка собирается из всех подписей документа</remarks>
+    public override string GetSignatureMarkAsHtml(int versionId)
+    {    	
+    	//Получение всех утверждающих подписей документа в порядке убывания.    	
+    	var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
+    	if (version == null)
+    		return null;    	
+    	var versionSignatures = Signatures.Get(version)
+    		.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval);
+    	if (!versionSignatures.Any())
+    		return null;
+    	var signatures = versionSignatures.OrderByDescending(x => x.SigningDate);
+    	
+    	// На основании каждой подписи создается html таблица с данными о подписи. 
+    	var htmlTablesList = new List<string>();
+    	foreach(var signature in signatures)
+    	{
+    		if (signature.SignCertificate == null)
+    			continue;
+    		var certificateSubject = Docflow.PublicFunctions.Module.GetCertificateSubject(signature);
+    		var signatoryName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
+    		if (string.IsNullOrEmpty(signatoryName))
+    			signatoryName = certificateSubject.CounterpartyName;
+    		
+    		string htmlTable = Sungero.Examples.Memos.Resources.HtmlMarkTable;
+    		htmlTable = htmlTable.Replace("{SignatoryFullName}", signatoryName);
+    		htmlTable = htmlTable.Replace("{Thumbprint}", signature.SignCertificate.Thumbprint.ToLower());
+    		htmlTable = htmlTable.Replace("{Validity}", string.Format("{0} {1} {2} {3}",
+    		                                                Company.Resources.From,
+    		                                                signature.SignCertificate.NotBefore.Value.ToShortDateString(),
+    		                                                Company.Resources.To,
+    		                                                signature.SignCertificate.NotAfter.Value.ToShortDateString())
+    		                   );
+    		htmlTablesList.Add(htmlTable);
+    		
+    	}
+    	
+    	// Компановка html таблиц в единый html документ
+    	var htmlTables = string.Join(Environment.NewLine, htmlTablesList);
+    	string htmlBody = Sungero.Examples.Memos.Resources.HtmlMarkBody;    	
+    	var htmlResult = htmlBody.Replace("{content}", htmlTables);
+    	return htmlResult;
+    }
+	       
   }
 }

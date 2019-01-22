@@ -45,7 +45,10 @@
     }
   ],
   "PublicStructures": [],
-  "ResourcesKeys": [],
+  "ResourcesKeys": [
+    "HtmlMarkTable",
+    "HtmlMarkBody"
+  ],
   "RibbonCardMetadata": {
     "NameGuid": "1e92fa93-31c6-4a1a-8298-b04262e1e9d3",
     "Name": "RibbonCard",
