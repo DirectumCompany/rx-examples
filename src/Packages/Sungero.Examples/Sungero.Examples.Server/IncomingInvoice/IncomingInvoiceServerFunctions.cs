@@ -13,9 +13,10 @@ namespace Sungero.Examples.Server
     /// Получить отметку об ЭП.
     /// </summary>
     /// <returns>Изображение отметки об ЭП в виде html.</returns>
-    /// <remarks>
-    /// В отметку об ЭП добавлены логотип, дата и время подписания, цвет отметки изменён на красный, текст изменен на "Принят к оплате".
-    /// </remarks>
+    /// <description>
+    /// Пример перекрытия логики наложения отметки об ЭП для входящего счета.
+    /// В отметку об ЭП добавлены логотип, дата и время подписания, цвет отметки изменён на красный, текст изменен на "ПРИНЯТ К ОПЛАТЕ".
+    /// </description>
     public override string GetSignatureMarkAsHtml(int versionId)
     {
       string html = Examples.IncomingInvoices.Resources.HtmlStampTemplateCustom;
