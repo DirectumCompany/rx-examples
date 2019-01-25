@@ -19,7 +19,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// Также в отметку добавлены дата и время подписания.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
-    public virtual string GetSignatureMarkForSignatureAsHtml(Sungero.Domain.Shared.ISignature signature)
+    public override string GetSignatureMarkForSignatureAsHtml(Sungero.Domain.Shared.ISignature signature)
     {
       if (signature == null)
         return string.Empty;
@@ -45,7 +45,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// Также в отметку добавлены дата и время подписания.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
-    public virtual string GetSignatureMarkForCertificateAsHtml(Sungero.Domain.Shared.ISignature signature)
+    public override string GetSignatureMarkForCertificateAsHtml(Sungero.Domain.Shared.ISignature signature)
     {
       if (signature == null)
         return string.Empty;
