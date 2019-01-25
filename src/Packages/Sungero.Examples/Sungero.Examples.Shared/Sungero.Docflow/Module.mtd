@@ -44,7 +44,8 @@
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Docflow",
   "ResourcesKeys": [
-    "HtmlStampTemplateCustom"
+    "HtmlStampTemplateForCertificateCustom",
+    "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
   "Version": "3.1.2.0",

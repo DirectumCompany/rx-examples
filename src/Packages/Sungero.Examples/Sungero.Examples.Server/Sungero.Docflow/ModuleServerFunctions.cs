@@ -9,39 +9,67 @@ namespace Sungero.Examples.Module.Docflow.Server
   partial class ModuleFunctions
   {
     /// <summary>
-    /// Получить отметку об ЭП.
+    /// Получить отметку об ЭП для подписи.
     /// </summary>
-    /// <returns>Изображение отметки об ЭП в виде html.</returns>
+    /// <param name="signature">Подпись.</param>
+    /// <returns>Изображение отметки об ЭП для подписи в виде html.</returns>
     /// <description>
-    /// Пример перекрытия логики наложения отметки об ЭП для всех документов.
-    /// В отметку об ЭП добавлены логотип, дата и время подписания, цвет отметки изменён на фиолетовый.
+    /// Пример перекрытия логики наложения отметки о ПЭП для всех документов.
+    /// В отметке о ПЭП изменёны логотип и пропорции заголовка. 
+    /// Также в отметку добавлены дата и время подписания.
+    /// Цвет отметки изменён на фиолетовый.
     /// </description>
-    public override string GetSignatureMarkAsHtml(Sungero.Docflow.IOfficialDocument document, int versionId)
+    public virtual string GetSignatureMarkForSignatureAsHtml(Sungero.Domain.Shared.ISignature signature)
     {
-      string html = Resources.HtmlStampTemplateCustom;
-      
-      var signature = Sungero.Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(document, versionId);
       if (signature == null)
-        throw new Exception(Sungero.Docflow.OfficialDocuments.Resources.LastVersionNotApproved);
+        return string.Empty;
       
-      #warning Заглушка, убрать в процессе реализации отметки для ПЭП.
-      if (signature.SignCertificate == null)
-        throw new Exception("Отсутствует сертификат");
-      var certificateSubject = this.GetCertificateSubject(signature);      
-      var signatoryName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
-      if (string.IsNullOrEmpty(signatoryName))
-        signatoryName = certificateSubject.CounterpartyName;
+      var signatoryFullName = signature.SignatoryFullName;
+      var signatoryId = signature.Signatory.Id;
       
-      html = html.Replace("{SignatoryFullName}", signatoryName);
-      html = html.Replace("{Thumbprint}", signature.SignCertificate.Thumbprint.ToLower());
-      html = html.Replace("{Validity}", string.Format("{0} {1} {2} {3}",
-                                                      Company.Resources.From,
-                                                      signature.SignCertificate.NotBefore.Value.ToShortDateString(),
-                                                      Company.Resources.To,
-                                                      signature.SignCertificate.NotAfter.Value.ToShortDateString())
-                         );
+      string html = Resources.HtmlStampTemplateForSignatureCustom;
+      html = html.Replace("{SignatoryFullName}", signatoryFullName);
+      html = html.Replace("{SignatoryId}", signatoryId.ToString());
       html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      return html;
+    }
+    
+    /// <summary>
+    /// Получить отметку об ЭП для сертификата из подписи.
+    /// </summary>
+    /// <param name="signature">Подпись.</param>
+    /// <returns>Изображение отметки об ЭП для сертификата в виде html.</returns>
+    /// <description>
+    /// Пример перекрытия логики наложения отметки о КЭП для всех документов.
+    /// В отметке о КЭП изменёны логотип и пропорции заголовка. 
+    /// Также в отметку добавлены дата и время подписания.
+    /// Цвет отметки изменён на фиолетовый.
+    /// </description>
+    public virtual string GetSignatureMarkForCertificateAsHtml(Sungero.Domain.Shared.ISignature signature)
+    {
+      if (signature == null)
+        return string.Empty;
       
+      var certificate = signature.SignCertificate;
+      if (certificate == null)
+        return string.Empty;
+      
+      var certificateSubject = this.GetCertificateSubject(signature);
+      
+      var signatoryFullName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
+      if (string.IsNullOrEmpty(signatoryFullName))
+        signatoryFullName = certificateSubject.CounterpartyName;
+      
+      string html = Resources.HtmlStampTemplateForCertificateCustom;
+      html = html.Replace("{SignatoryFullName}", signatoryFullName);
+      html = html.Replace("{Thumbprint}", certificate.Thumbprint.ToLower());
+      var validity = string.Format("{0} {1} {2} {3}",
+                                   Company.Resources.From,
+                                   certificate.NotBefore.Value.ToShortDateString(),
+                                   Company.Resources.To,
+                                   certificate.NotAfter.Value.ToShortDateString());
+      html = html.Replace("{Validity}", validity);
+      html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
       return html;
     }
   }
