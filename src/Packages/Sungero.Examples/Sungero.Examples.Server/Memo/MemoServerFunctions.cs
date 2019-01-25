@@ -16,9 +16,9 @@ namespace Sungero.Examples.Server
     /// Для служебной записки отметка ставится в верхнем левом углу последней страницы.
 	/// Отметка состоит из всех утверждающих подписей документа.    
     /// </remarks>
-	public override Sungero.Docflow.Structures.OfficialDocument.GeneratePublicBodyInfo GeneratePublicBodyWithSignatureMark(int versionId, string signatureMark)
+	public override Sungero.Docflow.Structures.OfficialDocument.СonversionToPdfResult GeneratePublicBodyWithSignatureMark(int versionId, string signatureMark)
 	{	 		
-      var info = Docflow.Structures.OfficialDocument.GeneratePublicBodyInfo.Create();
+      var info = Docflow.Structures.OfficialDocument.СonversionToPdfResult.Create();
       info.HasErrors = true;
       var version = _obj.Versions.SingleOrDefault(v => v.Id == versionId);
       if (version == null)
