@@ -72,5 +72,20 @@ namespace Sungero.Examples.Module.Docflow.Server
       html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
       return html;
     }
+    
+    /// <summary>
+    /// Перекрытие. Все jpg изображения > 1мб обрабатываются интерактивно.
+    /// </summary>
+    public override bool CanConvertToPdfInteractively(Sungero.Docflow.IOfficialDocument document)
+    {
+    	var jpgFormatsList = new List<string>() { "jpg", "jpeg"};
+    	if (jpgFormatsList.Contains(document.LastVersion.Body.DataType.ToLower()))
+    	{
+    		return document.LastVersion.Body.Size < Sungero.Docflow.Constants.OfficialDocument.MaxBodySizeForInteractiveConvertation &&
+        (Locks.GetLockInfo(document).IsLockedByMe || !Locks.GetLockInfo(document).IsLocked);
+    	}    	
+    	return base.CanConvertToPdfInteractively(document);   
+    }
+    
   }
 }
