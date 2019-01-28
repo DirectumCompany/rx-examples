@@ -46,8 +46,9 @@
   ],
   "PublicStructures": [],
   "ResourcesKeys": [
-    "HtmlMarkTable",
-    "HtmlMarkBody"
+    "HtmlMarkForCertificateTable",
+    "HtmlMarkBody",
+    "HtmlMarkTable"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "1e92fa93-31c6-4a1a-8298-b04262e1e9d3",

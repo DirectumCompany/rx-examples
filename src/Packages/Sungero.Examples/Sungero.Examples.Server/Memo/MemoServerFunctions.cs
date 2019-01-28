@@ -90,36 +90,42 @@ namespace Sungero.Examples.Server
       
       return info;
 	}
-	
-	/// <summary>
-    /// Получить отметку об ЭП.
-    /// </summary>
-    /// <returns>Изображение отметки об ЭП в виде html.</returns>
-    /// <remarks>Отметка собирается из всех подписей документа</remarks>
-    public override string GetSignatureMarkAsHtml(int versionId)
-    {    	
-    	//Получение всех утверждающих подписей документа в порядке убывания.    	
+	  
+	 public override string GetSignatureMarkAsHtml(int versionId)
+    {
+	 		//Получение всех утверждающих подписей документа в порядке убывания.    	
     	var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
     	if (version == null)
     		return null;    	
     	var versionSignatures = Signatures.Get(version)
     		.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval);
     	if (!versionSignatures.Any())
-    		return null;
-    	var signatures = versionSignatures.OrderByDescending(x => x.SigningDate);
+    		throw new Exception(Sungero.Docflow.OfficialDocuments.Resources.LastVersionNotApproved);
+    	var versionSignaturesWithCertificate = versionSignatures.Where(s => s.SignCertificate != null);
+    	if (versionSignaturesWithCertificate.Any())
+    		return GetSignatureMarkForCertificateAsHtml(versionSignaturesWithCertificate);
     	
+	 		return this.GetSignatureMarkForSignatureAsHtml(versionSignatures);
+	 	 	            
+    }
+	
+	/// <summary>
+    /// Получить отметку об ЭП.
+    /// </summary>
+    /// <returns>Изображение отметки об ЭП в виде html.</returns>
+    /// <remarks>Отметка собирается из всех подписей документа</remarks>
+    public string GetSignatureMarkForCertificateAsHtml(System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> versionSignatures)
+    {    	    	    	
     	// На основании каждой подписи создается html таблица с данными о подписи. 
     	var htmlTablesList = new List<string>();
-    	foreach(var signature in signatures)
+    	foreach(var signature in versionSignatures)
     	{
-    		if (signature.SignCertificate == null)
-    			continue;
     		var certificateSubject = Docflow.PublicFunctions.Module.GetCertificateSubject(signature);
     		var signatoryName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
     		if (string.IsNullOrEmpty(signatoryName))
     			signatoryName = certificateSubject.CounterpartyName;
     		
-    		string htmlTable = Sungero.Examples.Memos.Resources.HtmlMarkTable;
+    		string htmlTable = Sungero.Examples.Memos.Resources.HtmlMarkForCertificateTable;
     		htmlTable = htmlTable.Replace("{SignatoryFullName}", signatoryName);
     		htmlTable = htmlTable.Replace("{Thumbprint}", signature.SignCertificate.Thumbprint.ToLower());
     		htmlTable = htmlTable.Replace("{Validity}", string.Format("{0} {1} {2} {3}",
@@ -138,6 +144,35 @@ namespace Sungero.Examples.Server
     	var htmlResult = htmlBody.Replace("{content}", htmlTables);
     	return htmlResult;
     }
-	       
+	  
+		/// <summary>
+    /// Получить отметку об ЭП для подписи.
+    /// </summary>
+    /// <param name="signature">Подпись.</param>
+    /// <returns>Изображение отметки об ЭП для подписи в виде html.</returns>
+    public string GetSignatureMarkForSignatureAsHtml(System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> versionSignatures)
+    {
+    	// На основании каждой подписи создается html таблица с данными о подписи. 
+    	var htmlTablesList = new List<string>();
+    	foreach(var signature in versionSignatures)
+    	{    	
+    		var signatoryFullName = signature.SignatoryFullName;
+      	var signatoryId = signature.Signatory.Id;
+    		
+      	string htmlTable = Sungero.Examples.Memos.Resources.HtmlMarkTable;
+      	htmlTable = htmlTable.Replace("{SignatoryFullName}", signatoryFullName);
+      	htmlTable = htmlTable.Replace("{SignatoryId}", signatoryId.ToString());
+      	   		
+    		htmlTablesList.Add(htmlTable);
+    		
+    	}
+    	
+    	// Компановка html таблиц в единый html документ
+    	var htmlTables = string.Join(Environment.NewLine, htmlTablesList);
+    	string htmlBody = Sungero.Examples.Memos.Resources.HtmlMarkBody;    	
+    	var htmlResult = htmlBody.Replace("{content}", htmlTables);
+    	return htmlResult;   	
+    }
+    
   }
 }

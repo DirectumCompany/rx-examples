@@ -117,7 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="HtmlMarkTable" xml:space="preserve">
+  <data name="HtmlMarkForCertificateTable" xml:space="preserve">
     <value>&lt;table class="box1"&gt;
 &lt;colgroup&gt;
 &lt;col &gt;
@@ -160,5 +160,28 @@
 {content}
 &lt;/body&gt;
 &lt;/html&gt;</value>
+  </data>
+  <data name="HtmlMarkTable" xml:space="preserve">
+    <value>&lt;table class="box1"&gt;
+&lt;colgroup&gt;
+&lt;col &gt;
+&lt;col &gt;
+&lt;/colgroup&gt;
+&lt;tr&gt;
+  &lt;td colspan="2"&gt;  
+    &lt;div class="tg3" style ="margin-bottom: 3px"&gt;Документ подписан&lt;br&gt;электронной подписью в DirectumRX&lt;/div&gt;
+  &lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td colspan="2"&gt;
+    &lt;span class="tg1"&gt;Подписал &lt;b&gt;{SignatoryFullName}&lt;/b&gt;&lt;/span&gt;
+  &lt;/td&gt;  
+&lt;/tr&gt;
+&lt;tr&gt;
+  &lt;td colspan="2"&gt;
+    &lt;span class="tg1"&gt;Идентификатор пользователя {SignatoryId}&lt;/span&gt;
+  &lt;/td&gt;
+&lt;/tr&gt;
+&lt;/table&gt;</value>
   </data>
 </root>
