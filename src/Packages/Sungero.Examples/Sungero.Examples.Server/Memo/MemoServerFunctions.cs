@@ -20,7 +20,7 @@ namespace Sungero.Examples.Server
 			var versionSignatures = Signatures.Get(version)
 				.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval)
 				.GroupBy(s => s.Signatory).Select(s => s.OrderBy(d => d.SigningDate).FirstOrDefault());
-			return versionSignatures;	
+			return versionSignatures;
 		}
 		
 		/// <summary>
@@ -32,10 +32,10 @@ namespace Sungero.Examples.Server
 		{
 			var signatures = GetDocumentSignatures(versionId);
 			var htmlStamps = new List<string>();
-			var htmlStamp = string.Empty;			
+			var htmlStamp = string.Empty;
 			foreach (var signature in signatures)
 			{
-				if (signature.SignCertificate != null)										
+				if (signature.SignCertificate != null)
 					htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature);
 				else
 					htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSignatureAsHtml(signature);
@@ -67,19 +67,22 @@ namespace Sungero.Examples.Server
 					var extension = version.BodyAssociatedApplication.Extension;
 					// Конвертация в pdf документ.
 					var pdfDocument = pdfConverter.GeneratePdfDocument(inputStream, extension);
+					// Координаты отсчитываются от нижнего левого угла.
 					var xCoord = 5;
 					var yCoord = pdfDocument.Pages[1].Rect.Height - 5;
 					var htmlStamps = this.GetDocumentHtmlStamps(versionId);
+					// Отметка об эп проставляется только на первой странице.
 					var pages = new int[] {1};
 					foreach (var htmlStamp in htmlStamps)
 					{
 						var pdfStamp = pdfConverter.CreateMarkFromHtml(htmlStamp);
 						pdfStamp.XIndent = xCoord;
-						pdfStamp.YIndent = yCoord - pdfStamp.PdfPage.PageInfo.Height;						
+						// Отступ сверху на высоты штампа.
+						pdfStamp.YIndent = yCoord - pdfStamp.PdfPage.PageInfo.Height;
 						pdfConverter.AddStampToDocument(pdfDocument, pdfStamp, pages);
-						yCoord = yCoord - pdfStamp.PdfPage.PageInfo.Height - 5;						
+						yCoord = yCoord - pdfStamp.PdfPage.PageInfo.Height - 5;
 					}
-					pdfDocument.Save(pdfDocumentStream);				
+					pdfDocument.Save(pdfDocumentStream);
 				}
 				catch (Exception e)
 				{
@@ -121,8 +124,8 @@ namespace Sungero.Examples.Server
 				info.ErrorMessage = e.Message;
 			}
 			
-			return info;			
+			return info;
 		}
-				
+		
 	}
 }
