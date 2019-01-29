@@ -9,7 +9,11 @@ namespace Sungero.Examples.Server
 {
 	partial class MemoFunctions
 	{
-		
+		/// <summary>
+		/// Получить список всех подписей документа.
+		/// </summary>
+		/// <param name="versionId">Ид версии документа.</param>
+		/// <returns>Коллекция подписей документа.</returns>
 		public System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> GetDocumentSignatures(int versionId)
 		{
 			var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
@@ -19,6 +23,11 @@ namespace Sungero.Examples.Server
 			return versionSignatures;	
 		}
 		
+		/// <summary>
+		/// Получить список отметок об ЭП в формате хтмл.
+		/// </summary>
+		/// <param name="versionId">Ид версии документа.</param>
+		/// <returns>Список отметок об ЭП</returns>
 		public List<string> GetDocumentHtmlStamps(int versionId)
 		{
 			var signatures = GetDocumentSignatures(versionId);
@@ -112,8 +121,7 @@ namespace Sungero.Examples.Server
 				info.ErrorMessage = e.Message;
 			}
 			
-			return info;
-			
+			return info;			
 		}
 				
 	}
