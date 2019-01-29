@@ -14,7 +14,8 @@ namespace Sungero.Examples.Server
 		{
 			var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
 			var versionSignatures = Signatures.Get(version)
-				.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval);
+				.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval)
+				.GroupBy(s => s.Signatory).Select(s => s.OrderBy(d => d.SigningDate).FirstOrDefault());
 			return versionSignatures;	
 		}
 		
