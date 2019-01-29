@@ -9,14 +9,33 @@ namespace Sungero.Examples.Server
 {
 	partial class MemoFunctions
 	{
-		/// <summary>
-		/// Поставить отметку об ЭП.
-		/// </summary>
-		/// <remarks>
-		/// Для служебной записки отметка ставится в верхнем левом углу последней страницы.
-		/// Отметка состоит из всех утверждающих подписей документа.
-		/// </remarks>
-		public override Sungero.Docflow.Structures.OfficialDocument.СonversionToPdfResult GeneratePublicBodyWithSignatureMark(int versionId, string signatureMark)
+		
+		public System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> GetDocumentSignatures(int versionId)
+		{
+			var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
+			var versionSignatures = Signatures.Get(version)
+				.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval);
+			return versionSignatures;	
+		}
+		
+		public List<string> GetDocumentHtmlStamps(int versionId)
+		{
+			var signatures = GetDocumentSignatures(versionId);
+			var htmlStamps = new List<string>();
+			var htmlStamp = string.Empty;			
+			foreach (var signature in signatures)
+			{
+				if (signature.SignCertificate != null)										
+					htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature);
+				else
+					htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSignatureAsHtml(signature);
+				htmlStamps.Add(htmlStamp);
+			}
+			
+			return htmlStamps;
+		}
+		
+		public override Sungero.Docflow.Structures.OfficialDocument.СonversionToPdfResult ConvertToPdfAndAddSignatureMark(int versionId)
 		{
 			var info = Docflow.Structures.OfficialDocument.СonversionToPdfResult.Create();
 			info.HasErrors = true;
@@ -38,15 +57,19 @@ namespace Sungero.Examples.Server
 					var extension = version.BodyAssociatedApplication.Extension;
 					// Конвертация в pdf документ.
 					var pdfDocument = pdfConverter.GeneratePdfDocument(inputStream, extension);
-					var htmlStampString = signatureMark;
-					// Создание штампа в левом верхнем углу последней страницы.
-					var pdfStamp = pdfConverter.CreateMarkFromHtml(htmlStampString);
-					// Координаты отсчитываются от левого нижнего угла.
-					pdfStamp.XIndent = 5;
-					pdfStamp.YIndent = pdfDocument.Pages[1].Rect.Height - pdfStamp.PdfPage.PageInfo.Height - 5;
-					var pages = new int[] {pdfDocument.Pages.Count};
-					var doc = pdfConverter.AddStampToDocument(pdfDocument, pdfStamp, pages);
-					doc.Save(pdfDocumentStream);
+					var xCoord = 5;
+					var yCoord = pdfDocument.Pages[1].Rect.Height - 5;
+					var htmlStamps = this.GetDocumentHtmlStamps(versionId);
+					var pages = new int[] {1};
+					foreach (var htmlStamp in htmlStamps)
+					{
+						var pdfStamp = pdfConverter.CreateMarkFromHtml(htmlStamp);
+						pdfStamp.XIndent = xCoord;
+						pdfStamp.YIndent = yCoord - pdfStamp.PdfPage.PageInfo.Height;						
+						pdfConverter.AddStampToDocument(pdfDocument, pdfStamp, pages);
+						yCoord = yCoord - pdfStamp.PdfPage.PageInfo.Height - 5;						
+					}
+					pdfDocument.Save(pdfDocumentStream);				
 				}
 				catch (Exception e)
 				{
@@ -89,90 +112,8 @@ namespace Sungero.Examples.Server
 			}
 			
 			return info;
-		}
-		
-		/// <summary>
-		/// Получить отметку об ЭП.
-		/// </summary>
-		/// <returns>Изображение отметки об ЭП в виде html.</returns>
-		public override string GetSignatureMarkAsHtml(int versionId)
-		{
-			//Получение всех утверждающих подписей документа в порядке убывания.
-			var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
-			if (version == null)
-				return null;
-			var versionSignatures = Signatures.Get(version)
-				.Where(s => s.IsExternal != true && s.SignatureType == SignatureType.Approval);
-			if (!versionSignatures.Any())
-				throw new Exception(Sungero.Docflow.OfficialDocuments.Resources.LastVersionNotApproved);
-			var versionSignaturesWithCertificate = versionSignatures.Where(s => s.SignCertificate != null);
-			if (versionSignaturesWithCertificate.Any())
-				return GetSignatureMarkForCertificateAsHtml(versionSignaturesWithCertificate);
-			
-			return this.GetSignatureMarkForSignatureAsHtml(versionSignatures);
 			
 		}
-		
-		/// <summary>
-		/// Получить отметку об ЭП для документов подписаных КЭП.
-		/// </summary>
-		/// <returns>Изображение отметки об ЭП в виде html.</returns>
-		public string GetSignatureMarkForCertificateAsHtml(System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> versionSignatures)
-		{
-			// На основании каждой подписи создается html таблица с данными о подписи.
-			var htmlTablesList = new List<string>();
-			foreach(var signature in versionSignatures)
-			{
-				var certificateSubject = Docflow.PublicFunctions.Module.GetCertificateSubject(signature);
-				var signatoryName = string.Format("{0} {1}", certificateSubject.Surname, certificateSubject.GivenName).Trim();
-				if (string.IsNullOrEmpty(signatoryName))
-					signatoryName = certificateSubject.CounterpartyName;
 				
-				string htmlTable = Sungero.Examples.Memos.Resources.HtmlMarkForCertificateTable;
-				htmlTable = htmlTable.Replace("{SignatoryFullName}", signatoryName);
-				htmlTable = htmlTable.Replace("{Thumbprint}", signature.SignCertificate.Thumbprint.ToLower());
-				htmlTable = htmlTable.Replace("{Validity}", string.Format("{0} {1} {2} {3}",
-				                                                          Company.Resources.From,
-				                                                          signature.SignCertificate.NotBefore.Value.ToShortDateString(),
-				                                                          Company.Resources.To,
-				                                                          signature.SignCertificate.NotAfter.Value.ToShortDateString())
-				                             );
-				htmlTablesList.Add(htmlTable);				
-			}
-			
-			// Компановка html таблиц в единый html документ
-			var htmlTables = string.Join(Environment.NewLine, htmlTablesList);
-			string htmlBody = Sungero.Examples.Memos.Resources.HtmlMarkBody;
-			var htmlResult = htmlBody.Replace("{content}", htmlTables);
-			return htmlResult;
-		}
-		
-		/// <summary>
-		/// Получить отметку об ЭП для документов подписаных ПЭП.
-		/// </summary>
-		/// <returns>Изображение отметки об ЭП в виде html.</returns>
-		public string GetSignatureMarkForSignatureAsHtml(System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> versionSignatures)
-		{
-			// На основании каждой подписи создается html таблица с данными о подписи.
-			var htmlTablesList = new List<string>();
-			foreach(var signature in versionSignatures)
-			{
-				var signatoryFullName = signature.SignatoryFullName;
-				var signatoryId = signature.Signatory.Id;
-				
-				string htmlTable = Sungero.Examples.Memos.Resources.HtmlMarkTable;
-				htmlTable = htmlTable.Replace("{SignatoryFullName}", signatoryFullName);
-				htmlTable = htmlTable.Replace("{SignatoryId}", signatoryId.ToString());
-				
-				htmlTablesList.Add(htmlTable);				
-			}
-			
-			// Компановка html таблиц в единый html документ
-			var htmlTables = string.Join(Environment.NewLine, htmlTablesList);
-			string htmlBody = Sungero.Examples.Memos.Resources.HtmlMarkBody;
-			var htmlResult = htmlBody.Replace("{content}", htmlTables);
-			return htmlResult;
-		}
-		
 	}
 }
