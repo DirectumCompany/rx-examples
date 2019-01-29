@@ -12,7 +12,6 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Получить отметку об ЭП.
     /// </summary>
-    /// <param name="document">Документ для преобразования.</param>
     /// <param name="versionId">Id версии, для генерации.</param>
     /// <returns>Изображение отметки об ЭП в виде html.</returns>
     public override string GetSignatureMarkAsHtml(int versionId)

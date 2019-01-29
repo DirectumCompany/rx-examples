@@ -28,14 +28,6 @@
       "IsAncestorMetadata": true,
       "MonthSchedule": "Monthly",
       "TimePeriod": 60
-    },
-    {
-      "NameGuid": "133f7487-283e-476c-8774-8c87f4bc892a",
-      "Name": "ConvertDocumentToPdf",
-      "Daily": "Repeat",
-      "IsAncestorMetadata": true,
-      "MonthSchedule": "Monthly",
-      "TimePeriod": 10
     }
   ],
   "LayeredFromGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
@@ -48,7 +40,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "3.1.2.0",
+  "Version": "3.1.6.1",
   "Widgets": [],
   "Versions": [
     {

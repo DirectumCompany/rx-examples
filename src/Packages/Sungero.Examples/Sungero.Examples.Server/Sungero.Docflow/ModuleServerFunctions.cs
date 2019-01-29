@@ -76,15 +76,15 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <summary>
     /// Перекрытие. Все jpg изображения > 1мб обрабатываются интерактивно.
     /// </summary>
+    /// <param name="document">Документ для преобразования.</param>
+    /// <returns>True - возможно преобразовать интерактивно, иначе - False.</returns>
     public override bool CanConvertToPdfInteractively(Sungero.Docflow.IOfficialDocument document)
     {
-    	var jpgFormatsList = new List<string>() { "jpg", "jpeg"};
-    	if (jpgFormatsList.Contains(document.LastVersion.Body.DataType.ToLower()))
-    	{
-    		return document.LastVersion.Body.Size < Sungero.Docflow.Constants.OfficialDocument.MaxBodySizeForInteractiveConvertation &&
-        (Locks.GetLockInfo(document).IsLockedByMe || !Locks.GetLockInfo(document).IsLocked);
-    	}    	
-    	return base.CanConvertToPdfInteractively(document);   
+      var jpgFormatsList = new List<string>() { "jpg", "jpeg" };
+      if (jpgFormatsList.Contains(document.LastVersion.Body.DataType.ToLower()))
+        return Locks.GetLockInfo(document).IsLockedByMe || !Locks.GetLockInfo(document).IsLocked;
+      
+      return base.CanConvertToPdfInteractively(document);
     }
     
   }
