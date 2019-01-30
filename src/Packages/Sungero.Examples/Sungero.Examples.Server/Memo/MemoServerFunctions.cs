@@ -68,8 +68,8 @@ namespace Sungero.Examples.Server
           // Конвертация в pdf документ.
           var pdfDocument = pdfConverter.GeneratePdfDocument(inputStream, extension);
           // Координаты отсчитываются от нижнего левого угла.
-          var horizontalCoord = 5;
-          var verticalCoord = pdfDocument.Pages[1].Rect.Height - 5;
+          var horizontalCoord = 312;
+          var verticalCoord = pdfDocument.Pages[1].Rect.Height - 100;
           var htmlStamps = this.GetDocumentHtmlStamps(versionId);
           // Отметка об эп проставляется только на первой странице.
           var pages = new int[] { 1 };
