@@ -38,7 +38,7 @@ namespace Sungero.Examples.Server
         if (signature.SignCertificate != null)
           htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature);
         else
-          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSignatureAsHtml(signature);
+          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSimpleSignatureAsHtml(signature);
         htmlStamps.Add(htmlStamp);
       }
       
