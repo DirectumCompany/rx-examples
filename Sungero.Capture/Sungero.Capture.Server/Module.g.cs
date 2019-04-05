@@ -69,6 +69,31 @@ namespace Sungero.Capture.Functions
 {
   internal static partial class Module
   {
+    /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
+    [global::Sungero.Core.RemoteAttribute()]
+    internal static global::Sungero.Docflow.ISimpleDocument GetSimpleDocument(global::System.Int32 documentId)
+    {
+        return global::Sungero.Capture.Server.ModuleFunctions.GetSimpleDocument(documentId);
+    }
+    /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
+    [global::Sungero.Core.RemoteAttribute()]
+    internal static global::Sungero.Docflow.ISimpleDocument CreateSimpleDocument()
+    {
+        return global::Sungero.Capture.Server.ModuleFunctions.CreateSimpleDocument();
+    }
+    /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
+    [global::Sungero.Core.RemoteAttribute()]
+    internal static void GrantRightsToDocument(global::System.Int32 documentId, global::System.Int32 responsibleId, global::System.Guid rightType)
+    {
+    global::Sungero.Capture.Server.ModuleFunctions.GrantRightsToDocument(documentId, responsibleId, rightType);
+    }
+    /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
+    [global::Sungero.Core.RemoteAttribute()]
+    internal static global::Sungero.Workflow.ISimpleTask CreateSimpleTask(global::System.String taskName, global::System.Int32 documentId, global::System.Int32 responsibleId)
+    {
+        return global::Sungero.Capture.Server.ModuleFunctions.CreateSimpleTask(taskName, documentId, responsibleId);
+    }
+
     private static object GetFunctionsContainer()
     {
       return new global::Sungero.Capture.Server.ModuleFunctions();

@@ -117,4 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="InvalidResponsibleId" xml:space="preserve">
+    <value>Сотрудник с ИД, указанным в качестве ИД ответственного за документы захвата, не найден.</value>
+  </data>
+  <data name="FileNotFound" xml:space="preserve">
+    <value>Не найден файл {0}.</value>
+  </data>
+  <data name="NoFilesInfoInPackage" xml:space="preserve">
+    <value>В метаданных пакета, сформированного DCS, нет информации о содержащихся в нём файлах.</value>
+  </data>
+  <data name="DocumentName" xml:space="preserve">
+    <value>Импортированный документ №{0}.</value>
+  </data>
+  <data name="TaskName" xml:space="preserve">
+    <value>Обработайте документ "{0}".</value>
+  </data>
+  <data name="DocumentNotFound" xml:space="preserve">
+    <value>Документ с ИД {0} не найден.</value>
+  </data>
 </root>
