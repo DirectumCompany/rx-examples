@@ -6,7 +6,7 @@
       <Name>Sungero.Examples</Name>
       <Version>0.0.1.0</Version>
       <IncludeAssemblies>true</IncludeAssemblies>
-      <IncludeSources>false</IncludeSources>
+      <IncludeSources>true</IncludeSources>
       <IsSolution>true</IsSolution>
       <IsPreviousLayerModule>false</IsPreviousLayerModule>
     </PackageModuleItem>
