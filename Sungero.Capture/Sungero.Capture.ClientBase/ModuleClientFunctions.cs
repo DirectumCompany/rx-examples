@@ -10,7 +10,7 @@ namespace Sungero.Capture.Client
   public class ModuleFunctions
   {
     /// <summary>
-    /// Создать документ на основе пакета, сформированного DCS.
+    /// Создать документ на основе пакета документов со сканера.
     /// </summary>
     /// <param name="senderLine">Наименование линии.</param>
     /// <param name="instanceInfos">Путь к xml файлу DCTS c информацией об экземплярах захвата и о захваченных файлах.</param>
@@ -26,23 +26,8 @@ namespace Sungero.Capture.Client
         return;
       }
       
-      var filesXDoc = GetXDocumentFromFile(filesInfo);
-      if (filesXDoc == null)
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return;
-      }
-      
-      // При захвате из файловой системы (со сканера) создать документ на основе единственного файла в папке.
-      var fileElement = filesXDoc.Element("InputFilesSection").Element("Files").Elements().FirstOrDefault();
-      if (fileElement == null)
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return;
-      }
-      
-      var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
-      if (!File.Exists(filePath))
+      var filePath = GetScannedPackagePaths(filesInfo, folder);
+      if (string.IsNullOrEmpty(filePath))
       {
         Logger.Error(Resources.FileNotFoundFormat(filePath));
         return;
@@ -56,7 +41,7 @@ namespace Sungero.Capture.Client
       if (task != null)
         task.Start();
     }
-        
+    
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
@@ -103,6 +88,39 @@ namespace Sungero.Capture.Client
       var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(firstDoc.Name), firstDoc.Id, int.Parse(responsibleId));
       if (task != null)
         task.Start();
+    }
+    
+    /// <summary>
+    /// Получить путь к пакету документов со сканера.
+    /// </summary>
+    /// <param name="filesInfo">Путь к xml файлу DCTS c информацией об импортируемых файлах.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <returns>Путь к пакету документов со сканера.</returns>
+    public static string GetScannedPackagePaths(string filesInfo, string folder)
+    {
+      var filesXDoc = GetXDocumentFromFile(filesInfo);
+      if (filesXDoc == null)
+      {
+        Logger.Error(Resources.NoFilesInfoInPackage);
+        return string.Empty;
+      }
+      
+      // При захвате из файловой системы (со сканера) создать документ на основе единственного файла в папке.
+      var fileElement = filesXDoc.Element("InputFilesSection").Element("Files").Elements().FirstOrDefault();
+      if (fileElement == null)
+      {
+        Logger.Error(Resources.NoFilesInfoInPackage);
+        return string.Empty;
+      }
+      
+      var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
+      if (!File.Exists(filePath))
+      {
+        Logger.Error(Resources.FileNotFoundFormat(filePath));
+        return string.Empty;
+      }
+      
+      return filePath;
     }
     
     /// <summary>

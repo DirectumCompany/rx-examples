@@ -26,6 +26,11 @@ namespace Sungero.Capture.Functions
     global::Sungero.Capture.Client.ModuleFunctions.ImportDocumentFromEmail(senderLine, instanceInfos, deviceInfo, filesInfo, folder, responsibleId);
     }
     /// <redirect project="Sungero.Capture.ClientBase" type="Sungero.Capture.Client.ModuleFunctions" />
+    internal static global::System.String GetScannedPackagePaths(global::System.String filesInfo, global::System.String folder)
+    {
+        return global::Sungero.Capture.Client.ModuleFunctions.GetScannedPackagePaths(filesInfo, folder);
+    }
+    /// <redirect project="Sungero.Capture.ClientBase" type="Sungero.Capture.Client.ModuleFunctions" />
     internal static System.Xml.Linq.XDocument GetXDocumentFromFile(global::System.String path)
     {
         return global::Sungero.Capture.Client.ModuleFunctions.GetXDocumentFromFile(path);
