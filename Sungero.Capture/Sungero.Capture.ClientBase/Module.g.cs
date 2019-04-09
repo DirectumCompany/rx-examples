@@ -35,6 +35,11 @@ namespace Sungero.Capture.Functions
     {
         return global::Sungero.Capture.Client.ModuleFunctions.GetXDocumentFromFile(path);
     }
+    /// <redirect project="Sungero.Capture.ClientBase" type="Sungero.Capture.Client.ModuleFunctions" />
+    internal static global::System.Collections.Generic.List<global::System.Int32> GetIdFromDocumentBarcode(global::System.String path)
+    {
+        return global::Sungero.Capture.Client.ModuleFunctions.GetIdFromDocumentBarcode(path);
+    }
 
     internal static class Remote
     {
@@ -100,6 +105,10 @@ namespace Sungero.Capture.Client
 {
   public partial class ModuleClientPublicFunctions : global::Sungero.Capture.Client.IModuleClientPublicFunctions
   {
+    public global::System.Collections.Generic.List<global::System.Int32> GetIdFromDocumentBarcode(global::System.String path)
+    {
+      return global::Sungero.Capture.Functions.Module.GetIdFromDocumentBarcode(path);
+    }
   }
 }
 

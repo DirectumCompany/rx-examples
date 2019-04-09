@@ -44,6 +44,18 @@
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Capture",
+  "Libraries": [
+    {
+      "NameGuid": "ea52bd43-2e5d-404b-94e0-dabc7c0353d7",
+      "Name": "BarcodeRecognition",
+      "Scope": "Both"
+    },
+    {
+      "NameGuid": "6203401f-ecd8-49ac-8cb9-18fda1f4cdfe",
+      "Name": "AsposeExtensions",
+      "Scope": "Both"
+    }
+  ],
   "PublicFunctions": [
     {
       "Name": "CreateSimpleDocument",
@@ -75,6 +87,19 @@
       "Placement": "Shared",
       "ReturnType": "global::Sungero.Workflow.ISimpleTask",
       "ReturnTypeFullName": "Sungero.Workflow.ISimpleTask, Sungero.Workflow.Interfaces"
+    },
+    {
+      "Name": "GetIdFromDocumentBarcode",
+      "Parameters": [
+        {
+          "Name": "path",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "Placement": "Client",
+      "ReturnType": "global::System.Collections.Generic.List<global::System.Int32>",
+      "ReturnTypeFullName": "System.Collections.Generic.List"
     },
     {
       "Name": "GetSimpleDocument",

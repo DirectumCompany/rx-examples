@@ -4,6 +4,8 @@ using System.IO;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
+using Directum.BarcodeRecognition;
+using Sungero.AsposeExtensions;
 
 namespace Sungero.Capture.Client
 {
@@ -134,6 +136,47 @@ namespace Sungero.Capture.Client
         return null;
       
       return System.Xml.Linq.XDocument.Load(path);
+    }
+    
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="path"></param>
+    /// <returns></returns>
+    [Public]
+    public static List<int> GetIdFromDocumentBarcode(string path)
+    {
+      var recognitionParameters = new BarcodeRecognitionParameters(false, "Code128", true, "MaxQuality", 300);
+      
+      // Чтение файла и преобразование его в pdf.
+      MemoryStream pdfDocumentStream = null;
+      var pdfConverter = new AsposeExtensions.Converter();
+      using (var fileStream = new FileStream(path, FileMode.Open))
+      {
+        using (var memoryStream = new MemoryStream())
+        {
+          fileStream.CopyTo(memoryStream);
+          var extension = Path.GetExtension(path).TrimStart('.').ToLower();
+          pdfDocumentStream = pdfConverter.GeneratePdf(memoryStream, extension);
+        }
+      }
+      if (pdfDocumentStream == null)
+        return null;
+      
+      // Создание временного файла для чтения штрих-кода.
+      var tempFilePath = string.Format("{0}{1}_temp.pdf", Path.GetDirectoryName(path), Path.GetFileNameWithoutExtension(path));
+      using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
+      {
+        pdfDocumentStream.CopyTo(fileStream);
+        fileStream.Flush();
+      }
+      var barcodeNumber = new BarcodeRecognitionManager().RecognizeBarcode(tempFilePath, recognitionParameters);
+      if (!barcodeNumber.Any())
+        return null;
+      File.Delete(tempFilePath);
+      
+      var result = barcodeNumber.Select(x => int.Parse(string.Join("", x.Barcode.Where(c => char.IsDigit(c)))));
+      return result.ToList();
     }
   }
 }
