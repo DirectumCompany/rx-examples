@@ -94,9 +94,10 @@ namespace Sungero.Capture.Server
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
       step.Performer = responsible;
       
-      task.Attachments.Add(document);
       GrantRightsToDocument(documentId, responsibleId, DefaultAccessRightsTypes.FullAccess);
+      document.Save();
       
+      task.Attachments.Add(document);
       task.Save();
       
       return task;
