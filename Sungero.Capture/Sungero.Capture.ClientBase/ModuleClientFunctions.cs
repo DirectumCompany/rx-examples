@@ -17,9 +17,9 @@ namespace Sungero.Capture.Client
     /// <param name="deviceInfo">Путь к xml файлу DCTS c информацией об устройствах ввода.</param>
     /// <param name="filesInfo">Путь к xml файлу DCTS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    public static void ImportDocument(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, int responsibleId)
+    public static void ImportDocument(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {
-      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(responsibleId);
+      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
         Logger.Error(Resources.InvalidResponsibleId);
@@ -34,7 +34,7 @@ namespace Sungero.Capture.Client
       }
       
       // При захвате из файловой системы (со сканера) создать документ на основе единственного файла в папке.
-      var fileElement = filesXDoc.Element("Files").Elements().FirstOrDefault();
+      var fileElement = filesXDoc.Element("InputFilesSection").Element("Files").Elements().FirstOrDefault();
       if (fileElement == null)
       {
         Logger.Error(Resources.NoFilesInfoInPackage);
@@ -52,7 +52,7 @@ namespace Sungero.Capture.Client
       document.CreateVersionFrom(filePath);
       document.Save();
       
-      var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(document.Name), document.Id, responsibleId);
+      var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(document.Name), document.Id, int.Parse(responsibleId));
       if (task != null)
         task.Start();
     }
