@@ -92,7 +92,7 @@ namespace Sungero.Capture.Client
         document.CreateVersionFrom(filePath);
         if (firstDoc != null)
         {
-          document.Relations.Add("Simple relation", firstDoc);
+          document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, firstDoc);
         }
         else
         {
