@@ -77,6 +77,12 @@ namespace Sungero.Capture.Functions
     }
     /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
     [global::Sungero.Core.RemoteAttribute()]
+    internal static global::Sungero.Docflow.IOfficialDocument GetDocument(global::System.Int32 documentId)
+    {
+        return global::Sungero.Capture.Server.ModuleFunctions.GetDocument(documentId);
+    }
+    /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
+    [global::Sungero.Core.RemoteAttribute()]
     internal static global::Sungero.Docflow.ISimpleDocument CreateSimpleDocument()
     {
         return global::Sungero.Capture.Server.ModuleFunctions.CreateSimpleDocument();

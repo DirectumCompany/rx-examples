@@ -24,6 +24,18 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить документ.
+    /// </summary>
+    /// <param name="documentId">ИД документа.</param>
+    /// <returns>Документ.</returns>
+    [Remote, Public]
+    public static IOfficialDocument GetDocument(int documentId)
+    {
+      var document = OfficialDocuments.GetAll(x => x.Id == documentId).FirstOrDefault();
+      return document;
+    }
+    
+    /// <summary>
     /// Создать простой документ.
     /// </summary>
     /// <returns>Простой документ.</returns>
@@ -60,7 +72,7 @@ namespace Sungero.Capture.Server
         return;
       }
       
-      document.AccessRights.Grant(responsible, rightType);      
+      document.AccessRights.Grant(responsible, rightType);
     }
     
     /// <summary>

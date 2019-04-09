@@ -37,10 +37,6 @@
     <Page Include="ModuleDataTemplates.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="CommonLibrary">
-      <HintPath>..\..\..\.sds\Libraries\Common\CommonLibrary.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="CommonLibrary.Controls">
       <HintPath>..\..\..\.sds\Libraries\Common\CommonLibrary.Controls.dll</HintPath>
       <Private>True</Private>
@@ -106,6 +102,10 @@
     <Reference Include="System.Xaml" />
     <Reference Include="UIAutomationProvider" />
     <Reference Include="UIAutomationTypes" />
+    <Reference Include="CommonLibrary">
+      <HintPath>..\..\..\.sds\Libraries\Common\CommonLibrary.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\..\.sds\Sungero.Domain.Interfaces\Sungero.Domain.Interfaces.csproj">

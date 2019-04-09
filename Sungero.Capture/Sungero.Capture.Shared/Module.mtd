@@ -89,6 +89,20 @@
       "ReturnTypeFullName": "Sungero.Workflow.ISimpleTask, Sungero.Workflow.Interfaces"
     },
     {
+      "Name": "GetDocument",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "documentId",
+          "ParameterType": "global::System.Int32",
+          "ParameterTypeFullName": "System.Int32"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
+      "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+    },
+    {
       "Name": "GetIdFromDocumentBarcode",
       "Parameters": [
         {

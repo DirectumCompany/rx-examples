@@ -25,6 +25,13 @@ namespace Sungero.Capture.Functions
           "GetSimpleDocument(global::System.Int32)", documentId);
       }
       /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
+      internal static global::Sungero.Docflow.IOfficialDocument GetDocument(global::System.Int32 documentId)
+      {
+        return global::Sungero.Domain.Shared.RemoteFunctionExecutor.ExecuteWithResult<global::Sungero.Docflow.IOfficialDocument>(
+          global::System.Guid.Parse("4c7444e6-c4af-46c1-9cfa-d9194d3ff0cb"),
+          "GetDocument(global::System.Int32)", documentId);
+      }
+      /// <redirect project="Sungero.Capture.Server" type="Sungero.Capture.Server.ModuleFunctions" />
       internal static global::Sungero.Docflow.ISimpleDocument CreateSimpleDocument()
       {
         return global::Sungero.Domain.Shared.RemoteFunctionExecutor.ExecuteWithResult<global::Sungero.Docflow.ISimpleDocument>(
@@ -205,6 +212,10 @@ namespace Sungero.Capture.Shared
     public global::Sungero.Workflow.ISimpleTask Remote_CreateSimpleTask(global::System.String taskName, global::System.Int32 documentId, global::System.Int32 responsibleId)
     {
       return global::Sungero.Capture.Functions.Module.Remote.CreateSimpleTask(taskName, documentId, responsibleId);
+    }
+    public global::Sungero.Docflow.IOfficialDocument Remote_GetDocument(global::System.Int32 documentId)
+    {
+      return global::Sungero.Capture.Functions.Module.Remote.GetDocument(documentId);
     }
     public global::Sungero.Docflow.ISimpleDocument Remote_GetSimpleDocument(global::System.Int32 documentId)
     {

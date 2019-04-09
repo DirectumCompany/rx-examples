@@ -38,22 +38,6 @@
     <Compile Include="ModuleWidgetHandlers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Aspose.Cells">
-      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Cells.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Aspose.Pdf">
-      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Pdf.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Aspose.Slides">
-      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Slides.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="Aspose.Words">
-      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Words.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -110,6 +94,22 @@
     </Reference>
     <Reference Include="PdfSharp">
       <HintPath>..\Sungero.Capture.Libraries\BarcodeRecognition\PdfSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aspose.Cells">
+      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Cells.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aspose.Pdf">
+      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Pdf.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aspose.Slides">
+      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Slides.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Aspose.Words">
+      <HintPath>..\Sungero.Capture.Libraries\AsposeExtensions\Aspose.Words.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sungero.AsposeExtensions">

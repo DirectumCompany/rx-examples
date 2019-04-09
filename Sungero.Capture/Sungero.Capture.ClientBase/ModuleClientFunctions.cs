@@ -21,6 +21,7 @@ namespace Sungero.Capture.Client
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     public static void ImportDocument(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {
+      System.Threading.Thread.Sleep(10000);
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -35,7 +36,13 @@ namespace Sungero.Capture.Client
         return;
       }
       
-      var document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
+      // Поиск документа по штрих-коду.
+      Docflow.IOfficialDocument document = null;
+      var documentIds = GetIdFromDocumentBarcode(filePath);      
+      if (documentIds != null)
+        document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault());
+      if (document == null)
+        document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
       document.CreateVersionFrom(filePath);
       document.Save();
       
@@ -175,7 +182,7 @@ namespace Sungero.Capture.Client
         return null;
       File.Delete(tempFilePath);
       
-      var result = barcodeNumber.Select(x => int.Parse(string.Join("", x.Barcode.Where(c => char.IsDigit(c)))));
+      var result = barcodeNumber.Select(x => int.Parse(x.Barcode.Split(new string[] {" - "}, StringSplitOptions.None).Last()));
       return result.ToList();
     }
   }
