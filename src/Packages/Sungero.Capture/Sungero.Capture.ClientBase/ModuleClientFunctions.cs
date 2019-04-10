@@ -144,10 +144,10 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// 
+    /// Получить ИД из штрих-кода файла.
     /// </summary>
-    /// <param name="path"></param>
-    /// <returns></returns>
+    /// <param name="path">Путь к файлу.</param>
+    /// <returns>Список ИД.</returns>
     [Public]
     public static List<int> GetIdFromDocumentBarcode(string path)
     {
@@ -156,7 +156,7 @@ namespace Sungero.Capture.Client
       if (!barcodeNumber.Any())
         return null;
       
-      var result = barcodeNumber.Select(x => int.Parse(x.Barcode.Split(new string[] {" - "}, StringSplitOptions.None).Last()));
+      var result = barcodeNumber.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last()));
       return result.ToList();
     }
   }
