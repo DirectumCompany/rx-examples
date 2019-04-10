@@ -20,7 +20,6 @@ namespace Sungero.Capture.Client
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     public static void ImportDocument(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {
-      System.Threading.Thread.Sleep(10000);
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
