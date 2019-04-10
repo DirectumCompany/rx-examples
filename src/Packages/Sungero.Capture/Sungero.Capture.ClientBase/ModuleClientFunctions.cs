@@ -50,7 +50,7 @@ namespace Sungero.Capture.Client
     }
     
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
-    {
+    {      
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -58,28 +58,10 @@ namespace Sungero.Capture.Client
         return;
       }
       
-      var filesXDoc = GetXDocumentFromFile(filesInfo);
-      if (filesXDoc == null)
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return;
-      }
-      
-      var fileElements = filesXDoc.Element("InputFilesSection").Element("Files").Elements();
+      var filePaths = GetMailPackagePaths(filesInfo, folder);
       Sungero.Content.IElectronicDocument firstDoc = null;
-      foreach (var fileElement in fileElements)
+      foreach (var filePath in filePaths)
       {
-        var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
-        var fileDescription = fileElement.Element("FileDescription").Value;
-        if (fileDescription.Equals("body.html", StringComparison.InvariantCultureIgnoreCase))
-          continue;
-        
-        if (!File.Exists(filePath))
-        {
-          Logger.Error(Resources.FileNotFoundFormat(filePath));
-          return;
-        }
-        
         var document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
         document.CreateVersionFrom(filePath);
         if (firstDoc != null)
@@ -92,9 +74,44 @@ namespace Sungero.Capture.Client
         }
         document.Save();
       }
-      var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(firstDoc.Name), firstDoc.Id, int.Parse(responsibleId));
+      
+      var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(firstDoc.Name), firstDoc.Id, responsible.Id);
       if (task != null)
         task.Start();
+    }
+    
+    public static List<string> GetMailPackagePaths(string filesInfo, string folder)
+    {
+      var filePaths = new List<string>();
+      var filesXDoc = GetXDocumentFromFile(filesInfo);
+      if (filesXDoc == null)
+      {
+        Logger.Error(Resources.NoFilesInfoInPackage);
+        return filePaths;
+      }
+      
+      var fileElements = filesXDoc.Element("InputFilesSection").Element("Files").Elements();
+      var mailBodyElement = fileElements.FirstOrDefault(e => e.Element("FileDescription").Value.Equals("body.txt", StringComparison.InvariantCultureIgnoreCase) ||
+                                                        e.Element("FileDescription").Value.Equals("body.html", StringComparison.InvariantCultureIgnoreCase));
+      if (mailBodyElement != null)
+        filePaths.Add(Path.Combine(folder, Path.GetFileName(mailBodyElement.Element("FileName").Value)));
+      
+      foreach (var fileElement in fileElements)
+      {
+        var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
+        var fileDescription = fileElement.Element("FileDescription").Value;
+        if (fileDescription.Equals("body.html", StringComparison.InvariantCultureIgnoreCase) || fileDescription.Equals("body.txt", StringComparison.InvariantCultureIgnoreCase))
+          continue;
+        
+        if (!File.Exists(filePath))
+        {
+          Logger.Error(Resources.FileNotFoundFormat(filePath));
+          continue;
+        }
+        
+        filePaths.Add(filePath);
+      }
+      return filePaths;
     }
     
     /// <summary>
