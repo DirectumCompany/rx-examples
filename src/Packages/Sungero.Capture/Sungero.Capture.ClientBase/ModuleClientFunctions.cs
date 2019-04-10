@@ -27,7 +27,7 @@ namespace Sungero.Capture.Client
         return;
       }
       
-      var filePath = GetScannedPackagePaths(filesInfo, folder);
+      var filePath = GetScannedPackagePath(filesInfo, folder);
       if (string.IsNullOrEmpty(filePath))
       {
         Logger.Error(Resources.FileNotFoundFormat(filePath));
@@ -36,11 +36,15 @@ namespace Sungero.Capture.Client
       
       // Поиск документа по штрих-коду.
       Docflow.IOfficialDocument document = null;
-      var documentIds = GetIdFromDocumentBarcode(filePath);      
+      var documentIds = GetIdFromDocumentBarcode(filePath);
       if (documentIds != null)
         document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault());
+      
       if (document == null)
         document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
+      else
+        document.ExternalApprovalState = Docflow.OfficialDocument.ExternalApprovalState.Signed;
+      
       document.CreateVersionFrom(filePath);
       document.Save();
       
@@ -120,7 +124,7 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCTS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Путь к пакету документов со сканера.</returns>
-    public static string GetScannedPackagePaths(string filesInfo, string folder)
+    public static string GetScannedPackagePath(string filesInfo, string folder)
     {
       var filesXDoc = GetXDocumentFromFile(filesInfo);
       if (filesXDoc == null)
