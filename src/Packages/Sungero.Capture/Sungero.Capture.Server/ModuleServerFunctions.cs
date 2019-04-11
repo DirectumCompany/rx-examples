@@ -114,5 +114,12 @@ namespace Sungero.Capture.Server
       
       return task;
     }
+    
+    [Remote, Public]
+    public static string GetCurrentTenant()
+    {
+      var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
+      return currentTenant != null ? currentTenant.Id : string.Empty;
+    }
   }
 }

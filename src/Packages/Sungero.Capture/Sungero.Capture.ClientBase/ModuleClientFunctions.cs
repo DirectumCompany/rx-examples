@@ -66,7 +66,17 @@ namespace Sungero.Capture.Client
       Sungero.Content.IElectronicDocument firstDoc = null;
       foreach (var filePath in filePaths)
       {
-        var document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
+        Sungero.Docflow.IOfficialDocument document = null;
+        
+        var documentIds = GetBarcodeFromDocument(filePath);        
+        if (documentIds != null)
+          document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault());
+        
+        if (document == null)
+          document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
+        else
+          document.ExternalApprovalState = Docflow.OfficialDocument.ExternalApprovalState.Signed;
+        
         document.CreateVersionFrom(filePath);
         if (firstDoc != null)
         {
@@ -205,5 +215,28 @@ namespace Sungero.Capture.Client
       var result = barcodeNumber.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last()));
       return result.ToList();
     }
+    
+    [Public]
+    public static List<int> GetBarcodeFromDocument(string path)
+    {
+      var fileExtension = Path.GetExtension(path);
+      using (var memoryStream = new MemoryStream())
+      {
+        using (var fileStream = new FileStream(path, FileMode.Create))
+        {
+          fileStream.CopyTo(memoryStream);
+        }
+        var barcodeReader = new AsposeExtensions.BarcodeReader();
+        var barcodeList =  barcodeReader.ExtractBarcode(memoryStream, fileExtension);
+        if (barcodeList.Count == 0)
+          return new List<int>();
+        
+        var tenant = Functions.Module.Remote.GetCurrentTenant();
+        var tenantId = string.Format("{0, 10}", tenant).Substring(0, 10);
+        var docIds = barcodeList.Where(b => b.Contains(tenantId)).Select(x => int.Parse(x.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last()));
+        return docIds.ToList();
+      }                 
+    }
+    
   }
 }
