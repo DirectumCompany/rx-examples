@@ -84,19 +84,6 @@
       "ReturnTypeFullName": "Sungero.Workflow.ISimpleTask, Sungero.Workflow.Interfaces"
     },
     {
-      "Name": "GetBarcodeFromDocument",
-      "Parameters": [
-        {
-          "Name": "path",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "Placement": "Client",
-      "ReturnType": "global::System.Collections.Generic.List<global::System.Int32>",
-      "ReturnTypeFullName": "System.Collections.Generic.List"
-    },
-    {
       "Name": "GetCurrentTenant",
       "IsRemote": true,
       "Placement": "Shared",
