@@ -105,7 +105,7 @@
       "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
     },
     {
-      "Name": "GetIdFromDocumentBarcode",
+      "Name": "GetIdsFromFileBarcodes",
       "Parameters": [
         {
           "Name": "path",

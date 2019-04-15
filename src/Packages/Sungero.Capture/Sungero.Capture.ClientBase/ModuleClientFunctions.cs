@@ -35,9 +35,9 @@ namespace Sungero.Capture.Client
       }
       
       // Поиск документа по штрих-коду.
-      Docflow.IOfficialDocument document = null;
-      var documentIds = GetIdFromDocumentBarcode(filePath);
-      if (documentIds != null)
+      var document = Sungero.Docflow.OfficialDocuments.Null;
+      var documentIds = GetIdsFromFileBarcodes(filePath);
+      if (documentIds.Any())
         document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault());
       
       if (document == null)
@@ -190,20 +190,19 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Получить ИД из штрих-кода файла.
+    /// Получить список ИД из штрих-кодов файла.
     /// </summary>
     /// <param name="path">Путь к файлу.</param>
     /// <returns>Список ИД.</returns>
     [Public]
-    public static List<int> GetIdFromDocumentBarcode(string path)
+    public static List<int> GetIdsFromFileBarcodes(string path)
     {
       var recognitionParameters = new BarcodeRecognitionParameters(false, "Code128", true, "MaxQuality", 300);
-      var barcodeNumber = new BarcodeRecognitionManager().RecognizeBarcode(path, recognitionParameters);
-      if (!barcodeNumber.Any())
-        return null;
+      var barcodeInfos = new BarcodeRecognitionManager().RecognizeBarcode(path, recognitionParameters);
+      if (!barcodeInfos.Any())
+        return new List<int>();
       
-      var result = barcodeNumber.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last()));
-      return result.ToList();
+      return barcodeInfos.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last())).ToList();
     }   
   }
 }
