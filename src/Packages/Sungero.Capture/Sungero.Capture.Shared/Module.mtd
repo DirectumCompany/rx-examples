@@ -1,4 +1,4 @@
-﻿{
+{
   "$type": "Sungero.Metadata.ModuleMetadata, Sungero.Metadata",
   "NameGuid": "4c7444e6-c4af-46c1-9cfa-d9194d3ff0cb",
   "Name": "Capture",
@@ -44,11 +44,13 @@
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Capture",
-    },
+  "Libraries": [
     {
       "NameGuid": "10f6f0a5-cb61-4048-ab19-1e52e12d4f10",
       "Name": "ArioExtensions",
       "Scope": "Both"
+    }
+  ],
   "PublicFunctions": [
     {
       "Name": "CreateSimpleDocument",

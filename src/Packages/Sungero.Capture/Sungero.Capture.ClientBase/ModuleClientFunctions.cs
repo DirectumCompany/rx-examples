@@ -70,7 +70,6 @@ namespace Sungero.Capture.Client
       //                   Сейчас в платформе 17.5.0.0. Падает ошибка при загрузке сборок. (см. 81819)
         document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault())      
      */
-      if (documentIds.Any())
     }
     
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
