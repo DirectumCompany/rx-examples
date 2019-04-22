@@ -1,3 +1,7 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <queries>
+  <query key="SelectArioUrl">
+    <mssql><![CDATA[SELECT Value FROM Sungero_Docflow_Params WHERE ([Key] = '{0}')]]></mssql>
+    <postgres><![CDATA[SELECT Value FROM Sungero_Docflow_Params WHERE (Key = '{0}')]]></postgres>
+  </query>
 </queries>

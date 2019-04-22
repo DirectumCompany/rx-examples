@@ -121,5 +121,52 @@ namespace Sungero.Capture.Server
       var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
       return currentTenant != null ? currentTenant.Id : string.Empty;
     }
+    
+    [Remote]
+    public static string GetArioUrl()
+    {
+      var key = Constants.Module.ArioUrlKey;
+      var command = string.Format(Queries.Module.SelectArioUrl, key);
+      var commandExecutionResult = Docflow.PublicFunctions.Module.ExecuteScalarSQLCommand(command);
+      var arioUrl = string.Empty;
+      if (!(commandExecutionResult is DBNull) && commandExecutionResult != null)
+        arioUrl = commandExecutionResult.ToString();
+      return arioUrl;
+    }
+    
+    [Remote, Public]
+    public static void ProcessSplitedPackage(List<string> documentGuids, int responsibleId)
+    {
+      var documents = new List<IOfficialDocument>();
+      var firstDoc = CreateDocumentByGuid(documentGuids.First(), null);
+      documents.Add(firstDoc);
+      documentGuids = documentGuids.Skip(1).ToList();
+      foreach(var documentGuid in documentGuids)
+      {
+        documents.Add(CreateDocumentByGuid(documentGuid, firstDoc));
+      }
+      
+      if (documents.Any())
+      {
+        var task = CreateSimpleTask(Resources.TaskNameFormat(firstDoc.Name), firstDoc.Id, responsibleId);
+        if (task != null)
+          task.Start();
+      }
+    }
+    
+    public static Docflow.IOfficialDocument CreateDocumentByGuid(string documentGuid, IOfficialDocument firstDoc)
+    {
+      var arioConnector = new ArioExtensions.ArioConnector("http://smart:61100");
+      var documentBody = arioConnector.GetDocumentByGuid(documentGuid);
+      var document = CreateSimpleDocument();
+      document.CreateVersionFrom(documentBody, "pdf");
+      if (firstDoc != null)
+      {
+        document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, firstDoc);
+      }
+      document.Save();
+      return document;      
+    }
+    
   }
 }

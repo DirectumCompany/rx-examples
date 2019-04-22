@@ -11,6 +11,35 @@ namespace Sungero.Capture.Client
 {
   public class ModuleFunctions
   {
+    
+    public static int GetFirstPageClassifierId(string arioUrl, string firstPageClassifierName)
+    {
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      return arioConnector.GetClassifierByName(firstPageClassifierName).Id;
+    }
+    
+    public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
+    {
+      var documentGuids = new List<string>();
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      var fpClassifier = GetFirstPageClassifierId(arioUrl, firstPageClassifierName).ToString();      
+      var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), fpClassifier, fpClassifier);
+      foreach (var classificationResult in classificationResults)
+      {
+        documentGuids.Add(classificationResult.DocumentGuid);
+      }
+
+      return documentGuids;
+    }
+    
+    public static void ProcessCapturedPackege(string filePath, int responsibleId)
+    {
+      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var classifierName = "TestRX Classifier";
+      var documentGuids = SplitPackage(filePath, arioUrl, classifierName);
+      Functions.Module.Remote.ProcessSplitedPackage(documentGuids, responsibleId);
+    }
+    
     /// <summary>
     /// Создать документ на основе пакета документов со сканера.
     /// </summary>
@@ -34,27 +63,14 @@ namespace Sungero.Capture.Client
         Logger.Error(Resources.FileNotFoundFormat(filePath));
         return;
       }
-      
+      ProcessCapturedPackege(filePath, int.Parse(responsibleId));
       // Поиск документа по штрих-коду.
-      var document = Sungero.Docflow.OfficialDocuments.Null;
+      /*Docflow.IOfficialDocument document = null;
       // TODO Dmitriev_IA: BarcodeRecognition потребовал Aspose.Pdf версии 18.10.0.0.
       //                   Сейчас в платформе 17.5.0.0. Падает ошибка при загрузке сборок. (см. 81819)
-      /*
-      var documentIds = GetIdsFromFileBarcodes(filePath);
+        document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault())      
+     */
       if (documentIds.Any())
-        document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault());
-      
-      if (document == null)
-        document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
-      else
-        document.ExternalApprovalState = Docflow.OfficialDocument.ExternalApprovalState.Signed;*/
-      document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
-      document.CreateVersionFrom(filePath);
-      document.Save();
-      
-      var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(document.Name), document.Id, int.Parse(responsibleId));
-      if (task != null)
-        task.Start();
     }
     
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
