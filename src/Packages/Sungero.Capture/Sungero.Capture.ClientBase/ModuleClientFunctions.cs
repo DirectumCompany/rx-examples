@@ -4,7 +4,8 @@ using System.IO;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using Directum.BarcodeRecognition;
+// TODO Dmitriev_IA: см. 81819
+// using Directum.BarcodeRecognition;
 
 namespace Sungero.Capture.Client
 {
@@ -36,6 +37,9 @@ namespace Sungero.Capture.Client
       
       // Поиск документа по штрих-коду.
       var document = Sungero.Docflow.OfficialDocuments.Null;
+      // TODO Dmitriev_IA: BarcodeRecognition потребовал Aspose.Pdf версии 18.10.0.0.
+      //                   Сейчас в платформе 17.5.0.0. Падает ошибка при загрузке сборок. (см. 81819)
+      /*
       var documentIds = GetIdsFromFileBarcodes(filePath);
       if (documentIds.Any())
         document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault());
@@ -43,8 +47,8 @@ namespace Sungero.Capture.Client
       if (document == null)
         document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
       else
-        document.ExternalApprovalState = Docflow.OfficialDocument.ExternalApprovalState.Signed;
-      
+        document.ExternalApprovalState = Docflow.OfficialDocument.ExternalApprovalState.Signed;*/
+      document = Capture.PublicFunctions.Module.Remote.CreateSimpleDocument();
       document.CreateVersionFrom(filePath);
       document.Save();
       
@@ -189,20 +193,21 @@ namespace Sungero.Capture.Client
       return System.Xml.Linq.XDocument.Load(path);
     }
     
-    /// <summary>
-    /// Получить список ИД из штрих-кодов файла.
-    /// </summary>
-    /// <param name="path">Путь к файлу.</param>
-    /// <returns>Список ИД.</returns>
-    [Public]
-    public static List<int> GetIdsFromFileBarcodes(string path)
-    {
-      var recognitionParameters = new BarcodeRecognitionParameters(false, "Code128", true, "MaxQuality", 300);
-      var barcodeInfos = new BarcodeRecognitionManager().RecognizeBarcode(path, recognitionParameters);
-      if (!barcodeInfos.Any())
-        return new List<int>();
-      
-      return barcodeInfos.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last())).ToList();
-    }   
+    // TODO Dmitriev_IA: см. 81819
+    //    /// <summary>
+    //    /// Получить список ИД из штрих-кодов файла.
+    //    /// </summary>
+    //    /// <param name="path">Путь к файлу.</param>
+    //    /// <returns>Список ИД.</returns>
+    //    [Public]
+    //    public static List<int> GetIdsFromFileBarcodes(string path)
+    //    {
+    //      var recognitionParameters = new BarcodeRecognitionParameters(false, "Code128", true, "MaxQuality", 300);
+    //      var barcodeInfos = new BarcodeRecognitionManager().RecognizeBarcode(path, recognitionParameters);
+    //      if (!barcodeInfos.Any())
+    //        return new List<int>();
+    //      
+    //      return barcodeInfos.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last())).ToList();
+    //    }   
   }
 }

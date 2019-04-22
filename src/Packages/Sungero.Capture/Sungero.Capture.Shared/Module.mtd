@@ -44,13 +44,6 @@
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Capture",
-  "Libraries": [
-    {
-      "NameGuid": "ea52bd43-2e5d-404b-94e0-dabc7c0353d7",
-      "Name": "BarcodeRecognition",
-      "Scope": "Both"
-    }
-  ],
   "PublicFunctions": [
     {
       "Name": "CreateSimpleDocument",
@@ -103,19 +96,6 @@
       "Placement": "Shared",
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
       "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
-    },
-    {
-      "Name": "GetIdsFromFileBarcodes",
-      "Parameters": [
-        {
-          "Name": "path",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "Placement": "Client",
-      "ReturnType": "global::System.Collections.Generic.List<global::System.Int32>",
-      "ReturnTypeFullName": "System.Collections.Generic.List"
     },
     {
       "Name": "GetSimpleDocument",
