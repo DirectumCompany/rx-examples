@@ -11,35 +11,6 @@ namespace Sungero.Capture.Client
 {
   public class ModuleFunctions
   {
-    
-    public static int GetFirstPageClassifierId(string arioUrl, string firstPageClassifierName)
-    {
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      return arioConnector.GetClassifierByName(firstPageClassifierName).Id;
-    }
-    
-    public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
-    {
-      var documentGuids = new List<string>();
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifier = GetFirstPageClassifierId(arioUrl, firstPageClassifierName).ToString();      
-      var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), fpClassifier, fpClassifier);
-      foreach (var classificationResult in classificationResults)
-      {
-        documentGuids.Add(classificationResult.DocumentGuid);
-      }
-
-      return documentGuids;
-    }
-    
-    public static void ProcessCapturedPackege(string filePath, int responsibleId)
-    {
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var classifierName = "TestRX Classifier";
-      var documentGuids = SplitPackage(filePath, arioUrl, classifierName);
-      Functions.Module.Remote.ProcessSplitedPackage(documentGuids, responsibleId);
-    }
-    
     /// <summary>
     /// Создать документ на основе пакета документов со сканера.
     /// </summary>
@@ -50,6 +21,7 @@ namespace Sungero.Capture.Client
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     public static void ImportDocument(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {
+      // Проверить существование путей.
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -63,17 +35,43 @@ namespace Sungero.Capture.Client
         Logger.Error(Resources.FileNotFoundFormat(filePath));
         return;
       }
-      ProcessCapturedPackege(filePath, int.Parse(responsibleId));
+      
+      // Обработать пакет.
+      ProcessCapturedPackage(filePath, int.Parse(responsibleId));
+      
       // Поиск документа по штрих-коду.
       /*Docflow.IOfficialDocument document = null;
       // TODO Dmitriev_IA: BarcodeRecognition потребовал Aspose.Pdf версии 18.10.0.0.
       //                   Сейчас в платформе 17.5.0.0. Падает ошибка при загрузке сборок. (см. 81819)
-        document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault())      
-     */
+        document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault())
+       */
+    }
+    
+    public static void ProcessCapturedPackage(string filePath, int responsibleId)
+    {
+      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var classifierName = "TestRX Classifier";
+      var documentGuids = SplitPackage(filePath, arioUrl, classifierName);
+      Functions.Module.Remote.ProcessSplitedPackage(documentGuids, responsibleId);
+    }
+    
+    public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
+    {
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      var fpClassifier = GetFirstPageClassifierId(arioUrl, firstPageClassifierName).ToString();
+      var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), fpClassifier, fpClassifier);
+      var documentGuids = classificationResults.Select(r => r.DocumentGuid).ToList();
+      return documentGuids;
+    }
+    
+    public static int GetFirstPageClassifierId(string arioUrl, string firstPageClassifierName)
+    {
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      return arioConnector.GetClassifierByName(firstPageClassifierName).Id;
     }
     
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
-    {      
+    {
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -122,7 +120,7 @@ namespace Sungero.Capture.Client
       var fileElements = filesXDoc.Element("InputFilesSection").Element("Files").Elements();
       
       var mailBodyElements = fileElements.Where(e => e.Element("FileDescription").Value.Equals("body.txt", StringComparison.InvariantCultureIgnoreCase) ||
-                                                        e.Element("FileDescription").Value.Equals("body.html", StringComparison.InvariantCultureIgnoreCase));
+                                                e.Element("FileDescription").Value.Equals("body.html", StringComparison.InvariantCultureIgnoreCase));
       
       if(mailBodyElements.Count() > 0)
       {
@@ -133,7 +131,7 @@ namespace Sungero.Capture.Client
           {
             filePaths.Add(Path.Combine(folder, Path.GetFileName(mailBodyElement.Element("FileName").Value)));
             break;
-          }            
+          }
         }
       }
       
@@ -150,15 +148,15 @@ namespace Sungero.Capture.Client
         // Отбрасываем изображения из тела письма (например картинки из подписей).
         if (System.Text.RegularExpressions.Regex.IsMatch(fileDescription, @"^ATT\d+\s\d+\.\w+"))
           continue;
-                        
-        var filePath = Path.Combine(folder, Path.GetFileName(fileAttachment.Element("FileName").Value));        
+        
+        var filePath = Path.Combine(folder, Path.GetFileName(fileAttachment.Element("FileName").Value));
         if (!File.Exists(filePath))
         {
           Logger.Error(Resources.FileNotFoundFormat(filePath));
           continue;
         }
         filePaths.Add(filePath);
-      }      
+      }
       return filePaths;
     }
     
@@ -221,8 +219,8 @@ namespace Sungero.Capture.Client
     //      var barcodeInfos = new BarcodeRecognitionManager().RecognizeBarcode(path, recognitionParameters);
     //      if (!barcodeInfos.Any())
     //        return new List<int>();
-    //      
+    //
     //      return barcodeInfos.Select(x => int.Parse(x.Barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last())).ToList();
-    //    }   
+    //    }
   }
 }
