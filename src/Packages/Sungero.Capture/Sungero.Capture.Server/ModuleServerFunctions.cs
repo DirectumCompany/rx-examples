@@ -106,31 +106,7 @@ namespace Sungero.Capture.Server
       task.Save();
       task.Start();
     }
-    
-    /// <summary>
-    /// Получить простой документ.
-    /// </summary>
-    /// <param name="documentId">ИД документа.</param>
-    /// <returns>Простой документ.</returns>
-    [Remote, Public]
-    public static ISimpleDocument GetSimpleDocument(int documentId)
-    {
-      var document = SimpleDocuments.GetAll(x => x.Id == documentId).FirstOrDefault();
-      return document;
-    }
-    
-    /// <summary>
-    /// Получить документ.
-    /// </summary>
-    /// <param name="documentId">ИД документа.</param>
-    /// <returns>Документ.</returns>
-    [Remote, Public]
-    public static IOfficialDocument GetDocument(int documentId)
-    {
-      var document = OfficialDocuments.GetAll(x => x.Id == documentId).FirstOrDefault();
-      return document;
-    }
-    
+           
     [Remote, Public]
     public static string GetCurrentTenant()
     {
