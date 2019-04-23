@@ -13,13 +13,14 @@ namespace Sungero.Capture.Client
     /// Создать документ на основе пакета документов со сканера.
     /// </summary>
     /// <param name="senderLine">Наименование линии.</param>
-    /// <param name="instanceInfos">Путь к xml файлу DCTS c информацией об экземплярах захвата и о захваченных файлах.</param>
-    /// <param name="deviceInfo">Путь к xml файлу DCTS c информацией об устройствах ввода.</param>
-    /// <param name="filesInfo">Путь к xml файлу DCTS c информацией об импортируемых файлах.</param>
+    /// <param name="instanceInfos">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
+    /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
+    public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, 
+                                              string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
-      // Проверить существование путей.
+      // Найти ответственного.
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -35,8 +36,8 @@ namespace Sungero.Capture.Client
       }
       
       // Разделить пакет на документы.
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var documentGuids = SplitPackage(filePath, arioUrl);
+      var arioUrl = Functions.Module.Remote.GetArioUrl();      
+      var documentGuids = SplitPackage(filePath, arioUrl, firstPageClassifierName);
       
       // Обработать пакет.
       Functions.Module.Remote.ProcessSplitedPackage(documentGuids, int.Parse(responsibleId));           
@@ -48,10 +49,9 @@ namespace Sungero.Capture.Client
     /// <param name="filePath">Путь к пакету.</param>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <returns>Список Гуидов, по которым в Арио можно получить документы.</returns>
-    public static List<string> SplitPackage(string filePath, string arioUrl)
+    public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var firstPageClassifierName = "TestRX Classifier";
       var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
       var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), fpClassifier, fpClassifier);
       var documentGuids = classificationResults.Select(r => r.DocumentGuid).ToList();
@@ -61,7 +61,7 @@ namespace Sungero.Capture.Client
     /// <summary>
     /// Получить путь к пакету документов со сканера.
     /// </summary>
-    /// <param name="filesInfo">Путь к xml файлу DCTS c информацией об импортируемых файлах.</param>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Путь к пакету документов со сканера.</returns>
     public static string GetScannedPackagePath(string filesInfo, string folder)
