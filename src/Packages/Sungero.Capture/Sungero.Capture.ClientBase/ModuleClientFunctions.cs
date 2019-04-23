@@ -37,9 +37,8 @@ namespace Sungero.Capture.Client
       }
       
       // Разделить пакет на документы.
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var classifierName = "TestRX Classifier";
-      var documentGuids = SplitPackage(filePath, arioUrl, classifierName);
+      var arioUrl = Functions.Module.Remote.GetArioUrl();      
+      var documentGuids = SplitPackage(filePath, arioUrl);
       
       // Обработать пакет.
       Functions.Module.Remote.ProcessSplitedPackage(documentGuids, int.Parse(responsibleId));
@@ -52,21 +51,22 @@ namespace Sungero.Capture.Client
        */
     }
     
-    public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
+    /// <summary>
+    /// Разделить пакет на документы с помощью сервиса Ario.
+    /// </summary>
+    /// <param name="filePath">Путь к пакету.</param>
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <returns>Список Гуидов, по которым в Арио можно получить документы.</returns>
+    public static List<string> SplitPackage(string filePath, string arioUrl)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifier = GetFirstPageClassifierId(arioUrl, firstPageClassifierName).ToString();
+      var firstPageClassifierName = "TestRX Classifier";
+      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
       var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), fpClassifier, fpClassifier);
       var documentGuids = classificationResults.Select(r => r.DocumentGuid).ToList();
       return documentGuids;
     }
-    
-    public static int GetFirstPageClassifierId(string arioUrl, string firstPageClassifierName)
-    {
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      return arioConnector.GetClassifierByName(firstPageClassifierName).Id;
-    }
-    
+          
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {/*
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));

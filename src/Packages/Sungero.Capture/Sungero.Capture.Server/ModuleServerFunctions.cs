@@ -11,6 +11,11 @@ namespace Sungero.Capture.Server
 {
   public class ModuleFunctions
   {
+    /// <summary>
+    /// Создать документы в Rx и отправить задачу на проверку.
+    /// </summary>
+    /// <param name="documentGuids">Список Гуидов документов, на которые Арио разделил пакет.</param>
+    /// <param name="responsibleId">Ид сотрудника, ответственного за проверку документов.</param>
     [Remote, Public]
     public static void ProcessSplitedPackage(List<string> documentGuids, int responsibleId)
     {
@@ -24,6 +29,10 @@ namespace Sungero.Capture.Server
         SendToResponsible(leadingDocument, documents, responsibleId);
     }
     
+    /// <summary>
+    /// Получить адрес сервиса Арио.
+    /// </summary>
+    /// <returns>Адрес Арио.</returns>
     [Remote]
     public static string GetArioUrl()
     {
@@ -36,7 +45,13 @@ namespace Sungero.Capture.Server
       return arioUrl;
     }
     
-    public static Docflow.IOfficialDocument CreateDocumentByGuid(string documentGuid, IOfficialDocument firstDoc)
+    /// <summary>
+    /// Создать документ в Rx, тело документа загружается из Арио.
+    /// </summary>
+    /// <param name="documentGuid">Гуид тела документа.</param>
+    /// <param name="firstDoc">Ведущий документ.</param>
+    /// <returns></returns>
+    public static Docflow.IOfficialDocument CreateDocumentByGuid(string documentGuid, IOfficialDocument leadingDoc)
     {
       var arioUrl = Functions.Module.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
@@ -45,15 +60,15 @@ namespace Sungero.Capture.Server
       var document = SimpleDocuments.Create();
       document.Name = Resources.DocumentNameFormat(document.Id);
       document.CreateVersionFrom(documentBody, "pdf");
-      if (firstDoc != null)
-        document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, firstDoc);
+      if (leadingDoc != null)
+        document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDoc);
       
       document.Save();
       return document;
     }
     
     /// <summary>
-    /// Создать простую задачу.
+    /// Отправить задачу на проверку документов.
     /// </summary>
     /// <param name="taskName">Тема задачи.</param>
     /// <param name="documentId">ИД вкладываемого документа.</param>
