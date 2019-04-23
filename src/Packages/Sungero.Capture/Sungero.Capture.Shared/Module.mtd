@@ -53,37 +53,6 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "CreateSimpleDocument",
-      "IsRemote": true,
-      "Placement": "Shared",
-      "ReturnType": "global::Sungero.Docflow.ISimpleDocument",
-      "ReturnTypeFullName": "Sungero.Docflow.ISimpleDocument, Sungero.Domain.Interfaces"
-    },
-    {
-      "Name": "CreateSimpleTask",
-      "IsRemote": true,
-      "Parameters": [
-        {
-          "Name": "taskName",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        },
-        {
-          "Name": "documentId",
-          "ParameterType": "global::System.Int32",
-          "ParameterTypeFullName": "System.Int32"
-        },
-        {
-          "Name": "responsibleId",
-          "ParameterType": "global::System.Int32",
-          "ParameterTypeFullName": "System.Int32"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "global::Sungero.Workflow.ISimpleTask",
-      "ReturnTypeFullName": "Sungero.Workflow.ISimpleTask, Sungero.Workflow.Interfaces"
-    },
-    {
       "Name": "GetCurrentTenant",
       "IsRemote": true,
       "Placement": "Shared",
@@ -119,23 +88,18 @@
       "ReturnTypeFullName": "Sungero.Docflow.ISimpleDocument, Sungero.Domain.Interfaces"
     },
     {
-      "Name": "GrantRightsToDocument",
+      "Name": "ProcessSplitedPackage",
       "IsRemote": true,
       "Parameters": [
         {
-          "Name": "documentId",
-          "ParameterType": "global::System.Int32",
-          "ParameterTypeFullName": "System.Int32"
+          "Name": "documentGuids",
+          "ParameterType": "global::System.Collections.Generic.List<global::System.String>",
+          "ParameterTypeFullName": "System.Collections.Generic.List"
         },
         {
           "Name": "responsibleId",
           "ParameterType": "global::System.Int32",
           "ParameterTypeFullName": "System.Int32"
-        },
-        {
-          "Name": "rightType",
-          "ParameterType": "global::System.Guid",
-          "ParameterTypeFullName": "System.Guid"
         }
       ],
       "Placement": "Shared",
@@ -143,12 +107,17 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
-      "Name": "ProcessSplitedPackage",
+      "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [
         {
-          "Name": "documentGuids",
-          "ParameterType": "global::System.Collections.Generic.List<global::System.String>",
+          "Name": "leadingDocument",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "documents",
+          "ParameterType": "global::System.Collections.Generic.List<global::Sungero.Docflow.IOfficialDocument>",
           "ParameterTypeFullName": "System.Collections.Generic.List"
         },
         {

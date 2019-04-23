@@ -19,7 +19,7 @@ namespace Sungero.Capture.Client
     /// <param name="deviceInfo">Путь к xml файлу DCTS c информацией об устройствах ввода.</param>
     /// <param name="filesInfo">Путь к xml файлу DCTS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    public static void ImportDocument(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
+    public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
     {
       // Проверить существование путей.
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
@@ -36,8 +36,13 @@ namespace Sungero.Capture.Client
         return;
       }
       
+      // Разделить пакет на документы.
+      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var classifierName = "TestRX Classifier";
+      var documentGuids = SplitPackage(filePath, arioUrl, classifierName);
+      
       // Обработать пакет.
-      ProcessCapturedPackage(filePath, int.Parse(responsibleId));
+      Functions.Module.Remote.ProcessSplitedPackage(documentGuids, int.Parse(responsibleId));
       
       // Поиск документа по штрих-коду.
       /*Docflow.IOfficialDocument document = null;
@@ -45,14 +50,6 @@ namespace Sungero.Capture.Client
       //                   Сейчас в платформе 17.5.0.0. Падает ошибка при загрузке сборок. (см. 81819)
         document = Capture.PublicFunctions.Module.Remote.GetDocument(documentIds.FirstOrDefault())
        */
-    }
-    
-    public static void ProcessCapturedPackage(string filePath, int responsibleId)
-    {
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var classifierName = "TestRX Classifier";
-      var documentGuids = SplitPackage(filePath, arioUrl, classifierName);
-      Functions.Module.Remote.ProcessSplitedPackage(documentGuids, responsibleId);
     }
     
     public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
@@ -71,7 +68,7 @@ namespace Sungero.Capture.Client
     }
     
     public static void ImportDocumentFromEmail(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder, string responsibleId)
-    {
+    {/*
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -98,7 +95,7 @@ namespace Sungero.Capture.Client
       
       var task = Capture.PublicFunctions.Module.Remote.CreateSimpleTask(Resources.TaskNameFormat(firstDoc.Name), firstDoc.Id, responsible.Id);
       if (task != null)
-        task.Start();
+        task.Start();*/
     }
     
     /// <summary>
