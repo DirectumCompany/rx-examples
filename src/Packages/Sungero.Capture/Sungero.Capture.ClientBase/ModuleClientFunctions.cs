@@ -22,6 +22,7 @@ namespace Sungero.Capture.Client
     public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder,
                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
+    	Logger.Debug("Begin of captured package processing.");
       // Найти ответственного.
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
@@ -37,13 +38,17 @@ namespace Sungero.Capture.Client
         Logger.Error(Resources.FileNotFoundFormat(filePath));
         return;
       }
-      
+
+      Logger.DebugFormat("Begin of package {0} splitting and classification.", sourceFileName);
       // Разделить пакет на документы.
       var arioUrl = Functions.Module.Remote.GetArioUrl();
       var сlassificationResults = SplitPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      Logger.DebugFormat("End of package {0} splitting and classification.", sourceFileName);
       
+      Logger.DebugFormat("Begin of splitted package {0} processing.", sourceFileName);
       // Обработать пакет.
       Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, сlassificationResults, int.Parse(responsibleId));
+      Logger.DebugFormat("End of package {0} processing.", sourceFileName);
     }
     
     /// <summary>
@@ -52,13 +57,18 @@ namespace Sungero.Capture.Client
     /// <param name="filePath">Путь к пакету.</param>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <returns>Коллекция записей с результатом разделения. Запись состоит из гуида документа и его класса, присвоенного ему Арио.</returns>
     public static List<Sungero.Capture.Structures.Module.ClassifiedDocument> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
-      var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName).Id.ToString();
-      var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), typeClassifier, fpClassifier);
+      var fpClassifierId = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
+      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
+      var typeClassifierId = arioConnector.GetClassifierByName(typeClassifierName).Id.ToString();
+      Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
+      
+      var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), typeClassifierId, fpClassifierId);
+      Logger.Debug("End of package splitting and classification.");
       var result = new List<Sungero.Capture.Structures.Module.ClassifiedDocument>();
       foreach (var classificationResult in classificationResults)
       {
@@ -107,7 +117,7 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Получить путь к пакету документов со сканера.
+    /// Получить имя пакета документов со сканера.
     /// </summary>
     /// <param name="instanceInfos">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <returns>Путь к пакету документов со сканера.</returns>
