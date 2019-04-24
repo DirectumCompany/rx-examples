@@ -93,7 +93,8 @@
     "NoFilesInfoInPackage",
     "DocumentName",
     "TaskName",
-    "DocumentNotFound"
+    "DocumentNotFound",
+    "CheckPackage"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

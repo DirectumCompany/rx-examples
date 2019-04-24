@@ -135,4 +135,7 @@
   <data name="DocumentNotFound" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="CheckPackage" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
