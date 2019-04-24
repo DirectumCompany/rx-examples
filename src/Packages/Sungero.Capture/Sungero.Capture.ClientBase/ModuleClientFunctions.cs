@@ -53,16 +53,16 @@ namespace Sungero.Capture.Client
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <returns>Коллекция записей с результатом разделения. Запись состоит из гуида документа и его класса, присвоенного ему Арио.</returns>
-    public static List<Sungero.Capture.Structures.Module.PackageClassificationResult> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
+    public static List<Sungero.Capture.Structures.Module.ClassifiedDocument> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var classifierId = "8";
       var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
       var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), classifierId, fpClassifier);
-      var result = new List<Sungero.Capture.Structures.Module.PackageClassificationResult>();
+      var result = new List<Sungero.Capture.Structures.Module.ClassifiedDocument>();
       foreach (var classificationResult in classificationResults)
       {
-        var element = new Sungero.Capture.Structures.Module.PackageClassificationResult();
+        var element = new Sungero.Capture.Structures.Module.ClassifiedDocument();
         element.DocumentGuid = classificationResult.DocumentGuid;
         element.DocumentClass = classificationResult.PredictedClass != null ? classificationResult.PredictedClass.Name : null;
         result.Add(element);

@@ -6,7 +6,8 @@ using Sungero.CoreEntities;
 
 namespace Sungero.Capture.Structures.Module
 {
-  partial class PackageClassificationResult
+  // Результат классификации документа/пакета документов.
+  partial class ClassifiedDocument
   {
     // Гуид документа.
     public string DocumentGuid { get; set; }

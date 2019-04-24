@@ -15,23 +15,27 @@ namespace Sungero.Capture.Server
     /// Создать документы в Rx и отправить задачу на проверку.
     /// </summary>
     /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
-    /// <param name="documentGuids">Список Гуидов документов, на которые Арио разделил пакет.</param>
+    /// <param name="сlassificationResults">Коллекция записей с результатом разделения.</param>
     /// <param name="responsibleId">Ид сотрудника, ответственного за проверку документов.</param>
     [Remote]
-    public static void ProcessSplitedPackage(string sourceFileName, List<Sungero.Capture.Structures.Module.PackageClassificationResult> сlassificationResults, int responsibleId)
+    public static void ProcessSplitedPackage(string sourceFileName, List<Sungero.Capture.Structures.Module.ClassifiedDocument> сlassificationResults, int responsibleId)
     {
       var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass != null && d.DocumentClass.Equals("Письмо"));
+      
       IOfficialDocument leadingDocument;
       if (letterRecord != null)
       {
+        // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.       
         leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid);
         сlassificationResults.Remove(letterRecord);
       }
       else
       {
+        // Иначе ведущий документ - первый документ в списке.      
         leadingDocument = CreateDocumentByGuid(sourceFileName, 0, сlassificationResults.First().DocumentGuid, null);
         сlassificationResults = сlassificationResults.Skip(1).ToList();
       }
+      
       var documents = new List<IOfficialDocument>();
       int addendumNumber = 1;
       foreach(var сlassificationResult in сlassificationResults)
