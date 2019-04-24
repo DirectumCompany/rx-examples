@@ -1,4 +1,4 @@
-{
+﻿{
   "$type": "Sungero.Metadata.ModuleMetadata, Sungero.Metadata",
   "NameGuid": "4c7444e6-c4af-46c1-9cfa-d9194d3ff0cb",
   "Name": "Capture",
@@ -60,30 +60,11 @@
       "ReturnTypeFullName": "System.String"
     },
     {
-      "Name": "ProcessSplitedPackage",
-      "IsRemote": true,
-      "Parameters": [
-        {
           "Name": "sourceFileName",
           "ParameterType": "global::System.String",
           "ParameterTypeFullName": "System.String"
         },
         {
-          "Name": "documentGuids",
-          "ParameterType": "global::System.Collections.Generic.List<global::System.String>",
-          "ParameterTypeFullName": "System.Collections.Generic.List"
-        },
-        {
-          "Name": "responsibleId",
-          "ParameterType": "global::System.Int32",
-          "ParameterTypeFullName": "System.Int32"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    },
-    {
       "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [

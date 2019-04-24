@@ -17,14 +17,26 @@ namespace Sungero.Capture.Server
     /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
     /// <param name="documentGuids">Список Гуидов документов, на которые Арио разделил пакет.</param>
     /// <param name="responsibleId">Ид сотрудника, ответственного за проверку документов.</param>
-    [Remote, Public]
+    [Remote]
     public static void ProcessSplitedPackage(string sourceFileName, List<string> documentGuids, int responsibleId)
     {
+      var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass.Equals("Письмо"));
+      
+      IOfficialDocument leadingDocument;
+      if (letterRecord != null)
+      {
+        leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid);
+        сlassificationResults.Remove(letterRecord);
+      }
+      else
+      {
+        leadingDocument = CreateDocumentByGuid(сlassificationResults.First().DocumentGuid, null);
+        сlassificationResults = сlassificationResults.Skip(1).ToList();
+      }
       var documents = new List<IOfficialDocument>();
       var leadingDocument = CreateDocumentByGuid(sourceFileName, 0, documentGuids.First(), null);
-      documentGuids = documentGuids.Skip(1).ToList();
+        documents.Add(CreateDocumentByGuid(сlassificationResult.DocumentGuid, leadingDocument));
       int addendumNumber = 1;
-      foreach (var documentGuid in documentGuids)
         documents.Add(CreateDocumentByGuid(string.Empty, addendumNumber++, documentGuid, leadingDocument));
       
       if (leadingDocument != null)
@@ -47,7 +59,7 @@ namespace Sungero.Capture.Server
       
       return arioUrl;
     }
-    
+            
     /// <summary>
     /// Создать документ в Rx, тело документа загружается из Арио.
     /// </summary>
@@ -55,14 +67,11 @@ namespace Sungero.Capture.Server
     /// <param name="addendumNumber">Номер приложения.</param>
     /// <param name="documentGuid">Гуид тела документа.</param>
     /// <param name="firstDoc">Ведущий документ.</param>
-    /// <returns></returns>
+    /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateDocumentByGuid(string name, int addendumNumber,string documentGuid, IOfficialDocument leadingDoc)
-    {
-      var arioUrl = Functions.Module.GetArioUrl();
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var documentBody = arioConnector.GetDocumentByGuid(documentGuid);
-      
-      var document = SimpleDocuments.Create();
+    {      
+      var documentBody = GetDocumentBody(documentGuid);
+      var document = SimpleDocuments.Create();      
       document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;
       document.CreateVersionFrom(documentBody, "pdf");
       if (leadingDoc != null)
@@ -70,6 +79,36 @@ namespace Sungero.Capture.Server
       
       document.Save();
       return document;
+    }
+    
+    /// <summary>
+    /// Создать письмо в Rx.
+    /// </summary>
+    /// <param name="documentGuid">Гуид документа в Арио.</param>
+    /// <returns>Документ.</returns>
+    public static Docflow.IOfficialDocument CreateIncomingLetter(string documentGuid)
+    {
+      var documentBody = GetDocumentBody(documentGuid);
+      var document = Sungero.RecordManagement.IncomingLetters.Create();
+      document.Subject = "<TODO>";
+      document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
+      document.Department = Company.Departments.GetAll().FirstOrDefault();
+      document.BusinessUnit = document.Department.BusinessUnit;
+      document.CreateVersionFrom(documentBody, "pdf");
+      document.Save();
+      return document;
+    }
+    
+    /// <summary>
+    /// Получить тело документа из Арио. 
+    /// </summary>
+    /// <param name="documentGuid">Гуид документа в Арио.</param>
+    /// <returns>Тело документа.</returns>
+    public static System.IO.Stream GetDocumentBody(string documentGuid)
+    {
+      var arioUrl = Functions.Module.GetArioUrl();
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      return arioConnector.GetDocumentByGuid(documentGuid);
     }
     
     /// <summary>
