@@ -40,10 +40,10 @@ namespace Sungero.Capture.Client
       
       // Разделить пакет на документы.
       var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var documentGuids = SplitPackage(filePath, arioUrl, firstPageClassifierName);
+      var сlassificationResults = SplitPackage(filePath, arioUrl, firstPageClassifierName);
       
       // Обработать пакет.
-      Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, documentGuids, int.Parse(responsibleId));
+      Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, сlassificationResults, int.Parse(responsibleId));
     }
     
     /// <summary>
@@ -53,7 +53,7 @@ namespace Sungero.Capture.Client
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <returns>Коллекция записей с результатом разделения. Запись состоит из гуида документа и его класса, присвоенного ему Арио.</returns>
-    public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
+    public static List<Sungero.Capture.Structures.Module.PackageClassificationResult> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var classifierId = "8";

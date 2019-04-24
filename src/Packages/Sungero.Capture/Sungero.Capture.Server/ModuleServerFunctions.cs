@@ -18,10 +18,9 @@ namespace Sungero.Capture.Server
     /// <param name="documentGuids">Список Гуидов документов, на которые Арио разделил пакет.</param>
     /// <param name="responsibleId">Ид сотрудника, ответственного за проверку документов.</param>
     [Remote]
-    public static void ProcessSplitedPackage(string sourceFileName, List<string> documentGuids, int responsibleId)
+    public static void ProcessSplitedPackage(string sourceFileName, List<Sungero.Capture.Structures.Module.PackageClassificationResult> сlassificationResults, int responsibleId)
     {
-      var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass.Equals("Письмо"));
-      
+      var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass != null && d.DocumentClass.Equals("Письмо"));
       IOfficialDocument leadingDocument;
       if (letterRecord != null)
       {
@@ -30,14 +29,13 @@ namespace Sungero.Capture.Server
       }
       else
       {
-        leadingDocument = CreateDocumentByGuid(сlassificationResults.First().DocumentGuid, null);
+        leadingDocument = CreateDocumentByGuid(sourceFileName, 0, сlassificationResults.First().DocumentGuid, null);
         сlassificationResults = сlassificationResults.Skip(1).ToList();
       }
       var documents = new List<IOfficialDocument>();
-      var leadingDocument = CreateDocumentByGuid(sourceFileName, 0, documentGuids.First(), null);
-        documents.Add(CreateDocumentByGuid(сlassificationResult.DocumentGuid, leadingDocument));
       int addendumNumber = 1;
-        documents.Add(CreateDocumentByGuid(string.Empty, addendumNumber++, documentGuid, leadingDocument));
+      foreach(var сlassificationResult in сlassificationResults)
+        documents.Add(CreateDocumentByGuid(string.Empty, addendumNumber++, сlassificationResult.DocumentGuid, leadingDocument));
       
       if (leadingDocument != null)
         SendToResponsible(leadingDocument, documents, responsibleId);
@@ -59,7 +57,7 @@ namespace Sungero.Capture.Server
       
       return arioUrl;
     }
-            
+    
     /// <summary>
     /// Создать документ в Rx, тело документа загружается из Арио.
     /// </summary>
@@ -69,9 +67,9 @@ namespace Sungero.Capture.Server
     /// <param name="firstDoc">Ведущий документ.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateDocumentByGuid(string name, int addendumNumber,string documentGuid, IOfficialDocument leadingDoc)
-    {      
+    {
       var documentBody = GetDocumentBody(documentGuid);
-      var document = SimpleDocuments.Create();      
+      var document = SimpleDocuments.Create();
       document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;
       document.CreateVersionFrom(documentBody, "pdf");
       if (leadingDoc != null)
@@ -100,7 +98,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить тело документа из Арио. 
+    /// Получить тело документа из Арио.
     /// </summary>
     /// <param name="documentGuid">Гуид документа в Арио.</param>
     /// <returns>Тело документа.</returns>
@@ -150,7 +148,7 @@ namespace Sungero.Capture.Server
       task.Save();
       task.Start();
     }
-           
+    
     [Remote, Public]
     public static string GetCurrentTenant()
     {
