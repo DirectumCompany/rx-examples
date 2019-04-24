@@ -130,7 +130,7 @@
     <value>Приложение №{0}</value>
   </data>
   <data name="TaskName" xml:space="preserve">
-    <value>Обработайте документ "{0}".</value>
+    <value>Обработайте комплект документов: {0}.</value>
   </data>
   <data name="DocumentNotFound" xml:space="preserve">
     <value>Документ с ИД {0} не найден.</value>
