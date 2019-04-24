@@ -127,7 +127,7 @@
     <value>В метаданных пакета, сформированного DCS, нет информации о содержащихся в нём файлах.</value>
   </data>
   <data name="DocumentName" xml:space="preserve">
-    <value>Импортированный документ №{0}</value>
+    <value>Приложение №{0}</value>
   </data>
   <data name="TaskName" xml:space="preserve">
     <value>Обработайте документ "{0}".</value>

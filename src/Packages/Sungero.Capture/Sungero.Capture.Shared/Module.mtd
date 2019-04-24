@@ -64,6 +64,11 @@
       "IsRemote": true,
       "Parameters": [
         {
+          "Name": "sourceFileName",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        },
+        {
           "Name": "documentGuids",
           "ParameterType": "global::System.Collections.Generic.List<global::System.String>",
           "ParameterTypeFullName": "System.Collections.Generic.List"
