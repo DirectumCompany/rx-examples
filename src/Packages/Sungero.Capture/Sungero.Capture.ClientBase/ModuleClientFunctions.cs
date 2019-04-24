@@ -17,6 +17,8 @@ namespace Sungero.Capture.Client
     /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder,
                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
@@ -49,6 +51,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="filePath">Путь к пакету.</param>
     /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <returns>Список Гуидов, по которым в Арио можно получить документы.</returns>
     public static List<string> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName)
     {
