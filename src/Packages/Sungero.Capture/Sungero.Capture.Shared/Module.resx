@@ -138,4 +138,7 @@
   <data name="CheckPackage" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="AttachmentName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

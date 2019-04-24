@@ -138,4 +138,7 @@
   <data name="CheckPackage" xml:space="preserve">
     <value>Проверьте комплект документов</value>
   </data>
+  <data name="AttachmentName" xml:space="preserve">
+    <value>Приложение №{0}</value>
+  </data>
 </root>

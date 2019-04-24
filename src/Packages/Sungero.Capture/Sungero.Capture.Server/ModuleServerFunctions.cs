@@ -20,13 +20,23 @@ namespace Sungero.Capture.Server
     [Remote]
     public static void ProcessSplitedPackage(string sourceFileName, List<Sungero.Capture.Structures.Module.ClassifiedDocument> сlassificationResults, int responsibleId)
     {
-      var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass != null && d.DocumentClass.Equals("Письмо"));
+      var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass != null &&
+        d.DocumentClass.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
       
+      // Поиск ответственного.
+      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(responsibleId);
+      if (responsible == null)
+      {
+        Logger.Error(Capture.Resources.InvalidResponsibleId);
+        return;
+      }
+      var responsibleDepartment = GetDepartment(responsible);
+            
       IOfficialDocument leadingDocument;
       if (letterRecord != null)
       {
         // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.       
-        leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid);
+        leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid, responsibleDepartment);
         сlassificationResults.Remove(letterRecord);
       }
       else
@@ -42,7 +52,7 @@ namespace Sungero.Capture.Server
         documents.Add(CreateDocumentByGuid(string.Empty, addendumNumber++, сlassificationResult.DocumentGuid, leadingDocument));
       
       if (leadingDocument != null)
-        SendToResponsible(leadingDocument, documents, responsibleId);
+        SendToResponsible(leadingDocument, documents, responsible);
     }
     
     /// <summary>
@@ -74,11 +84,20 @@ namespace Sungero.Capture.Server
     {
       var documentBody = GetDocumentBody(documentGuid);
       var document = SimpleDocuments.Create();
-      document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;
+      document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;      
       document.CreateVersionFrom(documentBody, "pdf");
       if (leadingDoc != null)
-        document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDoc);
-      
+      {
+        if (IncomingDocumentBases.Is(leadingDoc))
+        {
+          document.Relations.AddFrom(Docflow.PublicConstants.Module.AddendumRelationName, leadingDoc);
+          document.Name = string.IsNullOrWhiteSpace(name) ? Resources.AttachmentNameFormat(addendumNumber) : name;
+        }
+        else
+        {
+          document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDoc);
+        }
+      }      
       document.Save();
       return document;
     }
@@ -88,14 +107,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="documentGuid">Гуид документа в Арио.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateIncomingLetter(string documentGuid)
+    public static Docflow.IOfficialDocument CreateIncomingLetter(string documentGuid, Company.IDepartment department)
     {
       var documentBody = GetDocumentBody(documentGuid);
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       document.Subject = "<TODO>";
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
-      document.Department = Company.Departments.GetAll().FirstOrDefault();
-      document.BusinessUnit = document.Department.BusinessUnit;
+      document.BusinessUnit = department.BusinessUnit;
+      document.Department = department;
       document.CreateVersionFrom(documentBody, "pdf");
       document.Save();
       return document;
@@ -121,15 +140,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsibleId">ИД ответственного.</param>
     /// <returns>Простая задача.</returns>
     [Remote, Public]
-    public static void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, int responsibleId)
-    {
-      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(responsibleId);
-      if (responsible == null)
-      {
-        Logger.Error(Capture.Resources.InvalidResponsibleId);
-        return;
-      }
-      
+    public static void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
+    {      
       if (leadingDocument == null)
         return;
       
@@ -153,6 +165,16 @@ namespace Sungero.Capture.Server
       task.Deadline = Calendar.Now.AddWorkingHours(4);
       task.Save();
       task.Start();
+    }
+    
+    public static Company.IDepartment GetDepartment(Company.IEmployee employee)
+    {
+      if (employee == null)
+        return null;
+      var employeeDepartment = Company.Departments.GetAll(d => d.Status == Sungero.CoreEntities.DatabookEntry.Status.Active &&
+         d.RecipientLinks.Any(l => Equals(l.Member, employee)))
+        .FirstOrDefault(department => department.BusinessUnit != null);
+      return employeeDepartment;
     }
     
     [Remote, Public]
