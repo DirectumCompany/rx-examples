@@ -149,6 +149,8 @@ namespace Sungero.Capture.Server
         document.Save();
         task.Attachments.Add(document);
       }
+      task.NeedsReview = false;
+      task.Deadline = Calendar.Now.AddWorkingHours(4);
       task.Save();
       task.Start();
     }
