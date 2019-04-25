@@ -107,6 +107,7 @@ namespace Sungero.Capture.Server
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
       document.BusinessUnit = department.BusinessUnit;
       document.Department = department;
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.CreateVersionFrom(documentBody, "pdf");
       document.Save();
       return document;
@@ -159,14 +160,22 @@ namespace Sungero.Capture.Server
       task.Start();
     }
     
+    /// <summary>
+    /// Получить подразделение из настроек сотрудника.
+    /// </summary>
+    /// <param name="employee">Сотрудник.</param>
+    /// <returns>Подразделение.</returns>
     public static Company.IDepartment GetDepartment(Company.IEmployee employee)
     {
       if (employee == null)
         return null;
-      var employeeDepartment = Company.Departments.GetAll(d => d.Status == Sungero.CoreEntities.DatabookEntry.Status.Active &&
-                                                          d.RecipientLinks.Any(l => Equals(l.Member, employee)))
-        .FirstOrDefault(department => department.BusinessUnit != null);
-      return employeeDepartment;
+      
+      var department = Company.Departments.Null;
+      var settings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(employee);
+      if (settings != null)
+        department = settings.Department;
+      
+      return department;
     }
     
     [Remote, Public]
