@@ -27,8 +27,7 @@ namespace Sungero.Capture.Server
       if (letterRecord != null)
       {
         // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.
-        var responsibleDepartment = GetDepartment(responsible);
-        leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid, responsibleDepartment);
+        leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid, responsible);
         сlassificationResults.Remove(letterRecord);
       }
       else
@@ -99,14 +98,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="documentGuid">Гуид документа в Арио.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateIncomingLetter(string documentGuid, Company.IDepartment department)
+    public static Docflow.IOfficialDocument CreateIncomingLetter(string documentGuid, IEmployee responsible)
     {
       var documentBody = GetDocumentBody(documentGuid);
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       document.Subject = "<TODO>";
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
-      document.BusinessUnit = department.BusinessUnit;
-      document.Department = department;
+      document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      document.Department = GetDepartment(responsible);
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.CreateVersionFrom(documentBody, "pdf");
       document.Save();
@@ -174,7 +173,8 @@ namespace Sungero.Capture.Server
       var settings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(employee);
       if (settings != null)
         department = settings.Department;
-      
+      if (department == null)
+        department = employee.Department;
       return department;
     }
     
