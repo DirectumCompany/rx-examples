@@ -22,8 +22,8 @@ namespace Sungero.Capture.Client
     public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder,
                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
-    	Logger.Debug("Begin of captured package processing.");
       // Найти ответственного.
+    	Logger.Debug("Begin of captured package processing...");
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
       {
@@ -31,6 +31,7 @@ namespace Sungero.Capture.Client
         return;
       }
       
+      // Получить имена файлов.
       var filePath = GetScannedPackagePath(filesInfo, folder);
       var sourceFileName = GetScannedPackageName(instanceInfos);
       if (string.IsNullOrEmpty(filePath))
@@ -39,16 +40,17 @@ namespace Sungero.Capture.Client
         return;
       }
 
-      Logger.DebugFormat("Begin of package {0} splitting and classification.", sourceFileName);
       // Разделить пакет на документы.
+      Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", sourceFileName);
       var arioUrl = Functions.Module.Remote.GetArioUrl();
       var сlassificationResults = SplitPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
-      Logger.DebugFormat("End of package {0} splitting and classification.", sourceFileName);
+      Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
       
-      Logger.DebugFormat("Begin of splitted package {0} processing.", sourceFileName);
       // Обработать пакет.
-      Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, сlassificationResults, int.Parse(responsibleId));
-      Logger.DebugFormat("End of package {0} processing.", sourceFileName);
+      Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
+      Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, сlassificationResults, responsible);
+      Logger.DebugFormat("End of splitted package \"{0}\" processing.", sourceFileName);
+    	Logger.Debug("End of captured package processing.");
     }
     
     /// <summary>
@@ -59,16 +61,20 @@ namespace Sungero.Capture.Client
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <returns>Коллекция записей с результатом разделения. Запись состоит из гуида документа и его класса, присвоенного ему Арио.</returns>
-    public static List<Sungero.Capture.Structures.Module.ClassifiedDocument> SplitPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
+    public static List<Sungero.Capture.Structures.Module.ClassifiedDocument> SplitPackage(string filePath, 
+                                                                                          string arioUrl, 
+                                                                                          string firstPageClassifierName, 
+                                                                                          string typeClassifierName)
     {
+      // Найти классификаторы.
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var fpClassifierId = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
-      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       var typeClassifierId = arioConnector.GetClassifierByName(typeClassifierName).Id.ToString();
+      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
       
+      // Классифицировать.
       var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), typeClassifierId, fpClassifierId);
-      Logger.Debug("End of package splitting and classification.");
       var result = new List<Sungero.Capture.Structures.Module.ClassifiedDocument>();
       foreach (var classificationResult in classificationResults)
       {

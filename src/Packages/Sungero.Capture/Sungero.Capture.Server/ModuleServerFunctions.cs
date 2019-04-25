@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Sungero.Company;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Docflow;
@@ -16,32 +17,23 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
     /// <param name="сlassificationResults">Коллекция записей с результатом разделения.</param>
-    /// <param name="responsibleId">Ид сотрудника, ответственного за проверку документов.</param>
+    /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     [Remote]
-    public static void ProcessSplitedPackage(string sourceFileName, List<Sungero.Capture.Structures.Module.ClassifiedDocument> сlassificationResults, int responsibleId)
+    public static void ProcessSplitedPackage(string sourceFileName, List<Sungero.Capture.Structures.Module.ClassifiedDocument> сlassificationResults, IEmployee responsible)
     {
       var letterRecord = сlassificationResults.FirstOrDefault(d => d.DocumentClass != null &&
-        d.DocumentClass.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
-      
-      // Поиск ответственного.
-      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(responsibleId);
-      if (responsible == null)
-      {
-        Logger.Error(Capture.Resources.InvalidResponsibleId);
-        return;
-      }
-      var responsibleDepartment = GetDepartment(responsible);
-            
+                                                              d.DocumentClass.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
       IOfficialDocument leadingDocument;
       if (letterRecord != null)
       {
-        // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.       
+        // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.
+        var responsibleDepartment = GetDepartment(responsible);
         leadingDocument = CreateIncomingLetter(letterRecord.DocumentGuid, responsibleDepartment);
         сlassificationResults.Remove(letterRecord);
       }
       else
       {
-        // Иначе ведущий документ - первый документ в списке.      
+        // Иначе ведущий документ - первый документ в списке.
         leadingDocument = CreateDocumentByGuid(sourceFileName, 0, сlassificationResults.First().DocumentGuid, null);
         сlassificationResults = сlassificationResults.Skip(1).ToList();
       }
@@ -84,7 +76,7 @@ namespace Sungero.Capture.Server
     {
       var documentBody = GetDocumentBody(documentGuid);
       var document = SimpleDocuments.Create();
-      document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;      
+      document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;
       document.CreateVersionFrom(documentBody, "pdf");
       if (leadingDoc != null)
       {
@@ -97,7 +89,7 @@ namespace Sungero.Capture.Server
         {
           document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDoc);
         }
-      }      
+      }
       document.Save();
       return document;
     }
@@ -141,7 +133,7 @@ namespace Sungero.Capture.Server
     /// <returns>Простая задача.</returns>
     [Remote, Public]
     public static void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
-    {      
+    {
       if (leadingDocument == null)
         return;
       
@@ -172,7 +164,7 @@ namespace Sungero.Capture.Server
       if (employee == null)
         return null;
       var employeeDepartment = Company.Departments.GetAll(d => d.Status == Sungero.CoreEntities.DatabookEntry.Status.Active &&
-         d.RecipientLinks.Any(l => Equals(l.Member, employee)))
+                                                          d.RecipientLinks.Any(l => Equals(l.Member, employee)))
         .FirstOrDefault(department => department.BusinessUnit != null);
       return employeeDepartment;
     }
