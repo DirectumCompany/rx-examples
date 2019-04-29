@@ -43,12 +43,12 @@ namespace Sungero.Capture.Client
       // Разделить пакет на документы.
       Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", sourceFileName);
       var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var сlassificationResults = SplitPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      var jsonClassificationResults = SplitPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
       
       // Обработать пакет.
       Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
-      Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, сlassificationResults, responsible);
+      Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, jsonClassificationResults, responsible);
       Logger.DebugFormat("End of splitted package \"{0}\" processing.", sourceFileName);
     	Logger.Debug("End of captured package processing.");
     }
@@ -60,30 +60,20 @@ namespace Sungero.Capture.Client
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    /// <returns>Коллекция записей с результатом разделения. Запись состоит из гуида документа и его класса, присвоенного ему Арио.</returns>
-    public static List<Sungero.Capture.Structures.Module.ClassifiedDocument> SplitPackage(string filePath, 
-                                                                                          string arioUrl, 
-                                                                                          string firstPageClassifierName, 
-                                                                                          string typeClassifierName)
+    /// <returns>Json с результатом классификации и извлечения фактов.</returns>
+    public static string SplitPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
     {
       // Найти классификаторы.
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var fpClassifierId = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
       var typeClassifierId = arioConnector.GetClassifierByName(typeClassifierName).Id.ToString();
+      
       Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
       
-      // Классифицировать.
-      var classificationResults = arioConnector.Classify(File.ReadAllBytes(filePath), Path.GetFileName(filePath), typeClassifierId, fpClassifierId);
-      var result = new List<Sungero.Capture.Structures.Module.ClassifiedDocument>();
-      foreach (var classificationResult in classificationResults)
-      {
-        var element = new Sungero.Capture.Structures.Module.ClassifiedDocument();
-        element.DocumentGuid = classificationResult.DocumentGuid;
-        element.DocumentClass = classificationResult.PredictedClass != null ? classificationResult.PredictedClass.Name : null;
-        result.Add(element);
-      }
-      return result;
+      var ruleMapping = GetClassRuleMapping();      
+                  
+      return arioConnector.ClassifyAndExtractFacts(File.ReadAllBytes(filePath), Path.GetFileName(filePath), typeClassifierId, fpClassifierId, ruleMapping);
     }
     
     /// <summary>
@@ -120,6 +110,19 @@ namespace Sungero.Capture.Client
       }
       
       return filePath;
+    }
+    
+    /// <summary>
+    /// Получить соответствие класса и имени правила его обработки.
+    /// </summary>
+    /// <returns></returns>
+    public static System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
+    {
+    	return new Dictionary<string, string>()
+      {
+      	{ "Входящее письмо" , "Letter"},
+      	{ "Письмо" , "Letter"}
+      };
     }
     
     /// <summary>
