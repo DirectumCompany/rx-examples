@@ -20,17 +20,18 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     [Remote]
     public static void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
-    {
-      var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
-      var letterRecord = сlassificationResults.FirstOrDefault(d => d.ClassificationResult.PredictedClass != null &&
-                                                              d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
-      
+    {    	
+    	var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
+    	
+    	var letterсlassificationResult = сlassificationResults.FirstOrDefault(d => d.ClassificationResult.PredictedClass != null && 
+    	  d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));   
+    	
       IOfficialDocument leadingDocument;
-      if (letterRecord != null)
+      if (letterсlassificationResult != null)
       {
         // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.
-        leadingDocument = CreateIncomingLetter(letterRecord, responsible);
-        сlassificationResults.Remove(letterRecord);
+        leadingDocument = CreateIncomingLetter(letterсlassificationResult, responsible);
+        сlassificationResults.Remove(letterсlassificationResult);
       }
       else
       {
@@ -98,18 +99,16 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать письмо в Rx.
     /// </summary>
-    /// <param name="letterRecord">Результат обработки письма в Ario.</param>
+    /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateIncomingLetter(ArioExtensions.Models.ProcessResponse letterRecord, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
     {
-      var documentBody = GetDocumentBody(letterRecord.ClassificationResult.DocumentGuid);
-      var document = Sungero.RecordManagement.IncomingLetters.Create();
+      var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
+      var document = Sungero.RecordManagement.IncomingLetters.Create();                 
       
-      var fields = GetFields(letterRecord.ExtractionResult.Facts, "letter");
-      
-      var correspondentNumber = fields.FirstOrDefault(f => f.Name.Equals("number", StringComparison.InvariantCultureIgnoreCase));
-      var dated = fields.FirstOrDefault(f => f.Name.Equals("date", StringComparison.InvariantCultureIgnoreCase));
+      var correspondentNumber = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "number");
+      var dated = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "date");
       if (dated != null)
         document.Dated = DateTime.Parse(dated.Value);
       
@@ -125,16 +124,17 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить поля из фактов.
+    /// Получить поле из фактов.
     /// </summary>
     /// <param name="facts"> Список фактов.</param>
-    /// <param name="factName"> Имя факта, поля которого будут извлечены.</param>
-    /// <returns> Коллекция полей, отсортированная в порядке уменьшения вероятности.</returns>
-    public static System.Collections.Generic.IEnumerable<ArioExtensions.Models.FactField> GetFields(List<ArioExtensions.Models.Fact> facts, string factName)
+    /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
+    /// <returns> Поле, полученное из Ario с наибольшей вероятностью.</returns>
+    public static ArioExtensions.Models.FactField GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)    	
     {
       var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
       IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(fact => fact.Fields);
-      return fields.OrderByDescending(f => f.Probability);
+      fields.OrderByDescending(f => f.Probability);
+      return fields.FirstOrDefault(f => f.Name.Equals(fieldName, StringComparison.InvariantCultureIgnoreCase));
     }
     
     /// <summary>
