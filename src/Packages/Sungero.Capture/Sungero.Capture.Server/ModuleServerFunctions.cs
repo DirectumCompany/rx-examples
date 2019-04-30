@@ -13,19 +13,18 @@ namespace Sungero.Capture.Server
   public class ModuleFunctions
   {
     /// <summary>
-    /// Создать документы в Rx и отправить задачу на проверку.
+    /// Создать документы в RX и отправить задачу на проверку.
     /// </summary>
     /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
     /// <param name="jsonClassificationResults">Json результатом классификации и извлечения фактов.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     [Remote]
     public static void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
-    {    	
-    	var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
-    	
-    	var letterRecord = сlassificationResults.FirstOrDefault(d => d.ClassificationResult.PredictedClass != null && 
-    	  d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));   
-    	
+    {
+      var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
+      var letterRecord = сlassificationResults.FirstOrDefault(d => d.ClassificationResult.PredictedClass != null &&
+                                                              d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
+      
       IOfficialDocument leadingDocument;
       if (letterRecord != null)
       {
@@ -34,7 +33,7 @@ namespace Sungero.Capture.Server
         сlassificationResults.Remove(letterRecord);
       }
       else
-      {      	
+      {
         // Иначе ведущий документ - первый документ в списке.
         leadingDocument = CreateDocumentByGuid(sourceFileName, 0, сlassificationResults.First().ClassificationResult.DocumentGuid, null);
         сlassificationResults = сlassificationResults.Skip(1).ToList();
@@ -106,22 +105,22 @@ namespace Sungero.Capture.Server
     {
       var documentBody = GetDocumentBody(letterRecord.ClassificationResult.DocumentGuid);
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-            
+      
       var fields = GetFields(letterRecord.ExtractionResult.Facts, "letter");
       
       var correspondentNumber = fields.FirstOrDefault(f => f.Name.Equals("number", StringComparison.InvariantCultureIgnoreCase));
       var dated = fields.FirstOrDefault(f => f.Name.Equals("date", StringComparison.InvariantCultureIgnoreCase));
       if (dated != null)
-      	document.Dated = DateTime.Parse(dated.Value);
+        document.Dated = DateTime.Parse(dated.Value);
       
       document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;
-      document.Subject = "<TODO>";
+      document.Subject = "TODO";
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
       document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = GetDepartment(responsible);
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.CreateVersionFrom(documentBody, "pdf");
-      document.Save();      
+      document.Save();
       return document;
     }
     
@@ -131,9 +130,9 @@ namespace Sungero.Capture.Server
     /// <param name="facts"> Список фактов.</param>
     /// <param name="factName"> Имя факта, поля которого будут извлечены.</param>
     /// <returns> Коллекция полей, отсортированная в порядке уменьшения вероятности.</returns>
-    public static System.Collections.Generic.IEnumerable<ArioExtensions.Models.FactField> GetFields(List<ArioExtensions.Models.Fact> facts, string factName)    	
+    public static System.Collections.Generic.IEnumerable<ArioExtensions.Models.FactField> GetFields(List<ArioExtensions.Models.Fact> facts, string factName)
     {
-    	var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
+      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
       IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(fact => fact.Fields);
       return fields.OrderByDescending(f => f.Probability);
     }
