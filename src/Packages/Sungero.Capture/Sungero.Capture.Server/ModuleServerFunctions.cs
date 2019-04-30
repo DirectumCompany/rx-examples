@@ -109,13 +109,13 @@ namespace Sungero.Capture.Server
       // При создании версии, если в документе пустой subject, то он заполняется значением из name. 
       var correspondentNumber = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "number");
       var dated = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "date");
+      var subject = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "subject");
       // Поэтому сначала создаем версию, чтобы subject мог быть пустым.
       document.CreateVersionFrom(documentBody, "pdf");
       document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;      
       if (dated != null)
         document.Dated = DateTime.Parse(dated.Value);
-      
-      var subject = fields.FirstOrDefault(f => f.Name.Equals("subject", StringComparison.InvariantCultureIgnoreCase));
+            
       document.Subject = subject != null && !string.IsNullOrEmpty(subject.Value) ? 
         string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
