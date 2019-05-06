@@ -119,6 +119,7 @@ namespace Sungero.Capture.Server
         string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
+      document.Correspondent = null;
       var correspondentNumber = GetField(facts, "letter", "number");
       document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;
       var correspondentDate = GetField(facts, "letter", "date");
@@ -126,8 +127,6 @@ namespace Sungero.Capture.Server
         document.Dated = DateTime.Parse(correspondentDate.Value);
       document.Correspondent = GetCounterparty(facts);
       
-      if (document.Correspondent == null)
-        document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
       // Заполнить данные нашей стороны.
       document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = GetDepartment(responsible);

@@ -16,5 +16,13 @@ namespace Sungero.SmartCapture.Shared
       // Содержание обязательно, только если это указано в метаданных.
       _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
     }
+    
+    public override List<Sungero.Parties.ICounterparty> GetCounterparties()
+    {
+      if (_obj.Correspondent == null)
+        return null;
+      
+      return base.GetCounterparties();
+    }
   }
 }
