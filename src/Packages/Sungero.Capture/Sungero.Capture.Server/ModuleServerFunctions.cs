@@ -104,27 +104,37 @@ namespace Sungero.Capture.Server
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
     {
+    	// Создать документ.
       var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
       var document = Sungero.RecordManagement.IncomingLetters.Create();
+      // Сначала создать версию, чтобы перезаписать содержание, если оно заполнилось из наименования.
+      document.CreateVersionFrom(documentBody, "pdf");
       
-      // При создании версии, если в документе пустой subject, то он заполняется значением из name.
+      // Получить факты из результатов классификации документа.
       var facts = letterсlassificationResult.ExtractionResult.Facts;
       var correspondentNumber = GetField(facts, "letter", "number");
-      var dated = GetField(facts, "letter", "date");
-      var subject = GetField(facts, "letter", "subject");
+      var correspondentDate = GetField(facts, "letter", "date");
+      var subject = GetField(facts, "letter", "subject");      
       
-      // Поэтому сначала создаем версию, чтобы subject мог быть пустым.
-      document.CreateVersionFrom(documentBody, "pdf");
-      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;
-      if (dated != null)
-        document.Dated = DateTime.Parse(dated.Value);
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      
+      // Заполнить наименование видом документа на случай отключенного автоформирования наименования.
+      document.Name = document.DocumentKind.ShortName;
       
       document.Subject = subject != null && !string.IsNullOrEmpty(subject.Value) ?
-        string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;
+        string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;                  
+      
+      // Заполнить данные корреспондента.
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
+      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;      
+      if (correspondentDate != null)
+        document.Dated = DateTime.Parse(correspondentDate.Value);
+      
+      // Заполнить данные нашей стороны.
       document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = GetDepartment(responsible);
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      
       document.Save();
       return document;
     }
