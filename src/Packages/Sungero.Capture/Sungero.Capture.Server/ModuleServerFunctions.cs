@@ -97,37 +97,31 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Создать письмо в RX.
+    /// Создать входящее письмо в RX.
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
     {
-    	// Создать документ.
-      var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
+      // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-      // Сначала создать версию, чтобы перезаписать содержание, если оно заполнилось из наименования.
+      var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
       document.CreateVersionFrom(documentBody, "pdf");
-      
-      // Получить факты из результатов классификации документа.
-      var facts = letterсlassificationResult.ExtractionResult.Facts;
-      var correspondentNumber = GetField(facts, "letter", "number");
-      var correspondentDate = GetField(facts, "letter", "date");
-      var subject = GetField(facts, "letter", "subject");      
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      
-      // Заполнить наименование видом документа на случай отключенного автоформирования наименования.
       document.Name = document.DocumentKind.ShortName;
-      
+      var facts = letterсlassificationResult.ExtractionResult.Facts;
+      var subject = GetField(facts, "letter", "subject");
       document.Subject = subject != null && !string.IsNullOrEmpty(subject.Value) ?
-        string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;                  
+        string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
-      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;      
+      var correspondentNumber = GetField(facts, "letter", "number");
+      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;
+      var correspondentDate = GetField(facts, "letter", "date");
       if (correspondentDate != null)
         document.Dated = DateTime.Parse(correspondentDate.Value);
       
