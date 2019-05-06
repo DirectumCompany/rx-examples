@@ -20,12 +20,12 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     [Remote]
     public static void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
-    {    	
-    	var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
-    	
-    	var letterсlassificationResult = сlassificationResults.FirstOrDefault(d => d.ClassificationResult.PredictedClass != null && 
-    	  d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));   
-    	
+    {
+      var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
+      var letterсlassificationResult = сlassificationResults
+        .Where(d => d.ClassificationResult.PredictedClass != null)
+        .FirstOrDefault(d => d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
+      
       IOfficialDocument leadingDocument;
       if (letterсlassificationResult != null)
       {
@@ -97,7 +97,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Создать письмо в Rx.
+    /// Создать письмо в RX.
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
@@ -105,18 +105,21 @@ namespace Sungero.Capture.Server
     public static Docflow.IOfficialDocument CreateIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
     {
       var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
-      var document = Sungero.RecordManagement.IncomingLetters.Create();                 
-      // При создании версии, если в документе пустой subject, то он заполняется значением из name. 
-      var correspondentNumber = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "number");
-      var dated = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "date");
-      var subject = GetField(letterсlassificationResult.ExtractionResult.Facts, "letter", "subject");
+      var document = Sungero.RecordManagement.IncomingLetters.Create();
+      
+      // При создании версии, если в документе пустой subject, то он заполняется значением из name.
+      var facts = letterсlassificationResult.ExtractionResult.Facts;
+      var correspondentNumber = GetField(facts, "letter", "number");
+      var dated = GetField(facts, "letter", "date");
+      var subject = GetField(facts, "letter", "subject");
+      
       // Поэтому сначала создаем версию, чтобы subject мог быть пустым.
       document.CreateVersionFrom(documentBody, "pdf");
-      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;      
+      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;
       if (dated != null)
         document.Dated = DateTime.Parse(dated.Value);
-            
-      document.Subject = subject != null && !string.IsNullOrEmpty(subject.Value) ? 
+      
+      document.Subject = subject != null && !string.IsNullOrEmpty(subject.Value) ?
         string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;
       document.Correspondent = Parties.Counterparties.GetAll().FirstOrDefault();
       document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
@@ -132,7 +135,7 @@ namespace Sungero.Capture.Server
     /// <param name="facts"> Список фактов.</param>
     /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
     /// <returns> Поле, полученное из Ario с наибольшей вероятностью.</returns>
-    public static ArioExtensions.Models.FactField GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)    	
+    public static ArioExtensions.Models.FactField GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
     {
       var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
       IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(fact => fact.Fields);
