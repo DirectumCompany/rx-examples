@@ -161,7 +161,8 @@ namespace Sungero.Capture.Server
         var legalForm = GetField(fact, "CorrespondentLegalForm");
         name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
         var counterparties = Counterparties.GetAll().Where(x => x.Name == name &&
-                                                           x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed).ToList();        
+                                                           x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed &&
+                                                           !x.Note.Contains(BusinessUnits.Resources.BusinessUnitComment)).ToList();
         if (counterparties.Any())
         {
           foundByName.AddRange(counterparties.ToList());
@@ -299,7 +300,8 @@ namespace Sungero.Capture.Server
       var result = new List<ICounterparty>();
       
       // Отфильтровать закрытые сущности.
-      counterparties = counterparties.Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
+      counterparties = counterparties.Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed &&
+                                            !x.Note.Contains(BusinessUnits.Resources.BusinessUnitComment));
       
       // Поиск по ИНН, если ИНН передан.
       if (searchByTin)
