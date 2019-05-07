@@ -209,10 +209,10 @@ namespace Sungero.Capture.Server
     
     public static List<ArioExtensions.Models.Fact> GetFacts(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
     {
-      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
-      filteredFacts = filteredFacts.Where(f => f.Fields.Any(field => Equals(field.Name, fieldName)));
-      return filteredFacts.OrderByDescending(f => f.Fields.Where(field => Equals(field.Name, fieldName)).Select(field => field.Probability)).ToList();
-    }
+      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));      
+      filteredFacts = filteredFacts.Where(f => f.Fields.Any(field => Equals(field.Name, fieldName)));      
+      return filteredFacts.OrderByDescending(f => f.Fields.FirstOrDefault(field => Equals(field.Name, fieldName)).Probability).ToList();
+    }    
     
     /// <summary>
     /// Получить тело документа из Арио.
