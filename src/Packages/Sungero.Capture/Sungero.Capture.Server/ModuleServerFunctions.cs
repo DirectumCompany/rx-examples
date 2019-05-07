@@ -137,7 +137,7 @@ namespace Sungero.Capture.Server
     
     public static Sungero.Parties.ICounterparty GetCounterparty(List<ArioExtensions.Models.Fact> facts)
     {
-      var tinList = new List<ICounterparty>();
+      var foundByTin = new List<ICounterparty>();
       // Поиск корреспондента по ИНН/КПП.
       var correspondentRequisites = GetFacts(facts, "Counterparty", "TIN");
       foreach (var fact in correspondentRequisites)
@@ -146,14 +146,14 @@ namespace Sungero.Capture.Server
         var trrc = GetField(fact, "TRRC");
         var counterparties = GetCounterparties(tin, trrc);
         if (counterparties.Any())
-          tinList.AddRange(counterparties.ToList());
+          foundByTin.AddRange(counterparties.ToList());
       }
       
-      if (tinList.Count == 1)
-        return tinList.First();
+      if (foundByTin.Count == 1)
+        return foundByTin.First();
       
-      var nameList = new List<ICounterparty>();
-      // Поиск корреспондента по наименованию, если не нашли по ИНН/КПП.
+      var foundByName = new List<ICounterparty>();
+      // Поиск корреспондента по наименованию.
       var correspondentNames = GetFacts(facts, "Letter", "CorrespondentName");
       foreach (var fact in correspondentNames)
       {
@@ -161,19 +161,26 @@ namespace Sungero.Capture.Server
         var legalForm = GetField(fact, "CorrespondentLegalForm");
         name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
         var counterparties = Counterparties.GetAll().Where(x => x.Name == name &&
-                                                           x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed).ToList();
+                                                           x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed).ToList();        
         if (counterparties.Any())
         {
-          nameList.AddRange(counterparties.ToList());
+          foundByName.AddRange(counterparties.ToList());
         }
       }
       
-      if (!tinList.Any())
-        return nameList.FirstOrDefault();
+      if (!foundByTin.Any())
+      {
+        if (correspondentRequisites.Any())
+          foundByName = foundByName.Where(c => string.IsNullOrEmpty(c.TIN)).ToList();
+        return foundByName.FirstOrDefault();
+      }
       
-      var a = nameList.Where(t => tinList.Any(n => n == t));
-      if (a.Any())
-        return a.First();
+      if (!foundByName.Any())
+        return foundByTin.FirstOrDefault();
+      
+      var foundByNameAndTin = foundByName.Where(t => foundByTin.Any(n => n == t));
+      if (foundByNameAndTin.Any())
+        return foundByNameAndTin.First();
       
       return Sungero.Parties.Counterparties.Null;
     }
