@@ -24,5 +24,14 @@ namespace Sungero.SmartCapture.Shared
       
       return base.GetCounterparties();
     }
+    
+    public override void FillName()
+    {
+      base.FillName();
+      
+      // Если имя формировать не из чего, то сформировать из краткого названия вида документа.
+      if (_obj.Name == Docflow.Resources.DocumentNameAutotext)
+        _obj.Name = _obj.DocumentKind.ShortName;
+    }
   }
 }
