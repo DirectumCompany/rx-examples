@@ -112,20 +112,18 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.Name = document.DocumentKind.ShortName;
       var facts = letterсlassificationResult.ExtractionResult.Facts;
       var subject = GetField(facts, "letter", "subject");
-      document.Subject = subject != null && !string.IsNullOrEmpty(subject.Value) ?
-        string.Format("{0}{1}", subject.Value.Substring(0,1).ToUpper(), subject.Value.Remove(0,1).ToLower()) : string.Empty;
+      document.Subject = !string.IsNullOrEmpty(subject) ?
+        string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
-      document.Correspondent = GetCounterparty(facts);     
-      var correspondentNumber = GetField(facts, "letter", "number");
-      document.InNumber = correspondentNumber != null ? correspondentNumber.Value : string.Empty;
+      document.Correspondent = GetCounterparty(facts);
+      document.InNumber = GetField(facts, "letter", "number");
       var correspondentDate = GetField(facts, "letter", "date");
-      if (correspondentDate != null)
-        document.Dated = DateTime.Parse(correspondentDate.Value);  
-			       
+      if (!string.IsNullOrEmpty(correspondentDate))
+        document.Dated = DateTime.Parse(correspondentDate);
+      
       // Заполнить данные нашей стороны.
       document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = GetDepartment(responsible);
@@ -141,54 +139,55 @@ namespace Sungero.Capture.Server
     /// <returns>Корреспондент.</returns>
     public static Sungero.Parties.ICounterparty GetCounterparty(List<ArioExtensions.Models.Fact> facts)
     {
-    	// Поиск корреспондента по ИНН/КПП.
-      var foundByTin = new List<ICounterparty>();      
+      // Получить ИНН/КПП и наименования/ФС контрагентов из фактов.
       var correspondentTINs = GetFacts(facts, "Counterparty", "TIN");
-      foreach (var fact in correspondentTINs)
-      {
-        var tin = GetField(fact, "TIN");
-        var trrc = GetField(fact, "TRRC");
-        var counterparties = GetCounterparties(tin, trrc);
-        if (counterparties.Any())
-          foundByTin.AddRange(counterparties.ToList());
-      }
-      
-      if (foundByTin.Count == 1)
-        return foundByTin.First();
-      
-      // Поиск корреспондента по наименованию.
-      var foundByName = new List<ICounterparty>();      
-      var correspondentNames = GetFacts(facts, "Letter", "CorrespondentName");
-      foreach (var fact in correspondentNames)
+      var correspondentNames = new List<string>();
+      foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
         var name = GetField(fact, "CorrespondentName");
         var legalForm = GetField(fact, "CorrespondentLegalForm");
-        name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
-        var counterparties = Counterparties.GetAll().Where(x => x.Name == name &&
-                                                           x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed &&
-                                                           !x.Note.Contains(BusinessUnits.Resources.BusinessUnitComment)).ToList();
-        if (counterparties.Any())        
-          foundByName.AddRange(counterparties.ToList());        
+        correspondentNames.Add(string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm));
       }
       
-      // Если по ИНН/КПП не нашлось корреспондента, то искать по наименованию в корреспондентах с пустыми ИНН/КПП.
-      if (!foundByTin.Any())
-      {
-        if (correspondentTINs.Any())
-          foundByName = foundByName.Where(c => string.IsNullOrEmpty(c.TIN)).ToList();
+      // Поиск корреспондентов по наименованию.
+      var foundByName = Counterparties.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment))
+        .Where(x => correspondentNames.Contains(x.Name))
+        .ToList();
+      
+      // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.      
+      if (!correspondentTINs.Any())
         return foundByName.FirstOrDefault();
+      else
+      {
+        var foundByTin = new List<ICounterparty>();
+        foreach (var fact in correspondentTINs)
+          foundByTin.AddRange(GetCounterparties(GetField(fact, "TIN"), GetField(fact, "TRRC")));
+        
+        if (foundByTin.Count == 1)
+          return foundByTin.First();
+        else
+        {
+          // Если по ИНН/КПП не нашлось корреспондента, то искать по наименованию в корреспондентах с пустыми ИНН/КПП.
+          if (!foundByTin.Any())
+          {
+            foundByName = foundByName.Where(x => string.IsNullOrEmpty(x.TIN) &&
+                                                 (!CompanyBases.Is(x) || string.IsNullOrEmpty(CompanyBases.As(x).TRRC)))
+                                     .ToList();
+            return foundByName.FirstOrDefault();
+          }
+          else
+          {
+            // Если по ИНН/КПП найдено несколько корреспондентов, то уточнить поиск по наименованию.
+            foundByName = foundByTin.Where(x => correspondentNames.Any(n => n == x.Name)).ToList();
+            if (foundByName.Any())
+              return foundByName.FirstOrDefault();
+            else
+              return foundByTin.FirstOrDefault();
+          }
+        }
       }
-      
-      // Если по наименованию без учета ИНН/КПП не нашлось корреспондента, то вернуть первого по ИНН/КПП.
-      if (!foundByName.Any())
-        return foundByTin.FirstOrDefault();
-      
-      // Если по ИНН/КПП нашлось несколько корреспондентов, то уточнить поиск по наименованию.
-      var foundByNameAndTin = foundByName.Where(t => foundByTin.Any(n => n == t));
-      if (foundByNameAndTin.Any())
-        return foundByNameAndTin.FirstOrDefault();
-      
-      return Sungero.Parties.Counterparties.Null;
     }
     
     /// <summary>
@@ -204,21 +203,24 @@ namespace Sungero.Capture.Server
         return field.Value;
       return string.Empty;
     }
-    
+        
     /// <summary>
     /// Получить поле из фактов.
     /// </summary>
     /// <param name="facts"> Список фактов.</param>
     /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
     /// <returns> Поле, полученное из Ario с наибольшей вероятностью.</returns>
-    public static ArioExtensions.Models.FactField GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
+    public static string GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
     {
       var filteredFacts = facts.Where(f => !string.IsNullOrWhiteSpace(f.Name))
                                .Where(f => string.Equals(f.Name, factName, StringComparison.InvariantCultureIgnoreCase))
                                .Where(f => f.Fields.Any());
       IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(f => f.Fields);
       var query = fields.OrderByDescending(f => f.Probability);
-      return query.FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));
+      var field = query.FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));      
+      if (field != null)
+        return field.Value;
+      return string.Empty;
     }
     
     /// <summary>
@@ -321,33 +323,35 @@ namespace Sungero.Capture.Server
       
       if (!searchByTin && !searchByTrrc)
         return new List<ICounterparty>();
-      
-      var counterparties = Counterparties.GetAll();
-      var result = new List<ICounterparty>();
-      
+
       // Отфильтровать закрытые сущности и копии НОР.
-      counterparties = counterparties.Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed &&
-                                            !x.Note.Contains(BusinessUnits.Resources.BusinessUnitComment));
+      var counterparties = Counterparties.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
       
       // Поиск по ИНН, если ИНН передан.
       if (searchByTin)
       {
-        var counterpartiesByTin = counterparties.Where(x => x.TIN == tin);
+        var strongTinCounterparties = counterparties.Where(x => x.TIN == tin).ToList();
         
         // Поиск по КПП, если КПП передан.
         if (searchByTrrc)
         {
-          var companies = counterpartiesByTin.ToList().Where(c => CompanyBases.Is(c)).Select(c => CompanyBases.As(c)).ToList();
-          result = companies.Where(x => x.TRRC == trrc).ToList<ICounterparty>();
+          var strongTrrcCompanies = strongTinCounterparties
+            .Where(c => CompanyBases.Is(c))
+            .Where(c => !string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC) && CompanyBases.As(c).TRRC == trrc)
+            .ToList();
           
-          // Поиск по пустому КПП, если не наидено записей по точному совпадению ИНН/КПП.
-          if (result.Count == 0)
-            result = companies.Where(x => string.IsNullOrWhiteSpace(x.TRRC)).ToList<ICounterparty>();
+          if (strongTrrcCompanies.Count > 0)
+            return strongTrrcCompanies;
+          
+          return strongTinCounterparties.Where(c => CompanyBases.Is(c) && string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
         }
-        else
-          result = counterpartiesByTin.ToList();
-      }      
-      return result;
-    }    
+        
+        return strongTinCounterparties;
+      }
+      
+      return counterparties.ToList();
+    }
   }
 }
