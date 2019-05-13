@@ -176,17 +176,17 @@ namespace Sungero.Capture.Server
       {
         if (correspondentTINs.Any())
           foundByName = foundByName.Where(c => string.IsNullOrEmpty(c.TIN)).ToList();
-        return foundByName.First();
+        return foundByName.FirstOrDefault();
       }
       
       // Если по наименованию без учета ИНН/КПП не нашлось корреспондента, то вернуть первого по ИНН/КПП.
       if (!foundByName.Any())
-        return foundByTin.First();
+        return foundByTin.FirstOrDefault();
       
       // Если по ИНН/КПП нашлось несколько корреспондентов, то уточнить поиск по наименованию.
       var foundByNameAndTin = foundByName.Where(t => foundByTin.Any(n => n == t));
       if (foundByNameAndTin.Any())
-        return foundByNameAndTin.First();
+        return foundByNameAndTin.FirstOrDefault();
       
       return Sungero.Parties.Counterparties.Null;
     }
@@ -213,10 +213,12 @@ namespace Sungero.Capture.Server
     /// <returns> Поле, полученное из Ario с наибольшей вероятностью.</returns>
     public static ArioExtensions.Models.FactField GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
     {
-      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
-      IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(fact => fact.Fields);
-      fields.OrderByDescending(f => f.Probability);
-      return fields.FirstOrDefault(f => f.Name.Equals(fieldName, StringComparison.InvariantCultureIgnoreCase));
+      var filteredFacts = facts.Where(f => !string.IsNullOrWhiteSpace(f.Name))
+                               .Where(f => string.Equals(f.Name, factName, StringComparison.InvariantCultureIgnoreCase))
+                               .Where(f => f.Fields.Any());
+      IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(f => f.Fields);
+      var query = fields.OrderByDescending(f => f.Probability);
+      return query.FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));
     }
     
     /// <summary>
