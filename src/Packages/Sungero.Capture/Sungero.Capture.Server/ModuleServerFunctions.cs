@@ -259,8 +259,8 @@ namespace Sungero.Capture.Server
         return;
       
       var task = SimpleTasks.Create();
-      task.Subject = Resources.TaskNameFormat(leadingDocument);
-      task.Texts.FirstOrDefault().Body = Resources.TaskText;
+      task.Subject = Resources.CheckPackageTaskNameFormat(leadingDocument);
+      task.ActiveText = Resources.CheckPackageTaskText;
       var step = task.RouteSteps.AddNew();
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
       step.Performer = responsible;

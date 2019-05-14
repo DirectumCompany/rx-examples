@@ -129,7 +129,7 @@
   <data name="DocumentName" xml:space="preserve">
     <value>Документ №{0}</value>
   </data>
-  <data name="TaskName" xml:space="preserve">
+  <data name="CheckPackageTaskName" xml:space="preserve">
     <value>Проверьте комплект документов: {0}</value>
   </data>
   <data name="DocumentNotFound" xml:space="preserve">
@@ -141,7 +141,7 @@
   <data name="AttachmentName" xml:space="preserve">
     <value>Приложение №{0}</value>
   </data>
-  <data name="TaskText" xml:space="preserve">
+  <data name="CheckPackageTaskText" xml:space="preserve">
     <value>- Проверьте, что реквизиты всех документов комплекта заполнены верно.
 - При необходимости измените типы документов и дозаполните карточки.
 - При необходимости зарегистрируйте поступившие документы.
