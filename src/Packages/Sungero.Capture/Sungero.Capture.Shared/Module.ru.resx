@@ -130,7 +130,7 @@
     <value>Документ №{0}</value>
   </data>
   <data name="TaskName" xml:space="preserve">
-    <value>Проверьте комплект документов: {0}.</value>
+    <value>Проверьте комплект документов: {0}</value>
   </data>
   <data name="DocumentNotFound" xml:space="preserve">
     <value>Документ с ИД {0} не найден.</value>
@@ -140,5 +140,11 @@
   </data>
   <data name="AttachmentName" xml:space="preserve">
     <value>Приложение №{0}</value>
+  </data>
+  <data name="TaskText" xml:space="preserve">
+    <value>- Проверьте, что реквизиты всех документов комплекта заполнены верно.
+- При необходимости измените типы документов и дозаполните карточки.
+- При необходимости зарегистрируйте поступившие документы.
+- Отправьте документы в работу или отметьте как устаревшие при ошибках занесения.</value>
   </data>
 </root>

@@ -248,9 +248,9 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Отправить задачу на проверку документов.
     /// </summary>
-    /// <param name="taskName">Тема задачи.</param>
-    /// <param name="documentId">ИД вкладываемого документа.</param>
-    /// <param name="responsibleId">ИД ответственного.</param>
+    /// <param name="leadingDocument">Основной документ.</param>
+    /// <param name="documents">Прочие документы.</param>
+    /// <param name="responsible">Ответственный.</param>
     /// <returns>Простая задача.</returns>
     [Remote, Public]
     public static void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
@@ -260,6 +260,7 @@ namespace Sungero.Capture.Server
       
       var task = SimpleTasks.Create();
       task.Subject = Resources.TaskNameFormat(leadingDocument);
+      task.Texts.FirstOrDefault().Body = Resources.TaskText;
       var step = task.RouteSteps.AddNew();
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
       step.Performer = responsible;

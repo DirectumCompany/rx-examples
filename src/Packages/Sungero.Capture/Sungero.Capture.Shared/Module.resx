@@ -141,4 +141,7 @@
   <data name="AttachmentName" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="TaskText" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

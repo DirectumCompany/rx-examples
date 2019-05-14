@@ -95,7 +95,8 @@
     "TaskName",
     "DocumentNotFound",
     "CheckPackage",
-    "AttachmentName"
+    "AttachmentName",
+    "TaskText"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
