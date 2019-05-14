@@ -156,40 +156,36 @@ namespace Sungero.Capture.Server
         .Where(x => correspondentNames.Contains(x.Name))
         .ToList();
       
-      // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.      
+      // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.
       if (!correspondentTINs.Any())
         return foundByName.FirstOrDefault();
       else
       {
+        // Поиск по ИНН/КПП.
         var foundByTin = new List<ICounterparty>();
         foreach (var fact in correspondentTINs)
           foundByTin.AddRange(GetCounterparties(GetField(fact, "TIN"), GetField(fact, "TRRC")));
         
+        // Найден ровно 1.
         if (foundByTin.Count == 1)
           return foundByTin.First();
+        
+        // Найдено 0. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
+        if (!foundByTin.Any())
+          return foundByName
+            .Where(x => string.IsNullOrEmpty(x.TIN))
+            .Where(x => !CompanyBases.Is(x) || string.IsNullOrEmpty(CompanyBases.As(x).TRRC))
+            .FirstOrDefault();
+
+        // Найдено несколько. Уточнить поиск по наименованию.
+        foundByName = foundByTin.Where(x => correspondentNames.Any(n => n == x.Name)).ToList();
+        if (foundByName.Any())
+          return foundByName.FirstOrDefault();
         else
-        {
-          // Если по ИНН/КПП не нашлось корреспондента, то искать по наименованию в корреспондентах с пустыми ИНН/КПП.
-          if (!foundByTin.Any())
-          {
-            foundByName = foundByName.Where(x => string.IsNullOrEmpty(x.TIN) &&
-                                                 (!CompanyBases.Is(x) || string.IsNullOrEmpty(CompanyBases.As(x).TRRC)))
-                                     .ToList();
-            return foundByName.FirstOrDefault();
-          }
-          else
-          {
-            // Если по ИНН/КПП найдено несколько корреспондентов, то уточнить поиск по наименованию.
-            foundByName = foundByTin.Where(x => correspondentNames.Any(n => n == x.Name)).ToList();
-            if (foundByName.Any())
-              return foundByName.FirstOrDefault();
-            else
-              return foundByTin.FirstOrDefault();
-          }
-        }
+          return foundByTin.FirstOrDefault();
       }
     }
-    
+
     /// <summary>
     /// Получить значение поля из фактов.
     /// </summary>
@@ -203,7 +199,7 @@ namespace Sungero.Capture.Server
         return field.Value;
       return string.Empty;
     }
-        
+
     /// <summary>
     /// Получить поле из фактов.
     /// </summary>
@@ -213,16 +209,16 @@ namespace Sungero.Capture.Server
     public static string GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
     {
       var filteredFacts = facts.Where(f => !string.IsNullOrWhiteSpace(f.Name))
-                               .Where(f => string.Equals(f.Name, factName, StringComparison.InvariantCultureIgnoreCase))
-                               .Where(f => f.Fields.Any());
+        .Where(f => string.Equals(f.Name, factName, StringComparison.InvariantCultureIgnoreCase))
+        .Where(f => f.Fields.Any());
       IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(f => f.Fields);
       var query = fields.OrderByDescending(f => f.Probability);
-      var field = query.FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));      
+      var field = query.FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));
       if (field != null)
         return field.Value;
       return string.Empty;
     }
-    
+
     /// <summary>
     /// Получить список фактов с переданными именем факта и именем поля.
     /// </summary>
@@ -232,11 +228,11 @@ namespace Sungero.Capture.Server
     /// <returns>Список фактов с наибольшей вероятностью.</returns>
     public static List<ArioExtensions.Models.Fact> GetFacts(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
     {
-      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));      
-      filteredFacts = filteredFacts.Where(f => f.Fields.Any(field => Equals(field.Name, fieldName)));      
+      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
+      filteredFacts = filteredFacts.Where(f => f.Fields.Any(field => Equals(field.Name, fieldName)));
       return filteredFacts.OrderByDescending(f => f.Fields.FirstOrDefault(field => Equals(field.Name, fieldName)).Probability).ToList();
-    }    
-    
+    }
+
     /// <summary>
     /// Получить тело документа из Арио.
     /// </summary>
@@ -248,7 +244,7 @@ namespace Sungero.Capture.Server
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
     }
-    
+
     /// <summary>
     /// Отправить задачу на проверку документов.
     /// </summary>
@@ -283,7 +279,7 @@ namespace Sungero.Capture.Server
       task.Save();
       task.Start();
     }
-    
+
     /// <summary>
     /// Получить подразделение из настроек сотрудника.
     /// </summary>
@@ -302,14 +298,14 @@ namespace Sungero.Capture.Server
         department = employee.Department;
       return department;
     }
-    
+
     [Remote, Public]
     public static string GetCurrentTenant()
     {
       var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
       return currentTenant != null ? currentTenant.Id : string.Empty;
     }
-    
+
     /// <summary>
     /// Получить список контрагентов по ИНН/КПП.
     /// </summary>
