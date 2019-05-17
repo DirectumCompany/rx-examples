@@ -151,5 +151,12 @@ namespace Sungero.Capture.Client
       
       return fileElement.Element("FileDescription").Value;
     }
+    
+    public static void EnableDemoMode()
+    {
+      Logger.Debug("Enable demo mode...");
+      Sungero.Capture.Functions.Module.Remote.PseudoInitializing();
+      Logger.Debug("End of enable demo mode.");
+    }
   }
 }

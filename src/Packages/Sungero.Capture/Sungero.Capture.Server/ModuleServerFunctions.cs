@@ -350,5 +350,20 @@ namespace Sungero.Capture.Server
       
       return counterparties.ToList();
     }
+    
+    /// <summary>
+    /// Инициализация демо-режима.
+    /// </summary>
+    [Remote]
+    public static void PseudoInitializing()
+    {
+      var notNumerable = Docflow.DocumentKind.NumberingType.NotNumerable;
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName, RecordManagement.Resources.IncomingLetterKindShortName, notNumerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false, Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
+                                                                              Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
+      
+      Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
+    }
   }
 }
