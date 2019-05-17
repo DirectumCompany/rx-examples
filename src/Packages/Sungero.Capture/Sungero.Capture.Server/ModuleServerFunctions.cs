@@ -30,8 +30,12 @@ namespace Sungero.Capture.Server
       IOfficialDocument leadingDocument;
       if (letterсlassificationResult != null)
       {
-        // Если в пакете есть документ с классом письмо, то создаем письмо и делаем его ведущим документом.
-        leadingDocument = CreateIncomingLetter(letterсlassificationResult, responsible);
+        // Если включен демо-режим, то создаем письмо с текстовыми полями.
+        var CaptureMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
+        if (CaptureMockMode != null)
+          leadingDocument = CreateMokeIncomingLetter(letterсlassificationResult, responsible);
+        else
+          leadingDocument = CreateIncomingLetter(letterсlassificationResult, responsible);
         сlassificationResults.Remove(letterсlassificationResult);
       }
       else
@@ -51,15 +55,24 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить значение параметра из docflow_params.
+    /// </summary>
+    /// <param name="paramName">Наименование параметра.</param>
+    /// <returns>Значение параметра.</returns>
+    public static object GetDocflowParamsValue(string paramName)
+    {
+      var command = string.Format(Queries.Module.SelectDocflowParamsValue, paramName);
+      return Docflow.PublicFunctions.Module.ExecuteScalarSQLCommand(command);
+    }
+    
+    /// <summary>
     /// Получить адрес сервиса Арио.
     /// </summary>
     /// <returns>Адрес Арио.</returns>
     [Remote]
     public static string GetArioUrl()
     {
-      var key = Constants.Module.ArioUrlKey;
-      var command = string.Format(Queries.Module.SelectArioUrl, key);
-      var commandExecutionResult = Docflow.PublicFunctions.Module.ExecuteScalarSQLCommand(command);
+      var commandExecutionResult = GetDocflowParamsValue(Constants.Module.ArioUrlKey);
       var arioUrl = string.Empty;
       if (!(commandExecutionResult is DBNull) && commandExecutionResult != null)
         arioUrl = commandExecutionResult.ToString();
@@ -127,6 +140,89 @@ namespace Sungero.Capture.Server
       // Заполнить данные нашей стороны.
       document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = GetDepartment(responsible);
+      
+      document.Save();
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать входящее письмо с текстовыми полями.
+    /// </summary>
+    /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Документ.</returns>
+    public static Docflow.IOfficialDocument CreateMokeIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
+    {
+      // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
+      var document = Sungero.Capture.MockIncommingLetters.Create();
+      var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = letterсlassificationResult.ExtractionResult.Facts;
+      var subject = GetField(facts, "letter", "subject");
+      document.Subject = !string.IsNullOrEmpty(subject) ?
+        string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
+      
+      // Заполнить данные корреспондента.
+      document.InNumber = GetField(facts, "letter", "number");
+      document.Dated = GetField(facts, "letter", "date");
+      foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
+      {
+        var name = GetField(fact, "CorrespondentName");
+        var legalForm = GetField(fact, "CorrespondentLegalForm");
+        name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+        
+        if (document.CorrespondentName == string.Empty)
+          document.CorrespondentName = name;
+        else
+          document.RecipientName = name;
+      }
+      
+      foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
+      {
+        var tin = GetField(fact, "TIN");
+        var trrc = GetField(fact, "TRRC");
+        if (document.CorrespondentTin == string.Empty)
+        {
+          document.CorrespondentTin = tin;
+          document.CorrespondentTrrc = trrc;
+        }
+        else
+        {
+          document.RecipientTin = tin;
+          document.RecipientTrrc = trrc;
+        }
+      }
+      
+      document.DateInResponseTo = GetField(facts, "letter", "responsetodate");
+      document.NumberInResponseTo = GetField(facts, "letter", "responsetonumber");
+      
+      // Заполнить данные нашей стороны.
+      document.Addressee = GetField(facts, "letter", "addressee");
+      document.Confidential = GetField(facts, "letter", "confidential");
+      
+      foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
+      {
+        var type = GetField(fact, "Type");
+        var surname = GetField(fact, "Surname");
+        var name = GetField(fact, "Name");
+        var patrn = GetField(fact, "Patrn");
+        
+        if (type == "SIGNATORY")
+        {
+          document.SignatorySurname = surname;
+          document.SignatoryName = name;
+          document.SignatoryPatrn = patrn;
+        }
+        else
+        {
+          document.AssigneeSurname = surname;
+          document.AssigneeName = name;
+          document.AssigneePatrn = patrn;
+        }
+      }
       
       document.Save();
       return document;

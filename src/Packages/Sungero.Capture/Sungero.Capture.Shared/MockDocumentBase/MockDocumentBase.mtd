@@ -101,7 +101,8 @@
     "SavingServer",
     "AfterSaveServer",
     "WriteHistoryServer",
-    "ConvertingFromServer"
+    "ConvertingFromServer",
+    "CreatedServer"
   ],
   "HideFromCreationArea": true,
   "IconResourcesKeys": [],

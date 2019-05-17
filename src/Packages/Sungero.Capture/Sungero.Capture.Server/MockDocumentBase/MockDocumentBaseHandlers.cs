@@ -18,6 +18,11 @@ namespace Sungero.Capture
   partial class MockDocumentBaseServerHandlers
   {
 
+    public override void Created(Sungero.Domain.CreatedEventArgs e)
+    {
+      base.Created(e);
+    }
+
     public override void BeforeSaveHistory(Sungero.Content.DocumentHistoryEventArgs e)
     {
     }
