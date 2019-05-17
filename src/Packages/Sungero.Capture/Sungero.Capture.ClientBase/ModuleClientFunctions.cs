@@ -152,11 +152,14 @@ namespace Sungero.Capture.Client
       return fileElement.Element("FileDescription").Value;
     }
     
-    public static void EnableDemoMode()
+    /// <summary>
+    /// Включить демо-режим.
+    /// </summary>
+    public static void SwitchToCaptureMockMode()
     {
-      Logger.Debug("Enable demo mode...");
-      Sungero.Capture.Functions.Module.Remote.PseudoInitializing();
-      Logger.Debug("End of enable demo mode.");
+      Logger.Debug("Switch to capture mock mode...");
+      Sungero.Capture.Functions.Module.Remote.InitCaptureMockMode();
+      Logger.Debug("End switch to capture mock mode.");
     }
   }
 }
