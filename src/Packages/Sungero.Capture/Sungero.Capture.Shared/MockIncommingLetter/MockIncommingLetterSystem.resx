@@ -133,13 +133,13 @@
     <value>No.</value>
   </data>
   <data name="ControlGroup_22900bd3ac35480fa46737fc0f4645d9" xml:space="preserve">
-    <value />
+    <value>Side 1</value>
   </data>
   <data name="Property_DateInResponseTo" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="Property_NumberInResponseTo" xml:space="preserve">
-    <value>TODO</value>
+    <value>No.</value>
   </data>
   <data name="Property_CorrespondentName" xml:space="preserve">
     <value>TODO</value>
@@ -188,5 +188,41 @@
   </data>
   <data name="Property_RecipientName" xml:space="preserve">
     <value>TODO</value>
+  </data>
+  <data name="ControlGroup_2d2669c27abe4373a0c238ddec79a85d" xml:space="preserve">
+    <value>Side 2</value>
+  </data>
+  <data name="ControlGroup_c031df17352d4cca8d7dfb63a5739f43" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_077c3542bafa4df0ba3eae60cceb55e4" xml:space="preserve">
+    <value>Signatory</value>
+  </data>
+  <data name="ControlGroup_17f2fcfc6d644dfd94687bddba8cbda9" xml:space="preserve">
+    <value>Assignee</value>
+  </data>
+  <data name="Control_a915c070568d4f08a7365fbdabe9e559_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_a915c070568d4f08a7365fbdabe9e559" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_f0607051ea774af2b7966d11cd8a7374_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_f0607051ea774af2b7966d11cd8a7374" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_ddf41ead829a4a3f8d12d40a52b7440c_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_ddf41ead829a4a3f8d12d40a52b7440c" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_fc50c88831554ff196e8ff7064894ead_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_fc50c88831554ff196e8ff7064894ead" xml:space="preserve">
+    <value />
   </data>
 </root>

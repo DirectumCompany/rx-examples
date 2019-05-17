@@ -132,17 +132,20 @@
   <data name="Property_InNumber" xml:space="preserve">
     <value>№</value>
   </data>
+  <data name="ControlGroup_22900bd3ac35480fa46737fc0f4645d9" xml:space="preserve">
+    <value>Сторона 1</value>
+  </data>
   <data name="Property_DateInResponseTo" xml:space="preserve">
-    <value>В ответ на дату документа</value>
+    <value>Дата</value>
   </data>
   <data name="Property_NumberInResponseTo" xml:space="preserve">
-    <value>В ответ на номер документа</value>
+    <value>№</value>
   </data>
   <data name="Property_CorrespondentName" xml:space="preserve">
-    <value>Наименование корреспондента</value>
+    <value>Корреспондент</value>
   </data>
   <data name="Property_CorrespondentLegalForm" xml:space="preserve">
-    <value>Организационно-правовая форма корреспондента</value>
+    <value>ОПФ</value>
   </data>
   <data name="Property_CorrHeadCompanyName" xml:space="preserve">
     <value>Наименование головной организации</value>
@@ -185,5 +188,17 @@
   </data>
   <data name="Property_RecipientName" xml:space="preserve">
     <value>Получатель</value>
+  </data>
+  <data name="ControlGroup_2d2669c27abe4373a0c238ddec79a85d" xml:space="preserve">
+    <value>Сторона 2</value>
+  </data>
+  <data name="ControlGroup_c031df17352d4cca8d7dfb63a5739f43" xml:space="preserve">
+    <value>В ответ на</value>
+  </data>
+  <data name="ControlGroup_077c3542bafa4df0ba3eae60cceb55e4" xml:space="preserve">
+    <value>Подписант</value>
+  </data>
+  <data name="ControlGroup_17f2fcfc6d644dfd94687bddba8cbda9" xml:space="preserve">
+    <value>Исполнитель</value>
   </data>
 </root>
