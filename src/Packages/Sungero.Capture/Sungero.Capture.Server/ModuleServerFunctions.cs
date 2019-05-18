@@ -6,8 +6,10 @@ using Sungero.Company;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Docflow;
-using Sungero.Workflow;
+using Sungero.Capture.Structures.Module;
 using Sungero.Parties;
+using Sungero.RecordManagement;
+using Sungero.Workflow;
 
 namespace Sungero.Capture.Server
 {
@@ -22,36 +24,97 @@ namespace Sungero.Capture.Server
     [Remote]
     public static void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
     {
-      var сlassificationResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
-      var letterсlassificationResult = сlassificationResults
-        .Where(d => d.ClassificationResult.PredictedClass != null)
-        .FirstOrDefault(d => d.ClassificationResult.PredictedClass.Name.Equals(Constants.Module.LetterClassName, StringComparison.InvariantCultureIgnoreCase));
-      
-      IOfficialDocument leadingDocument;
-      if (letterсlassificationResult != null)
+      // Создать документы по распознанным данным.
+      var recognitedDocuments = GetRecognitedDocuments(jsonClassificationResults);
+      var package = new List<IOfficialDocument>();
+      foreach (var recognitedDocument in recognitedDocuments)
       {
-        // Если включен демо-режим, то создаем письмо с текстовыми полями.
-        var CaptureMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
-        if (CaptureMockMode != null)
-          leadingDocument = CreateMokeIncomingLetter(letterсlassificationResult, responsible);
-        else
-          leadingDocument = CreateIncomingLetter(letterсlassificationResult, responsible);
-        сlassificationResults.Remove(letterсlassificationResult);
-      }
-      else
-      {
-        // Иначе ведущий документ - первый документ в списке.
-        leadingDocument = CreateDocumentByGuid(sourceFileName, 0, сlassificationResults.First().ClassificationResult.DocumentGuid, null);
-        сlassificationResults = сlassificationResults.Skip(1).ToList();
+        var document = CreateDocumentByRecognitedDocument(recognitedDocument, sourceFileName, responsible);
+        package.Add(document);
       }
       
-      var documents = new List<IOfficialDocument>();
+      // Определить ведущий документ.
+      var incLetter = package.Where(d => IncomingLetters.Is(d)).FirstOrDefault();
+      var leadingDocument = incLetter != null
+        ? incLetter
+        : package.FirstOrDefault();
+      
+      // Свзять приложения с ведущим документом.
+      var addendums = package.ToList();
+      addendums.Remove(leadingDocument);
       int addendumNumber = 1;
-      foreach(var сlassificationResult in сlassificationResults)
-        documents.Add(CreateDocumentByGuid(string.Empty, addendumNumber++, сlassificationResult.ClassificationResult.DocumentGuid, leadingDocument));
+      var hasLeadingDocument = !SimpleAssignments.Is(leadingDocument);
+      var relation = hasLeadingDocument
+        ? Docflow.PublicConstants.Module.AddendumRelationName
+        : Constants.Module.SimpleRelationRelationName;
+      foreach (var addendum in addendums)
+      {
+        addendum.Name = hasLeadingDocument
+          ? Resources.AttachmentNameFormat(addendumNumber)
+          : Resources.DocumentNameFormat(addendumNumber);
+        addendum.Relations.AddFrom(relation, leadingDocument);
+        addendum.Save();
+        addendumNumber++;
+      }
       
-      if (leadingDocument != null)
-        SendToResponsible(leadingDocument, documents, responsible);
+      // Отправить пакет ответственному.
+      SendToResponsible(leadingDocument, addendums, responsible);
+    }
+    
+    public static List<Structures.Module.RecognitedDocument> GetRecognitedDocuments(string jsonClassificationResults)
+    {
+      var recognitedDocuments = new List<RecognitedDocument>();
+      var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
+      foreach (var packageProcessResult in packageProcessResults)
+      {
+        // Класс и гуид тела документа.
+        var recognitedDocument = RecognitedDocument.Create();
+        var clsResult = packageProcessResult.ClassificationResult;
+        recognitedDocument.ClassificationResultId = clsResult.Id;
+        recognitedDocument.BodyGuid = clsResult.DocumentGuid;
+        recognitedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
+        
+        // Факты и поля фактов.
+        recognitedDocument.Facts = new List<Fact>();
+        if (packageProcessResult.ExtractionResult.Facts != null)
+        {
+          var facts = packageProcessResult.ExtractionResult.Facts
+            .Where(f => !string.IsNullOrWhiteSpace(f.Name))
+            .Where(f => f.Fields.Any())
+            .ToList();
+          foreach (var fact in facts)
+          {
+            var fields = fact.Fields.Where(f => f != null).Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
+            recognitedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
+          }
+        }
+        
+        recognitedDocuments.Add(recognitedDocument);
+      }
+      return recognitedDocuments;
+    }
+    
+    public static IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
+                                                                       string sourceFileName,
+                                                                       IEmployee responsible)
+    {
+      // Входящее письмо.
+      var recognitedClass = recognitedDocument.PredictedClass;
+      var CaptureMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
+      if (recognitedClass == Constants.Module.LetterClassName)
+      {
+        if (CaptureMockMode != null)
+        {
+          CreateMokeIncomingLetter(recognitedDocument, responsible);
+        }
+        else
+        {
+          CreateIncomingLetter(recognitedDocument, responsible);
+        }
+      }
+      
+      // Все нераспознанные документы создать простыми.
+      return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
     }
     
     /// <summary>
@@ -84,28 +147,15 @@ namespace Sungero.Capture.Server
     /// Создать документ в Rx, тело документа загружается из Арио.
     /// </summary>
     /// <param name="name">Имя документа.</param>
-    /// <param name="addendumNumber">Номер приложения.</param>
     /// <param name="documentGuid">Гуид тела документа.</param>
-    /// <param name="firstDoc">Ведущий документ.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateDocumentByGuid(string name, int addendumNumber,string documentGuid, IOfficialDocument leadingDoc)
+    public static Docflow.IOfficialDocument CreateSimpleDocument(string name, string documentGuid)
     {
-      var documentBody = GetDocumentBody(documentGuid);
       var document = SimpleDocuments.Create();
-      document.Name = string.IsNullOrWhiteSpace(name) ? Resources.DocumentNameFormat(addendumNumber) : name;
+      document.Name = !string.IsNullOrWhiteSpace(name) ? name : Resources.SimpleDocumentName;
+      var documentBody = GetDocumentBody(documentGuid);
       document.CreateVersionFrom(documentBody, "pdf");
-      if (leadingDoc != null)
-      {
-        if (IncomingDocumentBases.Is(leadingDoc))
-        {
-          document.Relations.AddFrom(Docflow.PublicConstants.Module.AddendumRelationName, leadingDoc);
-          document.Name = string.IsNullOrWhiteSpace(name) ? Resources.AttachmentNameFormat(addendumNumber) : name;
-        }
-        else
-        {
-          document.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDoc);
-        }
-      }
+      documentBody = null;
       document.Save();
       return document;
     }
@@ -116,24 +166,24 @@ namespace Sungero.Capture.Server
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-      var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
+      var documentBody = GetDocumentBody(letterсlassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = letterсlassificationResult.ExtractionResult.Facts;
-      var subject = GetField(facts, "letter", "subject");
+      var facts = letterсlassificationResult.Facts;
+      var subject = GetFieldValue(facts, "Letter", "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
       document.Correspondent = GetCounterparty(facts);
-      document.InNumber = GetField(facts, "letter", "number");
-      var correspondentDate = GetField(facts, "letter", "date");
+      document.InNumber = GetFieldValue(facts, "Letter", "Number");
+      var correspondentDate = GetFieldValue(facts, "Letter", "Date");
       if (!string.IsNullOrEmpty(correspondentDate))
         document.Dated = DateTime.Parse(correspondentDate);
       
@@ -151,27 +201,27 @@ namespace Sungero.Capture.Server
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMokeIncomingLetter(ArioExtensions.Models.PackageProcessResult letterсlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateMokeIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.Capture.MockIncommingLetters.Create();
-      var documentBody = GetDocumentBody(letterсlassificationResult.ClassificationResult.DocumentGuid);
+      var documentBody = GetDocumentBody(letterсlassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = letterсlassificationResult.ExtractionResult.Facts;
-      var subject = GetField(facts, "letter", "subject");
+      var facts = letterсlassificationResult.Facts;
+      var subject = GetFieldValue(facts, "Letter", "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
-      document.InNumber = GetField(facts, "letter", "number");
-      document.Dated = GetField(facts, "letter", "date");
+      document.InNumber = GetFieldValue(facts, "Letter", "Number");
+      document.Dated = GetFieldValue(facts, "Letter", "Date");
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
-        var name = GetField(fact, "CorrespondentName");
-        var legalForm = GetField(fact, "CorrespondentLegalForm");
+        var name = GetFieldValue(fact, "CorrespondentName");
+        var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
         name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
         
         if (document.CorrespondentName == string.Empty)
@@ -182,8 +232,8 @@ namespace Sungero.Capture.Server
       
       foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
       {
-        var tin = GetField(fact, "TIN");
-        var trrc = GetField(fact, "TRRC");
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
         if (document.CorrespondentTin == string.Empty)
         {
           document.CorrespondentTin = tin;
@@ -196,19 +246,19 @@ namespace Sungero.Capture.Server
         }
       }
       
-      document.DateInResponseTo = GetField(facts, "letter", "responsetodate");
-      document.NumberInResponseTo = GetField(facts, "letter", "responsetonumber");
+      document.DateInResponseTo = GetFieldValue(facts, "Letter", "ResponseToDate");
+      document.NumberInResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
       
       // Заполнить данные нашей стороны.
-      document.Addressee = GetField(facts, "letter", "addressee");
-      document.Confidential = GetField(facts, "letter", "confidential");
+      document.Addressee = GetFieldValue(facts, "Letter", "Addressee");
+      document.Confidential = GetFieldValue(facts, "Letter", "Confidential");
       
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
       {
-        var type = GetField(fact, "Type");
-        var surname = GetField(fact, "Surname");
-        var name = GetField(fact, "Name");
-        var patrn = GetField(fact, "Patrn");
+        var type = GetFieldValue(fact, "Type");
+        var surname = GetFieldValue(fact, "Surname");
+        var name = GetFieldValue(fact, "Name");
+        var patrn = GetFieldValue(fact, "Patrn");
         
         if (type == "SIGNATORY")
         {
@@ -233,15 +283,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts">Список фактов.</param>
     /// <returns>Корреспондент.</returns>
-    public static Sungero.Parties.ICounterparty GetCounterparty(List<ArioExtensions.Models.Fact> facts)
+    public static Sungero.Parties.ICounterparty GetCounterparty(List<Structures.Module.Fact> facts)
     {
       // Получить ИНН/КПП и наименования/ФС контрагентов из фактов.
-      var correspondentTINs = GetFacts(facts, "Counterparty", "TIN");
       var correspondentNames = new List<string>();
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
-        var name = GetField(fact, "CorrespondentName");
-        var legalForm = GetField(fact, "CorrespondentLegalForm");
+        var name = GetFieldValue(fact, "CorrespondentName");
+        var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
         correspondentNames.Add(string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm));
       }
       
@@ -253,6 +302,7 @@ namespace Sungero.Capture.Server
         .ToList();
       
       // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.
+      var correspondentTINs = GetFacts(facts, "Counterparty", "TIN");
       if (!correspondentTINs.Any())
         return foundByName.FirstOrDefault();
       else
@@ -260,7 +310,7 @@ namespace Sungero.Capture.Server
         // Поиск по ИНН/КПП.
         var foundByTin = new List<ICounterparty>();
         foreach (var fact in correspondentTINs)
-          foundByTin.AddRange(GetCounterparties(GetField(fact, "TIN"), GetField(fact, "TRRC")));
+          foundByTin.AddRange(GetCounterparties(GetFieldValue(fact, "TIN"), GetFieldValue(fact, "TRRC")));
         
         // Найден ровно 1.
         if (foundByTin.Count == 1)
@@ -288,9 +338,9 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Зачение поля.</returns>
-    public static string GetField(ArioExtensions.Models.Fact fact, string fieldName)
+    public static string GetFieldValue(Structures.Module.Fact fact, string fieldName)
     {
-      var field = fact.Fields.FirstOrDefault(f => Equals(f.Name, fieldName));
+      var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
       if (field != null)
         return field.Value;
       return string.Empty;
@@ -301,17 +351,19 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts"> Список фактов.</param>
     /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
-    /// <returns> Поле, полученное из Ario с наибольшей вероятностью.</returns>
-    public static string GetField(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
+    /// <returns>Поле, полученное из Ario с наибольшей вероятностью.</returns>
+    public static string GetFieldValue(List<Structures.Module.Fact> facts, string factName, string fieldName)
     {
-      var filteredFacts = facts.Where(f => !string.IsNullOrWhiteSpace(f.Name))
-        .Where(f => string.Equals(f.Name, factName, StringComparison.InvariantCultureIgnoreCase))
-        .Where(f => f.Fields.Any());
-      IEnumerable<ArioExtensions.Models.FactField> fields = filteredFacts.SelectMany(f => f.Fields);
-      var query = fields.OrderByDescending(f => f.Probability);
-      var field = query.FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));
+      IEnumerable<FactField> fields = facts
+        .Where(f => f.Name == factName)
+        .Where(f => f.Fields.Any())
+        .SelectMany(f => f.Fields);
+      var field = fields
+        .OrderByDescending(f => f.Probability)
+        .FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));
       if (field != null)
         return field.Value;
+      
       return string.Empty;
     }
 
@@ -322,11 +374,12 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Имя факта.</param>
     /// <param name="fieldName">Имя поля.</param>
     /// <returns>Список фактов с наибольшей вероятностью.</returns>
-    public static List<ArioExtensions.Models.Fact> GetFacts(List<ArioExtensions.Models.Fact> facts, string factName, string fieldName)
+    public static List<Structures.Module.Fact> GetFacts(List<Structures.Module.Fact> facts, string factName, string fieldName)
     {
-      var filteredFacts = facts.Where(fact => fact.Name.Equals(factName, StringComparison.InvariantCultureIgnoreCase));
-      filteredFacts = filteredFacts.Where(f => f.Fields.Any(field => Equals(field.Name, fieldName)));
-      return filteredFacts.OrderByDescending(f => f.Fields.FirstOrDefault(field => Equals(field.Name, fieldName)).Probability).ToList();
+      return facts
+        .Where(f => f.Name == factName)
+        .Where(f => f.Fields.Any(fl => fl.Name == fieldName))
+        .ToList();
     }
 
     /// <summary>

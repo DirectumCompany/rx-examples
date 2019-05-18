@@ -144,4 +144,7 @@
   <data name="CheckPackageTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="SimpleDocumentName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
