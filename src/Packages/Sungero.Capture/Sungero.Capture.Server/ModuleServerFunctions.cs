@@ -103,14 +103,9 @@ namespace Sungero.Capture.Server
       var CaptureMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
       if (recognitedClass == Constants.Module.LetterClassName)
       {
-        if (CaptureMockMode != null)
-        {
-          CreateMokeIncomingLetter(recognitedDocument, responsible);
-        }
-        else
-        {
-          CreateIncomingLetter(recognitedDocument, responsible);
-        }
+        return CaptureMockMode != null
+          ? CreateMokeIncomingLetter(recognitedDocument, responsible)
+          : CreateIncomingLetter(recognitedDocument, responsible);
       }
       
       // Все нераспознанные документы создать простыми.
