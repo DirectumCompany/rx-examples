@@ -39,7 +39,7 @@ namespace Sungero.Capture.Server
         ? incLetter
         : package.FirstOrDefault();
       
-      // Свзять приложения с ведущим документом.
+      // Связать приложения с ведущим документом.
       var addendums = package.ToList();
       addendums.Remove(leadingDocument);
       int addendumNumber = 1;
@@ -510,8 +510,24 @@ namespace Sungero.Capture.Server
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false, 
                                                                               Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
                                                                               Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
-      // Добавить параметр CaptureMockModeKey.
+      // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
+    }
+    
+    
+    /// <summary>
+    /// Инициализация захвата.
+    /// </summary>
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
+    [Remote]
+    public static void InitCapture(string arioUrl, string minFactProbability)
+    {
+      // Добавить параметр адреса сервиса Ario.
+      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.ArioUrlKey, arioUrl);
+      
+      // Добавить параметр минимальной вероятности для факта.
+      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
     }
   }
 }

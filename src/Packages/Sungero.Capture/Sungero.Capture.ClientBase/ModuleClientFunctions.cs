@@ -159,7 +159,17 @@ namespace Sungero.Capture.Client
     {
       Logger.Debug("Switch to capture mock mode...");
       Sungero.Capture.Functions.Module.Remote.InitCaptureMockMode();
-      Logger.Debug("End switch to capture mock mode.");
+    }
+    
+    /// <summary>
+    /// Конфигурировать захват.
+    /// </summary>
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
+    public static void ConfigureCapture(string arioUrl, string minFactProbability)
+    {
+      Logger.Debug("Configure capture...");
+      Sungero.Capture.Functions.Module.Remote.InitCapture(arioUrl, minFactProbability);
     }
   }
 }

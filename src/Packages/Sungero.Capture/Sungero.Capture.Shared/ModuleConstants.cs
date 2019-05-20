@@ -7,9 +7,9 @@ namespace Sungero.Capture.Constants
   {
     public const string SimpleRelationRelationName = "Simple relation";
         
-    public const string ArioUrlKey = "ARIO_UR";
+    public const string ArioUrlKey = "ArioUrl";
     
-    public const string ArioURL = "http://smart:61100";
+    public const string MinFactProbabilityKey = "MinFactProbability";
     
     public const string CaptureMockModeKey = "CaptureMockMode";
     
