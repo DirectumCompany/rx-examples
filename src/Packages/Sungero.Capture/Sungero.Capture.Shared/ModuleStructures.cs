@@ -6,16 +6,6 @@ using Sungero.CoreEntities;
 
 namespace Sungero.Capture.Structures.Module
 {
-  // Результат классификации документа/пакета документов.
-  partial class ClassifiedDocument
-  {
-    // Гуид документа.
-    public string DocumentGuid { get; set; }
-    
-    // Класс документа, присвоенный классификатором.
-    public string DocumentClass { get; set; }
-  }
-  
   /// <summary>
   /// Распознанный в Ario документ.
   /// </summary>
