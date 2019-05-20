@@ -516,12 +516,12 @@ namespace Sungero.Capture.Server
     
     
     /// <summary>
-    /// Инициализация захвата.
+    /// Задать основные параметры захвата.
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
     [Remote]
-    public static void InitCapture(string arioUrl, string minFactProbability)
+    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability)
     {
       // Добавить параметр адреса сервиса Ario.
       Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.ArioUrlKey, arioUrl);
