@@ -211,14 +211,9 @@ namespace Sungero.Capture.Server
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
-<<<<<<< HEAD
-      document.InNumber = GetFieldValue(facts, "Letter", "Number");
-      document.Dated = GetFieldValue(facts, "Letter", "Date");
-=======
       document.InNumber = GetField(facts, "letter", "number");
       document.Dated = Functions.Module.GetShortDate(GetField(facts, "letter", "date"));
           
->>>>>>> #82704 #82705 Прическа карточки и заполнения полей. [Rx]
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
         var name = GetFieldValue(fact, "CorrespondentName");
@@ -233,15 +228,9 @@ namespace Sungero.Capture.Server
       
       foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
       {
-<<<<<<< HEAD
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        if (document.CorrespondentTin == string.Empty)
-=======
         var tin = GetField(fact, "TIN");
         var trrc = GetField(fact, "TRRC");
         if (string.IsNullOrWhiteSpace(document.CorrespondentTin))
->>>>>>> #82704 #82705 Прическа карточки и заполнения полей. [Rx]
         {
           document.CorrespondentTin = tin;
           document.CorrespondentTrrc = trrc;
@@ -253,14 +242,6 @@ namespace Sungero.Capture.Server
         }
       }
       
-<<<<<<< HEAD
-      document.DateInResponseTo = GetFieldValue(facts, "Letter", "ResponseToDate");
-      document.NumberInResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
-      
-      // Заполнить данные нашей стороны.
-      document.Addressee = GetFieldValue(facts, "Letter", "Addressee");
-      document.Confidential = GetFieldValue(facts, "Letter", "Confidential");
-=======
       document.InResponseTo = GetField(facts, "letter", "responsetonumber");
       var responseToDate = Functions.Module.GetShortDate(GetField(facts, "letter", "responsetodate"));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
@@ -269,7 +250,6 @@ namespace Sungero.Capture.Server
       
       // Заполнить данные нашей стороны.
       document.Addressee = GetField(facts, "letter", "addressee");
->>>>>>> #82704 #82705 Прическа карточки и заполнения полей. [Rx]
       
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
       {
