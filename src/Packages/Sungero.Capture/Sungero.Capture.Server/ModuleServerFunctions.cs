@@ -211,25 +211,37 @@ namespace Sungero.Capture.Server
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
+<<<<<<< HEAD
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       document.Dated = GetFieldValue(facts, "Letter", "Date");
+=======
+      document.InNumber = GetField(facts, "letter", "number");
+      document.Dated = Functions.Module.GetShortDate(GetField(facts, "letter", "date"));
+          
+>>>>>>> #82704 #82705 Прическа карточки и заполнения полей. [Rx]
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
         var name = GetFieldValue(fact, "CorrespondentName");
         var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
         name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
         
-        if (document.CorrespondentName == string.Empty)
-          document.CorrespondentName = name;
+        if (string.IsNullOrWhiteSpace(document.Correspondent))
+          document.Correspondent = name;
         else
-          document.RecipientName = name;
+          document.Recipient = name;
       }
       
       foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
       {
+<<<<<<< HEAD
         var tin = GetFieldValue(fact, "TIN");
         var trrc = GetFieldValue(fact, "TRRC");
         if (document.CorrespondentTin == string.Empty)
+=======
+        var tin = GetField(fact, "TIN");
+        var trrc = GetField(fact, "TRRC");
+        if (string.IsNullOrWhiteSpace(document.CorrespondentTin))
+>>>>>>> #82704 #82705 Прическа карточки и заполнения полей. [Rx]
         {
           document.CorrespondentTin = tin;
           document.CorrespondentTrrc = trrc;
@@ -241,12 +253,23 @@ namespace Sungero.Capture.Server
         }
       }
       
+<<<<<<< HEAD
       document.DateInResponseTo = GetFieldValue(facts, "Letter", "ResponseToDate");
       document.NumberInResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
       
       // Заполнить данные нашей стороны.
       document.Addressee = GetFieldValue(facts, "Letter", "Addressee");
       document.Confidential = GetFieldValue(facts, "Letter", "Confidential");
+=======
+      document.InResponseTo = GetField(facts, "letter", "responsetonumber");
+      var responseToDate = Functions.Module.GetShortDate(GetField(facts, "letter", "responsetodate"));
+      document.InResponseTo = string.IsNullOrEmpty(responseToDate)
+        ? document.InResponseTo
+        : string.Format("{0} {1} {2}", document.InResponseTo, Sungero.Docflow.Resources.From, responseToDate);
+      
+      // Заполнить данные нашей стороны.
+      document.Addressee = GetField(facts, "letter", "addressee");
+>>>>>>> #82704 #82705 Прическа карточки и заполнения полей. [Rx]
       
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
       {
@@ -256,17 +279,9 @@ namespace Sungero.Capture.Server
         var patrn = GetFieldValue(fact, "Patrn");
         
         if (type == "SIGNATORY")
-        {
-          document.SignatorySurname = surname;
-          document.SignatoryName = name;
-          document.SignatoryPatrn = patrn;
-        }
+          document.Signatory = Functions.Module.ConcatFullName(surname, name, patrn);
         else
-        {
-          document.AssigneeSurname = surname;
-          document.AssigneeName = name;
-          document.AssigneePatrn = patrn;
-        }
+          document.Contact = Functions.Module.ConcatFullName(surname, name, patrn);
       }
       
       document.Save();
@@ -486,7 +501,8 @@ namespace Sungero.Capture.Server
           if (strongTrrcCompanies.Count > 0)
             return strongTrrcCompanies;
           
-          return strongTinCounterparties.Where(c => CompanyBases.Is(c) && string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
+          return strongTinCounterparties.Where(c => CompanyBases.Is(c) && 
+                                               string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
         }
         
         return strongTinCounterparties;
@@ -504,11 +520,15 @@ namespace Sungero.Capture.Server
       var notNumerable = Docflow.DocumentKind.NumberingType.NotNumerable;
       
       // Создать тип документа.
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterKindName, Capture.Server.MockIncommingLetter.ClassTypeGuid, Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, false);
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterKindName, 
+                                                                              Capture.Server.MockIncommingLetter.ClassTypeGuid, 
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, false);
       
       // Создать вид документа.
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName, RecordManagement.Resources.IncomingLetterKindShortName, notNumerable,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false, Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName, 
+                                                                              RecordManagement.Resources.IncomingLetterKindShortName, notNumerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false, 
+                                                                              Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
                                                                               Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
       // Добавить параметр CaptureMockModeKey.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);

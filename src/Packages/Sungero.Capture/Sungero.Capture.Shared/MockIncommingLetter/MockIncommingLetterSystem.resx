@@ -132,46 +132,19 @@
   <data name="Property_InNumber" xml:space="preserve">
     <value>No.</value>
   </data>
-  <data name="ControlGroup_22900bd3ac35480fa46737fc0f4645d9" xml:space="preserve">
-    <value>Side 1</value>
-  </data>
-  <data name="Property_DateInResponseTo" xml:space="preserve">
+  <data name="Property_InResponseTo" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="Property_NumberInResponseTo" xml:space="preserve">
-    <value>No.</value>
-  </data>
-  <data name="Property_CorrespondentName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_CorrespondentLegalForm" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_CorrHeadCompanyName" xml:space="preserve">
+  <data name="Property_Correspondent" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="Property_Addressee" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="Property_Confidential" xml:space="preserve">
+  <data name="Property_Signatory" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="Property_SignatorySurname" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_SignatoryName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_SignatoryPatrn" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_AssigneeSurname" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_AssigneeName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_AssigneePatrn" xml:space="preserve">
+  <data name="Property_Contact" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="Property_CorrespondentTin" xml:space="preserve">
@@ -186,20 +159,14 @@
   <data name="Property_RecipientTrrc" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="Property_RecipientName" xml:space="preserve">
+  <data name="Property_Recipient" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="ControlGroup_2d2669c27abe4373a0c238ddec79a85d" xml:space="preserve">
-    <value>Side 2</value>
+    <value>To</value>
   </data>
   <data name="ControlGroup_c031df17352d4cca8d7dfb63a5739f43" xml:space="preserve">
     <value>TODO</value>
-  </data>
-  <data name="ControlGroup_077c3542bafa4df0ba3eae60cceb55e4" xml:space="preserve">
-    <value>Signatory</value>
-  </data>
-  <data name="ControlGroup_17f2fcfc6d644dfd94687bddba8cbda9" xml:space="preserve">
-    <value>Assignee</value>
   </data>
   <data name="Control_a915c070568d4f08a7365fbdabe9e559_EmptyText" xml:space="preserve">
     <value />
