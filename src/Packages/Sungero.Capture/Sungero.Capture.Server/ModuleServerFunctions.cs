@@ -76,6 +76,7 @@ namespace Sungero.Capture.Server
         
         // Факты и поля фактов.
         recognitedDocument.Facts = new List<Fact>();
+        var minFactProbability = GetMinFactProbability();
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
           var facts = packageProcessResult.ExtractionResult.Facts
@@ -84,7 +85,9 @@ namespace Sungero.Capture.Server
             .ToList();
           foreach (var fact in facts)
           {
-            var fields = fact.Fields.Where(f => f != null).Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
+            var fields = fact.Fields.Where(f => f != null)
+                                    .Where(f => f.Probability >= minFactProbability)
+                                    .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
             recognitedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
           }
         }
@@ -520,7 +523,6 @@ namespace Sungero.Capture.Server
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
     }
     
-    
     /// <summary>
     /// Задать основные параметры захвата.
     /// </summary>
@@ -534,6 +536,19 @@ namespace Sungero.Capture.Server
       
       // Добавить параметр минимальной вероятности для факта.
       Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
+    }
+    
+    /// <summary>
+    /// Получить значение минимальной вероятности доверия факту.
+    /// </summary>
+    /// <returns>Минимальная вероятность доверия факту.</returns>
+    private static float GetMinFactProbability()
+    {
+      float minProbability = 0;
+      var paramValue = Functions.Module.GetDocflowParamsValue(Constants.Module.MinFactProbabilityKey);
+      if (!(paramValue is DBNull) && paramValue != null)
+        float.TryParse(paramValue.ToString(), out minProbability);
+      return minProbability;
     }
   }
 }
