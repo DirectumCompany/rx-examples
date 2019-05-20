@@ -506,16 +506,15 @@ namespace Sungero.Capture.Server
     [Remote]
     public static void InitCaptureMockMode()
     {
-      var notNumerable = Docflow.DocumentKind.NumberingType.NotNumerable;
-      
       // Создать тип документа.
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterKindName, 
                                                                               Capture.Server.MockIncommingLetter.ClassTypeGuid, 
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, false);
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true);
       
       // Создать вид документа.
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName, 
-                                                                              RecordManagement.Resources.IncomingLetterKindShortName, notNumerable,
+                                                                              RecordManagement.Resources.IncomingLetterKindShortName,
+                                                                              Docflow.DocumentKind.NumberingType.Registrable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false, 
                                                                               Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
                                                                               Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
