@@ -211,8 +211,8 @@ namespace Sungero.Capture.Server
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
-      document.InNumber = GetField(facts, "letter", "number");
-      document.Dated = Functions.Module.GetShortDate(GetField(facts, "letter", "date"));
+      document.InNumber = GetFieldValue(facts, "letter", "number");
+      document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "letter", "date"));
           
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
@@ -228,8 +228,8 @@ namespace Sungero.Capture.Server
       
       foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
       {
-        var tin = GetField(fact, "TIN");
-        var trrc = GetField(fact, "TRRC");
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
         if (string.IsNullOrWhiteSpace(document.CorrespondentTin))
         {
           document.CorrespondentTin = tin;
@@ -242,14 +242,14 @@ namespace Sungero.Capture.Server
         }
       }
       
-      document.InResponseTo = GetField(facts, "letter", "responsetonumber");
-      var responseToDate = Functions.Module.GetShortDate(GetField(facts, "letter", "responsetodate"));
+      document.InResponseTo = GetFieldValue(facts, "letter", "responsetonumber");
+      var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "letter", "responsetodate"));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? document.InResponseTo
         : string.Format("{0} {1} {2}", document.InResponseTo, Sungero.Docflow.Resources.From, responseToDate);
       
       // Заполнить данные нашей стороны.
-      document.Addressee = GetField(facts, "letter", "addressee");
+      document.Addressee = GetFieldValue(facts, "letter", "addressee");
       
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
       {
