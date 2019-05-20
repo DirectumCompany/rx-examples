@@ -15,14 +15,5 @@ namespace Sungero.Capture.Shared
       _obj.State.Properties.DocumentRegister.IsRequired = false;
       _obj.State.Properties.RegistrationDate.IsRequired = false;
     }
-    
-    public override void FillName()
-    {
-      base.FillName();
-      
-      // Если имя формировать не из чего, то сформировать из краткого названия вида документа.
-      if (_obj.Name == Docflow.Resources.DocumentNameAutotext)
-        _obj.Name = _obj.DocumentKind.ShortName;
-    }
   }
 }

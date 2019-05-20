@@ -222,6 +222,7 @@ namespace Sungero.Capture.Server
         
         if (string.IsNullOrWhiteSpace(document.Correspondent))
           document.Correspondent = name;
+        // Если коррекспондент уже заполнен, то занести наименование в получателя.
         else
           document.Recipient = name;
       }
@@ -235,6 +236,7 @@ namespace Sungero.Capture.Server
           document.CorrespondentTin = tin;
           document.CorrespondentTrrc = trrc;
         }
+        // Если ИНН/КПП корреспондента уже заполнены, то занести в ИНН/КПП получателя.
         else
         {
           document.RecipientTin = tin;
@@ -247,9 +249,6 @@ namespace Sungero.Capture.Server
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? document.InResponseTo
         : string.Format("{0} {1} {2}", document.InResponseTo, Sungero.Docflow.Resources.From, responseToDate);
-      
-      // Заполнить данные нашей стороны.
-      document.Addressee = GetFieldValue(facts, "letter", "addressee");
       
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
       {
@@ -264,6 +263,13 @@ namespace Sungero.Capture.Server
           document.Contact = Functions.Module.ConcatFullName(surname, name, patrn);
       }
       
+      // Заполнить данные нашей стороны.
+       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
+      {
+        var adressee = GetFieldValue(fact, "Addressee");
+        document.Addressees = string.IsNullOrEmpty(document.Addressees) ? adressee : string.Format("{0}, {1}", document.Addressees, adressee);
+      }
+       
       document.Save();
       return document;
     }

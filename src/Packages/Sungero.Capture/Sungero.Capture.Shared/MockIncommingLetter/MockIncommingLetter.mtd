@@ -408,8 +408,8 @@
     {
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "c9b3ec95-aca3-452f-81d6-f6f2aa16574b",
-      "Name": "Addressee",
-      "Code": "Addressee",
+      "Name": "Addressees",
+      "Code": "Addressees",
       "Length": 500,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "826e0ddb-4951-4a8c-b88f-35f2eb3e01ca"

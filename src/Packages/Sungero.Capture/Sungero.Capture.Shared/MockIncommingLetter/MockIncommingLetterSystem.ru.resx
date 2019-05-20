@@ -138,8 +138,8 @@
   <data name="Property_Correspondent" xml:space="preserve">
     <value>Корреспондент</value>
   </data>
-  <data name="Property_Addressee" xml:space="preserve">
-    <value>Адресат</value>
+  <data name="Property_Addressees" xml:space="preserve">
+    <value>Адресаты</value>
   </data>
   <data name="Property_Signatory" xml:space="preserve">
     <value>Подписал</value>
