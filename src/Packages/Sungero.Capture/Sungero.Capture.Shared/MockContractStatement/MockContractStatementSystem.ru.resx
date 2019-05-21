@@ -126,4 +126,58 @@
   <data name="CollectionDisplayName" xml:space="preserve">
     <value>Акты выполненных работ</value>
   </data>
+  <data name="Property_LeadDoc" xml:space="preserve">
+    <value>Договор</value>
+  </data>
+  <data name="ControlGroup_406e14dc17444a7f85d8f6eef8abaa3f" xml:space="preserve">
+    <value>Основное</value>
+  </data>
+  <data name="ControlGroup_42612188cf984a66a4cc5c674787d208" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+  <data name="ControlGroup_368b1a6f0e9349d78022574af68a77d0" xml:space="preserve">
+    <value>Контрагент</value>
+  </data>
+  <data name="Property_CounterpartyName" xml:space="preserve">
+    <value>Контрагент</value>
+  </data>
+  <data name="Property_CounterpartyTin" xml:space="preserve">
+    <value>ИНН</value>
+  </data>
+  <data name="Property_CounterpartyTrrc" xml:space="preserve">
+    <value>КПП</value>
+  </data>
+  <data name="ControlGroup_4e1d78fc6f6c4c81bf9aa1fa2031a46b" xml:space="preserve">
+    <value>Дата и номер</value>
+  </data>
+  <data name="ControlGroup_696a8bb83e1244c8927a37d955cfbf0f" xml:space="preserve">
+    <value>Хранение</value>
+  </data>
+  <data name="ControlGroup_1b194ce3c44048879f0d1cdc4303c583" xml:space="preserve">
+    <value>Жизненный цикл</value>
+  </data>
+  <data name="ControlGroup_72e492251e834e65bb33ea838a458e43" xml:space="preserve">
+    <value>Местонахождение</value>
+  </data>
+  <data name="ControlGroup_51f9701081174ee68bc5e4a86ce492c6" xml:space="preserve">
+    <value>Наша сторона</value>
+  </data>
+  <data name="Property_BusinessUnitName" xml:space="preserve">
+    <value>Наша орг.</value>
+  </data>
+  <data name="Property_BusinessUnitTin" xml:space="preserve">
+    <value>ИНН</value>
+  </data>
+  <data name="Property_BusinessUnitTrrc" xml:space="preserve">
+    <value>КПП</value>
+  </data>
+  <data name="ControlGroup_52b6e68c355f4bd4b3ea9ef12dd8abc7" xml:space="preserve">
+    <value>Условия</value>
+  </data>
+  <data name="Property_TotalAmount" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
+  <data name="Property_Currency" xml:space="preserve">
+    <value>Валюта</value>
+  </data>
 </root>
