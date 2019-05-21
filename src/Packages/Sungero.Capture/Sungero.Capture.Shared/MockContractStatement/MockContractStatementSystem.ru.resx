@@ -136,10 +136,10 @@
     <value>Примечание</value>
   </data>
   <data name="ControlGroup_368b1a6f0e9349d78022574af68a77d0" xml:space="preserve">
-    <value>Контрагент</value>
+    <value>Исполнитель</value>
   </data>
   <data name="Property_CounterpartyName" xml:space="preserve">
-    <value>Контрагент</value>
+    <value>Исполнитель</value>
   </data>
   <data name="Property_CounterpartyTin" xml:space="preserve">
     <value>ИНН</value>
@@ -160,10 +160,10 @@
     <value>Местонахождение</value>
   </data>
   <data name="ControlGroup_51f9701081174ee68bc5e4a86ce492c6" xml:space="preserve">
-    <value>Наша сторона</value>
+    <value>Заказчик</value>
   </data>
   <data name="Property_BusinessUnitName" xml:space="preserve">
-    <value>Наша орг.</value>
+    <value>Заказчик</value>
   </data>
   <data name="Property_BusinessUnitTin" xml:space="preserve">
     <value>ИНН</value>

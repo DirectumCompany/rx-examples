@@ -169,10 +169,10 @@
     <value />
   </data>
   <data name="ControlGroup_368b1a6f0e9349d78022574af68a77d0" xml:space="preserve">
-    <value>Counterparty</value>
+    <value>Contractor</value>
   </data>
   <data name="Property_CounterpartyName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Contractor</value>
   </data>
   <data name="Property_CounterpartyTin" xml:space="preserve">
     <value>TIN</value>
@@ -253,10 +253,10 @@
     <value />
   </data>
   <data name="ControlGroup_51f9701081174ee68bc5e4a86ce492c6" xml:space="preserve">
-    <value>Company</value>
+    <value>Customer</value>
   </data>
   <data name="Property_BusinessUnitName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Customer</value>
   </data>
   <data name="Property_BusinessUnitTin" xml:space="preserve">
     <value>TIN</value>
