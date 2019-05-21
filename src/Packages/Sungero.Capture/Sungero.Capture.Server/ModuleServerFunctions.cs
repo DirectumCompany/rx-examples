@@ -215,27 +215,11 @@ namespace Sungero.Capture.Server
       // Заполнить данные корреспондента.
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
-<<<<<<< HEAD
-      
-      foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
-      {
-        var name = GetFieldValue(fact, "CorrespondentName");
-        var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
-        name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
-        
-        if (string.IsNullOrWhiteSpace(document.Correspondent))
-          document.Correspondent = name;
-        // Если коррекспондент уже заполнен, то занести наименование в получателя.
-        else
-          document.Recipient = name;
-      }
-=======
       var orderedCorrespondentNames = GetOrderedCorrespondentNames(GetFacts(facts, "Letter", "CorrespondentName"));
       if (orderedCorrespondentNames.Count() > 0)
         document.Correspondent = orderedCorrespondentNames.FirstOrDefault().Value;
       if (orderedCorrespondentNames.Count() > 1)
         document.Recipient = orderedCorrespondentNames.LastOrDefault().Value;
->>>>>>> #82702. Выделение функции для получения CorrespondentName
       
       foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
       {
