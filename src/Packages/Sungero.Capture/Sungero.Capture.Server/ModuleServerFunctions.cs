@@ -217,6 +217,7 @@ namespace Sungero.Capture.Server
       // Заполнить данные корреспондента.
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
+<<<<<<< HEAD
       
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
@@ -230,6 +231,13 @@ namespace Sungero.Capture.Server
         else
           document.Recipient = name;
       }
+=======
+      var orderedCorrespondentNames = GetOrderedCorrespondentNames(GetFacts(facts, "Letter", "CorrespondentName"));
+      if (orderedCorrespondentNames.Count() > 0)
+        document.Correspondent = orderedCorrespondentNames.FirstOrDefault().Value;
+      if (orderedCorrespondentNames.Count() > 1)
+        document.Recipient = orderedCorrespondentNames.LastOrDefault().Value;
+>>>>>>> #82702. Выделение функции для получения CorrespondentName
       
       foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
       {
@@ -405,6 +413,17 @@ namespace Sungero.Capture.Server
       }
     }
 
+    /// <summary>
+    /// Получить поле из факта.
+    /// </summary>
+    /// <param name="fact">Имя факта.</param>
+    /// <param name="fieldName">Имя поля.</param>
+    /// <returns>Поле.</returns>
+    public static FactField GetField(Structures.Module.Fact fact, string fieldName)
+    {
+      return fact.Fields.FirstOrDefault(f => f.Name == fieldName);
+    }
+    
     /// <summary>
     /// Получить значение поля из фактов.
     /// </summary>
@@ -634,6 +653,26 @@ namespace Sungero.Capture.Server
       if (!(paramValue is DBNull) && paramValue != null)
         float.TryParse(paramValue.ToString(), out minProbability);
       return minProbability;
+    }
+    
+    /// <summary>
+    /// Получить список наименований контрагентов упорядоченных по убыванию вероятности.
+    /// </summary>
+    /// <param name="source">Исходный список фактов, содержащих наименования контрагентов.</param>
+    /// <returns>Упорядоченный список наименований контрагентов.</returns>
+    private static IOrderedEnumerable<KeyValuePair<decimal, string>> GetOrderedCorrespondentNames(List<Fact> source)
+    {
+      var correspondentNames = new Dictionary<decimal, string>();
+      foreach (var fact in source)
+      {
+        var correspondentNameField = GetField(fact, "CorrespondentName");
+        var name = correspondentNameField.Value;
+        var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
+        correspondentNames.Add(correspondentNameField.Probability,
+                               string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm));
+      }
+      
+      return correspondentNames.OrderByDescending(n => n.Key);
     }
   }
 }
