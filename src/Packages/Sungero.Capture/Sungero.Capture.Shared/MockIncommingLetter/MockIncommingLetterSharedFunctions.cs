@@ -14,8 +14,7 @@ namespace Sungero.Capture.Shared
       /* Имя в формате:
         <Вид документа> от <корреспондент> №<номер> от <дата> "<содержание>".
       */
-     var kind = _obj.DocumentKind;
-     if (kind == null)
+     if (_obj.DocumentKind == null)
        return;
      
      var name = _obj.DocumentKind.ShortName;
