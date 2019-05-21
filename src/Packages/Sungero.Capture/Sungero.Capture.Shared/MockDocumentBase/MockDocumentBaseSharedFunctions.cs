@@ -15,5 +15,10 @@ namespace Sungero.Capture.Shared
       _obj.State.Properties.DocumentRegister.IsRequired = false;
       _obj.State.Properties.RegistrationDate.IsRequired = false;
     }
+    
+    public override void SetLifeCycleState()
+    {
+      _obj.LifeCycleState = LifeCycleState.Active;
+    }
   }
 }
