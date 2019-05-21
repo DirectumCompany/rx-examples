@@ -36,9 +36,13 @@ namespace Sungero.Capture.Shared
     /// <returns>Дата.</returns>
     public string GetShortDate(string source)
     {
-      DateTime dateTmp;
-      Calendar.TryParseDate(source, out dateTmp);
-      return dateTmp != null ? dateTmp.ToShortDateString() : source;
+      if (!string.IsNullOrWhiteSpace(source))
+      {
+        DateTime dateTmp;
+        Calendar.TryParseDateTime(source, out dateTmp);
+        return dateTmp != null ? dateTmp.ToShortDateString() : source;
+      }
+      return string.Empty;
     }
   }
 }

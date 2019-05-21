@@ -209,13 +209,10 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = letterсlassificationResult.Facts;
-      var subject = GetFieldValue(facts, "Letter", "Subject");
-      document.Subject = !string.IsNullOrEmpty(subject) ?
-        string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       // Заполнить данные корреспондента.
-      document.InNumber = GetFieldValue(facts, "letter", "number");
-      document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "letter", "date"));
+      document.InNumber = GetFieldValue(facts, "Letter", "Number");
+      document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
           
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
@@ -247,8 +244,8 @@ namespace Sungero.Capture.Server
         }
       }
       
-      document.InResponseTo = GetFieldValue(facts, "letter", "responsetonumber");
-      var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "letter", "responsetodate"));
+      document.InResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
+      var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "ResponseToDate"));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? document.InResponseTo
         : string.Format("{0} {1} {2}", document.InResponseTo, Sungero.Docflow.Resources.From, responseToDate);
@@ -267,12 +264,17 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить данные нашей стороны.
-       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
+      foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
       {
         var adressee = GetFieldValue(fact, "Addressee");
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? adressee : string.Format("{0}, {1}", document.Addressees, adressee);
       }
-       
+      
+      // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
+      var subject = GetFieldValue(facts, "Letter", "Subject");
+      document.Subject = !string.IsNullOrEmpty(subject) ?
+        string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
+      
       document.Save();
       return document;
     }
