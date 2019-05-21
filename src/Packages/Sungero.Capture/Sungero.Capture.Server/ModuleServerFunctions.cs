@@ -207,8 +207,6 @@ namespace Sungero.Capture.Server
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.Capture.MockIncommingLetters.Create();
-      var documentBody = GetDocumentBody(letterсlassificationResult.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -288,6 +286,10 @@ namespace Sungero.Capture.Server
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
       
       document.Save();
+      
+      var documentBody = GetDocumentBody(letterсlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
       return document;
     }
     
