@@ -110,7 +110,11 @@ namespace Sungero.Capture.Server
           ? CreateMokeIncomingLetter(recognitedDocument, responsible)
           : CreateIncomingLetter(recognitedDocument, responsible);
       }
-      
+      // Акт выполненных работ.
+      else if (recognitedClass == Constants.Module.ContractStatementClassName && CaptureMockMode != null)
+      {
+        return CreateMokeContractStatement(recognitedDocument, responsible);
+      }
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
     }
@@ -274,6 +278,27 @@ namespace Sungero.Capture.Server
       var subject = GetFieldValue(facts, "Letter", "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
+      
+      document.Save();
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать акт выполненных работ с текстовыми полями.
+    /// </summary>
+    /// <param name="letterсlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Документ.</returns>
+    public static Docflow.IOfficialDocument CreateMokeContractStatement(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
+    {
+      // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
+      var document = Sungero.Capture.MockContractStatements.Create();
+      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = сlassificationResult.Facts;
       
       document.Save();
       return document;
@@ -492,7 +517,7 @@ namespace Sungero.Capture.Server
           if (strongTrrcCompanies.Count > 0)
             return strongTrrcCompanies;
           
-          return strongTinCounterparties.Where(c => CompanyBases.Is(c) && 
+          return strongTinCounterparties.Where(c => CompanyBases.Is(c) &&
                                                string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
         }
         
@@ -508,18 +533,30 @@ namespace Sungero.Capture.Server
     [Remote]
     public static void InitCaptureMockMode()
     {
-      // Создать тип документа.
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterKindName, 
-                                                                              Capture.Server.MockIncommingLetter.ClassTypeGuid, 
+      // Создать типы документов.
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterKindName,
+                                                                              Capture.Server.MockIncommingLetter.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true);
       
-      // Создать вид документа.
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName, 
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.ContractStatementKindName,
+                                                                              Capture.Server.MockContractStatement.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true);
+      
+      // Создать виды документов.
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
                                                                               RecordManagement.Resources.IncomingLetterKindShortName,
                                                                               Docflow.DocumentKind.NumberingType.Registrable,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false, 
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
                                                                               Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
                                                                               Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
+
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.ContractStatementKindName,
+                                                                              FinancialArchive.Resources.ContractStatementKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
+                                                                              Capture.Server.MockContractStatement.ClassTypeGuid, null, true, false,
+                                                                              Sungero.Capture.Constants.Module.Initialize.MockContractStatementKind, true);
+      
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
     }
