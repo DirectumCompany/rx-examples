@@ -14,6 +14,10 @@ namespace Sungero.Capture.Shared
       /* Имя в формате:
         <Вид документа> от <корреспондент> №<номер> от <дата> "<содержание>".
       */
+     var kind = _obj.DocumentKind;
+     if (kind == null)
+       return;
+     
      var name = _obj.DocumentKind.ShortName;
      
      using (TenantInfo.Culture.SwitchTo())
@@ -30,6 +34,7 @@ namespace Sungero.Capture.Shared
        if (!string.IsNullOrWhiteSpace(_obj.Subject))
          name += " \"" + _obj.Subject + "\"";
      }
+     
      _obj.Name = name;
     }
   }

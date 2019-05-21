@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -9,6 +9,10 @@ namespace Sungero.Capture
 {
   partial class MockDocumentBaseClientHandlers
   {
+
+    public override void DocumentKindValueInput(Sungero.Docflow.Client.OfficialDocumentDocumentKindValueInputEventArgs e)
+    {
+    }
 
   }
 }
