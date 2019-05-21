@@ -607,9 +607,13 @@
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
       "Name": "Versions",
       "EntityGuid": "f7b7c9ac-a2fe-4c8b-88fc-f2c050a2d628",
+      "HandledEvents": [
+        "AddedShared"
+      ],
       "IsAncestorMetadata": true,
       "Overridden": [
-        "EntityGuid"
+        "EntityGuid",
+        "HandledEvents"
       ]
     },
     {

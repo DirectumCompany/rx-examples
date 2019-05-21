@@ -86,8 +86,8 @@ namespace Sungero.Capture.Server
           foreach (var fact in facts)
           {
             var fields = fact.Fields.Where(f => f != null)
-                                    .Where(f => f.Probability >= minFactProbability)
-                                    .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
+              .Where(f => f.Probability >= minFactProbability)
+              .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
             recognitedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
           }
         }
@@ -107,13 +107,13 @@ namespace Sungero.Capture.Server
       if (recognitedClass == Constants.Module.LetterClassName)
       {
         return CaptureMockMode != null
-          ? CreateMokeIncomingLetter(recognitedDocument, responsible)
+          ? CreateMockIncomingLetter(recognitedDocument, responsible)
           : CreateIncomingLetter(recognitedDocument, responsible);
       }
       // Акт выполненных работ.
       else if (recognitedClass == Constants.Module.ContractStatementClassName && CaptureMockMode != null)
       {
-        return CreateMokeContractStatement(recognitedDocument, responsible);
+        return CreateMockContractStatement(recognitedDocument, responsible);
       }
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
@@ -203,7 +203,7 @@ namespace Sungero.Capture.Server
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMokeIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.Capture.MockIncommingLetters.Create();
@@ -217,7 +217,7 @@ namespace Sungero.Capture.Server
       // Заполнить данные корреспондента.
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
-          
+      
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
         var name = GetFieldValue(fact, "CorrespondentName");
@@ -289,7 +289,7 @@ namespace Sungero.Capture.Server
     /// <param name="letterсlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMokeContractStatement(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.Capture.MockContractStatements.Create();
@@ -299,6 +299,53 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = сlassificationResult.Facts;
+      
+      // Заполнить
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
+      
+      // Заполнить сумму и валюту.
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
+      var amountCents = GetFieldValue(facts, "DocumentAmount", "AmountCents");
+      double totalAmount;
+      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+      document.TotalAmount = totalAmount;
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).SingleOrDefault();
+      
+      // Заполнить наименование, ИНН/КПП организаций.
+      foreach (var fact in GetFacts(facts, "Counterparty", "Name"))
+      {
+        var name = GetFieldValue(fact, "Name");
+        var legalForm = GetFieldValue(fact, "LegalForm");
+        name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+        
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        var type = GetFieldValue(fact, "CounterpartyType");
+        
+        if (type == "SELLER" || (string.IsNullOrWhiteSpace(document.CounterpartyName) && string.IsNullOrEmpty(type)))
+        {
+          document.CounterpartyName = name;
+          document.CounterpartyTin = tin;
+          document.CounterpartyTrrc = trrc;
+        }
+        // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
+        else
+        {
+          document.BusinessUnitName = name;
+          document.BusinessUnitTin = tin;
+          document.BusinessUnitTrrc = trrc;
+        }
+      }
+      
+      var leadDocName = GetFieldValue(facts, "FinancialDocument", "DocumentBaseName");
+      var leadDocDate = Functions.Module.GetShortDate(GetFieldValue(facts, "FinancialDocument", "DocumentBaseDate"));
+      var leadDocNumber = GetFieldValue(facts, "FinancialDocument", "DocumentBaseNumber");
+      if (!string.IsNullOrWhiteSpace(leadDocName))
+        document.LeadDoc = string.Format("{0} №{1} от {2}", leadDocName, leadDocNumber, leadDocDate);
       
       document.Save();
       return document;
