@@ -647,28 +647,27 @@ namespace Sungero.Capture.Server
                                                                               Sungero.Docflow.DocumentType.DocumentFlow.Contracts, true);
       
       // Создать виды документов.
+      var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
                                                                               RecordManagement.Resources.IncomingLetterKindShortName,
                                                                               Sungero.Docflow.DocumentKind.NumberingType.Registrable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
                                                                               Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid,
-                                                                              new[] { OfficialDocuments.Info.Actions.SendActionItem },
-                                                                              Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
 
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.ContractStatementKindName,
                                                                               FinancialArchive.Resources.ContractStatementKindShortName,
                                                                               Sungero.Docflow.DocumentKind.NumberingType.Numerable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
-                                                                              Capture.Server.MockContractStatement.ClassTypeGuid, null, true, false,
-                                                                              Sungero.Capture.Constants.Module.Initialize.MockContractStatementKind, true);
+                                                                              Capture.Server.MockContractStatement.ClassTypeGuid, 
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockContractStatementKind);
 
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.WaybillDocumentKindName,
                                                                               FinancialArchive.Resources.WaybillDocumentKindShortName,
                                                                               Sungero.Docflow.DocumentKind.NumberingType.Numerable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
                                                                               Sungero.Capture.Server.MockWaybill.ClassTypeGuid,
-                                                                              new[] { OfficialDocuments.Info.Actions.SendForFreeApproval, OfficialDocuments.Info.Actions.SendForApproval },
-                                                                              Sungero.Capture.Constants.Module.Initialize.MockWaybillKind);
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockWaybillKind);
       
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
