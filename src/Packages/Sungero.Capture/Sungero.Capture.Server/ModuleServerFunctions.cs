@@ -303,30 +303,30 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      var amountCents = GetFieldValue(facts, "DocumentAmount", "AmountCents");
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");      
       double totalAmount;
       double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
       document.TotalAmount = totalAmount;
+      
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).SingleOrDefault();
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER").FirstOrDefault();
-      var buyerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "BUYER").FirstOrDefault();
+      var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
       if (sellerFact != null)
       {
-        var name = GetFieldValue(sellerFact, "Name");
-        var legalForm = GetFieldValue(sellerFact, "LegalForm");
-        document.CounterpartyName = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+        document.CounterpartyName = GetCorrespondentName(sellerFact, "Name", "LegalForm");
         document.CounterpartyTin = GetFieldValue(sellerFact, "TIN");
         document.CounterpartyTrrc = GetFieldValue(sellerFact, "TRRC");
       }
+      var buyerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "BUYER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
       if (buyerFact != null)
       {
-        var name = GetFieldValue(buyerFact, "Name");
-        var legalForm = GetFieldValue(buyerFact, "LegalForm");
-        document.BusinessUnitName = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+        document.BusinessUnitName = GetCorrespondentName(buyerFact, "Name", "LegalForm");
         document.BusinessUnitTin = GetFieldValue(buyerFact, "TIN");
         document.BusinessUnitTrrc = GetFieldValue(buyerFact, "TRRC");
       }
@@ -360,11 +360,9 @@ namespace Sungero.Capture.Server
         }
       }
       
-      var leadDocName = GetFieldValue(facts, "FinancialDocument", "DocumentBaseName");
-      var leadDocDate = Functions.Module.GetShortDate(GetFieldValue(facts, "FinancialDocument", "DocumentBaseDate"));
-      var leadDocNumber = GetFieldValue(facts, "FinancialDocument", "DocumentBaseNumber");
-      if (!string.IsNullOrWhiteSpace(leadDocName))
-        document.LeadDoc = string.Format("{0} №{1} от {2}", leadDocName, leadDocNumber, leadDocDate);
+      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
+      document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
       document.Save();
       
@@ -396,7 +394,60 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
-      document.Contract = GetLeadingDocumentName(leadingDocNames.First());
+      document.Contract = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
+      
+      // Контрагенты
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var shipperFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SHIPPER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (shipperFact != null)
+      {
+        document.Shipper = GetCorrespondentName(shipperFact, "Name", "LegalForm");
+        document.ShipperTin = GetFieldValue(shipperFact, "TIN");
+        document.ShipperTrrc = GetFieldValue(shipperFact, "TRRC");
+      }
+      
+      var consigneeFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "CONSIGNEE")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (consigneeFact != null)
+      {
+        document.Consignee = GetCorrespondentName(consigneeFact, "Name", "LegalForm");
+        document.ConsigneeTin = GetFieldValue(consigneeFact, "TIN");
+        document.ConsigneeTrrc = GetFieldValue(consigneeFact, "TRRC");
+      }
+      
+      var supplierFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SUPPLIER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (supplierFact != null)
+      {
+        document.Supplier = GetCorrespondentName(supplierFact, "Name", "LegalForm");
+        document.SupplierTin = GetFieldValue(supplierFact, "TIN");
+        document.SupplierTrrc = GetFieldValue(supplierFact, "TRRC");
+      }
+      
+      var payerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "PAYER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (payerFact != null)
+      {
+        document.Payer = GetCorrespondentName(payerFact, "Name", "LegalForm");
+        document.PayerTin = GetFieldValue(payerFact, "TIN");
+        document.PayerTrrc = GetFieldValue(payerFact, "TRRC");
+      }
+      
+      // Заполнить сумму и валюту.
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");      
+      double totalAmount;
+      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+      document.TotalAmount = totalAmount;
+      
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      
+      
       
       document.Save();
       
@@ -723,6 +774,9 @@ namespace Sungero.Capture.Server
     /// <returns>Наименование контрагента.</returns>
     private static string GetCorrespondentName(Fact fact, string nameFieldName, string legalFormFieldName)
     {
+      if (fact == null)
+        return string.Empty;
+      
       var name = GetFieldValue(fact, nameFieldName);
       var legalForm = GetFieldValue(fact, legalFormFieldName);
       return string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
@@ -735,20 +789,23 @@ namespace Sungero.Capture.Server
     /// <returns>Наименование ведущего документа с номером и датой.</returns>
     private static string GetLeadingDocumentName(Fact fact)
     {
+      if (fact == null)
+        return string.Empty;
+      
       var documentName = GetFieldValue(fact, "DocumentBaseName");
       var date = Functions.Module.GetShortDate(GetFieldValue(fact, "DocumentBaseDate"));
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
-      if (!string.IsNullOrWhiteSpace(documentName))
-      {
-        if (!string.IsNullOrWhiteSpace(date) && !string.IsNullOrWhiteSpace(number))
-          return string.Format("{0} №{1} от {2}", documentName, number, date);
-        else if (!string.IsNullOrWhiteSpace(number))
-          return string.Format("{0} №{1}", documentName, number);
-        else
-          return string.Format("{0} от {1}", documentName, date);
-      }
-      return string.Empty;
+      if (string.IsNullOrWhiteSpace(documentName))
+        return string.Empty;
+      
+      if (!string.IsNullOrWhiteSpace(number))
+        documentName = string.Format("{0} №{1}", documentName, number);
+      
+      if (!string.IsNullOrWhiteSpace(date))
+        documentName = string.Format("{0} от {1}", documentName, date);
+      
+      return documentName;
     }
   }
 }

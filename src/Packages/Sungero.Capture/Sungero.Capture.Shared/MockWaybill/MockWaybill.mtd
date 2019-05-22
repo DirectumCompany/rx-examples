@@ -169,7 +169,7 @@
           "Name": "TotalAmount",
           "ColumnNumber": 0,
           "ColumnSpan": 1,
-          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
           "ParentGuid": "18108e83-e97f-4016-a45e-812403bb90fe",
           "PropertyGuid": "760fcf88-f539-44be-8401-d29079622afc",
           "RowNumber": 0,
@@ -182,7 +182,7 @@
           "Name": "Currency",
           "ColumnNumber": 1,
           "ColumnSpan": 1,
-          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "18108e83-e97f-4016-a45e-812403bb90fe",
           "PropertyGuid": "506b32ba-7a9c-44a3-a113-4fd02fe6652d",
           "RowNumber": 0,
@@ -504,19 +504,21 @@
       "PreviousPropertyGuid": "023701b7-7293-4265-b235-f90625088afb"
     },
     {
-      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
       "NameGuid": "760fcf88-f539-44be-8401-d29079622afc",
       "Name": "TotalAmount",
       "Code": "TotalAmount1",
-      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "ee648a83-cb91-4027-8480-a1a0b4e0b712"
     },
     {
-      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "506b32ba-7a9c-44a3-a113-4fd02fe6652d",
       "Name": "Currency",
       "Code": "Currency1",
-      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+      "EntityGuid": "ffc2629f-dc30-4106-a3ce-c402ae7d32b9",
+      "FlatListInStandaloneLookup": true,
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
       "PreviousPropertyGuid": "760fcf88-f539-44be-8401-d29079622afc"
     }
   ],
