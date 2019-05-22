@@ -308,29 +308,52 @@ namespace Sungero.Capture.Server
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).SingleOrDefault();
       
-      // Заполнить наименование, ИНН/КПП организаций.
-      foreach (var fact in GetFacts(facts, "Counterparty", "Name"))
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER").FirstOrDefault();
+      var buyerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "BUYER").FirstOrDefault();
+      if (sellerFact != null)
       {
-        var name = GetFieldValue(fact, "Name");
-        var legalForm = GetFieldValue(fact, "LegalForm");
-        name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
-        
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        var type = GetFieldValue(fact, "CounterpartyType");
-        
-        if (type == "SELLER" || (string.IsNullOrWhiteSpace(document.CounterpartyName) && string.IsNullOrEmpty(type)))
+        var name = GetFieldValue(sellerFact, "Name");
+        var legalForm = GetFieldValue(sellerFact, "LegalForm");
+        document.CounterpartyName = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+        document.CounterpartyTin = GetFieldValue(sellerFact, "TIN");
+        document.CounterpartyTrrc = GetFieldValue(sellerFact, "TRRC");
+      }
+      if (buyerFact != null)
+      {
+        var name = GetFieldValue(buyerFact, "Name");
+        var legalForm = GetFieldValue(buyerFact, "LegalForm");
+        document.BusinessUnitName = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+        document.BusinessUnitTin = GetFieldValue(buyerFact, "TIN");
+        document.BusinessUnitTrrc = GetFieldValue(buyerFact, "TRRC");
+      }
+      
+      // Если исполнитель или заказчик не заполнились, ищем их по всем фактам.
+      if (sellerFact == null || buyerFact == null)
+      {
+        foreach (var fact in counterpartyFacts)
         {
-          document.CounterpartyName = name;
-          document.CounterpartyTin = tin;
-          document.CounterpartyTrrc = trrc;
-        }
-        // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
-        else
-        {
-          document.BusinessUnitName = name;
-          document.BusinessUnitTin = tin;
-          document.BusinessUnitTrrc = trrc;
+          var name = GetFieldValue(fact, "Name");
+          var legalForm = GetFieldValue(fact, "LegalForm");
+          name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+          
+          var tin = GetFieldValue(fact, "TIN");
+          var trrc = GetFieldValue(fact, "TRRC");
+          var type = GetFieldValue(fact, "CounterpartyType");
+          
+          if (string.IsNullOrWhiteSpace(document.CounterpartyName) && string.IsNullOrEmpty(type))
+          {
+            document.CounterpartyName = name;
+            document.CounterpartyTin = tin;
+            document.CounterpartyTrrc = trrc;
+          }
+          // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
+          else if (string.IsNullOrWhiteSpace(document.BusinessUnitName) && string.IsNullOrEmpty(type))
+          {
+            document.BusinessUnitName = name;
+            document.BusinessUnitTin = tin;
+            document.BusinessUnitTrrc = trrc;
+          }
         }
       }
       

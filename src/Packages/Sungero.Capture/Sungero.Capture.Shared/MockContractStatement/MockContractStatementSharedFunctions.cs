@@ -24,7 +24,7 @@ namespace Sungero.Capture.Shared
        */
       using (TenantInfo.Culture.SwitchTo())
       {
-        if (_obj.RegistrationNumber != null)
+        if (!string.IsNullOrWhiteSpace(_obj.RegistrationNumber))
           name += Sungero.Docflow.OfficialDocuments.Resources.Number + _obj.RegistrationNumber;
         
         if (_obj.RegistrationDate != null)
