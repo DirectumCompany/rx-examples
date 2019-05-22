@@ -88,8 +88,9 @@ namespace Sungero.Capture.Client
       return new Dictionary<string, string>()
       {
         { "Входящее письмо" , "Letter"},
-        { "Письмо" , "Letter"},
-        { "Акт выполненных работ" , "ContractStatement"}
+        { Constants.Module.LetterClassName , "Letter"},
+        { Constants.Module.ContractStatementClassName , "ContractStatement"},
+        { Constants.Module.WaybillClassName , "Waybill"}
       };
     }
     

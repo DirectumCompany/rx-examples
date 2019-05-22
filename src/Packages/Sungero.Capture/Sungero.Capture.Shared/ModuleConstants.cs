@@ -17,11 +17,15 @@ namespace Sungero.Capture.Constants
     
     public const string ContractStatementClassName = "Акт выполненных работ";
     
+    public const string WaybillClassName = "Товарная накладная";
+    
     public static class Initialize
     {
       public static readonly Guid MockIncommingLetterKind = Guid.Parse("E37D0916-7814-441E-84EF-904B7B643497");
       
       public static readonly Guid MockContractStatementKind = Guid.Parse("C149F090-CE5C-4786-BACE-AA38BB51635A");
+      
+      public static readonly Guid MockWaybillKind = Guid.Parse("75AB134F-B73B-4933-984F-0B08BCE699EF");
     }
   }
 }

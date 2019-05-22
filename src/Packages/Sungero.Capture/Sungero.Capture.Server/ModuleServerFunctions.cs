@@ -107,13 +107,18 @@ namespace Sungero.Capture.Server
       if (recognitedClass == Constants.Module.LetterClassName)
       {
         return CaptureMockMode != null
-          ? CreateMockIncomingLetter(recognitedDocument, responsible)
+          ? CreateMockIncomingLetter(recognitedDocument)
           : CreateIncomingLetter(recognitedDocument, responsible);
       }
       // Акт выполненных работ.
       else if (recognitedClass == Constants.Module.ContractStatementClassName && CaptureMockMode != null)
       {
-        return CreateMockContractStatement(recognitedDocument, responsible);
+        return CreateMockContractStatement(recognitedDocument);
+      }
+      // Товарная накладная.
+      else if (recognitedClass == Constants.Module.WaybillClassName && CaptureMockMode != null)
+      {
+        return CreateMockWaybill(recognitedDocument);
       }
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
@@ -201,9 +206,8 @@ namespace Sungero.Capture.Server
     /// Создать входящее письмо с текстовыми полями.
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
-    /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult)
     {
       var document = Sungero.Capture.MockIncommingLetters.Create();
       
@@ -283,9 +287,8 @@ namespace Sungero.Capture.Server
     /// Создать акт выполненных работ с текстовыми полями.
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
-    /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       
@@ -363,6 +366,25 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrWhiteSpace(leadDocName))
         document.LeadDoc = string.Format("{0} №{1} от {2}", leadDocName, leadDocNumber, leadDocDate);
       
+      document.Save();
+      
+      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать акт выполненных работ с текстовыми полями.
+    /// </summary>
+    /// <param name="letterсlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
+    /// <returns>Документ.</returns>
+    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.RecognitedDocument сlassificationResult)
+    {
+      var document = Sungero.Capture.MockWaybills.Create();
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.Save();
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
@@ -620,10 +642,14 @@ namespace Sungero.Capture.Server
                                                                               Capture.Server.MockContractStatement.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true);
       
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.WaybillDocumentTypeName,
+                                                                              Capture.Server.MockWaybill.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Contracts, true);
+      
       // Создать виды документов.
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
                                                                               RecordManagement.Resources.IncomingLetterKindShortName,
-                                                                              Docflow.DocumentKind.NumberingType.Registrable,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Registrable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
                                                                               Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid,
                                                                               new[] { OfficialDocuments.Info.Actions.SendActionItem },
@@ -635,6 +661,14 @@ namespace Sungero.Capture.Server
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
                                                                               Capture.Server.MockContractStatement.ClassTypeGuid, null, true, false,
                                                                               Sungero.Capture.Constants.Module.Initialize.MockContractStatementKind, true);
+
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.WaybillDocumentKindName,
+                                                                              FinancialArchive.Resources.WaybillDocumentKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
+                                                                              Sungero.Capture.Server.MockWaybill.ClassTypeGuid,
+                                                                              new[] { OfficialDocuments.Info.Actions.SendForFreeApproval, OfficialDocuments.Info.Actions.SendForApproval },
+                                                                              Sungero.Capture.Constants.Module.Initialize.MockWaybillKind);
       
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
