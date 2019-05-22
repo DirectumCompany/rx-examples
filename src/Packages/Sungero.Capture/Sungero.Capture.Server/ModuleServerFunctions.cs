@@ -205,7 +205,6 @@ namespace Sungero.Capture.Server
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
     {
-      // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.Capture.MockIncommingLetters.Create();
       
       // Заполнить основные свойства.
@@ -285,10 +284,7 @@ namespace Sungero.Capture.Server
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
     {
-      // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.Capture.MockContractStatements.Create();
-      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -342,6 +338,10 @@ namespace Sungero.Capture.Server
         document.LeadDoc = string.Format("{0} №{1} от {2}", leadDocName, leadDocNumber, leadDocDate);
       
       document.Save();
+      
+      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
       return document;
     }
     
