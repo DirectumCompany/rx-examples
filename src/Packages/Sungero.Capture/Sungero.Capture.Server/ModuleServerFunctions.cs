@@ -267,7 +267,7 @@ namespace Sungero.Capture.Server
       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
       {
         var adressee = GetFieldValue(fact, "Addressee");
-        document.Addressees = string.IsNullOrEmpty(document.Addressees) ? adressee : string.Format("{0}, {1}", document.Addressees, adressee);
+        document.Addressees = string.IsNullOrEmpty(document.Addressees) ? adressee : string.Format("{0}; {1}", document.Addressees, adressee);
       }
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.

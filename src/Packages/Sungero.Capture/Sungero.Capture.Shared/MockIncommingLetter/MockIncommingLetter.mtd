@@ -300,12 +300,17 @@
           "Name": "Addressee",
           "ColumnNumber": 0,
           "ColumnSpan": 2,
-          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.TextEditorToTextBinder",
           "ParentGuid": "2d2669c2-7abe-4373-a0c2-38ddec79a85d",
           "PropertyGuid": "c9b3ec95-aca3-452f-81d6-f6f2aa16574b",
           "RowNumber": 2,
           "RowSpan": 1,
-          "Settings": []
+          "Settings": [
+            {
+              "Name": "Height",
+              "Value": 40
+            }
+          ]
         },
         {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
