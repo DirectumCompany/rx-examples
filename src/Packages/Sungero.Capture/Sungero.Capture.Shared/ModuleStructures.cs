@@ -34,5 +34,5 @@ namespace Sungero.Capture.Structures.Module
     public string Name { get; set; }
     public string Value { get; set; }
     public decimal Probability { get; set; }
-  }    
+  }
 }

@@ -214,35 +214,38 @@ namespace Sungero.Capture.Server
       // Заполнить данные корреспондента.
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
-      var orderedCorrespondentNames = GetOrderedCorrespondentNames(GetFacts(facts, "Letter", "CorrespondentName"));
-      if (orderedCorrespondentNames.Count() > 0)
-        document.Correspondent = orderedCorrespondentNames.FirstOrDefault().Value;
-      if (orderedCorrespondentNames.Count() > 1)
-        document.Recipient = orderedCorrespondentNames.LastOrDefault().Value;
+      var correspondentNames = GetFacts(facts, "Letter", "CorrespondentName")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
       
-      foreach (var fact in GetFacts(facts, "Counterparty", "TIN"))
+      if (correspondentNames.Count() > 0)
+        document.Correspondent = GetCorrespondentName(correspondentNames.First(),
+                                                      "CorrespondentName", "CorrespondentLegalForm");
+      if (correspondentNames.Count() > 1)
+        document.Recipient = GetCorrespondentName(correspondentNames.Last(),
+                                                  "CorrespondentName", "CorrespondentLegalForm");
+      
+      // Заполнить ИНН/КПП для КА и НОР.
+      var tinTrrcFacts = GetFacts(facts, "Counterparty", "TIN")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
+      if (tinTrrcFacts.Count() > 0)
       {
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        if (string.IsNullOrWhiteSpace(document.CorrespondentTin))
-        {
-          document.CorrespondentTin = tin;
-          document.CorrespondentTrrc = trrc;
-        }
-        // Если ИНН/КПП корреспондента уже заполнены, то занести в ИНН/КПП получателя.
-        else
-        {
-          document.RecipientTin = tin;
-          document.RecipientTrrc = trrc;
-        }
+        document.CorrespondentTin = GetFieldValue(tinTrrcFacts.First(), "TIN");
+        document.CorrespondentTrrc = GetFieldValue(tinTrrcFacts.First(), "TRRC");
+      }
+      if (tinTrrcFacts.Count() > 1)
+      {
+        document.RecipientTin = GetFieldValue(tinTrrcFacts.Last(), "TIN");
+        document.RecipientTrrc = GetFieldValue(tinTrrcFacts.Last(), "TRRC");
       }
       
+      // В ответ на
       document.InResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
       var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "ResponseToDate"));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? document.InResponseTo
         : string.Format("{0} {1} {2}", document.InResponseTo, Sungero.Docflow.Resources.From, responseToDate);
       
+      // Подписант и контакт.
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
       {
         var type = GetFieldValue(fact, "Type");
@@ -645,21 +648,15 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Получить список наименований контрагентов упорядоченных по убыванию вероятности.
     /// </summary>
-    /// <param name="source">Исходный список фактов, содержащих наименования контрагентов.</param>
+    /// <param name="fact">Исходный факт, содержащий наименование контрагентов.</param>
+    /// <param name="nameFieldName">Наименование поля с наименованием контрагента.</param>
+    /// <param name="legalFormFieldName">Наименование поля с организационо-правовой формой контрагента.</param>
     /// <returns>Упорядоченный список наименований контрагентов.</returns>
-    private static IOrderedEnumerable<KeyValuePair<decimal, string>> GetOrderedCorrespondentNames(List<Fact> source)
+    private static string GetCorrespondentName(Fact fact, string nameFieldName, string legalFormFieldName)
     {
-      var correspondentNames = new Dictionary<decimal, string>();
-      foreach (var fact in source)
-      {
-        var correspondentNameField = GetField(fact, "CorrespondentName");
-        var name = correspondentNameField.Value;
-        var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
-        correspondentNames.Add(correspondentNameField.Probability,
-                               string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm));
-      }
-      
-      return correspondentNames.OrderByDescending(n => n.Key);
+      var name = GetFieldValue(fact, nameFieldName);
+      var legalForm = GetFieldValue(fact, legalFormFieldName);
+      return string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
     }
   }
 }
