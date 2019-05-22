@@ -150,10 +150,10 @@
           "Name": "Account",
           "ColumnDefinitions": [
             {
-              "Percentage": 54.52
+              "Percentage": 55.59
             },
             {
-              "Percentage": 43.55
+              "Percentage": 44.41
             }
           ],
           "ColumnNumber": 0,
@@ -195,10 +195,10 @@
           "Name": "Counterparty",
           "ColumnDefinitions": [
             {
-              "Percentage": 54.68
+              "Percentage": 55.76
             },
             {
-              "Percentage": 43.39
+              "Percentage": 44.24
             }
           ],
           "ColumnNumber": 0,

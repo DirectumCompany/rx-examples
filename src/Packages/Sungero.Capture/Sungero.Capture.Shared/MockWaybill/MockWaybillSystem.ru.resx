@@ -177,4 +177,7 @@
   <data name="ControlGroup_653db9199b3c44b8ab8433124a31aa14" xml:space="preserve">
     <value>Контрагенты</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Номер документа</value>
+  </data>
 </root>

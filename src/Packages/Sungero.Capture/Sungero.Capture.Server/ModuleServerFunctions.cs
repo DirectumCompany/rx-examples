@@ -296,7 +296,7 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = сlassificationResult.Facts;
       
-      // Заполнить
+      // Заполнить дату и номер.
       DateTime date;
       Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
       document.RegistrationDate = date;
@@ -375,9 +375,9 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Создать акт выполненных работ с текстовыми полями.
+    /// Создать накладную с текстовыми полями.
     /// </summary>
-    /// <param name="letterсlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
+    /// <param name="letterсlassificationResult">Результат обработки накладной в Ario.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.RecognitedDocument сlassificationResult)
     {
@@ -385,6 +385,19 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = сlassificationResult.Facts;
+      
+      // Заполнить дату и номер.
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      
+      // Договор.
+      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
+      document.Contract = GetLeadingDocumentName(leadingDocNames.First());
+      
       document.Save();
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
@@ -702,17 +715,40 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить список наименований контрагентов упорядоченных по убыванию вероятности.
+    /// Получить наименование контрагента.
     /// </summary>
-    /// <param name="fact">Исходный факт, содержащий наименование контрагентов.</param>
+    /// <param name="fact">Исходный факт, содержащий наименование контрагента.</param>
     /// <param name="nameFieldName">Наименование поля с наименованием контрагента.</param>
     /// <param name="legalFormFieldName">Наименование поля с организационо-правовой формой контрагента.</param>
-    /// <returns>Упорядоченный список наименований контрагентов.</returns>
+    /// <returns>Наименование контрагента.</returns>
     private static string GetCorrespondentName(Fact fact, string nameFieldName, string legalFormFieldName)
     {
       var name = GetFieldValue(fact, nameFieldName);
       var legalForm = GetFieldValue(fact, legalFormFieldName);
       return string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+    }
+    
+    /// <summary>
+    /// Получить наименование ведущего документа.
+    /// </summary>
+    /// <param name="fact">Исходный факт, содержащий наименование ведущего документа.</param>
+    /// <returns>Наименование ведущего документа с номером и датой.</returns>
+    private static string GetLeadingDocumentName(Fact fact)
+    {
+      var documentName = GetFieldValue(fact, "DocumentBaseName");
+      var date = Functions.Module.GetShortDate(GetFieldValue(fact, "DocumentBaseDate"));
+      var number = GetFieldValue(fact, "DocumentBaseNumber");
+      
+      if (!string.IsNullOrWhiteSpace(documentName))
+      {
+        if (!string.IsNullOrWhiteSpace(date) && !string.IsNullOrWhiteSpace(number))
+          return string.Format("{0} №{1} от {2}", documentName, number, date);
+        else if (!string.IsNullOrWhiteSpace(number))
+          return string.Format("{0} №{1}", documentName, number);
+        else
+          return string.Format("{0} от {1}", documentName, date);
+      }
+      return string.Empty;
     }
   }
 }

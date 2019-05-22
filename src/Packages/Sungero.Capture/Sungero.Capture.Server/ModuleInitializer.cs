@@ -9,5 +9,11 @@ namespace Sungero.Capture.Server
 {
   public partial class ModuleInitializer
   {
+
+    public override void Initializing(Sungero.Domain.ModuleInitializingEventArgs e)
+    {
+      // TODO Временно для разработки.
+      Functions.Module.InitCaptureMockMode();
+    }
   }
 }

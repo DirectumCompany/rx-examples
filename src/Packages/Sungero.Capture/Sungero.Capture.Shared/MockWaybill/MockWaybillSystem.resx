@@ -201,4 +201,7 @@
   <data name="ControlGroup_653db9199b3c44b8ab8433124a31aa14" xml:space="preserve">
     <value>Counterparty</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Document number</value>
+  </data>
 </root>
