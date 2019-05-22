@@ -273,4 +273,7 @@
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Document number</value>
+  </data>
 </root>

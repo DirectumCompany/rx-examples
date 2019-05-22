@@ -180,4 +180,7 @@
   <data name="Property_Currency" xml:space="preserve">
     <value>Валюта</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Номер документа</value>
+  </data>
 </root>
