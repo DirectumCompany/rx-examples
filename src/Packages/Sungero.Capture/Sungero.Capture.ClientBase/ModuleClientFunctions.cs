@@ -48,7 +48,7 @@ namespace Sungero.Capture.Client
       
       // Принудительно обвалить захват, если Ario вернул ошибку. DCS запишет в лог и перезапустит процесс.
       var ErrorMessage = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(jsonClassificationResults);
-      if (ErrorMessage != null)
+      if (ErrorMessage != null && !string.IsNullOrWhiteSpace(ErrorMessage.Message))
         throw new ApplicationException(ErrorMessage.Message);
       
       // Обработать пакет.
