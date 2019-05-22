@@ -46,6 +46,11 @@ namespace Sungero.Capture.Client
       var jsonClassificationResults = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
       
+      // Принудительно обвалить захват, если Ario вернул ошибку. DCS запишет в лог и перезапустит процесс.
+      var ErrorMessage = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(jsonClassificationResults);
+      if (ErrorMessage != null)
+        throw new ApplicationException(ErrorMessage.Message);
+      
       // Обработать пакет.
       Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
       Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, jsonClassificationResults, responsible);
