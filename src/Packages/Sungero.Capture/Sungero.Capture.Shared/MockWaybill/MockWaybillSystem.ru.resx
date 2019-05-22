@@ -126,4 +126,55 @@
   <data name="CollectionDisplayName" xml:space="preserve">
     <value>Накладные</value>
   </data>
+  <data name="Property_Contract" xml:space="preserve">
+    <value>Договор</value>
+  </data>
+  <data name="Property_Shipper" xml:space="preserve">
+    <value>Грузоотправитель</value>
+  </data>
+  <data name="Property_ShipperTin" xml:space="preserve">
+    <value>ИНН</value>
+  </data>
+  <data name="Property_ShipperTrrc" xml:space="preserve">
+    <value>КПП</value>
+  </data>
+  <data name="Property_Consignee" xml:space="preserve">
+    <value>Грузополучатель</value>
+  </data>
+  <data name="Property_ConsigneeTin" xml:space="preserve">
+    <value>ИНН</value>
+  </data>
+  <data name="Property_ConsigneeTrrc" xml:space="preserve">
+    <value>КПП</value>
+  </data>
+  <data name="Property_Supplier" xml:space="preserve">
+    <value>Поставщик</value>
+  </data>
+  <data name="Property_SupplierTin" xml:space="preserve">
+    <value>ИНН</value>
+  </data>
+  <data name="Property_SupplierTrrc" xml:space="preserve">
+    <value>КПП</value>
+  </data>
+  <data name="Property_Payer" xml:space="preserve">
+    <value>Плательщик</value>
+  </data>
+  <data name="Property_PayerTin" xml:space="preserve">
+    <value>ИНН</value>
+  </data>
+  <data name="Property_PayerTrrc" xml:space="preserve">
+    <value>КПП</value>
+  </data>
+  <data name="Property_TotalAmount" xml:space="preserve">
+    <value>Сумма</value>
+  </data>
+  <data name="Property_Currency" xml:space="preserve">
+    <value>Валюта</value>
+  </data>
+  <data name="ControlGroup_18108e83e97f4016a45e812403bb90fe" xml:space="preserve">
+    <value>Условия</value>
+  </data>
+  <data name="ControlGroup_653db9199b3c44b8ab8433124a31aa14" xml:space="preserve">
+    <value>Контрагенты</value>
+  </data>
 </root>

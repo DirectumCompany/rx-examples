@@ -126,4 +126,79 @@
   <data name="CollectionDisplayName" xml:space="preserve">
     <value>Waybills</value>
   </data>
+  <data name="Property_Contract" xml:space="preserve">
+    <value>Contract</value>
+  </data>
+  <data name="Resource_fc50c88831554ff196e8ff7064894ead" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_fc50c88831554ff196e8ff7064894ead_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_ddf41ead829a4a3f8d12d40a52b7440c" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_ddf41ead829a4a3f8d12d40a52b7440c_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_f0607051ea774af2b7966d11cd8a7374" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_f0607051ea774af2b7966d11cd8a7374_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_a915c070568d4f08a7365fbdabe9e559" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_a915c070568d4f08a7365fbdabe9e559_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Property_Shipper" xml:space="preserve">
+    <value>Shipper</value>
+  </data>
+  <data name="Property_ShipperTin" xml:space="preserve">
+    <value>TIN</value>
+  </data>
+  <data name="Property_ShipperTrrc" xml:space="preserve">
+    <value>TRRC</value>
+  </data>
+  <data name="Property_Consignee" xml:space="preserve">
+    <value>Consignee</value>
+  </data>
+  <data name="Property_ConsigneeTin" xml:space="preserve">
+    <value>TIN</value>
+  </data>
+  <data name="Property_ConsigneeTrrc" xml:space="preserve">
+    <value>TRRC</value>
+  </data>
+  <data name="Property_Supplier" xml:space="preserve">
+    <value>Supplier</value>
+  </data>
+  <data name="Property_SupplierTin" xml:space="preserve">
+    <value>TIN</value>
+  </data>
+  <data name="Property_SupplierTrrc" xml:space="preserve">
+    <value>TRRC</value>
+  </data>
+  <data name="Property_Payer" xml:space="preserve">
+    <value>Payer</value>
+  </data>
+  <data name="Property_PayerTin" xml:space="preserve">
+    <value>TIN</value>
+  </data>
+  <data name="Property_PayerTrrc" xml:space="preserve">
+    <value>TRRC</value>
+  </data>
+  <data name="Property_TotalAmount" xml:space="preserve">
+    <value>Amount</value>
+  </data>
+  <data name="Property_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="ControlGroup_18108e83e97f4016a45e812403bb90fe" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="ControlGroup_653db9199b3c44b8ab8433124a31aa14" xml:space="preserve">
+    <value>Counterparty</value>
+  </data>
 </root>
