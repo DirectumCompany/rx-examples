@@ -20,5 +20,21 @@ namespace Sungero.Capture.Shared
     {
       _obj.LifeCycleState = LifeCycleState.Active;
     }
+    
+    public override void ChangeRegistrationPaneVisibility(bool needShow, bool repeatRegister)
+    {
+      base.ChangeRegistrationPaneVisibility(needShow, repeatRegister);
+      
+      var properties = _obj.State.Properties;
+      
+      properties.DeliveryMethod.IsEnabled = needShow;
+      properties.DeliveryMethod.IsVisible = needShow;
+      
+      properties.CaseFile.IsEnabled = needShow;
+      properties.CaseFile.IsVisible = needShow;
+      
+      properties.PlacedToCaseFileDate.IsEnabled = needShow;
+      properties.PlacedToCaseFileDate.IsVisible = needShow;
+    }
   }
 }
