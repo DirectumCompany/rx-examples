@@ -599,7 +599,8 @@ namespace Sungero.Capture.Server
                                                                               RecordManagement.Resources.IncomingLetterKindShortName,
                                                                               Docflow.DocumentKind.NumberingType.Registrable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
-                                                                              Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid, null,
+                                                                              Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid,
+                                                                              new[] { OfficialDocuments.Info.Actions.SendActionItem },
                                                                               Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
 
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.ContractStatementKindName,
