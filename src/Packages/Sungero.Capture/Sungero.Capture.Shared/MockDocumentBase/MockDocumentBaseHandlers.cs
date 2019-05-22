@@ -12,6 +12,7 @@ namespace Sungero.Capture
 
     public override void DocumentKindChanged(Sungero.Docflow.Shared.OfficialDocumentDocumentKindChangedEventArgs e)
     {
+      this.FillName();
     }
 
   }
