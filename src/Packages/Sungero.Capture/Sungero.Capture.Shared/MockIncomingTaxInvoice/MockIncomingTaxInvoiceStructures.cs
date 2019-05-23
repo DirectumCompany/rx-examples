@@ -4,7 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.Capture.Structures.MockIncommingLetter
+namespace Sungero.Capture.Structures.MockIncomingTaxInvoice
 {
 
 }

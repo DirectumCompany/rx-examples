@@ -3,7 +3,7 @@ using Sungero.Core;
 
 namespace Sungero.Capture.Constants
 {
-  public static class MockIncommingLetter
+  public static class MockIncomingTaxInvoice
   {
 
   }

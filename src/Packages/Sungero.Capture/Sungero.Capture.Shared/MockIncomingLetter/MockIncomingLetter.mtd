@@ -1,7 +1,7 @@
 {
   "$type": "Sungero.Metadata.DocumentMetadata, Sungero.Content.Shared",
   "NameGuid": "e5dcf857-c2db-4f76-b444-21ebf152de4d",
-  "Name": "MockIncommingLetter",
+  "Name": "MockIncomingLetter",
   "AccessRightsMode": "Both",
   "BaseGuid": "720f07e1-9644-4393-a270-6a41414f9f47",
   "CanBeNavigationPropertyType": true,
@@ -343,7 +343,7 @@
       "Overridden": []
     }
   ],
-  "IconName": "MockIncommingLetter.ico",
+  "IconName": "MockIncomingLetter.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
   "OpenCardByDefaultInCollection": true,

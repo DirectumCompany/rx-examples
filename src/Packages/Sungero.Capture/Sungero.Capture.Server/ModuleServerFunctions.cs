@@ -211,7 +211,7 @@ namespace Sungero.Capture.Server
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult)
     {
-      var document = Sungero.Capture.MockIncommingLetters.Create();
+      var document = Sungero.Capture.MockIncomingLetters.Create();
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -700,11 +700,11 @@ namespace Sungero.Capture.Server
     public static void InitCaptureMockMode()
     {
       // Создать типы документов.
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterKindName,
-                                                                              Capture.Server.MockIncommingLetter.ClassTypeGuid,
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterTypeName,
+                                                                              Capture.Server.MockIncomingLetter.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true);
       
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.ContractStatementKindName,
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.ContractStatementTypeName,
                                                                               Capture.Server.MockContractStatement.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true);
       
@@ -712,28 +712,39 @@ namespace Sungero.Capture.Server
                                                                               Capture.Server.MockWaybill.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentType.DocumentFlow.Contracts, true);
       
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.IncomingTaxInvoiceTypeName,
+                                                                              Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
+      
       // Создать виды документов.
       var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
                                                                               RecordManagement.Resources.IncomingLetterKindShortName,
                                                                               Sungero.Docflow.DocumentKind.NumberingType.Registrable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
-                                                                              Sungero.Capture.Server.MockIncommingLetter.ClassTypeGuid,
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncommingLetterKind);
+                                                                              Sungero.Capture.Server.MockIncomingLetter.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingLetterKindGuid);
 
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.ContractStatementKindName,
                                                                               FinancialArchive.Resources.ContractStatementKindShortName,
                                                                               Sungero.Docflow.DocumentKind.NumberingType.Numerable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
                                                                               Capture.Server.MockContractStatement.ClassTypeGuid, 
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockContractStatementKind);
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockContractStatementKindGuid);
 
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.WaybillDocumentKindName,
                                                                               FinancialArchive.Resources.WaybillDocumentKindShortName,
                                                                               Sungero.Docflow.DocumentKind.NumberingType.Numerable,
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
                                                                               Sungero.Capture.Server.MockWaybill.ClassTypeGuid,
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockWaybillKind);
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockWaybillKindGuid);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.IncomingTaxInvoiceKindName,
+                                                                              FinancialArchive.Resources.IncomingTaxInvoiceKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
+                                                                              Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingTaxInvoiceGuid);
       
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
