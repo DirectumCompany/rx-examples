@@ -49,9 +49,11 @@ namespace Sungero.Capture.Server
         : Constants.Module.SimpleRelationRelationName;
       foreach (var addendum in addendums)
       {
-        addendum.Name = hasLeadingDocument
-          ? Resources.AttachmentNameFormat(addendumNumber)
-          : Resources.DocumentNameFormat(addendumNumber);
+        if (SimpleDocuments.Is(addendum))
+          addendum.Name = hasLeadingDocument
+            ? Resources.AttachmentNameFormat(addendumNumber)
+            : Resources.DocumentNameFormat(addendumNumber);
+        
         addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
         addendumNumber++;
