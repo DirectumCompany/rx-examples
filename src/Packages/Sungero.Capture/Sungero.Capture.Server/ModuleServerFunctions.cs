@@ -308,14 +308,20 @@ namespace Sungero.Capture.Server
       
       // Заполнить сумму и валюту.
       var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      double totalAmount;
-      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-      document.TotalAmount = totalAmount;
+      if (!string.IsNullOrWhiteSpace(amount))
+      {
+        double totalAmount;
+        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+        document.TotalAmount = totalAmount;
+      }
       
       var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
-      double vatAmount;
-      double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
-      document.VatAmount = vatAmount;
+      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
+      {
+        double vatAmount;
+        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
+        document.VatAmount = vatAmount;
+      }
       
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
@@ -449,14 +455,20 @@ namespace Sungero.Capture.Server
       
       // Заполнить сумму и валюту.
       var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      double totalAmount;
-      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-      document.TotalAmount = totalAmount;
+      if (!string.IsNullOrWhiteSpace(amount))
+      {
+        double totalAmount;
+        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+        document.TotalAmount = totalAmount;
+      }
       
       var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
-      double vatAmount;
-      double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
-      document.VatAmount = vatAmount;
+      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
+      {
+        double vatAmount;
+        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
+        document.VatAmount = vatAmount;
+      }
       
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
