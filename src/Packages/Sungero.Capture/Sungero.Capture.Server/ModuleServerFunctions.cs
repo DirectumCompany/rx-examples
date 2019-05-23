@@ -50,13 +50,15 @@ namespace Sungero.Capture.Server
       foreach (var addendum in addendums)
       {
         if (SimpleDocuments.Is(addendum))
+        {
           addendum.Name = hasLeadingDocument
             ? Resources.AttachmentNameFormat(addendumNumber)
             : Resources.DocumentNameFormat(addendumNumber);
+          addendumNumber++;
+        }
         
         addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
-        addendumNumber++;
       }
       
       // Отправить пакет ответственному.
