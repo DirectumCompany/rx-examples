@@ -321,6 +321,7 @@ namespace Sungero.Capture.Server
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      
       var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
         .FirstOrDefault();
@@ -344,8 +345,8 @@ namespace Sungero.Capture.Server
       if (sellerFact == null || buyerFact == null)
       {
         var withoutTypeFacts = counterpartyFacts
-          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")));
-          .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")))
+          .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
         foreach (var fact in withoutTypeFacts)
         {
           var name = GetCorrespondentName(fact, "Name", "LegalForm");
@@ -410,7 +411,8 @@ namespace Sungero.Capture.Server
         .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
       document.Contract = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
-      // Контрагенты
+      // Заполнить контрагентов по типу. 
+      // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var shipperFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SHIPPER")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
@@ -662,7 +664,7 @@ namespace Sungero.Capture.Server
       return department;
     }
 
-    [Remote, Public]
+    [Public, Remote]
     public static string GetCurrentTenant()
     {
       var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
