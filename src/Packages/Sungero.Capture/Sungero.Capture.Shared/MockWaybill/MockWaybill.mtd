@@ -41,7 +41,8 @@
           "IsAncestorMetadata": true,
           "Overridden": [
             "Controls",
-            "IsVisible"
+            "IsVisible",
+            "ColumnDefinitions"
           ]
         },
         {
@@ -150,10 +151,10 @@
           "Name": "Account",
           "ColumnDefinitions": [
             {
-              "Percentage": 55.59
+              "Percentage": 50.0
             },
             {
-              "Percentage": 44.41
+              "Percentage": 50.0
             }
           ],
           "ColumnNumber": 0,
@@ -165,27 +166,14 @@
         },
         {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
-          "NameGuid": "bd18e545-aab9-4921-b5bb-36557423ce86",
-          "Name": "TotalAmount",
-          "ColumnNumber": 0,
-          "ColumnSpan": 1,
-          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
-          "ParentGuid": "18108e83-e97f-4016-a45e-812403bb90fe",
-          "PropertyGuid": "760fcf88-f539-44be-8401-d29079622afc",
-          "RowNumber": 0,
-          "RowSpan": 1,
-          "Settings": []
-        },
-        {
-          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "d4b88bb7-4f30-45d0-90c6-673737268478",
           "Name": "Currency",
-          "ColumnNumber": 1,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "18108e83-e97f-4016-a45e-812403bb90fe",
           "PropertyGuid": "506b32ba-7a9c-44a3-a113-4fd02fe6652d",
-          "RowNumber": 0,
+          "RowNumber": 1,
           "RowSpan": 1,
           "Settings": []
         },
@@ -363,6 +351,32 @@
           "RowNumber": 7,
           "RowSpan": 1,
           "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "bd18e545-aab9-4921-b5bb-36557423ce86",
+          "Name": "TotalAmount",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+          "ParentGuid": "18108e83-e97f-4016-a45e-812403bb90fe",
+          "PropertyGuid": "760fcf88-f539-44be-8401-d29079622afc",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "76aac3dc-ad8b-482e-b456-32b26e5b7c65",
+          "Name": "VatAmount",
+          "ColumnNumber": 1,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+          "ParentGuid": "18108e83-e97f-4016-a45e-812403bb90fe",
+          "PropertyGuid": "62dca4bc-f57c-41b6-8fb7-4deaf5ce7698",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
         }
       ],
       "IsAncestorMetadata": true,
@@ -520,6 +534,14 @@
       "FlatListInStandaloneLookup": true,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
       "PreviousPropertyGuid": "760fcf88-f539-44be-8401-d29079622afc"
+    },
+    {
+      "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "62dca4bc-f57c-41b6-8fb7-4deaf5ce7698",
+      "Name": "VatAmount",
+      "Code": "VatAmount1",
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+      "PreviousPropertyGuid": "506b32ba-7a9c-44a3-a113-4fd02fe6652d"
     }
   ],
   "PublicStructures": [],
