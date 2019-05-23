@@ -311,17 +311,8 @@ namespace Sungero.Capture.Server
       document.RegistrationDate = date;
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
-      // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");      
-      double totalAmount;
-      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-      document.TotalAmount = totalAmount;
-      
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      
+      // Заполнить контрагентов по типу.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      
       var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
         .FirstOrDefault();
@@ -372,10 +363,21 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");      
-      double totalAmount;
-      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-      document.TotalAmount = totalAmount;
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
+      if (!string.IsNullOrWhiteSpace(amount))
+      {
+        double totalAmount;
+        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+        document.TotalAmount = totalAmount;
+      }
+      
+      var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
+      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
+      {
+        double vatAmount;
+        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
+        document.VatAmount = vatAmount;
+      }
       
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
@@ -411,7 +413,7 @@ namespace Sungero.Capture.Server
         .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
       document.Contract = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
-      // Заполнить контрагентов по типу. 
+      // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var shipperFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SHIPPER")
