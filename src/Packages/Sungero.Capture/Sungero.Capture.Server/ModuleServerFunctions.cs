@@ -300,6 +300,11 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = сlassificationResult.Facts;
       
+      // Договор.
+      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
+      document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
+      
       // Заполнить дату и номер.
       DateTime date;
       Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
@@ -307,21 +312,10 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      if (!string.IsNullOrWhiteSpace(amount))
-      {
-        double totalAmount;
-        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-        document.TotalAmount = totalAmount;
-      }
-      
-      var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
-      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
-      {
-        double vatAmount;
-        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
-        document.VatAmount = vatAmount;
-      }
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");      
+      double totalAmount;
+      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+      document.TotalAmount = totalAmount;
       
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
@@ -346,27 +340,28 @@ namespace Sungero.Capture.Server
         document.BusinessUnitTrrc = GetFieldValue(buyerFact, "TRRC");
       }
       
-      // Если исполнитель или заказчик не заполнились, ищем их по всем фактам.
+      // Если исполнитель или заказчик не заполнились, ищем их по всем фактам с незаполненным типом.
       if (sellerFact == null || buyerFact == null)
       {
-        foreach (var fact in counterpartyFacts)
+        var withoutTypeFacts = counterpartyFacts
+          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")));
+          .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        foreach (var fact in withoutTypeFacts)
         {
-          var name = GetFieldValue(fact, "Name");
-          var legalForm = GetFieldValue(fact, "LegalForm");
-          name = string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm);
+          var name = GetCorrespondentName(fact, "Name", "LegalForm");
           
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
           var type = GetFieldValue(fact, "CounterpartyType");
           
-          if (string.IsNullOrWhiteSpace(document.CounterpartyName) && string.IsNullOrEmpty(type))
+          if (string.IsNullOrWhiteSpace(document.CounterpartyName))
           {
             document.CounterpartyName = name;
             document.CounterpartyTin = tin;
             document.CounterpartyTrrc = trrc;
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
-          else if (string.IsNullOrWhiteSpace(document.BusinessUnitName) && string.IsNullOrEmpty(type))
+          else if (string.IsNullOrWhiteSpace(document.BusinessUnitName))
           {
             document.BusinessUnitName = name;
             document.BusinessUnitTin = tin;
@@ -375,12 +370,16 @@ namespace Sungero.Capture.Server
         }
       }
       
-      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
-      document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
+      // Заполнить сумму и валюту.
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");      
+      double totalAmount;
+      double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+      document.TotalAmount = totalAmount;
+      
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
       document.Save();
-      
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
@@ -615,7 +614,7 @@ namespace Sungero.Capture.Server
     /// <param name="documents">Прочие документы.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Простая задача.</returns>
-    [Remote, Public]
+    [Public, Remote]
     public static void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
     {
       if (leadingDocument == null)
