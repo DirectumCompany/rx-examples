@@ -44,5 +44,15 @@ namespace Sungero.Capture.Shared
       
       _obj.Name = Docflow.PublicFunctions.OfficialDocument.AddClosingQuote(name, _obj);
     }
+    
+    public override void ChangeRegistrationPaneVisibility(bool needShow, bool repeatRegister)
+    {
+      base.ChangeRegistrationPaneVisibility(needShow, repeatRegister);
+      
+      var properties = _obj.State.Properties;
+      
+      properties.RegistrationNumber.IsEnabled = true;
+      properties.RegistrationDate.IsEnabled = true;
+    }
   }
 }
