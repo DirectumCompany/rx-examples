@@ -7,6 +7,15 @@ using Sungero.Capture.MockContractStatement;
 
 namespace Sungero.Capture
 {
+  partial class MockContractStatementGoodsSharedCollectionHandlers
+  {
+
+    public virtual void GoodsAdded(Sungero.Domain.Shared.CollectionPropertyAddedEventArgs e)
+    {
+      _added.Number = (_obj.Goods.Max(a => a.Number) ?? 0) + 1;
+    }
+  }
+
   partial class MockContractStatementVersionsSharedCollectionHandlers
   {
 

@@ -555,10 +555,10 @@
           "Name": "Terms",
           "ColumnDefinitions": [
             {
-              "Percentage": 51.51
+              "Percentage": 53.22
             },
             {
-              "Percentage": 45.27
+              "Percentage": 46.78
             }
           ],
           "ColumnNumber": 0,
@@ -610,6 +610,39 @@
       ],
       "IsAncestorMetadata": true,
       "Overridden": []
+    },
+    {
+      "$type": "Sungero.Metadata.InplaceFormMetadata, Sungero.Metadata",
+      "NameGuid": "7ef3674b-48d0-45a8-8f00-6f1d5b27d560",
+      "Name": "Goods",
+      "Controls": [
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "e83f2a4f-d958-46a8-accc-58562b8d1172",
+          "Name": "Goods",
+          "GroupType": "WithTitleNoBorder"
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "44fd5f53-e32c-4902-9a45-4f3912f45a08",
+          "Name": "Goods",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.GridControlToChildCollectionBinder",
+          "HeaderLocation": "None",
+          "ParentGuid": "e83f2a4f-d958-46a8-accc-58562b8d1172",
+          "PropertyGuid": "b2a0893f-4674-4bcc-8d18-ce715b47f817",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": [
+            {
+              "Name": "NeedExpand",
+              "Value": true
+            }
+          ]
+        }
+      ],
+      "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
   ],
   "IconName": "MockContractStatement.ico",
@@ -730,6 +763,18 @@
       "Code": "VatAmount",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "ddf1869a-4e19-486a-9a37-4bc5a3961dc2"
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "b2a0893f-4674-4bcc-8d18-ce715b47f817",
+      "Name": "Goods",
+      "Code": "MockCSGoods",
+      "EntityGuid": "2271579b-78d3-404d-abdf-e8a3886cbd84",
+      "HandledEvents": [
+        "AddedShared"
+      ],
+      "IsShowedInList": false,
+      "PreviousPropertyGuid": "d770eb82-501d-47fc-b2a4-5e300281603a"
     }
   ],
   "PublicStructures": [],
