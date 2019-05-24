@@ -464,11 +464,7 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
-      }
-      
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      
+      }            
       document.Save();
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
@@ -498,63 +494,44 @@ namespace Sungero.Capture.Server
             
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var shipperFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SHIPPER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (shipperFact != null)
+      var shipper = GetMostProbableCounterparty(facts, "SHIPPER");     
+      if (shipper != null)
       {
-        document.ShipperName = GetCorrespondentName(shipperFact, "Name", "LegalForm");
-        document.ShipperTin = GetFieldValue(shipperFact, "TIN");
-        document.ShipperTrrc = GetFieldValue(shipperFact, "TRRC");
+        document.ShipperName = shipper.Name;
+        document.ShipperTin = shipper.Tin;
+        document.ShipperTrrc = shipper.Trrc;
       }
       
-      var consigneeFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "CONSIGNEE")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (consigneeFact != null)
+      var consignee = GetMostProbableCounterparty(facts, "CONSIGNEE");      
+      if (consignee != null)
       {
-        document.ConsigneeName = GetCorrespondentName(consigneeFact, "Name", "LegalForm");
-        document.ConsigneeTin = GetFieldValue(consigneeFact, "TIN");
-        document.ConsigneeTrrc = GetFieldValue(consigneeFact, "TRRC");
+        document.ConsigneeName = consignee.Name;
+        document.ConsigneeTin = consignee.Tin;
+        document.ConsigneeTrrc = consignee.Trrc;
       }
       
-      var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (sellerFact != null)
+      var seller = GetMostProbableCounterparty(facts, "SELLER");
+      if (seller != null)
       {
-        document.SellerName = GetCorrespondentName(sellerFact, "Name", "LegalForm");
-        document.SellerTin = GetFieldValue(sellerFact, "TIN");
-        document.SellerTrrc = GetFieldValue(sellerFact, "TRRC");
+        document.SellerName = seller.Name;
+        document.SellerTin = seller.Tin;
+        document.SellerTrrc = seller.Trrc;
       }
       
-      var buyerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "BUYER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (buyerFact != null)
+      var buyer = GetMostProbableCounterparty(facts, "BUYER");
+      if (buyer != null)
       {
-        document.BuyerName = GetCorrespondentName(buyerFact, "Name", "LegalForm");
-        document.BuyerTin = GetFieldValue(buyerFact, "TIN");
-        document.BuyerTrrc = GetFieldValue(buyerFact, "TRRC");
+        document.BuyerName = buyer.Name;
+        document.BuyerTin = buyer.Tin;
+        document.BuyerTrrc = buyer.Trrc;
       }
       
       // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      if (!string.IsNullOrWhiteSpace(amount))
-      {
-        double totalAmount;
-        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-        document.TotalAmount = totalAmount;
-      }
-      
-      var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
-      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
-      {
-        double vatAmount;
-        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
-        document.VATTotalAmount = vatAmount;
-      }
+     // Заполнить сумму и валюту.
+      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
+      document.VATTotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
       document.Save();
       
