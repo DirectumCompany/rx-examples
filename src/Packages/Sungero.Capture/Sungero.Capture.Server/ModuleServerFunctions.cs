@@ -287,7 +287,7 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать акт выполненных работ с текстовыми полями.
     /// </summary>
-    /// <param name="letterсlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
+    /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
     {
@@ -309,30 +309,25 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагентов по типу.
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (sellerFact != null)
+      var seller = GetMostProbalityCounterparty(facts, "SELLER");
+      if (seller != null)
       {
-        document.CounterpartyName = GetCorrespondentName(sellerFact, "Name", "LegalForm");
-        document.CounterpartyTin = GetFieldValue(sellerFact, "TIN");
-        document.CounterpartyTrrc = GetFieldValue(sellerFact, "TRRC");
+        document.CounterpartyName = seller.Name;
+        document.CounterpartyTin = seller.Tin;
+        document.CounterpartyTrrc = seller.Trrc;
       }
-      var buyerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "BUYER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (buyerFact != null)
+      var buyer = GetMostProbalityCounterparty(facts, "BUYER");
+      if (buyer != null)
       {
-        document.BusinessUnitName = GetCorrespondentName(buyerFact, "Name", "LegalForm");
-        document.BusinessUnitTin = GetFieldValue(buyerFact, "TIN");
-        document.BusinessUnitTrrc = GetFieldValue(buyerFact, "TRRC");
+        document.BusinessUnitName = buyer.Name;
+        document.BusinessUnitTin = buyer.Tin;
+        document.BusinessUnitTrrc = buyer.Trrc;
       }
       
       // Если исполнитель или заказчик не заполнились, ищем их по всем фактам с незаполненным типом.
-      if (sellerFact == null || buyerFact == null)
+      if (seller == null || buyer == null)
       {
-        var withoutTypeFacts = counterpartyFacts
+        var withoutTypeFacts = GetFacts(facts, "Counterparty", "Name")
           .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")))
           .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
         foreach (var fact in withoutTypeFacts)
@@ -386,6 +381,23 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    public static Structures.Module.MockCounterparty GetMostProbalityCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      
+      if (mostProbabilityFact == null)
+        return null;
+
+      var counterparty = Structures.Module.MockCounterparty.Create();
+      counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
+      counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
+      counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
+      return counterparty;
+    }
+    
     /// <summary>
     /// Создать накладную с текстовыми полями.
     /// </summary>
@@ -413,44 +425,36 @@ namespace Sungero.Capture.Server
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var shipperFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SHIPPER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (shipperFact != null)
+      var shipper = GetMostProbalityCounterparty(facts, "SHIPPER");
+      if (shipper != null)
       {
-        document.Shipper = GetCorrespondentName(shipperFact, "Name", "LegalForm");
-        document.ShipperTin = GetFieldValue(shipperFact, "TIN");
-        document.ShipperTrrc = GetFieldValue(shipperFact, "TRRC");
+        document.Shipper = shipper.Name;
+        document.ShipperTin = shipper.Tin;
+        document.ShipperTrrc = shipper.Trrc;
       }
       
-      var consigneeFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "CONSIGNEE")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (consigneeFact != null)
+      var consignee = GetMostProbalityCounterparty(facts, "CONSIGNEE");
+      if (consignee != null)
       {
-        document.Consignee = GetCorrespondentName(consigneeFact, "Name", "LegalForm");
-        document.ConsigneeTin = GetFieldValue(consigneeFact, "TIN");
-        document.ConsigneeTrrc = GetFieldValue(consigneeFact, "TRRC");
+        document.Consignee = consignee.Name;
+        document.ConsigneeTin = consignee.Tin;
+        document.ConsigneeTrrc = consignee.Trrc;
       }
       
-      var supplierFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SUPPLIER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (supplierFact != null)
+      var supplier = GetMostProbalityCounterparty(facts, "SUPPLIER");
+      if (supplier != null)
       {
-        document.Supplier = GetCorrespondentName(supplierFact, "Name", "LegalForm");
-        document.SupplierTin = GetFieldValue(supplierFact, "TIN");
-        document.SupplierTrrc = GetFieldValue(supplierFact, "TRRC");
+        document.Supplier = supplier.Name;
+        document.SupplierTin = supplier.Tin;
+        document.SupplierTrrc = supplier.Trrc;
       }
       
-      var payerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "PAYER")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      if (payerFact != null)
+      var payer = GetMostProbalityCounterparty(facts, "PAYER");
+      if (payer != null)
       {
-        document.Payer = GetCorrespondentName(payerFact, "Name", "LegalForm");
-        document.PayerTin = GetFieldValue(payerFact, "TIN");
-        document.PayerTrrc = GetFieldValue(payerFact, "TRRC");
+        document.Payer = payer.Name;
+        document.PayerTin = payer.Tin;
+        document.PayerTrrc = payer.Trrc;
       }
       
       // Заполнить сумму и валюту.
