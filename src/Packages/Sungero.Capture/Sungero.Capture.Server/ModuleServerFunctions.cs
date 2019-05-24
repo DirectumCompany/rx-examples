@@ -355,22 +355,8 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      if (!string.IsNullOrWhiteSpace(amount))
-      {
-        double totalAmount;
-        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-        document.TotalAmount = totalAmount;
-      }
-      
-      var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
-      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
-      {
-        double vatAmount;
-        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
-        document.VatAmount = vatAmount;
-      }
-      
+      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
+      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount"); 
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
@@ -458,24 +444,22 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить сумму и валюту.
-      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
-      if (!string.IsNullOrWhiteSpace(amount))
-      {
-        double totalAmount;
-        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
-        document.TotalAmount = totalAmount;
-      }
-      
-      var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
-      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
-      {
-        double vatAmount;
-        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
-        document.VatAmount = vatAmount;
-      }
-      
+      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
+      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      
+      // Заполнить Номенклатуру.
+      foreach (var fact in GetFacts(facts, "Goods", "Name"))
+      {
+        var good = document.Goods.AddNew();
+        good.Name = GetFieldValue(fact, "Name");
+        good.UnitName = GetFieldValue(fact, "UnitName");
+        good.Count = GetFieldNumericalValue(fact, "Count");
+        good.Price = GetFieldNumericalValue(fact, "Price");
+        good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
+        good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+      }
       
       document.Save();
       
@@ -555,7 +539,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
-    /// <returns>Зачение поля.</returns>
+    /// <returns>Значение поля.</returns>
     public static string GetFieldValue(Structures.Module.Fact fact, string fieldName)
     {
       var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
@@ -585,6 +569,30 @@ namespace Sungero.Capture.Server
       return string.Empty;
     }
 
+    /// <summary>
+    /// Получить числовое значение поля из фактов.
+    /// </summary>
+    /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
+    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
+    /// <returns>Числовое значение поля.</returns>
+    public static double? GetFieldNumericalValue(Structures.Module.Fact fact, string fieldName)
+    {
+      var field = GetFieldValue(fact, fieldName);
+      return ConvertStringToDouble(field);
+    }
+    
+    /// <summary>
+    /// Получить числовое значение поля из фактов.
+    /// </summary>
+    /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
+    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
+    /// <returns>Числовое значение поля.</returns>
+    public static double? GetFieldNumericalValue(List<Structures.Module.Fact> facts, string factName, string fieldName)
+    {
+      var field = GetFieldValue(facts, factName, fieldName);
+      return ConvertStringToDouble(field);
+    }
+    
     /// <summary>
     /// Получить список фактов с переданными именем факта и именем поля.
     /// </summary>
@@ -845,6 +853,21 @@ namespace Sungero.Capture.Server
         documentName = string.Format("{0} от {1}", documentName, date);
       
       return documentName;
+    }
+    
+    /// <summary>
+    /// Преобразовать строковое значение поля в числовое.
+    /// </summary>
+    /// <param name="field">Поле.</param>
+    /// <returns>Число.</returns>
+    private static double? ConvertStringToDouble(string field)
+    {
+      if (string.IsNullOrWhiteSpace(field))
+        return null;
+
+      double result;
+      double.TryParse(field, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out result);
+      return result;
     }
   }
 }
