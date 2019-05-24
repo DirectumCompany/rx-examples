@@ -20,6 +20,28 @@
   },
   "Forms": [
     {
+      "$type": "Sungero.Metadata.InplaceFormMetadata, Sungero.Metadata",
+      "NameGuid": "30d15053-0c64-40f2-89b8-b68c0c9fd574",
+      "Name": "Tracking",
+      "Controls": [],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "PreviousInplaceFormGuid"
+      ],
+      "PreviousInplaceFormGuid": "a1ced6b8-fe17-4f61-8310-0fb8faf6b263"
+    },
+    {
+      "$type": "Sungero.Metadata.InplaceFormMetadata, Sungero.Metadata",
+      "NameGuid": "a1ced6b8-fe17-4f61-8310-0fb8faf6b263",
+      "Name": "State",
+      "Controls": [],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "PreviousInplaceFormGuid"
+      ],
+      "PreviousInplaceFormGuid": "2ab2b7e2-72aa-417b-b57f-9e18ae7a3c26"
+    },
+    {
       "$type": "Sungero.Metadata.StandaloneFormMetadata, Sungero.Metadata",
       "NameGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f",
       "Name": "Card",
@@ -381,6 +403,39 @@
       ],
       "IsAncestorMetadata": true,
       "Overridden": []
+    },
+    {
+      "$type": "Sungero.Metadata.InplaceFormMetadata, Sungero.Metadata",
+      "NameGuid": "2ab2b7e2-72aa-417b-b57f-9e18ae7a3c26",
+      "Name": "Goods",
+      "Controls": [
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "efe68dd5-b83a-4ff3-ad3c-143b096f3397",
+          "Name": "Goods",
+          "GroupType": "WithTitleNoBorder"
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "8ae60a6e-a55e-4609-ac56-d23eecb613fa",
+          "Name": "Goods",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.GridControlToChildCollectionBinder",
+          "HeaderLocation": "None",
+          "ParentGuid": "efe68dd5-b83a-4ff3-ad3c-143b096f3397",
+          "PropertyGuid": "6b278cd8-6212-46ff-b1f3-31efacec1fdd",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": [
+            {
+              "Name": "NeedExpand",
+              "Value": true
+            }
+          ]
+        }
+      ],
+      "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
   ],
   "IconResourcesKeys": [],
@@ -542,6 +597,18 @@
       "Code": "VatAmount1",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "506b32ba-7a9c-44a3-a113-4fd02fe6652d"
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "6b278cd8-6212-46ff-b1f3-31efacec1fdd",
+      "Name": "Goods",
+      "Code": "MockWaybillGoo",
+      "EntityGuid": "79e33e38-c25f-4ad6-8779-bb978bb13fae",
+      "HandledEvents": [
+        "AddedShared"
+      ],
+      "IsShowedInList": false,
+      "PreviousPropertyGuid": "62dca4bc-f57c-41b6-8fb7-4deaf5ce7698"
     }
   ],
   "PublicStructures": [],

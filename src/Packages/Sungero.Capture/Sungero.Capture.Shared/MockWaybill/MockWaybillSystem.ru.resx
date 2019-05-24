@@ -183,4 +183,13 @@
   <data name="Property_VatAmount" xml:space="preserve">
     <value>В т.ч. НДС</value>
   </data>
+  <data name="Property_Goods" xml:space="preserve">
+    <value>Номенклатура</value>
+  </data>
+  <data name="Form_2ab2b7e272aa417bb57f9e18ae7a3c26" xml:space="preserve">
+    <value>Номенклатура</value>
+  </data>
+  <data name="ControlGroup_efe68dd5b83a4ff3ad3c143b096f3397" xml:space="preserve">
+    <value>Номенклатурные позиции</value>
+  </data>
 </root>
