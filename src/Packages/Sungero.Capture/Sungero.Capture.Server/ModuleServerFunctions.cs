@@ -109,21 +109,18 @@ namespace Sungero.Capture.Server
       var recognitedClass = recognitedDocument.PredictedClass;
       var CaptureMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
       if (recognitedClass == Constants.Module.LetterClassName)
-      {
         return CaptureMockMode != null
           ? CreateMockIncomingLetter(recognitedDocument)
           : CreateIncomingLetter(recognitedDocument, responsible);
-      }
+      
       // Акт выполненных работ.
-      else if (recognitedClass == Constants.Module.ContractStatementClassName && CaptureMockMode != null)
-      {
+      if (recognitedClass == Constants.Module.ContractStatementClassName && CaptureMockMode != null)
         return CreateMockContractStatement(recognitedDocument);
-      }
+
       // Товарная накладная.
-      else if (recognitedClass == Constants.Module.WaybillClassName && CaptureMockMode != null)
-      {
+      if (recognitedClass == Constants.Module.WaybillClassName && CaptureMockMode != null)
         return CreateMockWaybill(recognitedDocument);
-      }
+
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
     }
@@ -209,15 +206,15 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать входящее письмо с текстовыми полями.
     /// </summary>
-    /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
+    /// <param name="letterClassificationResult">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterClassificationResult)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = letterсlassificationResult.Facts;
+      var facts = letterClassificationResult.Facts;
       
       // Заполнить данные корреспондента.
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
@@ -246,7 +243,7 @@ namespace Sungero.Capture.Server
         document.RecipientTrrc = GetFieldValue(tinTrrcFacts.Last(), "TRRC");
       }
       
-      // В ответ на
+      // В ответ на.
       document.InResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
       var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "ResponseToDate"));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
@@ -281,7 +278,7 @@ namespace Sungero.Capture.Server
       
       document.Save();
       
-      var documentBody = GetDocumentBody(letterсlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(letterClassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       return document;
