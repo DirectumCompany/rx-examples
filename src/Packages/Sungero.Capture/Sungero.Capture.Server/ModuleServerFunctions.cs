@@ -309,14 +309,14 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагентов по типу.
-      var seller = GetMostProbabilityCounterparty(facts, "SELLER");
+      var seller = GetMostProbableCounterparty(facts, "SELLER");
       if (seller != null)
       {
         document.CounterpartyName = seller.Name;
         document.CounterpartyTin = seller.Tin;
         document.CounterpartyTrrc = seller.Trrc;
       }
-      var buyer = GetMostProbabilityCounterparty(facts, "BUYER");
+      var buyer = GetMostProbableCounterparty(facts, "BUYER");
       if (buyer != null)
       {
         document.BusinessUnitName = buyer.Name;
@@ -367,7 +367,7 @@ namespace Sungero.Capture.Server
       return document;
     }
     
-    public static Structures.Module.MockCounterparty GetMostProbabilityCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    public static Structures.Module.MockCounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
     {
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
@@ -411,7 +411,7 @@ namespace Sungero.Capture.Server
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var shipper = GetMostProbabilityCounterparty(facts, "SHIPPER");
+      var shipper = GetMostProbableCounterparty(facts, "SHIPPER");
       if (shipper != null)
       {
         document.Shipper = shipper.Name;
@@ -419,7 +419,7 @@ namespace Sungero.Capture.Server
         document.ShipperTrrc = shipper.Trrc;
       }
       
-      var consignee = GetMostProbabilityCounterparty(facts, "CONSIGNEE");
+      var consignee = GetMostProbableCounterparty(facts, "CONSIGNEE");
       if (consignee != null)
       {
         document.Consignee = consignee.Name;
@@ -427,7 +427,7 @@ namespace Sungero.Capture.Server
         document.ConsigneeTrrc = consignee.Trrc;
       }
       
-      var supplier = GetMostProbabilityCounterparty(facts, "SUPPLIER");
+      var supplier = GetMostProbableCounterparty(facts, "SUPPLIER");
       if (supplier != null)
       {
         document.Supplier = supplier.Name;
@@ -435,7 +435,7 @@ namespace Sungero.Capture.Server
         document.SupplierTrrc = supplier.Trrc;
       }
       
-      var payer = GetMostProbabilityCounterparty(facts, "PAYER");
+      var payer = GetMostProbableCounterparty(facts, "PAYER");
       if (payer != null)
       {
         document.Payer = payer.Name;
