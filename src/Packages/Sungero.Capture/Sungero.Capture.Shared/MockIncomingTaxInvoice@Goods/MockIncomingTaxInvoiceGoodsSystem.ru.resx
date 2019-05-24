@@ -117,124 +117,25 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="DisplayName" xml:space="preserve">
-    <value>Tax Invoice Received</value>
+  <data name="Property_Name" xml:space="preserve">
+    <value>Наименование</value>
   </data>
-  <data name="AccusativeDisplayName" xml:space="preserve">
-    <value>Tax Invoice Received</value>
+  <data name="Property_UnitName" xml:space="preserve">
+    <value>Ед. изм.</value>
   </data>
-  <data name="CollectionDisplayName" xml:space="preserve">
-    <value>Tax Invoices Received</value>
+  <data name="Property_Count" xml:space="preserve">
+    <value>Кол-во</value>
   </data>
-  <data name="Property_Number" xml:space="preserve">
-    <value>No</value>
-  </data>
-  <data name="Property_Date" xml:space="preserve">
-    <value>Date</value>
-  </data>
-  <data name="Property_IsAdjustment" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_SellerName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_SellerTin" xml:space="preserve">
-    <value>TIN</value>
-  </data>
-  <data name="Property_SellerTrrc" xml:space="preserve">
-    <value>TRRC</value>
-  </data>
-  <data name="Property_BuyerName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_BuyerTin" xml:space="preserve">
-    <value>TIN</value>
-  </data>
-  <data name="Property_BuyerTrrc" xml:space="preserve">
-    <value>TRRC</value>
-  </data>
-  <data name="Property_ConsigneeName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_ConsigneeTin" xml:space="preserve">
-    <value>TIN</value>
-  </data>
-  <data name="Property_ConsigneeTrrc" xml:space="preserve">
-    <value>TRRC</value>
-  </data>
-  <data name="Property_ShipperName" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Property_ShipperTin" xml:space="preserve">
-    <value>TIN</value>
-  </data>
-  <data name="Property_ShipperTrrc" xml:space="preserve">
-    <value>TRRC</value>
-  </data>
-  <data name="Property_TotalAmount" xml:space="preserve">
-    <value>Total amount</value>
-  </data>
-  <data name="Property_Currency" xml:space="preserve">
-    <value>Currency</value>
+  <data name="Property_Price" xml:space="preserve">
+    <value>Цена</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>Сумма НДС</value>
   </data>
-  <data name="ControlGroup_406e14dc17444a7f85d8f6eef8abaa3f" xml:space="preserve">
-    <value>Main</value>
+  <data name="Property_TotalAmount" xml:space="preserve">
+    <value>Сумма с учетом НДС</value>
   </data>
-  <data name="Resource_fc50c88831554ff196e8ff7064894ead" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Control_fc50c88831554ff196e8ff7064894ead_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Resource_ddf41ead829a4a3f8d12d40a52b7440c" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Control_ddf41ead829a4a3f8d12d40a52b7440c_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Resource_f0607051ea774af2b7966d11cd8a7374" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Control_f0607051ea774af2b7966d11cd8a7374_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Resource_a915c070568d4f08a7365fbdabe9e559" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Control_a915c070568d4f08a7365fbdabe9e559_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ControlGroup_b8017e2288d643da8d6d8d11917b1dd6" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ControlGroup_42612188cf984a66a4cc5c674787d208" xml:space="preserve">
-    <value>Notes</value>
-  </data>
-  <data name="Resource_0e47ae684ffc4acb80bf3d6f715ce7c2" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Control_0e47ae684ffc4acb80bf3d6f715ce7c2_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Property_Revision" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="ControlGroup_b4cfe07238f84c218833684a494238f6" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="ControlGroup_ea9990d5e1154f7580a631004fa5c8a0" xml:space="preserve">
-    <value>Counterparties</value>
-  </data>
-  <data name="Property_Goods" xml:space="preserve">
-    <value>TODO</value>
-  </data>
-  <data name="Form_5c89ea6fb99b42788a34973bbca8c6ae" xml:space="preserve">
-    <value>Goods</value>
-  </data>
-  <data name="ControlGroup_e795561b528c4cab91007122deb9d2e6" xml:space="preserve">
-    <value>TODO</value>
+  <data name="Property_Number" xml:space="preserve">
+    <value>Номер</value>
   </data>
 </root>

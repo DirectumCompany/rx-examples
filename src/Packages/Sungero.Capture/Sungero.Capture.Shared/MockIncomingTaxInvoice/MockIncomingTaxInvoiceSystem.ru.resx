@@ -195,4 +195,13 @@
   <data name="ControlGroup_ea9990d5e1154f7580a631004fa5c8a0" xml:space="preserve">
     <value>Контрагенты</value>
   </data>
+  <data name="Property_Goods" xml:space="preserve">
+    <value>Номенклатура</value>
+  </data>
+  <data name="Form_5c89ea6fb99b42788a34973bbca8c6ae" xml:space="preserve">
+    <value>Номенклатура</value>
+  </data>
+  <data name="ControlGroup_e795561b528c4cab91007122deb9d2e6" xml:space="preserve">
+    <value>Номенклатурные позиции</value>
+  </data>
 </root>
