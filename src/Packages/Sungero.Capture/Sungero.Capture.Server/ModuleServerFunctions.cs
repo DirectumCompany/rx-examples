@@ -364,7 +364,19 @@ namespace Sungero.Capture.Server
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
+      // Заполнить Номенклатуру.
+      foreach (var fact in GetFacts(facts, "Goods", "Name"))
+      {
+        var good = document.Goods.AddNew();
+        good.Name = GetFieldValue(fact, "Name");
+        good.UnitName = GetFieldValue(fact, "UnitName");
+        good.Count = GetFieldNumericalValue(fact, "Count");
+        good.Price = GetFieldNumericalValue(fact, "Price");
+        good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
+        good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+      }            
       document.Save();
+      
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
