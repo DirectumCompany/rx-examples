@@ -121,6 +121,11 @@ namespace Sungero.Capture.Server
       if (recognitedClass == Constants.Module.WaybillClassName && CaptureMockMode != null)
         return CreateMockWaybill(recognitedDocument);
 
+      // Счет-фактура входящая
+      else if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && CaptureMockMode != null)
+      {
+        return CreateMockIncomingTaxInvoice(recognitedDocument);
+      }
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
     }
@@ -459,6 +464,96 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+      }
+      
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      
+      document.Save();
+      
+      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать счет-фактуру с текстовыми полями.
+    /// </summary>
+    /// <param name="letterсlassificationResult">Результат обработки счет-фактуры в Ario.</param>
+    /// <returns>Документ.</returns>
+    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.RecognitedDocument сlassificationResult)
+    {
+      var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = сlassificationResult.Facts;
+      
+      // Заполнить дату и номер.
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+            
+      // Заполнить контрагентов по типу.
+      // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var shipperFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SHIPPER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (shipperFact != null)
+      {
+        document.ShipperName = GetCorrespondentName(shipperFact, "Name", "LegalForm");
+        document.ShipperTin = GetFieldValue(shipperFact, "TIN");
+        document.ShipperTrrc = GetFieldValue(shipperFact, "TRRC");
+      }
+      
+      var consigneeFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "CONSIGNEE")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (consigneeFact != null)
+      {
+        document.ConsigneeName = GetCorrespondentName(consigneeFact, "Name", "LegalForm");
+        document.ConsigneeTin = GetFieldValue(consigneeFact, "TIN");
+        document.ConsigneeTrrc = GetFieldValue(consigneeFact, "TRRC");
+      }
+      
+      var sellerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "SELLER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (sellerFact != null)
+      {
+        document.SellerName = GetCorrespondentName(sellerFact, "Name", "LegalForm");
+        document.SellerTin = GetFieldValue(sellerFact, "TIN");
+        document.SellerTrrc = GetFieldValue(sellerFact, "TRRC");
+      }
+      
+      var buyerFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == "BUYER")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      if (buyerFact != null)
+      {
+        document.BuyerName = GetCorrespondentName(buyerFact, "Name", "LegalForm");
+        document.BuyerTin = GetFieldValue(buyerFact, "TIN");
+        document.BuyerTrrc = GetFieldValue(buyerFact, "TRRC");
+      }
+      
+      // Заполнить сумму и валюту.
+      var amount = GetFieldValue(facts, "DocumentAmount", "Amount");
+      if (!string.IsNullOrWhiteSpace(amount))
+      {
+        double totalAmount;
+        double.TryParse(amount, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out totalAmount);
+        document.TotalAmount = totalAmount;
+      }
+      
+      var vatAmountRaw = GetFieldValue(facts, "DocumentAmount", "VatAmount");
+      if (!string.IsNullOrWhiteSpace(vatAmountRaw))
+      {
+        double vatAmount;
+        double.TryParse(vatAmountRaw, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out vatAmount);
+        document.VATTotalAmount = vatAmount;
       }
       
       document.Save();

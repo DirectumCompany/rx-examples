@@ -19,6 +19,8 @@ namespace Sungero.Capture.Constants
     
     public const string WaybillClassName = "Товарная накладная";
     
+    public const string IncomingTaxInvoiceClassName = "Счет-фактура";
+    
     public static class Initialize
     {
       public static readonly Guid MockIncomingLetterKindGuid = Guid.Parse("E37D0916-7814-441E-84EF-904B7B643497");

@@ -90,7 +90,8 @@ namespace Sungero.Capture.Client
         { "Входящее письмо" , "Letter"},
         { Constants.Module.LetterClassName , "Letter"},
         { Constants.Module.ContractStatementClassName , "ContractStatement"},
-        { Constants.Module.WaybillClassName , "Waybill"}
+        { Constants.Module.WaybillClassName , "Waybill"},
+        { Constants.Module.IncomingTaxInvoiceClassName , "TaxInvoice"}
       };
     }
     
