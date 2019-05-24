@@ -122,7 +122,7 @@ namespace Sungero.Capture.Server
         return CreateMockWaybill(recognitedDocument);
 
       // Счет-фактура входящая.
-      if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && CaptureMockMode != null)      
+      if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && CaptureMockMode != null)
         return CreateMockIncomingTaxInvoice(recognitedDocument);
       
       // Все нераспознанные документы создать простыми.
@@ -360,7 +360,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount"); 
+      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
@@ -374,7 +374,7 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
-      }            
+      }
       document.Save();
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
@@ -475,7 +475,7 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
-      }            
+      }
       document.Save();
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
@@ -502,10 +502,10 @@ namespace Sungero.Capture.Server
       Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
       document.RegistrationDate = date;
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
-            
+      
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
-      var shipper = GetMostProbableCounterparty(facts, "SHIPPER");     
+      var shipper = GetMostProbableCounterparty(facts, "SHIPPER");
       if (shipper != null)
       {
         document.ShipperName = shipper.Name;
@@ -513,7 +513,7 @@ namespace Sungero.Capture.Server
         document.ShipperTrrc = shipper.Trrc;
       }
       
-      var consignee = GetMostProbableCounterparty(facts, "CONSIGNEE");      
+      var consignee = GetMostProbableCounterparty(facts, "CONSIGNEE");
       if (consignee != null)
       {
         document.ConsigneeName = consignee.Name;
@@ -538,12 +538,21 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить сумму и валюту.
-     // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
       document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      
+      // Заполнить Номенклатуру.
+      foreach (var fact in GetFacts(facts, "Goods", "Name"))
+      {
+        var good = document.Goods.AddNew();
+        good.Name = GetFieldValue(fact, "Name");
+        good.UnitName = GetFieldValue(fact, "UnitName");
+        good.Count = GetFieldNumericalValue(fact, "Count");
+        good.Price = GetFieldNumericalValue(fact, "Price");
+        good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
+        good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+      }
       document.Save();
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
