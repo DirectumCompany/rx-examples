@@ -121,11 +121,10 @@ namespace Sungero.Capture.Server
       if (recognitedClass == Constants.Module.WaybillClassName && CaptureMockMode != null)
         return CreateMockWaybill(recognitedDocument);
 
-      // Счет-фактура входящая
-      else if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && CaptureMockMode != null)
-      {
+      // Счет-фактура входящая.
+      if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && CaptureMockMode != null)      
         return CreateMockIncomingTaxInvoice(recognitedDocument);
-      }
+      
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
     }
@@ -529,7 +528,7 @@ namespace Sungero.Capture.Server
       // Заполнить сумму и валюту.
      // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      document.VATTotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
+      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       

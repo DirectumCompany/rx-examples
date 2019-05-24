@@ -177,7 +177,7 @@
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
   </data>
-  <data name="Property_VATTotalAmount" xml:space="preserve">
+  <data name="Property_VatAmount" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="ControlGroup_406e14dc17444a7f85d8f6eef8abaa3f" xml:space="preserve">

@@ -225,7 +225,7 @@
         {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "b6912216-85c0-4bfb-aca4-e32b9df26d42",
-          "Name": "VATTotalAmount",
+          "Name": "VatAmount",
           "ColumnNumber": 1,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
@@ -602,8 +602,8 @@
     {
       "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
       "NameGuid": "f6a43774-6e16-4f5a-9d4f-ce9a6f1dc547",
-      "Name": "VATTotalAmount",
-      "Code": "VATTotalAmount",
+      "Name": "VatAmount",
+      "Code": "VatAmount2",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "0b67a575-88ee-4870-b030-7e471523aad2"
     },
