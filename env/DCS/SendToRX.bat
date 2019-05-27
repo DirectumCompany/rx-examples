@@ -1,1 +1,0 @@
-"<Полный путь к DrxUtil.exe>" -n "Service user" -p 11111 -f Sungero.Capture.Module.ImportDocument %1 %2 %3 %4 %5 80
