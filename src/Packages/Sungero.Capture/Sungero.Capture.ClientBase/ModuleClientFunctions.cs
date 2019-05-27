@@ -83,15 +83,16 @@ namespace Sungero.Capture.Client
     /// Получить соответствие класса и имени правила его обработки.
     /// </summary>
     /// <returns></returns>
-    public static System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
+    [Public]
+    public virtual System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
     {
       return new Dictionary<string, string>()
       {
-        { "Входящее письмо" , "Letter"},
-        { Constants.Module.LetterClassName , "Letter"},
-        { Constants.Module.ContractStatementClassName , "ContractStatement"},
-        { Constants.Module.WaybillClassName , "Waybill"},
-        { Constants.Module.IncomingTaxInvoiceClassName , "TaxInvoice"}
+        { "Входящее письмо", "Letter"},
+        { Constants.Module.LetterClassName, "Letter"},
+        { Constants.Module.ContractStatementClassName, "ContractStatement"},
+        { Constants.Module.WaybillClassName, "Waybill"},
+        { Constants.Module.IncomingTaxInvoiceClassName, "TaxInvoice"}
       };
     }
     

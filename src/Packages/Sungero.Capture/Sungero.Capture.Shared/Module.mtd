@@ -77,6 +77,11 @@
   ],
   "PublicFunctions": [
     {
+      "Name": "GetClassRuleMapping",
+      "Placement": "Client",
+      "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
+    },
+    {
       "Name": "GetCurrentTenant",
       "IsRemote": true,
       "Placement": "Shared",

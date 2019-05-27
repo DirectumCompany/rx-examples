@@ -22,7 +22,7 @@ namespace Sungero.Capture.Server
     /// <param name="jsonClassificationResults">Json результатом классификации и извлечения фактов.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     [Remote]
-    public static void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
+    public virtual void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
     {
       // Создать документы по распознанным данным.
       var recognitedDocuments = GetRecognitedDocuments(jsonClassificationResults);
@@ -65,7 +65,7 @@ namespace Sungero.Capture.Server
       SendToResponsible(leadingDocument, addendums, responsible);
     }
     
-    public static List<Structures.Module.RecognitedDocument> GetRecognitedDocuments(string jsonClassificationResults)
+    public virtual List<Structures.Module.RecognitedDocument> GetRecognitedDocuments(string jsonClassificationResults)
     {
       var recognitedDocuments = new List<RecognitedDocument>();
       var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
@@ -101,9 +101,9 @@ namespace Sungero.Capture.Server
       return recognitedDocuments;
     }
     
-    public static IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
-                                                                       string sourceFileName,
-                                                                       IEmployee responsible)
+    public virtual IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
+                                                                        string sourceFileName,
+                                                                        IEmployee responsible)
     {
       // Входящее письмо.
       var recognitedClass = recognitedDocument.PredictedClass;
@@ -720,7 +720,7 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Простая задача.</returns>
     [Public, Remote]
-    public static void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
+    public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
     {
       if (leadingDocument == null)
         return;
