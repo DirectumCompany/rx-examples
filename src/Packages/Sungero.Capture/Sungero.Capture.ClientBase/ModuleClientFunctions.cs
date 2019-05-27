@@ -84,7 +84,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <returns></returns>
     [Public]
-    public virtual System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
+    public static System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
     {
       return new Dictionary<string, string>()
       {
