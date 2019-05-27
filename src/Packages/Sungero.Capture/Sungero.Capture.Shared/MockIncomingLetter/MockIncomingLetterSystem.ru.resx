@@ -168,4 +168,7 @@
   <data name="ControlGroup_c031df17352d4cca8d7dfb63a5739f43" xml:space="preserve">
     <value>От кого</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Номер документа</value>
+  </data>
 </root>

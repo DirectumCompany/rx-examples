@@ -120,4 +120,7 @@
   <data name="DisplayName" xml:space="preserve">
     <value>Official Document</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Document number</value>
+  </data>
 </root>

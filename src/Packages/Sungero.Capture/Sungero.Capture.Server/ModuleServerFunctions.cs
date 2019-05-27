@@ -496,12 +496,13 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = сlassificationResult.Facts;
-      
+                  
       // Заполнить дату и номер.
       DateTime date;
       Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
       document.RegistrationDate = date;
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      document.IsAdjustment = false;
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.

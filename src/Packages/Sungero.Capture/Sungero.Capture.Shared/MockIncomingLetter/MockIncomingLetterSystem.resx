@@ -195,4 +195,7 @@
   <data name="Control_9a144e1868b3489ab6bf4da3b9022e38_EmptyText" xml:space="preserve">
     <value />
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Document number</value>
+  </data>
 </root>
