@@ -461,7 +461,12 @@
           "PropertyGuid": "4a8ddb1e-5d40-4880-94d8-0b01c200fac1",
           "RowNumber": 0,
           "RowSpan": 1,
-          "Settings": []
+          "Settings": [
+            {
+              "Name": "NeedExpand",
+              "Value": true
+            }
+          ]
         }
       ],
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"

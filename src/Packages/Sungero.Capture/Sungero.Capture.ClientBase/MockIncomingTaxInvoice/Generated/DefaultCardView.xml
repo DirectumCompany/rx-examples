@@ -7,81 +7,93 @@
       <property name="$GridControl" iskey="true" value="GridControl">
         <property name="GroupSummary" iskey="true" value="0" />
         <property name="View" isnull="true" iskey="true">
-          <property name="ShowTotalSummary">false</property>
-          <property name="AllowMoveColumnToDropArea">false</property>
-          <property name="AllowColumnMoving">true</property>
           <property name="ColumnChooserState" isnull="true" iskey="true">
             <property name="Location">816,-2</property>
             <property name="Size">220,250</property>
           </property>
           <property name="AutoWidth">false</property>
           <property name="AllowGrouping">false</property>
-          <property name="AllowSorting">true</property>
           <property name="ShowGroupPanel">false</property>
-          <property name="LinesPerRowMode">None</property>
+          <property name="AllowSorting">true</property>
+          <property name="ShowTotalSummary">false</property>
+          <property name="AllowMoveColumnToDropArea">false</property>
+          <property name="AllowColumnMoving">true</property>
           <property name="IsRowCellMenuEnabled">false</property>
+          <property name="LinesPerRowMode">None</property>
         </property>
-        <property name="GroupCount">0</property>
         <property name="TotalSummary" iskey="true" value="0" />
+        <property name="GroupCount">0</property>
         <property name="Columns" iskey="true" value="7">
           <property name="Item1" isnull="true" iskey="true">
-            <property name="FieldName">Name</property>
             <property name="Visible">true</property>
+            <property name="FieldName">Name</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_Name</property>
             <property name="ExtendedVisibleIndex">1</property>
             <property name="VisibleIndex">1</property>
-            <property name="ActualWidth">40*</property>
+            <property name="Width">415</property>
+            <property name="ActualWidth">39*</property>
           </property>
           <property name="Item2" isnull="true" iskey="true">
-            <property name="FieldName">UnitName</property>
             <property name="Visible">true</property>
+            <property name="FieldName">UnitName</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_UnitName</property>
-            <property name="ExtendedVisibleIndex">2</property>
-            <property name="VisibleIndex">2</property>
+            <property name="ExtendedVisibleIndex">3</property>
+            <property name="VisibleIndex">3</property>
+            <property name="Width">96</property>
             <property name="ActualWidth">9*</property>
           </property>
           <property name="Item3" isnull="true" iskey="true">
-            <property name="FieldName">Count</property>
             <property name="Visible">true</property>
+            <property name="FieldName">Count</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_Count</property>
-            <property name="ExtendedVisibleIndex">3</property>
-            <property name="VisibleIndex">3</property>
+            <property name="ExtendedVisibleIndex">2</property>
+            <property name="VisibleIndex">2</property>
+            <property name="Width">74</property>
             <property name="ActualWidth">7*</property>
           </property>
           <property name="Item4" isnull="true" iskey="true">
-            <property name="FieldName">Price</property>
             <property name="Visible">true</property>
+            <property name="FieldName">Price</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_Price</property>
             <property name="ExtendedVisibleIndex">4</property>
             <property name="VisibleIndex">4</property>
+            <property name="Width">74</property>
             <property name="ActualWidth">7*</property>
           </property>
           <property name="Item5" isnull="true" iskey="true">
-            <property name="FieldName">VatAmount</property>
             <property name="Visible">true</property>
+            <property name="FieldName">VatAmount</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_VatAmount</property>
             <property name="ExtendedVisibleIndex">5</property>
             <property name="VisibleIndex">5</property>
+            <property name="Width">117</property>
             <property name="ActualWidth">11*</property>
           </property>
           <property name="Item6" isnull="true" iskey="true">
-            <property name="FieldName">TotalAmount</property>
             <property name="Visible">true</property>
+            <property name="FieldName">TotalAmount</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_TotalAmount</property>
             <property name="ExtendedVisibleIndex">6</property>
             <property name="VisibleIndex">6</property>
-            <property name="ActualWidth">18*</property>
+            <property name="Width">149</property>
+            <property name="ActualWidth">14*</property>
           </property>
           <property name="Item7" isnull="true" iskey="true">
-            <property name="FieldName">Number</property>
             <property name="Visible">true</property>
+            <property name="FieldName">Number</property>
             <property name="Name">MockIncomingTaxInvoice_Goods_Number</property>
             <property name="ExtendedVisibleIndex">0</property>
             <property name="VisibleIndex">0</property>
-            <property name="ActualWidth">7*</property>
+            <property name="Width">53</property>
+            <property name="ActualWidth">5*</property>
           </property>
         </property>
-        <property name="SortInfo" iskey="true" value="0" />
+        <property name="SortInfo" iskey="true" value="1">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">Number</property>
+            <property name="SortOrder">Ascending</property>
+          </property>
+        </property>
         <property name="GroupSummarySortInfo" iskey="true" value="0" />
       </property>
     </XtraSerializer>
