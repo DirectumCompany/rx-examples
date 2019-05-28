@@ -536,6 +536,7 @@ namespace Sungero.Capture.Server
       Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
       document.RegistrationDate = date;
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      document.IsAdjustment = false;
       
       // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
