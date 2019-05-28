@@ -26,31 +26,21 @@ namespace Sungero.Capture.Client
       Logger.Debug("Begin of captured package processing...");
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
-      {
-        Logger.Error(Resources.InvalidResponsibleId);
-        return;
-      }
+        throw new ApplicationException(Resources.InvalidResponsibleId);
       
       // Получить имена файлов.
       var filePath = GetScannedPackagePath(filesInfo, folder);
       var sourceFileName = GetScannedPackageName(instanceInfos);
       if (string.IsNullOrEmpty(filePath))
-      {
-        Logger.Error(Resources.FileNotFoundFormat(filePath));
-        return;
-      }
-
+        throw new ApplicationException(Resources.FileNotFoundFormat(filePath));
+      
       // Разделить пакет на документы.
       Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", sourceFileName);
       var arioUrl = Functions.Module.Remote.GetArioUrl();
       if (string.IsNullOrEmpty(arioUrl))
-      {
-        Logger.Error(Resources.EmptyArioUrl);
-        return;
-      }
+        throw new ApplicationException(Resources.EmptyArioUrl);
+      
       var jsonClassificationResults = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
-      if (string.IsNullOrEmpty(jsonClassificationResults))
-        return;
       Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
       
       // Принудительно обвалить захват, если Ario вернул ошибку. DCS запишет в лог и перезапустит процесс.
@@ -78,18 +68,12 @@ namespace Sungero.Capture.Client
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
       if (fpClassifier == null)
-      {
-        Logger.ErrorFormat(Resources.ClassifierNotFound, firstPageClassifierName);
-        return string.Empty;
-      }
-        
+        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      
       var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
       if (typeClassifier == null)
-      {
-        Logger.ErrorFormat(Resources.ClassifierNotFound, typeClassifierName);
-        return string.Empty;
-      }
-              
+        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      
       var fpClassifierId = fpClassifier.Id.ToString();
       var typeClassifierId = typeClassifier.Id.ToString();
       
@@ -126,10 +110,7 @@ namespace Sungero.Capture.Client
     public static string GetScannedPackagePath(string filesInfo, string folder)
     {
       if (!File.Exists(filesInfo))
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return string.Empty;
-      }
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
       
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       var fileElement = filesXDoc
@@ -138,11 +119,8 @@ namespace Sungero.Capture.Client
         .Elements()
         .FirstOrDefault();
       if (fileElement == null)
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return string.Empty;
-      }
-      
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
+            
       var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
       if (!File.Exists(filePath))
       {
@@ -161,11 +139,8 @@ namespace Sungero.Capture.Client
     public static string GetScannedPackageName(string instanceInfos)
     {
       if (!File.Exists(instanceInfos))
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return string.Empty;
-      }
-
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);  
+      
       var filesXDoc = System.Xml.Linq.XDocument.Load(instanceInfos);
       var fileElement = filesXDoc
         .Element("CaptureInstanceInfoList")
@@ -174,10 +149,7 @@ namespace Sungero.Capture.Client
         .Elements()
         .FirstOrDefault();
       if (fileElement == null)
-      {
-        Logger.Error(Resources.NoFilesInfoInPackage);
-        return string.Empty;
-      }
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
       
       return fileElement.Element("FileDescription").Value;
     }
