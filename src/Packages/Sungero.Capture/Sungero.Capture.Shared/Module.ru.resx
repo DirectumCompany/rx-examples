@@ -150,4 +150,10 @@
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>Документ</value>
   </data>
+  <data name="ClassifierNotFound" xml:space="preserve">
+    <value>Не найден классификатор с именем {0}</value>
+  </data>
+  <data name="EmptyArioUrl" xml:space="preserve">
+    <value>Не задан адрес сервиса Ario</value>
+  </data>
 </root>

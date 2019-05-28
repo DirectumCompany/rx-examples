@@ -77,10 +77,10 @@ namespace Sungero.Capture.Server
         recognitedDocument.ClassificationResultId = clsResult.Id;
         recognitedDocument.BodyGuid = clsResult.DocumentGuid;
         recognitedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
-        
+        recognitedDocument.Message = packageProcessResult.Message;
         // Факты и поля фактов.
         recognitedDocument.Facts = new List<Fact>();
-        var minFactProbability = GetMinFactProbability();
+        var minFactProbability = GetMinFactProbability();        
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
           var facts = packageProcessResult.ExtractionResult.Facts
@@ -126,7 +126,7 @@ namespace Sungero.Capture.Server
         return CreateMockIncomingTaxInvoice(recognitedDocument);
       
       // Все нераспознанные документы создать простыми.
-      return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid);
+      return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid, recognitedDocument.Message);
     }
     
     /// <summary>
@@ -161,10 +161,11 @@ namespace Sungero.Capture.Server
     /// <param name="name">Имя документа.</param>
     /// <param name="documentGuid">Гуид тела документа.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateSimpleDocument(string name, string documentGuid)
+    public static Docflow.IOfficialDocument CreateSimpleDocument(string name, string documentGuid, string note)
     {
       var document = SimpleDocuments.Create();
       document.Name = !string.IsNullOrWhiteSpace(name) ? name : Resources.SimpleDocumentName;
+      document.Note = note;
       var documentBody = GetDocumentBody(documentGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       documentBody = null;

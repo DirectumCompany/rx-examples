@@ -126,7 +126,9 @@
     "CheckPackage",
     "AttachmentName",
     "CheckPackageTaskText",
-    "SimpleDocumentName"
+    "SimpleDocumentName",
+    "ClassifierNotFound",
+    "EmptyArioUrl"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

@@ -147,4 +147,10 @@
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="ClassifierNotFound" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="EmptyArioUrl" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

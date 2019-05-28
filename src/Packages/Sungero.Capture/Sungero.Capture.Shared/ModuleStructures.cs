@@ -15,6 +15,7 @@ namespace Sungero.Capture.Structures.Module
     public string BodyGuid { get; set; }
     public string PredictedClass { get; set; }
     public List<Sungero.Capture.Structures.Module.Fact> Facts { get; set; }
+    public string Message { get; set; }
   }
   
   /// <summary>

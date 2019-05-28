@@ -43,7 +43,14 @@ namespace Sungero.Capture.Client
       // Разделить пакет на документы.
       Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", sourceFileName);
       var arioUrl = Functions.Module.Remote.GetArioUrl();
+      if (string.IsNullOrEmpty(arioUrl))
+      {
+        Logger.Error(Resources.EmptyArioUrl);
+        return;
+      }
       var jsonClassificationResults = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      if (string.IsNullOrEmpty(jsonClassificationResults))
+        return;
       Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
       
       // Принудительно обвалить захват, если Ario вернул ошибку. DCS запишет в лог и перезапустит процесс.
@@ -69,8 +76,22 @@ namespace Sungero.Capture.Client
     public static string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifierId = arioConnector.GetClassifierByName(firstPageClassifierName).Id.ToString();
-      var typeClassifierId = arioConnector.GetClassifierByName(typeClassifierName).Id.ToString();
+      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
+      if (fpClassifier == null)
+      {
+        Logger.ErrorFormat(Resources.ClassifierNotFound, firstPageClassifierName);
+        return string.Empty;
+      }
+        
+      var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
+      if (typeClassifier == null)
+      {
+        Logger.ErrorFormat(Resources.ClassifierNotFound, typeClassifierName);
+        return string.Empty;
+      }
+              
+      var fpClassifierId = fpClassifier.Id.ToString();
+      var typeClassifierId = typeClassifier.Id.ToString();
       
       Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
