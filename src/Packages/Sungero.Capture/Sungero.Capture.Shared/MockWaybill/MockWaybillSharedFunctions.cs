@@ -30,8 +30,14 @@ namespace Sungero.Capture.Shared
         if (_obj.RegistrationDate != null)
           name += Sungero.Docflow.OfficialDocuments.Resources.DateFrom + _obj.RegistrationDate.Value.ToString("d");
         
-       /* if (!string.IsNullOrWhiteSpace(_obj.CounterpartyName))
-          name += " " + _obj.CounterpartyName;*/
+        if (!string.IsNullOrWhiteSpace(_obj.Supplier))
+          name += " " + _obj.Supplier;
+        else if(!string.IsNullOrWhiteSpace(_obj.Shipper))
+          name += " " + _obj.Shipper;
+        else if(!string.IsNullOrWhiteSpace(_obj.Payer))
+          name += " " + _obj.Payer;
+        else if(!string.IsNullOrWhiteSpace(_obj.Consignee))
+          name += " " + _obj.Consignee;
         
         if (!string.IsNullOrWhiteSpace(_obj.Subject))
           name += " \"" + _obj.Subject + "\"";
@@ -50,7 +56,7 @@ namespace Sungero.Capture.Shared
       base.ChangeRegistrationPaneVisibility(needShow, repeatRegister);
       
       var properties = _obj.State.Properties;
-        
+      
       properties.RegistrationNumber.IsEnabled = true;
       properties.RegistrationDate.IsEnabled = true;
     }

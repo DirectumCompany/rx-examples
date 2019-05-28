@@ -413,12 +413,6 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = сlassificationResult.Facts;
       
-      // Заполнить дату и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
-      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
-      
       // Договор.
       var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
@@ -459,6 +453,12 @@ namespace Sungero.Capture.Server
         document.PayerTrrc = payer.Trrc;
       }
       
+      // Заполнить дату и номер.
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      
       // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
       document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
@@ -496,13 +496,6 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = сlassificationResult.Facts;
-                  
-      // Заполнить дату и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
-      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
-      document.IsAdjustment = false;
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -537,6 +530,12 @@ namespace Sungero.Capture.Server
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
       }
+      
+      // Заполнить дату и номер.
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       
       // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");

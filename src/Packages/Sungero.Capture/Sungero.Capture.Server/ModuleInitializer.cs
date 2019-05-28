@@ -13,7 +13,9 @@ namespace Sungero.Capture.Server
     public override void Initializing(Sungero.Domain.ModuleInitializingEventArgs e)
     {
       // TODO Временно для разработки.
-      Functions.Module.InitCaptureMockMode();
+      var CaptureMockMode = ModuleFunctions.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
+      if (CaptureMockMode != null)
+        Functions.Module.InitCaptureMockMode();
     }
   }
 }
