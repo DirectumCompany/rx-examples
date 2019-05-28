@@ -101,6 +101,46 @@ namespace Sungero.Capture.Server
       return recognitedDocuments;
     }
     
+    /// <summary>
+    /// Определить ведущий документ.
+    /// </summary>
+    /// <param name="package">Комплект документов.</param>
+    /// <returns>Ведущий документ.</returns>
+    public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
+    {
+      var leadingDocument = package.FirstOrDefault();
+      var incLetter = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null
+        ? package.Where(d => MockIncomingLetters.Is(d)).FirstOrDefault()
+        : package.Where(d => IncomingLetters.Is(d)).FirstOrDefault();
+      if (incLetter != null)
+      {
+        leadingDocument = incLetter;
+      }
+      else
+      {
+        var contractStatement = package.Where(d => MockContractStatements.Is(d)).FirstOrDefault();
+        if (contractStatement != null)
+        {
+          leadingDocument = contractStatement;
+        }
+        else
+        {
+          var waybill = package.Where(d => MockWaybills.Is(d)).FirstOrDefault();
+          if (waybill != null)
+          {
+            leadingDocument = waybill;
+          }
+          else
+          {
+            var incTaxInvoice = package.Where(d => MockIncomingTaxInvoices.Is(d)).FirstOrDefault();
+            if (incTaxInvoice != null)
+              leadingDocument = incTaxInvoice;
+          }
+        }
+      }
+      return leadingDocument;
+    }
+    
     public virtual IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
                                                                         string sourceFileName,
                                                                         IEmployee responsible)
