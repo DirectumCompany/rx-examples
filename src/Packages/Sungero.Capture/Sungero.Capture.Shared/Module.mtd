@@ -1,0 +1,146 @@
+{
+  "$type": "Sungero.Metadata.ModuleMetadata, Sungero.Metadata",
+  "NameGuid": "4c7444e6-c4af-46c1-9cfa-d9194d3ff0cb",
+  "Name": "Capture",
+  "ClientAssemblyName": "Sungero.Capture.Client",
+  "ClientBaseAssemblyName": "Sungero.Capture.ClientBase",
+  "ClientBaseNamespace": "Sungero.Capture.ClientBase",
+  "ClientNamespace": "Sungero.Capture.Client",
+  "Code": "Capture",
+  "CompanyCode": "Sungero",
+  "Cover": {
+    "NameGuid": "89cab6b6-685b-40ab-a8f2-6a36e594768c",
+    "Actions": [],
+    "Background": null,
+    "Footer": {
+      "NameGuid": "6f3b0569-ce8b-4c71-8447-b0eb5a15ab84",
+      "BackgroundPosition": "Stretch"
+    },
+    "Groups": [],
+    "Header": {
+      "NameGuid": "de1b320d-90f5-41ac-97b4-ce8f7079c701",
+      "BackgroundPosition": "Stretch"
+    }
+  },
+  "Dependencies": [
+    {
+      "Id": "f83768c8-f40d-43dd-8cfa-3098f694d645",
+      "IsSolutionModule": true,
+      "MaxVersion": "",
+      "MinVersion": ""
+    },
+    {
+      "Id": "92491aa6-c4df-4f46-a807-ebdd337bda74",
+      "MaxVersion": "",
+      "MinVersion": "1.1.0.0"
+    },
+    {
+      "Id": "ec7b606a-21ee-4f16-aba8-ab8c2af76d12",
+      "MaxVersion": "",
+      "MinVersion": "0.0.1.0"
+    }
+  ],
+  "ExplorerTreeOrder": [
+    {
+      "ItemId": "720f07e1-9644-4393-a270-6a41414f9f47"
+    },
+    {
+      "ItemId": "e5dcf857-c2db-4f76-b444-21ebf152de4d",
+      "PreviousItemId": "720f07e1-9644-4393-a270-6a41414f9f47"
+    },
+    {
+      "ItemId": "935aac5f-a11b-44d3-9299-ad04ea8ebd86",
+      "PreviousItemId": "e5dcf857-c2db-4f76-b444-21ebf152de4d"
+    },
+    {
+      "ItemId": "6d66f13a-79e1-4318-baef-be4b69e8c80d",
+      "PreviousItemId": "935aac5f-a11b-44d3-9299-ad04ea8ebd86"
+    },
+    {
+      "ItemId": "f664c21a-22cc-45ed-8ea0-494c2b9f0f47",
+      "PreviousItemId": "6d66f13a-79e1-4318-baef-be4b69e8c80d"
+    }
+  ],
+  "HandledEvents": [
+    "InitializingServer"
+  ],
+  "IconResourcesKeys": [],
+  "Importance": "Medium",
+  "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "InterfaceNamespace": "Sungero.Capture",
+  "Libraries": [
+    {
+      "NameGuid": "10f6f0a5-cb61-4048-ab19-1e52e12d4f10",
+      "Name": "ArioExtensions",
+      "Scope": "Both"
+    }
+  ],
+  "PublicFunctions": [
+    {
+      "Name": "GetClassRuleMapping",
+      "Placement": "Client",
+      "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
+    },
+    {
+      "Name": "GetCurrentTenant",
+      "IsRemote": true,
+      "Placement": "Shared",
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
+    },
+    {
+      "Name": "SendToResponsible",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "leadingDocument",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "documents",
+          "ParameterType": "global::System.Collections.Generic.List<global::Sungero.Docflow.IOfficialDocument>",
+          "ParameterTypeFullName": "System.Collections.Generic.List"
+        },
+        {
+          "Name": "responsible",
+          "ParameterType": "global::Sungero.Company.IEmployee",
+          "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.Capture",
+  "ResourcesKeys": [
+    "InvalidResponsibleId",
+    "FileNotFound",
+    "NoFilesInfoInPackage",
+    "DocumentName",
+    "CheckPackageTaskName",
+    "DocumentNotFound",
+    "CheckPackage",
+    "AttachmentName",
+    "CheckPackageTaskText",
+    "SimpleDocumentName",
+    "ClassifierNotFound",
+    "EmptyArioUrl"
+  ],
+  "ServerAssemblyName": "Sungero.Capture.Server",
+  "ServerNamespace": "Sungero.Capture.Server",
+  "SharedAssemblyName": "Sungero.Capture.Shared",
+  "SharedNamespace": "Sungero.Capture.Shared",
+  "SpecialFolders": [],
+  "Version": "0.0.1.0",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "ModuleMetadata",
+      "Number": 6
+    }
+  ]
+}

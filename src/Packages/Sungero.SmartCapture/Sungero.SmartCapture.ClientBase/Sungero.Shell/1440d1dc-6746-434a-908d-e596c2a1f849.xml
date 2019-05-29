@@ -1,0 +1,201 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <ViewName>Default</ViewName>
+  <Folder>
+    <XtraSerializer version="1.0" application="GridControl">
+      <property name="#LayoutVersion" isnull="true" />
+      <property name="$GridControl" iskey="true" value="GridControl">
+        <property name="GroupCount">0</property>
+        <property name="GroupSummary" iskey="true" value="0" />
+        <property name="Columns" iskey="true" value="18">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">T</property>
+            <property name="Name">T</property>
+            <property name="SortMode">Custom</property>
+            <property name="Fixed">None</property>
+            <property name="UnboundType">Object</property>
+            <property name="VisibleIndex">0</property>
+            <property name="AllowResizing">False</property>
+            <property name="Visible">true</property>
+          </property>
+          <property name="Item2" isnull="true" iskey="true">
+            <property name="FieldName">String_Name</property>
+            <property name="Name">String_Name</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">4</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item3" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Created</property>
+            <property name="Name">DateTime_Created</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">5</property>
+            <property name="Visible">true</property>
+            <property name="ActualWidth">19*</property>
+          </property>
+          <property name="Item4" isnull="true" iskey="true">
+            <property name="FieldName">Collection_To_abfe2c50b1ff44bd905466a122bbe99e</property>
+            <property name="Name">Collection_To_abfe2c50b1ff44bd905466a122bbe99e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">3</property>
+            <property name="Visible">true</property>
+            <property name="ActualWidth">18*</property>
+          </property>
+          <property name="Item5" isnull="true" iskey="true">
+            <property name="FieldName">Integer_Id</property>
+            <property name="Name">Integer_Id</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">0</property>
+            <property name="Visible">false</property>
+            <property name="Width">5</property>
+            <property name="ActualWidth">4*</property>
+          </property>
+          <property name="Item6" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Start_RouteType_83f2a5370cf04429ae76e9a386ca53aa</property>
+            <property name="Name">Enumeration_Start_RouteType_83f2a5370cf04429ae76e9a386ca53aa</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item7" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Maximum_deadline</property>
+            <property name="Name">DateTime_Maximum_deadline</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">3</property>
+            <property name="Visible">true</property>
+            <property name="ActualWidth">130</property>
+          </property>
+          <property name="Item8" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Status_Status_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="Name">Enumeration_Status_Status_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item9" isnull="true" iskey="true">
+            <property name="FieldName">String_Subject</property>
+            <property name="Name">String_Subject</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">2</property>
+            <property name="Visible">true</property>
+            <property name="ActualWidth">55*</property>
+          </property>
+          <property name="Item10" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_From_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="Name">Navigation_From_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">10*</property>
+          </property>
+          <property name="Item11" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_1917880615</property>
+            <property name="Name">DateTime_1917880615</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item12" isnull="true" iskey="true">
+            <property name="FieldName">Boolean_Assignment_for_review</property>
+            <property name="Name">Boolean_Assignment_for_review</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">4*</property>
+          </property>
+          <property name="Item13" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Parent_task_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="Name">Navigation_Parent_task_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item14" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Parent_assignment_ea683a63273e43aebcf17a443698008a</property>
+            <property name="Name">Navigation_Parent_assignment_ea683a63273e43aebcf17a443698008a</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item15" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Main_task_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="Name">Navigation_Main_task_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item16" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Importance_Importance_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="Name">Enumeration_Importance_Importance_d795d1f645c14e5e9677b53fb7280c7e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Visible">true</property>
+            <property name="ActualWidth">3*</property>
+          </property>
+          <property name="Item17" isnull="true" iskey="true">
+            <property name="SortMode">Custom</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="FieldName">DateTime_Modified</property>
+            <property name="Name">DateTime_Modified</property>
+            <property name="VisibleIndex">3</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item18" isnull="true" iskey="true">
+            <property name="SortMode">Custom</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="FieldName">DateTime_Started</property>
+            <property name="Name">DateTime_Started</property>
+            <property name="VisibleIndex">2</property>
+            <property name="Visible">false</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+        </property>
+        <property name="View" isnull="true" iskey="true">
+          <property name="ShowTotalSummary">false</property>
+          <property name="IsRowCellMenuEnabled">true</property>
+          <property name="WaitIndicatorType">Panel</property>
+          <property name="ColumnChooserState" isnull="true" iskey="true">
+            <property name="Location">851,362</property>
+            <property name="Size">220,250</property>
+          </property>
+          <property name="ShowGroupPanel">false</property>
+          <property name="AutoWidth">true</property>
+          <property name="ShowAutoFilterRow">false</property>
+        </property>
+        <property name="TotalSummary" iskey="true" value="0" />
+        <property name="SortInfo" iskey="true" value="1">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Created</property>
+            <property name="SortOrder">Descending</property>
+          </property>
+        </property>
+        <property name="FilterString" isnull="true" />
+        <property name="MRUFilters" iskey="true" value="0" />
+        <property name="GroupSummarySortInfo" iskey="true" value="0" />
+      </property>
+    </XtraSerializer>
+  </Folder>
+</settings>

@@ -1,0 +1,79 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "63d98c5e-e572-4372-9bf9-543f3da3524b",
+  "Name": "Shell",
+  "AssociatedGuid": "f83768c8-f40d-43dd-8cfa-3098f694d645",
+  "BaseGuid": "fcc573ab-5f4e-4b20-88e8-7b1e11a7a59a",
+  "ClientBaseAssemblyName": "Sungero.SmartCapture.ClientBase",
+  "ClientBaseNamespace": "Sungero.SmartCapture.Module.Shell.ClientBase",
+  "Code": "Shell",
+  "CompanyCode": "Sungero",
+  "ExplorerTreeOrder": [],
+  "IconResourcesKeys": [],
+  "Importance": "Low",
+  "LayeredFromGuid": "fcc573ab-5f4e-4b20-88e8-7b1e11a7a59a",
+  "NeedResetAppliedCache": true,
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.SmartCapture.Module.Shell",
+  "ResourcesKeys": [],
+  "SpecialFolders": [
+    {
+      "NameGuid": "1ead1abe-1b7e-4833-9e01-ee7f8404537a",
+      "Name": "OnDocumentProcessing",
+      "DisplayType": "Inbox",
+      "FilterPanel": {
+        "NameGuid": "d3b6d490-0c19-4938-b922-c0e1ba29694d",
+        "Name": "FilterPanel",
+        "Controls": [
+          {
+            "$type": "Sungero.Metadata.FilterListItemMetadata, Sungero.Metadata",
+            "NameGuid": "2c6a31f4-38cc-4cf4-a786-629a86611ab8",
+            "Name": "Other",
+            "IsAncestorMetadata": true,
+            "Overridden": [
+              "PreviousGuid"
+            ],
+            "ParentGuid": "298dc603-b006-4e60-8ee2-30e3e71c9c5a",
+            "PreviousGuid": "ff3e7344-12f6-4ff0-bf8f-5e962bc46d6a"
+          },
+          {
+            "$type": "Sungero.Metadata.FilterListItemMetadata, Sungero.Metadata",
+            "NameGuid": "ff3e7344-12f6-4ff0-bf8f-5e962bc46d6a",
+            "Name": "ProcessPackage",
+            "ParentGuid": "298dc603-b006-4e60-8ee2-30e3e71c9c5a",
+            "PreviousGuid": "af1b7526-b495-4464-b209-6ea003876fef"
+          }
+        ],
+        "IsAncestorMetadata": true,
+        "Overridden": [
+          "Controls"
+        ]
+      },
+      "HandledEvents": [
+        "DataQueryServer"
+      ],
+      "IconPath": "OnDocumentProcessing_1ead1abe1b7e48339e01ee7f8404537a.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "IsViewSettingsByFolder": true,
+      "NeedShowMarkedCount": true,
+      "Overridden": [
+        "HandledEvents",
+        "FilterPanel"
+      ]
+    }
+  ],
+  "Version": "3.1.39.1",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 6
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 6
+    }
+  ]
+}
