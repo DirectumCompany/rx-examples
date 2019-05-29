@@ -34,10 +34,7 @@ namespace Sungero.Capture.Server
       }
       
       // Определить ведущий документ.
-      var incLetter = package.Where(d => IncomingLetters.Is(d)).FirstOrDefault();
-      var leadingDocument = incLetter != null
-        ? incLetter
-        : package.FirstOrDefault();
+      var leadingDocument = GetLeadingDocument(package);
       
       // Связать приложения с ведущим документом.
       var addendums = package.ToList();
@@ -80,7 +77,7 @@ namespace Sungero.Capture.Server
         recognitedDocument.Message = packageProcessResult.Message;
         // Факты и поля фактов.
         recognitedDocument.Facts = new List<Fact>();
-        var minFactProbability = GetMinFactProbability();        
+        var minFactProbability = GetMinFactProbability();
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
           var facts = packageProcessResult.ExtractionResult.Facts
@@ -113,31 +110,20 @@ namespace Sungero.Capture.Server
         ? package.Where(d => MockIncomingLetters.Is(d)).FirstOrDefault()
         : package.Where(d => IncomingLetters.Is(d)).FirstOrDefault();
       if (incLetter != null)
-      {
-        leadingDocument = incLetter;
-      }
-      else
-      {
-        var contractStatement = package.Where(d => MockContractStatements.Is(d)).FirstOrDefault();
-        if (contractStatement != null)
-        {
-          leadingDocument = contractStatement;
-        }
-        else
-        {
-          var waybill = package.Where(d => MockWaybills.Is(d)).FirstOrDefault();
-          if (waybill != null)
-          {
-            leadingDocument = waybill;
-          }
-          else
-          {
-            var incTaxInvoice = package.Where(d => MockIncomingTaxInvoices.Is(d)).FirstOrDefault();
-            if (incTaxInvoice != null)
-              leadingDocument = incTaxInvoice;
-          }
-        }
-      }
+        return incLetter;
+      
+      var contractStatement = package.Where(d => MockContractStatements.Is(d)).FirstOrDefault();
+      if (contractStatement != null)
+        return contractStatement;
+      
+      var waybill = package.Where(d => MockWaybills.Is(d)).FirstOrDefault();
+      if (waybill != null)
+        return waybill;
+      
+      var incTaxInvoice = package.Where(d => MockIncomingTaxInvoices.Is(d)).FirstOrDefault();
+      if (incTaxInvoice != null)
+        return incTaxInvoice;
+      
       return leadingDocument;
     }
     
