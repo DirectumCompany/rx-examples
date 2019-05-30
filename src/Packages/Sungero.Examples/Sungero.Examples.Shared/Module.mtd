@@ -55,7 +55,7 @@
   "SharedAssemblyName": "Sungero.Examples.Shared",
   "SharedNamespace": "Sungero.Examples.Shared",
   "SpecialFolders": [],
-  "Version": "0.0.1.0",
+  "Version": "3.1.0.0",
   "Widgets": [],
   "Versions": [
     {
