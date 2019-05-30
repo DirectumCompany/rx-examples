@@ -42,7 +42,7 @@
   "SharedAssemblyName": "Sungero.SmartCapture.Shared",
   "SharedNamespace": "Sungero.SmartCapture.Shared",
   "SpecialFolders": [],
-  "Version": "0.0.2.0",
+  "Version": "3.1.0.0",
   "Widgets": [],
   "Versions": [
     {
