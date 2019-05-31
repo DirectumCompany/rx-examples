@@ -97,6 +97,7 @@ namespace Sungero.Capture.Client
         { Constants.Module.LetterClassName, "Letter"},
         { Constants.Module.ContractStatementClassName, "ContractStatement"},
         { Constants.Module.WaybillClassName, "Waybill"},
+        { Constants.Module.UniversalTransferDocumentClassName, "GeneralTransferDocument"},
         { Constants.Module.IncomingTaxInvoiceClassName, "TaxInvoice"}
       };
     }
