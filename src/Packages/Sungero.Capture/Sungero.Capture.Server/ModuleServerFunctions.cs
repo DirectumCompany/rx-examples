@@ -196,8 +196,10 @@ namespace Sungero.Capture.Server
           : CreateIncomingLetter(recognizedDocument, responsible);
       
       // Акт выполненных работ.
-      if (recognizedClass == Constants.Module.ContractStatementClassName && isMockMode)
-        return CreateMockContractStatement(recognizedDocument);
+      if (recognitedClass == Constants.Module.ContractStatementClassName && isMockMode)
+        return isMockMode
+          ? CreateMockContractStatement(recognitedDocument)
+          : CreateContractStatement(recognitedDocument);
       
       // Товарная накладная.
       if (recognizedClass == Constants.Module.WaybillClassName && isMockMode)
@@ -325,6 +327,27 @@ namespace Sungero.Capture.Server
       if (department == null)
         department = employee.Department;
       return department;
+    }
+    
+    /// <summary>
+    /// Получить ведущий документ по номеру и дате из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Документ с соответствующими номером и датой.</returns>
+    /// <remarks>Будет возвращен первый попавшийся, если таких документов несколько.
+    /// Будет возвращен null, если таких документов нет.</remarks>
+    private static Sungero.Contracts.IContractualDocument GetLeadingDocument(Fact fact)
+    {
+      if (fact == null)
+        return Sungero.Contracts.ContractualDocuments.Null;
+      
+      DateTime docDate;
+      var date = Functions.Module.GetShortDate(GetFieldValue(fact, "DocumentBaseDate"));
+      Calendar.TryParseDate(date, out docDate);
+      var number = GetFieldValue(fact, "DocumentBaseNumber");
+      
+      return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
+                                                                x.RegistrationDate == docDate).FirstOrDefault();
     }
     
     /// <summary>
@@ -520,11 +543,11 @@ namespace Sungero.Capture.Server
     #region Акт.
     
     /// <summary>
-    /// Создать акт выполненных работ с текстовыми полями.
+    /// Создать акт выполненных работ (демо режим).
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
-    /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
+    /// <returns>Акт выполненных работ.</returns>
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       
@@ -537,7 +560,7 @@ namespace Sungero.Capture.Server
         .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
       document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
-      // Заполнить дату и номер.
+      // Дата и номер.
       DateTime date;
       Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
       document.RegistrationDate = date;
@@ -610,6 +633,75 @@ namespace Sungero.Capture.Server
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
+      
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать акт выполненных работ.
+    /// </summary>
+    /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
+    /// <returns>Акт выполненных работ.</returns>
+    public static Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
+    {
+      var document = FinancialArchive.ContractStatements.Create();
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = сlassificationResult.Facts;
+      
+      // Договор.
+      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
+      document.LeadingDocument = GetLeadingDocument(leadingDocNames.FirstOrDefault());
+      
+      // Дата и номер.
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
+      
+      // Заполнить контрагента/НОР по типу.
+      // Рассматриваем входящие акты, для которых SELLER - Контрагент, BUYER - НОР.
+      var seller = GetMostProbableCounterparty(facts, "SELLER");
+      document.Counterparty = GetCounterparties(seller.Tin, seller.Trrc).FirstOrDefault();
+      var buyer = GetMostProbableCounterparty(facts, "BUYER");
+      document.BusinessUnit = GetBusinessUnits(buyer.Tin, buyer.Trrc).FirstOrDefault();
+      
+      // В актах могут прийти контрагенты без типа. Заполнить контрагентами без типа.
+      if (seller == null || buyer == null)
+      {
+        var withoutTypeFacts = GetFacts(facts, "Counterparty", "Name")
+          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")))
+          .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+        
+        foreach (var fact in withoutTypeFacts)
+        {
+          var tin = GetFieldValue(fact, "TIN");
+          var trrc = GetFieldValue(fact, "TRRC");
+          Sungero.Company.IBusinessUnit businessUnit = null;
+          
+          if (document.Counterparty == null)
+            document.Counterparty = GetCounterparties(tin, trrc).FirstOrDefault();
+          
+          // businessUnit получаем всегда, так как он может заполнится от ответственного, но не будет совпадать с фактическим в акте.
+          businessUnit = GetBusinessUnits(tin, trrc).FirstOrDefault();
+          if (businessUnit != null)
+            document.BusinessUnit = businessUnit;
+        }
+      }
+      
+      // Заполнить сумму и валюту.
+      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      
+      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Регистрация.
+      var module = new ModuleFunctions();
+      module.RegisterDocument(document);
       
       return document;
     }
