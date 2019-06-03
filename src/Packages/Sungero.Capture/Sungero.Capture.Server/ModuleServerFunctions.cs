@@ -196,10 +196,10 @@ namespace Sungero.Capture.Server
           : CreateIncomingLetter(recognizedDocument, responsible);
       
       // Акт выполненных работ.
-      if (recognitedClass == Constants.Module.ContractStatementClassName && isMockMode)
+      if (recognizedClass == Constants.Module.ContractStatementClassName && isMockMode)
         return isMockMode
-          ? CreateMockContractStatement(recognitedDocument)
-          : CreateContractStatement(recognitedDocument);
+          ? CreateMockContractStatement(recognizedDocument)
+          : CreateContractStatement(recognizedDocument);
       
       // Товарная накладная.
       if (recognizedClass == Constants.Module.WaybillClassName && isMockMode)
@@ -547,7 +547,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       
@@ -642,7 +642,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public static Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
     {
       var document = FinancialArchive.ContractStatements.Create();
       
