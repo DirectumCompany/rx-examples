@@ -21,6 +21,10 @@ namespace Sungero.SmartCapture
       
       // Восстановить обязательность контрагента.
       _obj.State.Properties.Counterparty.IsRequired = true;
+      
+      // Контрагент не дб задизейблен, если незаполнен.
+      if (_obj.Counterparty == null)
+        _obj.State.Properties.Counterparty.IsEnabled = true;
     }
 
   }
