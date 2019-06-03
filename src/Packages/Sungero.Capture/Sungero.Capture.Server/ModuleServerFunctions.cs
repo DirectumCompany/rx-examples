@@ -218,20 +218,40 @@ namespace Sungero.Capture.Server
       var subject = GetFieldValue(facts, "Letter", "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
+
+      // Адресат.
+      foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
+      {
+        var addressee = GetFieldValue(fact, "Addressee");
+        document.Addressee = GetEmployeeByName(addressee);
+      }
       
+      // Заполнить данные нашей стороны.
+      document.BusinessUnit = GetBusinessUnit(facts, document.Addressee, responsible);
+      
+      document.Department = document.Addressee != null
+        ? GetDepartment(document.Addressee)
+        : GetDepartment(responsible);
+
       // Заполнить данные корреспондента.
       document.Correspondent = GetCounterparty(facts);
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       var correspondentDate = GetFieldValue(facts, "Letter", "Date");
       if (!string.IsNullOrEmpty(correspondentDate))
         document.Dated = DateTime.Parse(correspondentDate);
-      
-      // Заполнить данные нашей стороны.
-      document.BusinessUnit =  Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = GetDepartment(responsible);
-      
+
       document.Save();
       return document;
+    }
+    
+    /// <summary>
+    /// Получить сотрудника по имени.
+    /// </summary>
+    /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
+    /// <returns>Сотрудник.</returns>
+    public static IEmployee GetEmployeeByName(string name)
+    {
+      return Employees.GetAll().Where(e => e.Person.ShortName == name || e.Name == name).FirstOrDefault();
     }
     
     /// <summary>
@@ -410,23 +430,6 @@ namespace Sungero.Capture.Server
       return document;
     }
     
-    public static Structures.Module.MockCounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
-    {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      
-      if (mostProbabilityFact == null)
-        return null;
-
-      var counterparty = Structures.Module.MockCounterparty.Create();
-      counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
-      counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
-      counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
-      return counterparty;
-    }
-    
     /// <summary>
     /// Создать накладную с текстовыми полями.
     /// </summary>
@@ -589,6 +592,23 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    public static Structures.Module.MockCounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      
+      if (mostProbabilityFact == null)
+        return null;
+
+      var counterparty = Structures.Module.MockCounterparty.Create();
+      counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
+      counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
+      counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
+      return counterparty;
+    }
+    
     /// <summary>
     /// Поиск корреспондента по извлеченным фактам.
     /// </summary>
@@ -600,9 +620,8 @@ namespace Sungero.Capture.Server
       var correspondentNames = new List<string>();
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
-        var name = GetFieldValue(fact, "CorrespondentName");
-        var legalForm = GetFieldValue(fact, "CorrespondentLegalForm");
-        correspondentNames.Add(string.IsNullOrEmpty(legalForm) ? name : string.Format("{0}, {1}", name, legalForm));
+        var name = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
+        correspondentNames.Add(name);
       }
       
       // Поиск корреспондентов по наименованию.
@@ -642,7 +661,79 @@ namespace Sungero.Capture.Server
           return foundByTin.FirstOrDefault();
       }
     }
+    
+    /// <summary>
+    /// Поиск НОР по извлеченным фактам.
+    /// </summary>
+    /// <param name="facts">Список фактов.</param>
+    /// <returns>НОР.</returns>
+    public static Sungero.Company.IBusinessUnit GetBusinessUnit(List<Structures.Module.Fact> facts, IEmployee responsible, IEmployee adressee)
+    {
+      // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
+      var businessUnitByAdressee = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(adressee);
+      Sungero.Company.IBusinessUnit businessUnit = null;
+      
+      var businessUnits = GetBusinessUnits(facts);
+      // Попытаться уточнить по адресату.
+      if (businessUnits.Any() && businessUnitByAdressee != null)
+        businessUnit = businessUnits.FindAll(x => x.Equals(businessUnitByAdressee)).FirstOrDefault();
 
+      businessUnit = businessUnit != null ? businessUnit : businessUnits.FirstOrDefault();
+      var businessUnitByEmployee = adressee != null ? businessUnitByAdressee : Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      
+      return businessUnit != null ? businessUnit : businessUnitByEmployee;
+    }
+    
+    /// <summary>
+    /// Поиск НОР по извлеченным фактам.
+    /// </summary>
+    /// <param name="facts">Список фактов.</param>
+    /// <returns>НОР.</returns>
+    public static List<Sungero.Company.IBusinessUnit> GetBusinessUnits(List<Structures.Module.Fact> facts)
+    {
+      // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
+      var correspondentNames = new List<string>();
+      var correspondents = GetFactsWithoutProbability(facts, "Letter", "CorrespondentName")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
+      foreach (var fact in correspondents)
+      {
+        var name = GetFieldValue(fact, "CorrespondentName");
+        correspondentNames.Add(name.ToLower());
+      }
+      
+      // Поиск НОР по наименованию без ФС.
+      var foundByName = new List<IBusinessUnit>();
+      foreach (var correspondentName in correspondentNames)
+      {
+        var businessUnits = BusinessUnits.GetAll()
+          .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+          .Where(x => x.Name.ToLower().Contains(correspondentName));
+        foundByName.AddRange(businessUnits);
+      }
+      
+      // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
+      var correspondentTINs = GetFactsWithoutProbability(facts, "Counterparty", "TIN")
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
+      if (!correspondentTINs.Any())
+        return foundByName;
+      else
+      {
+        // Поиск по ИНН/КПП.
+        var foundByTin = new List<IBusinessUnit>();
+        foreach (var fact in correspondentTINs)
+          foundByTin.AddRange(GetBusinessUnits(GetFieldValue(fact, "TIN"), GetFieldValue(fact, "TRRC")));
+        
+        // Найдено по ИНН/КПП.
+        if (foundByTin.Any())
+          return foundByTin;
+        
+        // Не найдено. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
+        if (foundByName.Any())
+          return foundByName.Where(x => string.IsNullOrEmpty(x.TIN) && string.IsNullOrEmpty(x.TRRC)).ToList();
+      }
+      return foundByName;
+    }
+    
     /// <summary>
     /// Получить поле из факта.
     /// </summary>
@@ -720,14 +811,33 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Имя факта.</param>
     /// <param name="fieldName">Имя поля.</param>
     /// <returns>Список фактов с наибольшей вероятностью.</returns>
+    /// <remarks>С учетом вероятности факта.</remarks>
     public static List<Structures.Module.Fact> GetFacts(List<Structures.Module.Fact> facts, string factName, string fieldName)
+    {
+      var minFactProbability = GetMinFactProbability();
+      return facts
+        .Where(f => f.Name == factName)
+        .Where(f => f.Fields.Any(fl => fl.Name == fieldName))
+        .Where(f => f.Fields.Any(fl => fl.Probability >= (decimal)(minFactProbability)))
+        .ToList();
+    }
+    
+    /// <summary>
+    /// Получить список фактов с переданными именем факта и именем поля.
+    /// </summary>
+    /// <param name="facts">Список фактов.</param>
+    /// <param name="factName">Имя факта.</param>
+    /// <param name="fieldName">Имя поля.</param>
+    /// <returns>Список фактов с наибольшей вероятностью.</returns>
+    /// <remarks>Без учета вероятности факта.</remarks>
+    public static List<Structures.Module.Fact> GetFactsWithoutProbability(List<Structures.Module.Fact> facts, string factName, string fieldName)
     {
       return facts
         .Where(f => f.Name == factName)
         .Where(f => f.Fields.Any(fl => fl.Name == fieldName))
         .ToList();
     }
-
+    
     /// <summary>
     /// Получить тело документа из Арио.
     /// </summary>
@@ -845,6 +955,46 @@ namespace Sungero.Capture.Server
       }
       
       return counterparties.ToList();
+    }
+    
+    /// <summary>
+    /// Получить список НОР по ИНН/КПП.
+    /// </summary>
+    /// <param name="tin">ИНН.</param>
+    /// <param name="trrc">КПП.</param>
+    /// <returns>Список НОР.</returns>
+    public static List<IBusinessUnit> GetBusinessUnits(string tin, string trrc)
+    {
+      var searchByTin = !string.IsNullOrWhiteSpace(tin);
+      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
+      
+      if (!searchByTin && !searchByTrrc)
+        return new List<IBusinessUnit>();
+
+      // Отфильтровать закрытые НОР.
+      var businessUnits = BusinessUnits.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
+      
+      // Поиск по ИНН, если ИНН передан.
+      if (searchByTin)
+      {
+        var strongTinBusinessUnits = businessUnits.Where(x => x.TIN == tin).ToList();
+        
+        // Поиск по КПП, если КПП передан.
+        if (searchByTrrc)
+        {
+          var strongTrrcBusinessUnits = strongTinBusinessUnits
+            .Where(c => !string.IsNullOrWhiteSpace(c.TRRC) && c.TRRC == trrc)
+            .ToList();
+          
+          if (strongTrrcBusinessUnits.Count > 0)
+            return strongTrrcBusinessUnits;
+        }
+        
+        return strongTinBusinessUnits;
+      }
+      
+      return new List<IBusinessUnit>();
     }
     
     /// <summary>
