@@ -347,7 +347,7 @@ namespace Sungero.Capture.Server
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
-                                                                x.RegistrationDate == docDate).FirstOrDefault();
+                                                           x.RegistrationDate == docDate).FirstOrDefault();
     }
     
     /// <summary>
@@ -567,14 +567,14 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагентов по типу.
-      var seller = GetMostProbableCounterparty(facts, "SELLER");
+      var seller = GetMostProbableMockCounterparty(facts, "SELLER");
       if (seller != null)
       {
         document.CounterpartyName = seller.Name;
         document.CounterpartyTin = seller.Tin;
         document.CounterpartyTrrc = seller.Trrc;
       }
-      var buyer = GetMostProbableCounterparty(facts, "BUYER");
+      var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
       if (buyer != null)
       {
         document.BusinessUnitName = buyer.Name;
@@ -663,13 +663,11 @@ namespace Sungero.Capture.Server
       
       // Заполнить контрагента/НОР по типу.
       // Рассматриваем входящие акты, для которых SELLER - Контрагент, BUYER - НОР.
-      var seller = GetMostProbableCounterparty(facts, "SELLER");
-      document.Counterparty = GetCounterparties(seller.Tin, seller.Trrc).FirstOrDefault();
-      var buyer = GetMostProbableCounterparty(facts, "BUYER");
-      document.BusinessUnit = GetBusinessUnits(buyer.Tin, buyer.Trrc).FirstOrDefault();
+      document.Counterparty = GetMostProbableCounterparty(facts, "SELLER");
+      document.BusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
       
       // В актах могут прийти контрагенты без типа. Заполнить контрагентами без типа.
-      if (seller == null || buyer == null)
+      if (document.Counterparty == null || document.BusinessUnit == null)
       {
         var withoutTypeFacts = GetFacts(facts, "Counterparty", "Name")
           .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")))
@@ -731,7 +729,7 @@ namespace Sungero.Capture.Server
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var shipper = GetMostProbableCounterparty(facts, "SHIPPER");
+      var shipper = GetMostProbableMockCounterparty(facts, "SHIPPER");
       if (shipper != null)
       {
         document.Shipper = shipper.Name;
@@ -739,7 +737,7 @@ namespace Sungero.Capture.Server
         document.ShipperTrrc = shipper.Trrc;
       }
       
-      var consignee = GetMostProbableCounterparty(facts, "CONSIGNEE");
+      var consignee = GetMostProbableMockCounterparty(facts, "CONSIGNEE");
       if (consignee != null)
       {
         document.Consignee = consignee.Name;
@@ -747,7 +745,7 @@ namespace Sungero.Capture.Server
         document.ConsigneeTrrc = consignee.Trrc;
       }
       
-      var supplier = GetMostProbableCounterparty(facts, "SUPPLIER");
+      var supplier = GetMostProbableMockCounterparty(facts, "SUPPLIER");
       if (supplier != null)
       {
         document.Supplier = supplier.Name;
@@ -755,7 +753,7 @@ namespace Sungero.Capture.Server
         document.SupplierTrrc = supplier.Trrc;
       }
       
-      var payer = GetMostProbableCounterparty(facts, "PAYER");
+      var payer = GetMostProbableMockCounterparty(facts, "PAYER");
       if (payer != null)
       {
         document.Payer = payer.Name;
@@ -813,7 +811,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
-      var shipper = GetMostProbableCounterparty(facts, "SHIPPER");
+      var shipper = GetMostProbableMockCounterparty(facts, "SHIPPER");
       if (shipper != null)
       {
         document.ShipperName = shipper.Name;
@@ -821,7 +819,7 @@ namespace Sungero.Capture.Server
         document.ShipperTrrc = shipper.Trrc;
       }
       
-      var consignee = GetMostProbableCounterparty(facts, "CONSIGNEE");
+      var consignee = GetMostProbableMockCounterparty(facts, "CONSIGNEE");
       if (consignee != null)
       {
         document.ConsigneeName = consignee.Name;
@@ -829,7 +827,7 @@ namespace Sungero.Capture.Server
         document.ConsigneeTrrc = consignee.Trrc;
       }
       
-      var seller = GetMostProbableCounterparty(facts, "SELLER");
+      var seller = GetMostProbableMockCounterparty(facts, "SELLER");
       if (seller != null)
       {
         document.SellerName = seller.Name;
@@ -837,7 +835,7 @@ namespace Sungero.Capture.Server
         document.SellerTrrc = seller.Trrc;
       }
       
-      var buyer = GetMostProbableCounterparty(facts, "BUYER");
+      var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
       if (buyer != null)
       {
         document.BuyerName = buyer.Name;
@@ -880,7 +878,7 @@ namespace Sungero.Capture.Server
     
     #region Поиск контрагента/НОР.
     
-    public static Structures.Module.MockCounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
     {
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
@@ -895,6 +893,42 @@ namespace Sungero.Capture.Server
       counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
       counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
       return counterparty;
+    }
+    
+    public static IBusinessUnit GetMostProbableBusinessUnit(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+      
+      foreach (var fact in counterpartyFacts)
+      {
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        var bussinesUnits = GetBusinessUnits(tin, trrc);
+        if (bussinesUnits.Any())
+          return bussinesUnits.First();
+      }
+      
+      return null;
+    }
+    
+    public static ICounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+      
+      foreach (var fact in counterpartyFacts)
+      {
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        var counterparties = GetCounterparties(tin, trrc);
+        if (counterparties.Any())
+          return counterparties.First();
+      }
+      
+      return null;
     }
     
     /// <summary>
@@ -912,25 +946,10 @@ namespace Sungero.Capture.Server
       
       // Заполнение контрагентов.
       var facts = сlassificationResult.Facts;
-      var buyerFact = GetMostProbableCounterparty(facts, "BUYER");
-      var sellerFact = GetMostProbableCounterparty(facts, "SELLER");
-      
-      IBusinessUnit buyerBusinessUnit = null;
-      ICounterparty buyerCounterparty = null;
-      IBusinessUnit sellerBusinessUnit = null;
-      ICounterparty sellerCounterparty = null;
-      
-      if (buyerFact != null)
-      {
-        buyerBusinessUnit = GetBusinessUnits(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();
-        buyerCounterparty = GetCounterparties(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();
-      }
-      
-      if (sellerFact != null)
-      {
-        sellerBusinessUnit = GetBusinessUnits(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();
-        sellerCounterparty = GetCounterparties(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();
-      }
+      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
+      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
+      var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
+      var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
       
       // Если не можем однозначно определить НОР, то заполняем ее из ответственного.
       if (buyerBusinessUnit != null && sellerBusinessUnit != null || buyerBusinessUnit == null && sellerBusinessUnit == null)
