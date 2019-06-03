@@ -165,6 +165,7 @@ namespace Sungero.Capture.Server
           foreach (var fact in facts)
           {
             var fields = fact.Fields.Where(f => f != null)
+              .Where(f => f.Probability >= minFactProbability)
               .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
             recognitedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
           }
@@ -300,7 +301,7 @@ namespace Sungero.Capture.Server
     /// <returns>Сотрудник.</returns>
     public static IEmployee GetEmployeeByName(string name)
     {
-      return Employees.GetAll().Where(e => e.Person.ShortName == name || e.Name == name).FirstOrDefault();
+      return Employees.GetAll().Where(x => x.Person.ShortName == name || x.Name == name).FirstOrDefault();
     }
     
     /// <summary>
@@ -884,7 +885,7 @@ namespace Sungero.Capture.Server
     {
       // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
       var correspondentNames = new List<string>();
-      var correspondents = GetFactsWithoutProbability(facts, "Letter", "CorrespondentName")
+      var correspondents = GetFacts(facts, "Letter", "CorrespondentName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
       foreach (var fact in correspondents)
       {
@@ -903,7 +904,7 @@ namespace Sungero.Capture.Server
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
-      var correspondentTINs = GetFactsWithoutProbability(facts, "Counterparty", "TIN")
+      var correspondentTINs = GetFacts(facts, "Counterparty", "TIN")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
       if (!correspondentTINs.Any())
         return foundByName;
@@ -1095,23 +1096,6 @@ namespace Sungero.Capture.Server
     public static List<Structures.Module.Fact> GetFacts(List<Structures.Module.Fact> facts, string factName, string fieldName)
     {
       var minFactProbability = GetMinFactProbability();
-      return facts
-        .Where(f => f.Name == factName)
-        .Where(f => f.Fields.Any(fl => fl.Name == fieldName))
-        .Where(f => f.Fields.Any(fl => fl.Probability >= (decimal)(minFactProbability)))
-        .ToList();
-    }
-    
-    /// <summary>
-    /// Получить список фактов с переданными именем факта и именем поля.
-    /// </summary>
-    /// <param name="facts">Список фактов.</param>
-    /// <param name="factName">Имя факта.</param>
-    /// <param name="fieldName">Имя поля.</param>
-    /// <returns>Список фактов с наибольшей вероятностью.</returns>
-    /// <remarks>Без учета вероятности факта.</remarks>
-    public static List<Structures.Module.Fact> GetFactsWithoutProbability(List<Structures.Module.Fact> facts, string factName, string fieldName)
-    {
       return facts
         .Where(f => f.Name == factName)
         .Where(f => f.Fields.Any(fl => fl.Name == fieldName))
