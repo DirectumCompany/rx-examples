@@ -308,7 +308,13 @@ namespace Sungero.Capture.Server
     /// <returns>Сотрудник.</returns>
     public static IEmployee GetEmployeeByName(string name)
     {
-      return Employees.GetAll().Where(x => x.Person.ShortName == name || x.Name == name).FirstOrDefault();
+      var noBreakSpace = new string('\u00A0', 1);
+      var space = new string('\u0020', 1);
+      
+      return Employees.GetAll()
+        .Where(x => x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == 
+               name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") || x.Name.ToLower() == name.ToLower())
+        .FirstOrDefault();
     }
     
     /// <summary>
@@ -438,6 +444,8 @@ namespace Sungero.Capture.Server
       {
         var addressee = GetFieldValue(fact, "Addressee");
         document.Addressee = GetEmployeeByName(addressee);
+        if (document.Addressee != null)
+          break;
       }
       
       // Заполнить данные нашей стороны.
@@ -522,8 +530,8 @@ namespace Sungero.Capture.Server
       // Заполнить данные нашей стороны.
       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
       {
-        var adressee = GetFieldValue(fact, "Addressee");
-        document.Addressees = string.IsNullOrEmpty(document.Addressees) ? adressee : string.Format("{0}; {1}", document.Addressees, adressee);
+        var addressee = GetFieldValue(fact, "Addressee");
+        document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
       }
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
@@ -1046,21 +1054,21 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="businessUnits">НОР найденные по фактам.</param>
     /// <param name="responsible">Ответственный.</param>
-    /// <param name="adressee">Адресат.</param>
+    /// <param name="addressee">Адресат.</param>
     /// <returns>НОР.</returns>
-    public static Sungero.Company.IBusinessUnit GetBusinessUnit(List<IBusinessUnit> businessUnits, IEmployee responsible, IEmployee adressee)
+    public static Sungero.Company.IBusinessUnit GetBusinessUnit(List<IBusinessUnit> businessUnits, IEmployee responsible, IEmployee addressee)
     {
       // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
-      var businessUnitByAdressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(adressee);
+      var businessUnitByAddressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(addressee);
       Sungero.Company.IBusinessUnit businessUnit = null;
       
       // Попытаться уточнить по адресату.
-      if (businessUnits.Any() && businessUnitByAdressee != null)
-        businessUnit = businessUnitByAdressee;
+      if (businessUnits.Any() && businessUnitByAddressee != null)
+        businessUnit = businessUnitByAddressee;
       else
         businessUnit = businessUnits.FirstOrDefault();
       
-      return businessUnit ?? businessUnitByAdressee ?? Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      return businessUnit ?? businessUnitByAddressee ?? Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
     }
     
     /// <summary>
