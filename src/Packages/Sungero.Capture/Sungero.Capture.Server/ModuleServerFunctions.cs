@@ -15,6 +15,84 @@ namespace Sungero.Capture.Server
 {
   public class ModuleFunctions
   {
+    #region Инициализация.
+    
+    /// <summary>
+    /// Инициализация демо-режима.
+    /// </summary>
+    [Remote]
+    public static void InitCaptureMockMode()
+    {
+      // Создать типы документов.
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterTypeName,
+                                                                              Capture.Server.MockIncomingLetter.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.ContractStatementTypeName,
+                                                                              Capture.Server.MockContractStatement.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.WaybillDocumentTypeName,
+                                                                              Capture.Server.MockWaybill.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Contracts, true);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.IncomingTaxInvoiceTypeName,
+                                                                              Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
+      
+      // Создать виды документов.
+      var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
+                                                                              RecordManagement.Resources.IncomingLetterKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Registrable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
+                                                                              Sungero.Capture.Server.MockIncomingLetter.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingLetterKindGuid);
+
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.ContractStatementKindName,
+                                                                              FinancialArchive.Resources.ContractStatementKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
+                                                                              Capture.Server.MockContractStatement.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockContractStatementKindGuid);
+
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.WaybillDocumentKindName,
+                                                                              FinancialArchive.Resources.WaybillDocumentKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
+                                                                              Sungero.Capture.Server.MockWaybill.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockWaybillKindGuid);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.IncomingTaxInvoiceKindName,
+                                                                              FinancialArchive.Resources.IncomingTaxInvoiceKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
+                                                                              Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingTaxInvoiceGuid);
+      
+      // Добавить параметр признака активации демо-режима.
+      Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
+    }
+    
+    /// <summary>
+    /// Задать основные параметры захвата.
+    /// </summary>
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
+    [Remote]
+    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability)
+    {
+      // Добавить параметр адреса сервиса Ario.
+      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.ArioUrlKey, arioUrl);
+      
+      // Добавить параметр минимальной вероятности для факта.
+      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
+    }
+    
+    #endregion
+    
+    #region Общий процесс обработки захваченных документов.
+    
     /// <summary>
     /// Создать документы в RX и отправить задачу на проверку.
     /// </summary>
@@ -98,7 +176,42 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Определить ведущий документ.
+    /// Создать документ DirectumRX на основе классификации Ario.
+    /// </summary>
+    /// <param name="recognitedDocument">Результат классификации Ario.</param>
+    /// <param name="sourceFileName">Путь до исходного файла, отправленного на распознование.</param>
+    /// <param name="responsible">Ответственный сотрудник.</param>
+    /// <returns>Документ, созданный на основе классификации.</returns>
+    public virtual IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
+                                                                        string sourceFileName,
+                                                                        IEmployee responsible)
+    {
+      // Входящее письмо.
+      var recognitedClass = recognitedDocument.PredictedClass;
+      var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+      if (recognitedClass == Constants.Module.LetterClassName)
+        return isMockMode
+          ? CreateMockIncomingLetter(recognitedDocument)
+          : CreateIncomingLetter(recognitedDocument, responsible);
+      
+      // Акт выполненных работ.
+      if (recognitedClass == Constants.Module.ContractStatementClassName && isMockMode)
+        return CreateMockContractStatement(recognitedDocument);
+      
+      // Товарная накладная.
+      if (recognitedClass == Constants.Module.WaybillClassName && isMockMode)
+        return CreateMockWaybill(recognitedDocument);
+      
+      // Счет-фактура входящая.
+      if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && isMockMode)
+        return CreateMockIncomingTaxInvoice(recognitedDocument);
+      
+      // Все нераспознанные документы создать простыми.
+      return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid, recognitedDocument.Message);
+    }
+    
+    /// <summary>
+    /// Определить ведущий документ распознанного комплекта.
     /// </summary>
     /// <param name="package">Комплект документов.</param>
     /// <returns>Ведущий документ.</returns>
@@ -126,32 +239,15 @@ namespace Sungero.Capture.Server
       return leadingDocument;
     }
     
-    public virtual IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
-                                                                        string sourceFileName,
-                                                                        IEmployee responsible)
+    #endregion
+    
+    #region Фасад DirectumRX.
+    
+    [Public, Remote]
+    public static string GetCurrentTenant()
     {
-      // Входящее письмо.
-      var recognitedClass = recognitedDocument.PredictedClass;
-      var CaptureMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey);
-      if (recognitedClass == Constants.Module.LetterClassName)
-        return CaptureMockMode != null
-          ? CreateMockIncomingLetter(recognitedDocument)
-          : CreateIncomingLetter(recognitedDocument, responsible);
-      
-      // Акт выполненных работ.
-      if (recognitedClass == Constants.Module.ContractStatementClassName && CaptureMockMode != null)
-        return CreateMockContractStatement(recognitedDocument);
-
-      // Товарная накладная.
-      if (recognitedClass == Constants.Module.WaybillClassName && CaptureMockMode != null)
-        return CreateMockWaybill(recognitedDocument);
-
-      // Счет-фактура входящая.
-      if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && CaptureMockMode != null)
-        return CreateMockIncomingTaxInvoice(recognitedDocument);
-      
-      // Все нераспознанные документы создать простыми.
-      return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid, recognitedDocument.Message);
+      var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
+      return currentTenant != null ? currentTenant.Id : string.Empty;
     }
     
     public virtual void RegisterDocument(IOfficialDocument document)
@@ -198,6 +294,75 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить сотрудника по имени.
+    /// </summary>
+    /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
+    /// <returns>Сотрудник.</returns>
+    public static IEmployee GetEmployeeByName(string name)
+    {
+      return Employees.GetAll().Where(e => e.Person.ShortName == name || e.Name == name).FirstOrDefault();
+    }
+    
+    /// <summary>
+    /// Получить подразделение из настроек сотрудника.
+    /// </summary>
+    /// <param name="employee">Сотрудник.</param>
+    /// <returns>Подразделение.</returns>
+    public static Company.IDepartment GetDepartment(Company.IEmployee employee)
+    {
+      if (employee == null)
+        return null;
+      
+      var department = Company.Departments.Null;
+      var settings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(employee);
+      if (settings != null)
+        department = settings.Department;
+      if (department == null)
+        department = employee.Department;
+      return department;
+    }
+    
+    /// <summary>
+    /// Отправить задачу на проверку документов.
+    /// </summary>
+    /// <param name="leadingDocument">Основной документ.</param>
+    /// <param name="documents">Прочие документы.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Простая задача.</returns>
+    [Public, Remote]
+    public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
+    {
+      if (leadingDocument == null)
+        return;
+      
+      var task = SimpleTasks.Create();
+      task.Subject = Resources.CheckPackageTaskNameFormat(leadingDocument);
+      task.ActiveText = Resources.CheckPackageTaskText;
+      var step = task.RouteSteps.AddNew();
+      step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
+      step.Performer = responsible;
+      
+      // Вложить в задачу и выдать права на документы ответственному.
+      leadingDocument.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
+      leadingDocument.Save();
+      task.Attachments.Add(leadingDocument);
+      foreach (var document in documents)
+      {
+        document.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
+        document.Save();
+        task.Attachments.Add(document);
+      }
+      task.NeedsReview = false;
+      task.Deadline = Calendar.Now.AddWorkingHours(4);
+      task.Save();
+      task.Start();
+    }
+    
+    #endregion
+    
+    #region Простой документ.
+    
+    /// <summary>
     /// Создать документ в Rx, тело документа загружается из Арио.
     /// </summary>
     /// <param name="name">Имя документа.</param>
@@ -214,6 +379,10 @@ namespace Sungero.Capture.Server
       document.Save();
       return document;
     }
+    
+    #endregion
+    
+    #region Входящее письмо.
     
     /// <summary>
     /// Создать входящее письмо в RX.
@@ -258,16 +427,6 @@ namespace Sungero.Capture.Server
 
       document.Save();
       return document;
-    }
-    
-    /// <summary>
-    /// Получить сотрудника по имени.
-    /// </summary>
-    /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
-    /// <returns>Сотрудник.</returns>
-    public static IEmployee GetEmployeeByName(string name)
-    {
-      return Employees.GetAll().Where(e => e.Person.ShortName == name || e.Name == name).FirstOrDefault();
     }
     
     /// <summary>
@@ -350,6 +509,10 @@ namespace Sungero.Capture.Server
       
       return document;
     }
+    
+    #endregion
+    
+    #region Акт.
     
     /// <summary>
     /// Создать акт выполненных работ с текстовыми полями.
@@ -446,6 +609,10 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    #endregion
+    
+    #region Накладная.
+    
     /// <summary>
     /// Создать накладную с текстовыми полями.
     /// </summary>
@@ -530,6 +697,10 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    #endregion
+    
+    #region Счет-фактура.
+    
     /// <summary>
     /// Создать счет-фактуру с текстовыми полями.
     /// </summary>
@@ -607,6 +778,10 @@ namespace Sungero.Capture.Server
       
       return document;
     }
+    
+    #endregion
+    
+    #region Поиск контрагента/НОР.
     
     public static Structures.Module.MockCounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
     {
@@ -751,6 +926,95 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить список контрагентов по ИНН/КПП.
+    /// </summary>
+    /// <param name="tin">ИНН.</param>
+    /// <param name="trrc">КПП.</param>
+    /// <returns>Список контрагентов.</returns>
+    public static List<ICounterparty> GetCounterparties(string tin, string trrc)
+    {
+      var searchByTin = !string.IsNullOrWhiteSpace(tin);
+      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
+      
+      if (!searchByTin && !searchByTrrc)
+        return new List<ICounterparty>();
+
+      // Отфильтровать закрытые сущности и копии НОР.
+      var counterparties = Counterparties.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
+      
+      // Поиск по ИНН, если ИНН передан.
+      if (searchByTin)
+      {
+        var strongTinCounterparties = counterparties.Where(x => x.TIN == tin).ToList();
+        
+        // Поиск по КПП, если КПП передан.
+        if (searchByTrrc)
+        {
+          var strongTrrcCompanies = strongTinCounterparties
+            .Where(c => CompanyBases.Is(c))
+            .Where(c => !string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC) && CompanyBases.As(c).TRRC == trrc)
+            .ToList();
+          
+          if (strongTrrcCompanies.Count > 0)
+            return strongTrrcCompanies;
+          
+          return strongTinCounterparties.Where(c => CompanyBases.Is(c) &&
+                                               string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
+        }
+        
+        return strongTinCounterparties;
+      }
+      
+      return counterparties.ToList();
+    }
+    
+    /// <summary>
+    /// Получить список НОР по ИНН/КПП.
+    /// </summary>
+    /// <param name="tin">ИНН.</param>
+    /// <param name="trrc">КПП.</param>
+    /// <returns>Список НОР.</returns>
+    public static List<IBusinessUnit> GetBusinessUnits(string tin, string trrc)
+    {
+      var searchByTin = !string.IsNullOrWhiteSpace(tin);
+      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
+      
+      if (!searchByTin && !searchByTrrc)
+        return new List<IBusinessUnit>();
+
+      // Отфильтровать закрытые НОР.
+      var businessUnits = BusinessUnits.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
+      
+      // Поиск по ИНН, если ИНН передан.
+      if (searchByTin)
+      {
+        var strongTinBusinessUnits = businessUnits.Where(x => x.TIN == tin).ToList();
+        
+        // Поиск по КПП, если КПП передан.
+        if (searchByTrrc)
+        {
+          var strongTrrcBusinessUnits = strongTinBusinessUnits
+            .Where(c => !string.IsNullOrWhiteSpace(c.TRRC) && c.TRRC == trrc)
+            .ToList();
+          
+          if (strongTrrcBusinessUnits.Count > 0)
+            return strongTrrcBusinessUnits;
+        }
+        
+        return strongTinBusinessUnits;
+      }
+      
+      return new List<IBusinessUnit>();
+    }
+    
+    #endregion
+    
+    #region Работа с полями/фктами.
+    
+    /// <summary>
     /// Получить поле из факта.
     /// </summary>
     /// <param name="fact">Имя факта.</param>
@@ -865,225 +1129,6 @@ namespace Sungero.Capture.Server
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
     }
-
-    /// <summary>
-    /// Отправить задачу на проверку документов.
-    /// </summary>
-    /// <param name="leadingDocument">Основной документ.</param>
-    /// <param name="documents">Прочие документы.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Простая задача.</returns>
-    [Public, Remote]
-    public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
-    {
-      if (leadingDocument == null)
-        return;
-      
-      var task = SimpleTasks.Create();
-      task.Subject = Resources.CheckPackageTaskNameFormat(leadingDocument);
-      task.ActiveText = Resources.CheckPackageTaskText;
-      var step = task.RouteSteps.AddNew();
-      step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
-      step.Performer = responsible;
-      
-      // Вложить в задачу и выдать права на документы ответственному.
-      leadingDocument.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
-      leadingDocument.Save();
-      task.Attachments.Add(leadingDocument);
-      foreach (var document in documents)
-      {
-        document.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
-        document.Save();
-        task.Attachments.Add(document);
-      }
-      task.NeedsReview = false;
-      task.Deadline = Calendar.Now.AddWorkingHours(4);
-      task.Save();
-      task.Start();
-    }
-
-    /// <summary>
-    /// Получить подразделение из настроек сотрудника.
-    /// </summary>
-    /// <param name="employee">Сотрудник.</param>
-    /// <returns>Подразделение.</returns>
-    public static Company.IDepartment GetDepartment(Company.IEmployee employee)
-    {
-      if (employee == null)
-        return null;
-      
-      var department = Company.Departments.Null;
-      var settings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(employee);
-      if (settings != null)
-        department = settings.Department;
-      if (department == null)
-        department = employee.Department;
-      return department;
-    }
-
-    [Public, Remote]
-    public static string GetCurrentTenant()
-    {
-      var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
-      return currentTenant != null ? currentTenant.Id : string.Empty;
-    }
-
-    /// <summary>
-    /// Получить список контрагентов по ИНН/КПП.
-    /// </summary>
-    /// <param name="tin">ИНН.</param>
-    /// <param name="trrc">КПП.</param>
-    /// <returns>Список контрагентов.</returns>
-    public static List<ICounterparty> GetCounterparties(string tin, string trrc)
-    {
-      var searchByTin = !string.IsNullOrWhiteSpace(tin);
-      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
-      
-      if (!searchByTin && !searchByTrrc)
-        return new List<ICounterparty>();
-
-      // Отфильтровать закрытые сущности и копии НОР.
-      var counterparties = Counterparties.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
-      
-      // Поиск по ИНН, если ИНН передан.
-      if (searchByTin)
-      {
-        var strongTinCounterparties = counterparties.Where(x => x.TIN == tin).ToList();
-        
-        // Поиск по КПП, если КПП передан.
-        if (searchByTrrc)
-        {
-          var strongTrrcCompanies = strongTinCounterparties
-            .Where(c => CompanyBases.Is(c))
-            .Where(c => !string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC) && CompanyBases.As(c).TRRC == trrc)
-            .ToList();
-          
-          if (strongTrrcCompanies.Count > 0)
-            return strongTrrcCompanies;
-          
-          return strongTinCounterparties.Where(c => CompanyBases.Is(c) &&
-                                               string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
-        }
-        
-        return strongTinCounterparties;
-      }
-      
-      return counterparties.ToList();
-    }
-    
-    /// <summary>
-    /// Получить список НОР по ИНН/КПП.
-    /// </summary>
-    /// <param name="tin">ИНН.</param>
-    /// <param name="trrc">КПП.</param>
-    /// <returns>Список НОР.</returns>
-    public static List<IBusinessUnit> GetBusinessUnits(string tin, string trrc)
-    {
-      var searchByTin = !string.IsNullOrWhiteSpace(tin);
-      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
-      
-      if (!searchByTin && !searchByTrrc)
-        return new List<IBusinessUnit>();
-
-      // Отфильтровать закрытые НОР.
-      var businessUnits = BusinessUnits.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
-      
-      // Поиск по ИНН, если ИНН передан.
-      if (searchByTin)
-      {
-        var strongTinBusinessUnits = businessUnits.Where(x => x.TIN == tin).ToList();
-        
-        // Поиск по КПП, если КПП передан.
-        if (searchByTrrc)
-        {
-          var strongTrrcBusinessUnits = strongTinBusinessUnits
-            .Where(c => !string.IsNullOrWhiteSpace(c.TRRC) && c.TRRC == trrc)
-            .ToList();
-          
-          if (strongTrrcBusinessUnits.Count > 0)
-            return strongTrrcBusinessUnits;
-        }
-        
-        return strongTinBusinessUnits;
-      }
-      
-      return new List<IBusinessUnit>();
-    }
-    
-    /// <summary>
-    /// Инициализация демо-режима.
-    /// </summary>
-    [Remote]
-    public static void InitCaptureMockMode()
-    {
-      // Создать типы документов.
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterTypeName,
-                                                                              Capture.Server.MockIncomingLetter.ClassTypeGuid,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true);
-      
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.ContractStatementTypeName,
-                                                                              Capture.Server.MockContractStatement.ClassTypeGuid,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true);
-      
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.WaybillDocumentTypeName,
-                                                                              Capture.Server.MockWaybill.ClassTypeGuid,
-                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Contracts, true);
-      
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(FinancialArchive.Resources.IncomingTaxInvoiceTypeName,
-                                                                              Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
-                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
-      
-      // Создать виды документов.
-      var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
-                                                                              RecordManagement.Resources.IncomingLetterKindShortName,
-                                                                              Sungero.Docflow.DocumentKind.NumberingType.Registrable,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
-                                                                              Sungero.Capture.Server.MockIncomingLetter.ClassTypeGuid,
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingLetterKindGuid);
-
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.ContractStatementKindName,
-                                                                              FinancialArchive.Resources.ContractStatementKindShortName,
-                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
-                                                                              Capture.Server.MockContractStatement.ClassTypeGuid,
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockContractStatementKindGuid);
-
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.WaybillDocumentKindName,
-                                                                              FinancialArchive.Resources.WaybillDocumentKindShortName,
-                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Contracts, true, false,
-                                                                              Sungero.Capture.Server.MockWaybill.ClassTypeGuid,
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockWaybillKindGuid);
-      
-      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(FinancialArchive.Resources.IncomingTaxInvoiceKindName,
-                                                                              FinancialArchive.Resources.IncomingTaxInvoiceKindShortName,
-                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
-                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
-                                                                              Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
-                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingTaxInvoiceGuid);
-      
-      // Добавить параметр признака активации демо-режима.
-      Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
-    }
-    
-    /// <summary>
-    /// Задать основные параметры захвата.
-    /// </summary>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
-    [Remote]
-    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability)
-    {
-      // Добавить параметр адреса сервиса Ario.
-      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.ArioUrlKey, arioUrl);
-      
-      // Добавить параметр минимальной вероятности для факта.
-      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
-    }
     
     /// <summary>
     /// Получить значение минимальной вероятности доверия факту.
@@ -1155,5 +1200,7 @@ namespace Sungero.Capture.Server
       double.TryParse(field, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out result);
       return result;
     }
+    
+    #endregion
   }
 }
