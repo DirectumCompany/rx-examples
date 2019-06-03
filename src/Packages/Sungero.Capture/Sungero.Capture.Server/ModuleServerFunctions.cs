@@ -210,7 +210,7 @@ namespace Sungero.Capture.Server
         return CreateMockIncomingTaxInvoice(recognizedDocument);
       
       // УПД.
-      if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && isMockMode)
+      if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
         return CreateUniversalTransferDocument(recognizedDocument, responsible);
       
       // Все нераспознанные документы создать простыми.
@@ -271,7 +271,7 @@ namespace Sungero.Capture.Server
       
       // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
       document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
-        Environment.NewLine + document.Note;            
+        Environment.NewLine + document.Note;
     }
     
     /// <summary>
@@ -909,9 +909,9 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = сlassificationResult.Facts;
       
       // Заполнение контрагентов.
+      var facts = сlassificationResult.Facts;
       var buyerFact = GetMostProbableCounterparty(facts, "BUYER");
       var sellerFact = GetMostProbableCounterparty(facts, "SELLER");
       
@@ -919,21 +919,21 @@ namespace Sungero.Capture.Server
       ICounterparty buyerCounterparty = null;
       IBusinessUnit sellerBusinessUnit = null;
       ICounterparty sellerCounterparty = null;
-            
+      
       if (buyerFact != null)
       {
         buyerBusinessUnit = GetBusinessUnits(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();
-        buyerCounterparty = GetCounterparties(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();       
+        buyerCounterparty = GetCounterparties(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();
       }
       
       if (sellerFact != null)
       {
-        sellerBusinessUnit = GetBusinessUnits(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();        
-        sellerCounterparty = GetCounterparties(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();        
+        sellerBusinessUnit = GetBusinessUnits(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();
+        sellerCounterparty = GetCounterparties(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();
       }
       
       // Если не можем однозначно определить НОР, то заполняем ее из ответственного.
-      if ((buyerBusinessUnit != null && sellerBusinessUnit != null) || (buyerBusinessUnit == null && sellerBusinessUnit == null))
+      if (buyerBusinessUnit != null && sellerBusinessUnit != null || buyerBusinessUnit == null && sellerBusinessUnit == null)
       {
         document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       }
@@ -1288,7 +1288,7 @@ namespace Sungero.Capture.Server
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
     }
-                    
+    
     /// Получить значение минимальной вероятности доверия факту.
     /// </summary>
     /// <returns>Минимальная вероятность доверия факту.</returns>
