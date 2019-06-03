@@ -243,8 +243,8 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить данные нашей стороны.
-      document.BusinessUnit = GetBusinessUnit(facts, responsible, document.Addressee);
-      
+      var businessUnits = GetBusinessUnitsByFacts(facts);
+      document.BusinessUnit = GetBusinessUnit(businessUnits, responsible, document.Addressee);
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
         : GetDepartment(responsible);
@@ -681,23 +681,23 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Поиск НОР по извлеченным фактам.
     /// </summary>
-    /// <param name="facts">Список фактов.</param>
+    /// <param name="businessUnits">НОР найденные по фактам.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <param name="adressee">Адресат.</param>
     /// <returns>НОР.</returns>
-    public static Sungero.Company.IBusinessUnit GetBusinessUnit(List<Structures.Module.Fact> facts, IEmployee responsible, IEmployee adressee)
+    public static Sungero.Company.IBusinessUnit GetBusinessUnit(List<IBusinessUnit> businessUnits, IEmployee responsible, IEmployee adressee)
     {
       // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
-      var businessUnitByAdressee = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(adressee);
+      var businessUnitByAdressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(adressee);
       Sungero.Company.IBusinessUnit businessUnit = null;
       
-      var businessUnits = GetBusinessUnits(facts);
       // Попытаться уточнить по адресату.
       if (businessUnits.Any() && businessUnitByAdressee != null)
-        businessUnit = businessUnits.FindAll(x => x.Equals(businessUnitByAdressee)).FirstOrDefault();
-
-      businessUnit = businessUnit != null ? businessUnit : businessUnits.FirstOrDefault();
-      var businessUnitByEmployee = adressee != null ? businessUnitByAdressee : Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+        businessUnit = businessUnitByAdressee;
+      else
+        businessUnit = businessUnits.FirstOrDefault();
       
-      return businessUnit != null ? businessUnit : businessUnitByEmployee;
+      return businessUnit ?? businessUnitByAdressee ?? Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
     }
     
     /// <summary>
@@ -705,7 +705,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts">Список фактов.</param>
     /// <returns>НОР.</returns>
-    public static List<Sungero.Company.IBusinessUnit> GetBusinessUnits(List<Structures.Module.Fact> facts)
+    public static List<Sungero.Company.IBusinessUnit> GetBusinessUnitsByFacts(List<Structures.Module.Fact> facts)
     {
       // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
       var correspondentNames = new List<string>();
