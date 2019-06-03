@@ -154,6 +154,23 @@ namespace Sungero.Capture.Server
       return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid, recognitedDocument.Message);
     }
     
+    public virtual void RegisterDocument(IOfficialDocument document)
+    {
+      // Присвоить номер, если вид документа - нумеруемый.
+      var number = document.RegistrationNumber;
+      var date = document.RegistrationDate;
+      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable)
+      {
+        var isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, number, date);
+        if (isRegistered)
+          return;
+      }
+      
+      // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
+      document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
+        Environment.NewLine + document.Note;
+    }
+    
     /// <summary>
     /// Получить значение параметра из docflow_params.
     /// </summary>
