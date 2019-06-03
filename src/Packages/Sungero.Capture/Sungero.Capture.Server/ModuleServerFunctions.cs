@@ -270,8 +270,9 @@ namespace Sungero.Capture.Server
       }
       
       // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
-      document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
-        Environment.NewLine + document.Note;
+      if (date != null && string.IsNullOrWhiteSpace(number))
+        document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
+          Environment.NewLine + document.Note;
     }
     
     /// <summary>
@@ -561,9 +562,7 @@ namespace Sungero.Capture.Server
       document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
       // Дата и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
-      document.RegistrationDate = date;
+      document.RegistrationDate = GetFieldDateTimeValue(facts, "Document", "Date");
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагентов по типу.
@@ -656,9 +655,7 @@ namespace Sungero.Capture.Server
       document.LeadingDocument = GetLeadingDocument(leadingDocNames.FirstOrDefault());
       
       // Дата и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
-      document.RegistrationDate = date;
+      document.RegistrationDate = GetFieldDateTimeValue(facts, "Document", "Date");
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагента/НОР по типу.
@@ -761,9 +758,7 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить дату и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
+      document.RegistrationDate = GetFieldDateTimeValue(facts, "FinancialDocument", "Date");
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       
       // Заполнить сумму и валюту.
@@ -843,9 +838,7 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить дату и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
+      document.RegistrationDate = GetFieldDateTimeValue(facts, "FinancialDocument", "Date");
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       document.IsAdjustment = false;
       
@@ -976,9 +969,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Заполнить дату и номер.
-      DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
+      document.RegistrationDate = GetFieldDateTimeValue(facts, "FinancialDocument", "Date");
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       document.IsAdjustment = false;
       
@@ -1279,6 +1270,25 @@ namespace Sungero.Capture.Server
     {
       var field = GetFieldValue(facts, factName, fieldName);
       return ConvertStringToDouble(field);
+    }
+    
+    /// <summary>
+    /// Получить значение поля типа DateTime из фактов.
+    /// </summary>
+    /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
+    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
+    /// <returns>Значение поля типа DateTime.</returns>
+    public static DateTime? GetFieldDateTimeValue(List<Structures.Module.Fact> facts, string factName, string fieldName)
+    {
+      var recognizedDate = GetFieldValue(facts, factName, fieldName);
+      if (string.IsNullOrWhiteSpace(recognizedDate))
+        return null;
+      
+      DateTime date;
+      if (Calendar.TryParseDate(recognizedDate, out date))
+        return date;
+      else
+        return null;
     }
     
     /// <summary>
