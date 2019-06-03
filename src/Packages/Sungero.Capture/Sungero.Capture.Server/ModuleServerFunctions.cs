@@ -196,7 +196,7 @@ namespace Sungero.Capture.Server
           : CreateIncomingLetter(recognizedDocument, responsible);
       
       // Акт выполненных работ.
-      if (recognizedClass == Constants.Module.ContractStatementClassName && isMockMode)
+      if (recognizedClass == Constants.Module.ContractStatementClassName)
         return isMockMode
           ? CreateMockContractStatement(recognizedDocument)
           : CreateContractStatement(recognizedDocument);
@@ -642,7 +642,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public static Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
+    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
     {
       var document = FinancialArchive.ContractStatements.Create();
       
@@ -698,8 +698,7 @@ namespace Sungero.Capture.Server
       document.CreateVersionFrom(documentBody, "pdf");
       
       // Регистрация.
-      var module = new ModuleFunctions();
-      module.RegisterDocument(document);
+      RegisterDocument(document);
       
       return document;
     }
@@ -937,7 +936,7 @@ namespace Sungero.Capture.Server
     /// <param name="сlassificationResult">Результат обработки УПД в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public static Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument сlassificationResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument сlassificationResult, IEmployee responsible)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       
@@ -991,6 +990,9 @@ namespace Sungero.Capture.Server
       
       var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Регистрация.
+      RegisterDocument(document);
       
       return document;
     }
