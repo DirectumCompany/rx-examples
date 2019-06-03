@@ -266,6 +266,10 @@ namespace Sungero.Capture.Server
       // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
       document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
         Environment.NewLine + document.Note;
+      // УПД.
+      if (recognitedClass == Constants.Module.UniversalTransferDocumentClassName && CaptureMockMode != null)
+        return CreateUniversalTransferDocument(recognitedDocument, responsible);
+      
     }
     
     /// <summary>
@@ -802,6 +806,85 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Создать УПД.
+    /// </summary>
+    /// <param name="сlassificationResult">Результат обработки УПД в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns></returns>
+    public static Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
+    {
+      var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = сlassificationResult.Facts;
+      
+      // Заполнение контрагентов.
+      var buyerFact = GetMostProbableCounterparty(facts, "BUYER");
+      var sellerFact = GetMostProbableCounterparty(facts, "SELLER");
+      
+      IBusinessUnit buyerBusinessUnit = null;
+      ICounterparty buyerCounterparty = null;
+      IBusinessUnit sellerBusinessUnit = null;
+      ICounterparty sellerCounterparty = null;
+            
+      if (buyerFact != null)
+      {
+        buyerBusinessUnit = GetBusinessUnits(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();
+        buyerCounterparty = GetCounterparties(buyerFact.Tin, buyerFact.Trrc).FirstOrDefault();       
+      }
+      
+      if (sellerFact != null)
+      {
+        sellerBusinessUnit = GetBusinessUnits(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();        
+        sellerCounterparty = GetCounterparties(sellerFact.Tin, sellerFact.Trrc).FirstOrDefault();        
+      }
+      
+      // Если не можем однозначно определить НОР, то заполняем ее из ответственного.
+      if ((buyerBusinessUnit != null && sellerBusinessUnit != null) || (buyerBusinessUnit == null && sellerBusinessUnit == null))
+      {
+        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      }
+      else
+      {
+        document.BusinessUnit = buyerBusinessUnit ?? sellerBusinessUnit;
+      }
+      
+      // Если не можем однозначно определить контрагента, то выбираем его методом исключения.
+      if (buyerCounterparty != null && sellerCounterparty != null)
+      {
+        if (document.BusinessUnit == buyerBusinessUnit)
+          document.Counterparty = sellerCounterparty;
+        else if (document.BusinessUnit == sellerBusinessUnit)
+          document.Counterparty = buyerCounterparty;
+      }
+      else
+      {
+        document.Counterparty = buyerCounterparty ?? sellerCounterparty;
+      }
+      
+      document.ResponsibleEmployee = responsible;
+      
+      // Заполнить дату и номер.
+      DateTime date;
+      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
+      document.RegistrationDate = date;
+      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      document.IsAdjustment = false;
+      
+      // Заполнить сумму и валюту.
+      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
+      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      document.Save();
+      
+      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      return document;
+    }
+    
+    /// <summary>
     /// Поиск корреспондента по извлеченным фактам.
     /// </summary>
     /// <param name="facts">Список фактов.</param>
@@ -1115,6 +1198,49 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+      return new List<ICounterparty>();
+    }
+    
+    /// <summary>
+    /// Получить список НОР по ИНН/КПП.
+    /// </summary>
+    /// <param name="tin">ИНН.</param>
+    /// <param name="trrc">КПП.</param>
+    /// <returns></returns>
+    public static List<IBusinessUnit> GetBusinessUnits(string tin, string trrc)
+    {
+      var searchByTin = !string.IsNullOrWhiteSpace(tin);
+      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
+      
+      if (!searchByTin && !searchByTrrc)
+        return new List<IBusinessUnit>();
+
+      // Отфильтровать закрытые сущности.
+      var businessUnits = BusinessUnits.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
+      
+      // Поиск по ИНН, если ИНН передан.
+      if (searchByTin)
+      {
+        var strongTinBusinessUnits = businessUnits.Where(x => x.TIN == tin).ToList();
+        
+        // Поиск по КПП, если КПП передан.
+        if (searchByTrrc)
+        {
+          var strongTrrcBusinessUnits = strongTinBusinessUnits
+            .Where(bu => !string.IsNullOrWhiteSpace(bu.TRRC) && bu.TRRC == trrc)
+            .ToList();
+          
+          if (strongTrrcBusinessUnits.Count > 0)
+            return strongTrrcBusinessUnits;
+          
+          return strongTinBusinessUnits.Where(c => string.IsNullOrWhiteSpace(c.TRRC)).ToList();
+        }
+        
+        return strongTinBusinessUnits;
+      }
+      
+      return new List<IBusinessUnit>();
     /// Получить значение минимальной вероятности доверия факту.
     /// </summary>
     /// <returns>Минимальная вероятность доверия факту.</returns>
