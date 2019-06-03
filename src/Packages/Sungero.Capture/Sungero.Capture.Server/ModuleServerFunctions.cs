@@ -87,7 +87,6 @@ namespace Sungero.Capture.Server
           foreach (var fact in facts)
           {
             var fields = fact.Fields.Where(f => f != null)
-              .Where(f => f.Probability >= minFactProbability)
               .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
             recognitedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
           }
@@ -227,7 +226,7 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить данные нашей стороны.
-      document.BusinessUnit = GetBusinessUnit(facts, document.Addressee, responsible);
+      document.BusinessUnit = GetBusinessUnit(facts, responsible, document.Addressee);
       
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
