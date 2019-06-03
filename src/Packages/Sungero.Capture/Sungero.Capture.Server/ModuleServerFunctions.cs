@@ -207,6 +207,10 @@ namespace Sungero.Capture.Server
       if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName && isMockMode)
         return CreateMockIncomingTaxInvoice(recognizedDocument);
       
+      // УПД.
+      if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && isMockMode)
+        return CreateUniversalTransferDocument(recognizedDocument, responsible);
+      
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognizedDocument.BodyGuid, recognizedDocument.Message);
     }
@@ -265,11 +269,7 @@ namespace Sungero.Capture.Server
       
       // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
       document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
-        Environment.NewLine + document.Note;
-      // УПД.
-      if (recognitedClass == Constants.Module.UniversalTransferDocumentClassName && CaptureMockMode != null)
-        return CreateUniversalTransferDocument(recognitedDocument, responsible);
-      
+        Environment.NewLine + document.Note;            
     }
     
     /// <summary>
@@ -811,7 +811,7 @@ namespace Sungero.Capture.Server
     /// <param name="сlassificationResult">Результат обработки УПД в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public static Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognitedDocument сlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument сlassificationResult, IEmployee responsible)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       
@@ -1196,51 +1196,7 @@ namespace Sungero.Capture.Server
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
     }
-    
-    /// <summary>
-      return new List<ICounterparty>();
-    }
-    
-    /// <summary>
-    /// Получить список НОР по ИНН/КПП.
-    /// </summary>
-    /// <param name="tin">ИНН.</param>
-    /// <param name="trrc">КПП.</param>
-    /// <returns></returns>
-    public static List<IBusinessUnit> GetBusinessUnits(string tin, string trrc)
-    {
-      var searchByTin = !string.IsNullOrWhiteSpace(tin);
-      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
-      
-      if (!searchByTin && !searchByTrrc)
-        return new List<IBusinessUnit>();
-
-      // Отфильтровать закрытые сущности.
-      var businessUnits = BusinessUnits.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
-      
-      // Поиск по ИНН, если ИНН передан.
-      if (searchByTin)
-      {
-        var strongTinBusinessUnits = businessUnits.Where(x => x.TIN == tin).ToList();
-        
-        // Поиск по КПП, если КПП передан.
-        if (searchByTrrc)
-        {
-          var strongTrrcBusinessUnits = strongTinBusinessUnits
-            .Where(bu => !string.IsNullOrWhiteSpace(bu.TRRC) && bu.TRRC == trrc)
-            .ToList();
-          
-          if (strongTrrcBusinessUnits.Count > 0)
-            return strongTrrcBusinessUnits;
-          
-          return strongTinBusinessUnits.Where(c => string.IsNullOrWhiteSpace(c.TRRC)).ToList();
-        }
-        
-        return strongTinBusinessUnits;
-      }
-      
-      return new List<IBusinessUnit>();
+                    
     /// Получить значение минимальной вероятности доверия факту.
     /// </summary>
     /// <returns>Минимальная вероятность доверия факту.</returns>
