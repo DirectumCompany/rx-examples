@@ -9,7 +9,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Распознанный в Ario документ.
   /// </summary>
-  partial class RecognitedDocument
+  partial class RecognizedDocument
   {
     public int ClassificationResultId { get; set; }
     public string BodyGuid { get; set; }

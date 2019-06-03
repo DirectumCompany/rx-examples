@@ -103,11 +103,11 @@ namespace Sungero.Capture.Server
     public virtual void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
     {
       // Создать документы по распознанным данным.
-      var recognitedDocuments = GetRecognitedDocuments(jsonClassificationResults);
+      var recognizedDocuments = GetRecognizedDocuments(jsonClassificationResults);
       var package = new List<IOfficialDocument>();
-      foreach (var recognitedDocument in recognitedDocuments)
+      foreach (var recognizedDocument in recognizedDocuments)
       {
-        var document = CreateDocumentByRecognitedDocument(recognitedDocument, sourceFileName, responsible);
+        var document = CreateDocumentByRecognizedDocument(recognizedDocument, sourceFileName, responsible);
         package.Add(document);
       }
       
@@ -140,21 +140,21 @@ namespace Sungero.Capture.Server
       SendToResponsible(leadingDocument, addendums, responsible);
     }
     
-    public virtual List<Structures.Module.RecognitedDocument> GetRecognitedDocuments(string jsonClassificationResults)
+    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults)
     {
-      var recognitedDocuments = new List<RecognitedDocument>();
+      var recognizedDocuments = new List<RecognizedDocument>();
       var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
       foreach (var packageProcessResult in packageProcessResults)
       {
         // Класс и гуид тела документа.
-        var recognitedDocument = RecognitedDocument.Create();
+        var recognizedDocument = RecognizedDocument.Create();
         var clsResult = packageProcessResult.ClassificationResult;
-        recognitedDocument.ClassificationResultId = clsResult.Id;
-        recognitedDocument.BodyGuid = clsResult.DocumentGuid;
-        recognitedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
-        recognitedDocument.Message = packageProcessResult.Message;
+        recognizedDocument.ClassificationResultId = clsResult.Id;
+        recognizedDocument.BodyGuid = clsResult.DocumentGuid;
+        recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
+        recognizedDocument.Message = packageProcessResult.Message;
         // Факты и поля фактов.
-        recognitedDocument.Facts = new List<Fact>();
+        recognizedDocument.Facts = new List<Fact>();
         var minFactProbability = GetMinFactProbability();
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
@@ -167,48 +167,48 @@ namespace Sungero.Capture.Server
             var fields = fact.Fields.Where(f => f != null)
               .Where(f => f.Probability >= minFactProbability)
               .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
-            recognitedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
+            recognizedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
           }
         }
         
-        recognitedDocuments.Add(recognitedDocument);
+        recognizedDocuments.Add(recognizedDocument);
       }
-      return recognitedDocuments;
+      return recognizedDocuments;
     }
     
     /// <summary>
     /// Создать документ DirectumRX на основе классификации Ario.
     /// </summary>
-    /// <param name="recognitedDocument">Результат классификации Ario.</param>
+    /// <param name="recognizedDocument">Результат классификации Ario.</param>
     /// <param name="sourceFileName">Путь до исходного файла, отправленного на распознование.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
-    public virtual IOfficialDocument CreateDocumentByRecognitedDocument(Structures.Module.RecognitedDocument recognitedDocument,
+    public virtual IOfficialDocument CreateDocumentByRecognizedDocument(Structures.Module.RecognizedDocument recognizedDocument,
                                                                         string sourceFileName,
                                                                         IEmployee responsible)
     {
       // Входящее письмо.
-      var recognitedClass = recognitedDocument.PredictedClass;
+      var recognizedClass = recognizedDocument.PredictedClass;
       var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
-      if (recognitedClass == Constants.Module.LetterClassName)
+      if (recognizedClass == Constants.Module.LetterClassName)
         return isMockMode
-          ? CreateMockIncomingLetter(recognitedDocument)
-          : CreateIncomingLetter(recognitedDocument, responsible);
+          ? CreateMockIncomingLetter(recognizedDocument)
+          : CreateIncomingLetter(recognizedDocument, responsible);
       
       // Акт выполненных работ.
-      if (recognitedClass == Constants.Module.ContractStatementClassName && isMockMode)
-        return CreateMockContractStatement(recognitedDocument);
+      if (recognizedClass == Constants.Module.ContractStatementClassName && isMockMode)
+        return CreateMockContractStatement(recognizedDocument);
       
       // Товарная накладная.
-      if (recognitedClass == Constants.Module.WaybillClassName && isMockMode)
-        return CreateMockWaybill(recognitedDocument);
+      if (recognizedClass == Constants.Module.WaybillClassName && isMockMode)
+        return CreateMockWaybill(recognizedDocument);
       
       // Счет-фактура входящая.
-      if (recognitedClass == Constants.Module.IncomingTaxInvoiceClassName && isMockMode)
-        return CreateMockIncomingTaxInvoice(recognitedDocument);
+      if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName && isMockMode)
+        return CreateMockIncomingTaxInvoice(recognizedDocument);
       
       // Все нераспознанные документы создать простыми.
-      return CreateSimpleDocument(sourceFileName, recognitedDocument.BodyGuid, recognitedDocument.Message);
+      return CreateSimpleDocument(sourceFileName, recognizedDocument.BodyGuid, recognizedDocument.Message);
     }
     
     /// <summary>
@@ -391,7 +391,7 @@ namespace Sungero.Capture.Server
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.RecognitedDocument letterсlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.RecognizedDocument letterсlassificationResult, IEmployee responsible)
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.RecordManagement.IncomingLetters.Create();
@@ -435,7 +435,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="letterClassificationResult">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognitedDocument letterClassificationResult)
+    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognizedDocument letterClassificationResult)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
       
@@ -520,7 +520,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognitedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       
@@ -619,7 +619,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки накладной в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.RecognitedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.RecognizedDocument сlassificationResult)
     {
       var document = Sungero.Capture.MockWaybills.Create();
       
@@ -707,7 +707,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.RecognitedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.RecognizedDocument сlassificationResult)
     {
       var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
       
