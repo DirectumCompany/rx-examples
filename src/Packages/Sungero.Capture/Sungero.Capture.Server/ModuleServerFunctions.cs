@@ -199,7 +199,7 @@ namespace Sungero.Capture.Server
       if (recognizedClass == Constants.Module.ContractStatementClassName)
         return isMockMode
           ? CreateMockContractStatement(recognizedDocument)
-          : CreateContractStatement(recognizedDocument);
+          : CreateContractStatement(recognizedDocument, responsible);
       
       // Товарная накладная.
       if (recognizedClass == Constants.Module.WaybillClassName && isMockMode)
@@ -649,7 +649,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
+    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument сlassificationResult, IEmployee responsible)
     {
       var document = FinancialArchive.ContractStatements.Create();
       
@@ -693,6 +693,13 @@ namespace Sungero.Capture.Server
             document.BusinessUnit = businessUnit;
         }
       }
+      
+      if (document.BusinessUnit == null)
+        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      
+      // Подразделение и ответственный.
+      document.Department = GetDepartment(responsible);
+      document.ResponsibleEmployee = responsible;
       
       // Заполнить сумму и валюту.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
@@ -891,36 +898,18 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
-      // Заполнение контрагентов.
+      // Заполнение НОР и контрагентов.
       var facts = сlassificationResult.Facts;
       var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
       var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
       var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
       var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
+      document.BusinessUnit = buyerBusinessUnit ?? sellerBusinessUnit ??
+        Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      document.Counterparty = sellerCounterparty ?? buyerCounterparty;
       
-      // Если не можем однозначно определить НОР, то заполняем ее из ответственного.
-      if (buyerBusinessUnit != null && sellerBusinessUnit != null || buyerBusinessUnit == null && sellerBusinessUnit == null)
-      {
-        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-      }
-      else
-      {
-        document.BusinessUnit = buyerBusinessUnit ?? sellerBusinessUnit;
-      }
-      
-      // Если не можем однозначно определить контрагента, то выбираем его методом исключения.
-      if (buyerCounterparty != null && sellerCounterparty != null)
-      {
-        if (document.BusinessUnit == buyerBusinessUnit)
-          document.Counterparty = sellerCounterparty;
-        else if (document.BusinessUnit == sellerBusinessUnit)
-          document.Counterparty = buyerCounterparty;
-      }
-      else
-      {
-        document.Counterparty = buyerCounterparty ?? sellerCounterparty;
-      }
-      
+      // Подразделение и ответственный.
+      document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Заполнить дату и номер.
@@ -1213,7 +1202,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Работа с полями/фктами
+    #region Работа с полями/фактами
     
     /// <summary>
     /// Получить поле из факта.
