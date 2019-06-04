@@ -1202,7 +1202,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Работа с полями/фктами
+    #region Работа с полями/фактами
     
     /// <summary>
     /// Получить поле из факта.
