@@ -117,4 +117,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ControlGroup_15ab389baa1e482f87fccc3b3a47baba" xml:space="preserve">
+    <value>From</value>
+  </data>
+  <data name="ControlGroup_76e06a199bba4365ae0a43b3489d12f6" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_528df05b1e894790a07828cb21b285bf" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="ControlGroup_f02df9b976e0493ba6490a86ebe42df9" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="ControlGroup_ecf8f14df20b422888d7aeb82a4fee27" xml:space="preserve">
+    <value>To</value>
+  </data>
 </root>

@@ -15,7 +15,7 @@ namespace Sungero.Capture.Server
 {
   public class ModuleFunctions
   {
-    #region Инициализация.
+    #region Инициализация
     
     /// <summary>
     /// Инициализация демо-режима.
@@ -91,7 +91,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Общий процесс обработки захваченных документов.
+    #region Общий процесс обработки захваченных документов
     
     /// <summary>
     /// Создать документы в RX и отправить задачу на проверку.
@@ -248,7 +248,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Фасад DirectumRX.
+    #region Фасад DirectumRX
     
     [Public, Remote]
     public static string GetCurrentTenant()
@@ -312,7 +312,7 @@ namespace Sungero.Capture.Server
       var space = new string('\u0020', 1);
       
       return Employees.GetAll()
-        .Where(x => x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == 
+        .Where(x => x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") ==
                name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") || x.Name.ToLower() == name.ToLower())
         .FirstOrDefault();
     }
@@ -395,7 +395,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Простой документ.
+    #region Простой документ
     
     /// <summary>
     /// Создать документ в Rx, тело документа загружается из Арио.
@@ -417,7 +417,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Входящее письмо.
+    #region Входящее письмо
     
     /// <summary>
     /// Создать входящее письмо в RX.
@@ -549,7 +549,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Акт.
+    #region Акт
     
     /// <summary>
     /// Создать акт выполненных работ (демо режим).
@@ -710,7 +710,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Накладная.
+    #region Накладная
     
     /// <summary>
     /// Создать накладную с текстовыми полями.
@@ -796,7 +796,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Счет-фактура.
+    #region Счет-фактура
     
     /// <summary>
     /// Создать счет-фактуру с текстовыми полями.
@@ -876,60 +876,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Поиск контрагента/НОР.
-    
-    public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
-    {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      
-      if (mostProbabilityFact == null)
-        return null;
-
-      var counterparty = Structures.Module.MockCounterparty.Create();
-      counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
-      counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
-      counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
-      return counterparty;
-    }
-    
-    public static IBusinessUnit GetMostProbableBusinessUnit(List<Structures.Module.Fact> facts, string counterpartyType)
-    {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
-      
-      foreach (var fact in counterpartyFacts)
-      {
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        var bussinesUnits = GetBusinessUnits(tin, trrc);
-        if (bussinesUnits.Any())
-          return bussinesUnits.First();
-      }
-      
-      return null;
-    }
-    
-    public static ICounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
-    {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
-      
-      foreach (var fact in counterpartyFacts)
-      {
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        var counterparties = GetCounterparties(tin, trrc);
-        if (counterparties.Any())
-          return counterparties.First();
-      }
-      
-      return null;
-    }
+    #region УПД
     
     /// <summary>
     /// Создать УПД.
@@ -995,6 +942,64 @@ namespace Sungero.Capture.Server
       
       return document;
     }
+    
+    #endregion
+    
+    #region Поиск контрагента/НОР
+    
+    public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
+        .FirstOrDefault();
+      
+      if (mostProbabilityFact == null)
+        return null;
+
+      var counterparty = Structures.Module.MockCounterparty.Create();
+      counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
+      counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
+      counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
+      return counterparty;
+    }
+    
+    public static IBusinessUnit GetMostProbableBusinessUnit(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+      
+      foreach (var fact in counterpartyFacts)
+      {
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        var bussinesUnits = GetBusinessUnits(tin, trrc);
+        if (bussinesUnits.Any())
+          return bussinesUnits.First();
+      }
+      
+      return null;
+    }
+    
+    public static ICounterparty GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+      
+      foreach (var fact in counterpartyFacts)
+      {
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        var counterparties = GetCounterparties(tin, trrc);
+        if (counterparties.Any())
+          return counterparties.First();
+      }
+      
+      return null;
+    }
+    
     
     /// <summary>
     /// Поиск корреспондента по извлеченным фактам.
@@ -1208,7 +1213,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Работа с полями/фктами.
+    #region Работа с полями/фктами
     
     /// <summary>
     /// Получить поле из факта.
