@@ -1054,13 +1054,11 @@ namespace Sungero.Capture.Server
     {
       // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
       var businessUnitByAddressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(addressee);
-      Sungero.Company.IBusinessUnit businessUnit = null;
       
       // Попытаться уточнить по адресату.
-      if (businessUnits.Any() && businessUnitByAddressee != null)
-        businessUnit = businessUnitByAddressee;
-      else
-        businessUnit = businessUnits.FirstOrDefault();
+      var businessUnit = businessUnits.Any() && businessUnitByAddressee != null
+        ? businessUnitByAddressee
+        : businessUnits.FirstOrDefault();
       
       return businessUnit ?? businessUnitByAddressee ?? Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
     }
@@ -1102,7 +1100,12 @@ namespace Sungero.Capture.Server
         // Поиск по ИНН/КПП.
         var foundByTin = new List<IBusinessUnit>();
         foreach (var fact in correspondentTINs)
-          foundByTin.AddRange(GetBusinessUnits(GetFieldValue(fact, "TIN"), GetFieldValue(fact, "TRRC")));
+        {
+          var tin = GetFieldValue(fact, "TIN");
+          var trrc = GetFieldValue(fact, "TRRC");
+          var businessUnits = GetBusinessUnits(tin, trrc);
+          foundByTin.AddRange(businessUnits);
+        }
         
         // Найдено по ИНН/КПП.
         if (foundByTin.Any())
