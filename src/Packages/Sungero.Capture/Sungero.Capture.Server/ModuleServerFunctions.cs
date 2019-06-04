@@ -153,6 +153,12 @@ namespace Sungero.Capture.Server
         recognizedDocument.BodyGuid = clsResult.DocumentGuid;
         recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognizedDocument.Message = packageProcessResult.Message;
+        var docInfo = DocumentRecognitionInfos.Create();
+        docInfo.Name = recognizedDocument.PredictedClass;
+        docInfo.RecognizedClass = recognizedDocument.PredictedClass;
+        if (clsResult.PredictedProbability != null)
+          docInfo.ClassProbability = (double)(clsResult.PredictedProbability);
+        
         // Факты и поля фактов.
         recognizedDocument.Facts = new List<Fact>();
         var minFactProbability = GetMinFactProbability();
@@ -168,9 +174,21 @@ namespace Sungero.Capture.Server
               .Where(f => f.Probability >= minFactProbability)
               .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
             recognizedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
+            
+            foreach (var factField in fact.Fields)
+            {
+              var fieldInfo = docInfo.Facts.AddNew();
+              fieldInfo.FactId = fact.Id;
+              fieldInfo.FieldId = factField.Id;
+              fieldInfo.FactName = fact.Name;
+              fieldInfo.FieldName = factField.Name;
+              fieldInfo.FieldValue = factField.Value;
+              fieldInfo.FieldProbability = factField.Probability;
+            }
           }
         }
-        
+        docInfo.Save();
+        recognizedDocument.Info = docInfo;
         recognizedDocuments.Add(recognizedDocument);
       }
       return recognizedDocuments;

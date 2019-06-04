@@ -16,6 +16,7 @@ namespace Sungero.Capture.Structures.Module
     public string PredictedClass { get; set; }
     public List<Sungero.Capture.Structures.Module.Fact> Facts { get; set; }
     public string Message { get; set; }
+    public IDocumentRecognitionInfo Info { get; set; }
   }
   
   /// <summary>
