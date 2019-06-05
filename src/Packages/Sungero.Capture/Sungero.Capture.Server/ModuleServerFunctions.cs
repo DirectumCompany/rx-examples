@@ -489,10 +489,14 @@ namespace Sungero.Capture.Server
       // Адресат.
       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
       {
-        var addressee = GetFieldValue(fact, "Addressee");
+        var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
+        var addressee = GetFieldValue(addresseeFact, "Addressee");
         document.Addressee = GetEmployeeByName(addressee);
         if (document.Addressee != null)
+        {
+          LinkFactAndProperty(recognizedDocument, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee); 
           break;
+        }
       }
       
       // Заполнить данные нашей стороны.
