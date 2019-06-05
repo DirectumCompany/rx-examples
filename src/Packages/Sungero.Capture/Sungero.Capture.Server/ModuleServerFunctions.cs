@@ -503,8 +503,8 @@ namespace Sungero.Capture.Server
       var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
       document.Dated = GetFieldDateTimeValue(dateFact, "Date");
       document.InNumber = GetFieldValue(numberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, dateFact, props.RegistrationDate.Name, document.Dated);
-      LinkFactAndProperty(recognizedDocument, numberFact, props.RegistrationNumber.Name, document.InNumber);
+      LinkFactAndProperty(recognizedDocument, dateFact, null, props.RegistrationDate.Name, document.Dated);
+      LinkFactAndProperty(recognizedDocument, numberFact, null, props.RegistrationNumber.Name, document.InNumber);
       
       // Заполнить подписанта и контакт.
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
@@ -608,6 +608,16 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Акт
+    /*
+    public static void FillRegistrationData(IOfficialDocument document, List<Structures.Module.Fact> facts, string factName)
+    {
+      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
+    }*/
     
     /// <summary>
     /// Создать акт выполненных работ (демо режим).
@@ -633,8 +643,8 @@ namespace Sungero.Capture.Server
       var regNumberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
       document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
+      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -724,15 +734,15 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, props.LeadingDocument.Name, document.LeadingDocument);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
       
       // Дата и номер.
       var regDateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
       var regNumberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
       document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
+      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
       
       // Заполнить контрагента/НОР по типу.
       // Рассматриваем входящие акты, для которых SELLER - Контрагент, BUYER - НОР.
@@ -846,8 +856,8 @@ namespace Sungero.Capture.Server
       var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
       document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
+      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
       
       // Сумма и валюта.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
@@ -931,8 +941,8 @@ namespace Sungero.Capture.Server
       var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
       document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
+      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
       document.IsAdjustment = false;
       
       // Сумма и валюта.
@@ -997,8 +1007,8 @@ namespace Sungero.Capture.Server
       var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
       document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
+      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
       document.IsAdjustment = false;
       
       // Сумма и валюта.
@@ -1501,7 +1511,9 @@ namespace Sungero.Capture.Server
       return result;
     }
     
-    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument, Structures.Module.Fact fact, string propertyName, object propertyValue)
+    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument,
+                                           Structures.Module.Fact fact, string fieldName,
+                                           string propertyName, object propertyValue)
     {
       if (fact == null || propertyValue == null)
         return;
@@ -1510,7 +1522,10 @@ namespace Sungero.Capture.Server
       if (propertyValue is Sungero.Domain.Shared.IEntity)
         propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
       
-      foreach (var recognizedFact in recognizedDocument.Info.Facts.Where(f => f.FactId == fact.Id))
+      var facts = recognizedDocument.Info.Facts
+        .Where(f => f.FactId == fact.Id)
+        .Where(f => string.IsNullOrWhiteSpace(fieldName) || f.FieldName == fieldName);
+      foreach (var recognizedFact in facts)
       {
         recognizedFact.PropertyName = propertyName;
         recognizedFact.PropertyValue = propertyStringValue;
