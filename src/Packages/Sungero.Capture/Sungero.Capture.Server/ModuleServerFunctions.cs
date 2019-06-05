@@ -618,51 +618,6 @@ namespace Sungero.Capture.Server
     
     #region Акт
     
-    public static void FillRegistrationData(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument, string factName)
-    {
-      var facts = recognizedDocument.Facts;
-      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      
-      var props = document.Info.Properties;
-      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
-    }
-    
-    public static void FillCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
-                                                       Structures.Module.RecognizedDocument recognizedDocument,
-                                                       IEmployee responsible)
-    {
-      // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
-      var facts = recognizedDocument.Facts;
-      var props = document.Info.Properties;
-      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
-      var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
-      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
-      var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
-      if (businessUnitWithFact != null)
-      {
-        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
-      }
-      else
-      {
-        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-      }
-      
-      var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
-      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
-      var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
-      var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
-      if (counterpartyWithFact != null)
-      {
-        document.Counterparty = counterpartyWithFact.Counterparty;
-        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
-      }
-    }
-    
     /// <summary>
     /// Создать акт выполненных работ (демо режим).
     /// </summary>
@@ -776,6 +731,7 @@ namespace Sungero.Capture.Server
     /// Создать акт выполненных работ.
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
+    /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Акт выполненных работ.</returns>
     public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
     {
@@ -813,6 +769,63 @@ namespace Sungero.Capture.Server
       RegisterDocument(document);
       
       return document;
+    }
+    
+    /// <summary>
+    /// Заполнить регистрационные данные.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="factName">Наименование факта.</param>
+    public static void FillRegistrationData(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument, string factName)
+    {
+      var facts = recognizedDocument.Facts;
+      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
+    }
+    
+    /// <summary>
+    /// Заполнить контрагента и НОР в акте.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="responsible">Ответственный сотрудник.</param>
+    public static void FillCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
+                                                       Structures.Module.RecognizedDocument recognizedDocument,
+                                                       IEmployee responsible)
+    {
+      // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
+      var facts = recognizedDocument.Facts;
+      var props = document.Info.Properties;
+      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
+      var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
+      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
+      var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
+      if (businessUnitWithFact != null)
+      {
+        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
+      }
+      else
+      {
+        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      }
+      
+      var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
+      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
+      var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
+      var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
+      if (counterpartyWithFact != null)
+      {
+        document.Counterparty = counterpartyWithFact.Counterparty;
+        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
+      }
     }
     
     #endregion
