@@ -172,8 +172,8 @@ namespace Sungero.Capture.Server
           {
             var fields = fact.Fields.Where(f => f != null)
               .Where(f => f.Probability >= minFactProbability)
-              .Select(f => FactField.Create(f.Name, f.Value, (decimal)(f.Probability)));
-            recognizedDocument.Facts.Add(Fact.Create(fact.Name, fields.ToList()));
+              .Select(f => FactField.Create(f.Id, f.Name, f.Value, (decimal)(f.Probability)));
+            recognizedDocument.Facts.Add(Fact.Create(fact.Id, fact.Name, fields.ToList()));
             
             foreach (var factField in fact.Fields)
             {
@@ -611,13 +611,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognizedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
+      var props = document.Info.Properties;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = сlassificationResult.Facts;
+      var facts = recognizedDocument.Facts;
       
       // Договор.
       var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
@@ -625,8 +626,12 @@ namespace Sungero.Capture.Server
       document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
       // Дата и номер.
-      document.RegistrationDate = GetFieldDateTimeValue(facts, "Document", "Date");
-      document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
+      var regDateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -693,7 +698,7 @@ namespace Sungero.Capture.Server
       }
       document.Save();
       
-      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       return document;
@@ -704,22 +709,27 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument сlassificationResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
     {
       var document = FinancialArchive.ContractStatements.Create();
+      var props = document.Info.Properties;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = сlassificationResult.Facts;
+      var facts = recognizedDocument.Facts;
       
       // Договор.
-      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
-      document.LeadingDocument = GetLeadingDocument(leadingDocNames.FirstOrDefault());
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, props.LeadingDocument.Name, document.LeadingDocument);
       
       // Дата и номер.
-      document.RegistrationDate = GetFieldDateTimeValue(facts, "Document", "Date");
-      document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
+      var regDateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
       
       // Заполнить контрагента/НОР по типу.
       // Рассматриваем входящие акты, для которых SELLER - Контрагент, BUYER - НОР.
@@ -761,7 +771,7 @@ namespace Sungero.Capture.Server
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
-      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       // Регистрация.
@@ -779,13 +789,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки накладной в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.RecognizedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = Sungero.Capture.MockWaybills.Create();
+      var props = document.Info.Properties;
       
-      // Заполнить основные свойства.
+      // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = сlassificationResult.Facts;
+      var facts = recognizedDocument.Facts;
       
       // Договор.
       var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
@@ -827,17 +838,21 @@ namespace Sungero.Capture.Server
         document.PayerTrrc = payer.Trrc;
       }
       
-      // Заполнить дату и номер.
-      document.RegistrationDate = GetFieldDateTimeValue(facts, "FinancialDocument", "Date");
-      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      // Дата и номер.
+      var regDateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
       
-      // Заполнить сумму и валюту.
+      // Сумма и валюта.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
       document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       
-      // Заполнить Номенклатуру.
+      // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
       {
         var good = document.Goods.AddNew();
@@ -850,7 +865,7 @@ namespace Sungero.Capture.Server
       }
       document.Save();
       
-      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       return document;
@@ -865,13 +880,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="letterсlassificationResult">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.RecognizedDocument сlassificationResult)
+    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
+      var props = document.Info.Properties;
       
-      // Заполнить основные свойства.
+      // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = сlassificationResult.Facts;
+      var facts = recognizedDocument.Facts;
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -907,17 +923,22 @@ namespace Sungero.Capture.Server
         document.BuyerTrrc = buyer.Trrc;
       }
       
-      // Заполнить дату и номер.
-      document.RegistrationDate = GetFieldDateTimeValue(facts, "FinancialDocument", "Date");
-      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      // Дата и номер.
+      var regDateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
       document.IsAdjustment = false;
       
-      // Заполнить сумму и валюту.
+      // Сумма и валюта.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
       document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      // Заполнить Номенклатуру.
+      
+      // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
       {
         var good = document.Goods.AddNew();
@@ -930,7 +951,7 @@ namespace Sungero.Capture.Server
       }
       document.Save();
       
-      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       return document;
@@ -946,15 +967,16 @@ namespace Sungero.Capture.Server
     /// <param name="сlassificationResult">Результат обработки УПД в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument сlassificationResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
+      var props = document.Info.Properties;
       
-      // Заполнить основные свойства.
+      // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
-      // Заполнение НОР и контрагентов.
-      var facts = сlassificationResult.Facts;
+      // НОР и контрагент.
+      var facts = recognizedDocument.Facts;
       var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
       var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
       var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
@@ -967,18 +989,22 @@ namespace Sungero.Capture.Server
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
-      // Заполнить дату и номер.
-      document.RegistrationDate = GetFieldDateTimeValue(facts, "FinancialDocument", "Date");
-      document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
+      // Дата и номер.
+      var regDateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
       document.IsAdjustment = false;
       
-      // Заполнить сумму и валюту.
+      // Сумма и валюта.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
       var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       document.Save();
       
-      var documentBody = GetDocumentBody(сlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       // Регистрация.
@@ -1289,6 +1315,7 @@ namespace Sungero.Capture.Server
       var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
       if (field != null)
         return field.Value;
+      
       return string.Empty;
     }
 
@@ -1343,9 +1370,9 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Значение поля типа DateTime.</returns>
-    public static DateTime? GetFieldDateTimeValue(List<Structures.Module.Fact> facts, string factName, string fieldName)
+    public static DateTime? GetFieldDateTimeValue(Structures.Module.Fact fact, string fieldName)
     {
-      var recognizedDate = GetFieldValue(facts, factName, fieldName);
+      var recognizedDate = GetFieldValue(fact, fieldName);
       if (string.IsNullOrWhiteSpace(recognizedDate))
         return null;
       
@@ -1366,10 +1393,26 @@ namespace Sungero.Capture.Server
     /// <remarks>С учетом вероятности факта.</remarks>
     public static List<Structures.Module.Fact> GetFacts(List<Structures.Module.Fact> facts, string factName, string fieldName)
     {
-      var minFactProbability = GetMinFactProbability();
       return facts
         .Where(f => f.Name == factName)
         .Where(f => f.Fields.Any(fl => fl.Name == fieldName))
+        .ToList();
+    }
+    
+    /// <summary>
+    /// Получить сортированный список фактов.
+    /// </summary>
+    /// <param name="facts">Список фактов.</param>
+    /// <param name="factName">Имя факта.</param>
+    /// <param name="orderFieldName">Имя поля по вероятности которого будет произведена сортировка.</param>
+    /// <returns>Список фактов с наибольшей вероятностью.</returns>
+    /// <remarks>С учетом вероятности факта.</remarks>
+    public static List<Structures.Module.Fact> GetOrderedFacts(List<Structures.Module.Fact> facts, string factName, string orderFieldName)
+    {
+      return facts
+        .Where(f => f.Name == factName)
+        .Where(f => f.Fields.Any(fl => fl.Name == orderFieldName))
+        .OrderByDescending(f => f.Fields.First(fl => fl.Name == orderFieldName).Probability)
         .ToList();
     }
     
@@ -1453,6 +1496,22 @@ namespace Sungero.Capture.Server
       double result;
       double.TryParse(field, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out result);
       return result;
+    }
+    
+    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument, Structures.Module.Fact fact, string propertyName, object propertyValue)
+    {
+      if (fact == null || propertyValue == null)
+        return;
+      
+      var propertyStringValue = propertyValue.ToString();
+      if (propertyValue is Sungero.Domain.Shared.IEntity)
+        propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
+      
+      foreach (var recognizedFact in recognizedDocument.Info.Facts.Where(f => f.FactId == fact.Id))
+      {
+        recognizedFact.PropertyName = propertyName;
+        recognizedFact.PropertyValue = propertyStringValue;
+      }
     }
     
     #endregion

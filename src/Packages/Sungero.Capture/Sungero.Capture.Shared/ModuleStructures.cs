@@ -24,6 +24,7 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class Fact
   {
+    public int Id { get; set; }
     public string Name { get; set; }
     public List<Sungero.Capture.Structures.Module.FactField> Fields { get; set; }
   }
@@ -33,6 +34,7 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class FactField
   {
+    public int Id { get; set; }
     public string Name { get; set; }
     public string Value { get; set; }
     public decimal Probability { get; set; }
