@@ -487,17 +487,10 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       
       // Адресат.
-      foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
-      {
-        var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
-        var addressee = GetFieldValue(addresseeFact, "Addressee");
-        document.Addressee = GetEmployeeByName(addressee);
-        if (document.Addressee != null)
-        {
-          LinkFactAndProperty(recognizedDocument, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee); 
-          break;
-        }
-      }
+      var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
+      var addressee = GetFieldValue(addresseeFact, "Addressee");
+      document.Addressee = GetEmployeeByName(addressee);
+      LinkFactAndProperty(recognizedDocument, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee);
       
       // Заполнить данные нашей стороны.
       var businessUnits = GetBusinessUnitsByFacts(facts);
