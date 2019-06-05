@@ -653,6 +653,10 @@ namespace Sungero.Capture.Server
         document.CounterpartyName = seller.Name;
         document.CounterpartyTin = seller.Tin;
         document.CounterpartyTrrc = seller.Trrc;
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.CounterpartyName.Name, seller.Name);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.CounterpartyName.Name, seller.Name);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.CounterpartyTin.Name, seller.Tin);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.CounterpartyTrrc.Name, seller.Trrc);
       }
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
       if (buyer != null)
@@ -660,6 +664,10 @@ namespace Sungero.Capture.Server
         document.BusinessUnitName = buyer.Name;
         document.BusinessUnitTin = buyer.Tin;
         document.BusinessUnitTrrc = buyer.Trrc;
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "Name", props.BusinessUnitName.Name, buyer.Name);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "LegalForm", props.BusinessUnitName.Name, buyer.Name);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TIN", props.BusinessUnitTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BusinessUnitTrrc.Name, buyer.Trrc);
       }
       
       // В актах могут прийти контрагенты без типа. Заполнить контрагентами без типа.
@@ -681,6 +689,10 @@ namespace Sungero.Capture.Server
             document.CounterpartyName = name;
             document.CounterpartyTin = tin;
             document.CounterpartyTrrc = trrc;
+            LinkFactAndProperty(recognizedDocument, fact, "Name", props.CounterpartyName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.CounterpartyName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.CounterpartyTin.Name, tin);
+            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.CounterpartyTrrc.Name, trrc);
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
           else if (string.IsNullOrWhiteSpace(document.BusinessUnitName))
@@ -688,6 +700,10 @@ namespace Sungero.Capture.Server
             document.BusinessUnitName = name;
             document.BusinessUnitTin = tin;
             document.BusinessUnitTrrc = trrc;
+            LinkFactAndProperty(recognizedDocument, fact, "Name", props.BusinessUnitName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.BusinessUnitName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.BusinessUnitTin.Name, tin);
+            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.BusinessUnitTrrc.Name, trrc);
           }
         }
       }
@@ -820,6 +836,10 @@ namespace Sungero.Capture.Server
         document.Shipper = shipper.Name;
         document.ShipperTin = shipper.Tin;
         document.ShipperTrrc = shipper.Trrc;
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "Name", props.Shipper.Name, shipper.Name);
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "LegalForm", props.Shipper.Name, shipper.Name);
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TIN", props.ShipperTin.Name, shipper.Tin);
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TRRC", props.ShipperTrrc.Name, shipper.Trrc);
       }
       
       var consignee = GetMostProbableMockCounterparty(facts, "CONSIGNEE");
@@ -828,6 +848,10 @@ namespace Sungero.Capture.Server
         document.Consignee = consignee.Name;
         document.ConsigneeTin = consignee.Tin;
         document.ConsigneeTrrc = consignee.Trrc;
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "Name", props.Consignee.Name, consignee.Name);
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "LegalForm", props.Consignee.Name, consignee.Name);
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TIN", props.ConsigneeTin.Name, consignee.Tin);
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TRRC", props.ConsigneeTrrc.Name, consignee.Trrc);
       }
       
       var supplier = GetMostProbableMockCounterparty(facts, "SUPPLIER");
@@ -836,6 +860,10 @@ namespace Sungero.Capture.Server
         document.Supplier = supplier.Name;
         document.SupplierTin = supplier.Tin;
         document.SupplierTrrc = supplier.Trrc;
+        LinkFactAndProperty(recognizedDocument, supplier.Fact, "Name", props.Supplier.Name, supplier.Name);
+        LinkFactAndProperty(recognizedDocument, supplier.Fact, "LegalForm", props.Supplier.Name, supplier.Name);
+        LinkFactAndProperty(recognizedDocument, supplier.Fact, "TIN", props.SupplierTin.Name, supplier.Tin);
+        LinkFactAndProperty(recognizedDocument, supplier.Fact, "TRRC", props.SupplierTrrc.Name, supplier.Trrc);
       }
       
       var payer = GetMostProbableMockCounterparty(facts, "PAYER");
@@ -844,6 +872,10 @@ namespace Sungero.Capture.Server
         document.Payer = payer.Name;
         document.PayerTin = payer.Tin;
         document.PayerTrrc = payer.Trrc;
+        LinkFactAndProperty(recognizedDocument, payer.Fact, "Name", props.Payer.Name, payer.Name);
+        LinkFactAndProperty(recognizedDocument, payer.Fact, "LegalForm", props.Payer.Name, payer.Name);
+        LinkFactAndProperty(recognizedDocument, payer.Fact, "TIN", props.PayerTin.Name, payer.Tin);
+        LinkFactAndProperty(recognizedDocument, payer.Fact, "TRRC", props.PayerTrrc.Name, payer.Trrc);
       }
       
       // Дата и номер.
@@ -900,6 +932,10 @@ namespace Sungero.Capture.Server
         document.ShipperName = shipper.Name;
         document.ShipperTin = shipper.Tin;
         document.ShipperTrrc = shipper.Trrc;
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "Name", props.ShipperName.Name, shipper.Name);
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "LegalForm", props.ShipperName.Name, shipper.Name);
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TIN", props.ShipperTin.Name, shipper.Tin);
+        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TRRC", props.ShipperTrrc.Name, shipper.Trrc);
       }
       
       var consignee = GetMostProbableMockCounterparty(facts, "CONSIGNEE");
@@ -908,6 +944,10 @@ namespace Sungero.Capture.Server
         document.ConsigneeName = consignee.Name;
         document.ConsigneeTin = consignee.Tin;
         document.ConsigneeTrrc = consignee.Trrc;
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "Name", props.ConsigneeName.Name, consignee.Name);
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "LegalForm", props.ConsigneeName.Name, consignee.Name);
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TIN", props.ConsigneeTin.Name, consignee.Tin);
+        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TRRC", props.ConsigneeTrrc.Name, consignee.Trrc);
       }
       
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -916,6 +956,10 @@ namespace Sungero.Capture.Server
         document.SellerName = seller.Name;
         document.SellerTin = seller.Tin;
         document.SellerTrrc = seller.Trrc;
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
       }
       
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
@@ -924,6 +968,10 @@ namespace Sungero.Capture.Server
         document.BuyerName = buyer.Name;
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
       }
       
       // Дата и номер.
@@ -1012,11 +1060,8 @@ namespace Sungero.Capture.Server
     
     public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
     {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
-      var mostProbabilityFact = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability)
-        .FirstOrDefault();
-      
+      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name");
+      var mostProbabilityFact = counterpartyFacts.Where(f =>  GetFieldValue(f, "CounterpartyType") == counterpartyType).FirstOrDefault();
       if (mostProbabilityFact == null)
         return null;
 
@@ -1024,6 +1069,7 @@ namespace Sungero.Capture.Server
       counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
       counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
       counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
+      counterparty.Fact = mostProbabilityFact;
       return counterparty;
     }
     

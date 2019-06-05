@@ -45,6 +45,7 @@ namespace Sungero.Capture.Structures.Module
     public string Name { get; set; }
     public string Tin { get; set; }
     public string Trrc { get; set; }
+    public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
   }
   
 }
