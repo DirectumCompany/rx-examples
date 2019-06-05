@@ -608,16 +608,19 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Акт
-    /*
-    public static void FillRegistrationData(IOfficialDocument document, List<Structures.Module.Fact> facts, string factName)
+    
+    public static void FillRegistrationData(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument, string factName)
     {
+      var facts = recognizedDocument.Facts;
       var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
       var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
       document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, props.RegistrationNumber.Name, document.RegistrationNumber);
-    }*/
+      
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
+    }
     
     /// <summary>
     /// Создать акт выполненных работ (демо режим).
@@ -639,12 +642,7 @@ namespace Sungero.Capture.Server
       document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
       // Дата и номер.
-      var regDateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
+      FillRegistrationData(document, recognizedDocument, "Document");
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -737,12 +735,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
       
       // Дата и номер.
-      var regDateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
+      FillRegistrationData(document, recognizedDocument, "Document");
       
       // Заполнить контрагента/НОР по типу.
       // Рассматриваем входящие акты, для которых SELLER - Контрагент, BUYER - НОР.
@@ -852,12 +845,7 @@ namespace Sungero.Capture.Server
       }
       
       // Дата и номер.
-      var regDateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
       // Сумма и валюта.
       document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
@@ -937,12 +925,7 @@ namespace Sungero.Capture.Server
       }
       
       // Дата и номер.
-      var regDateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       document.IsAdjustment = false;
       
       // Сумма и валюта.
@@ -1003,12 +986,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Дата и номер.
-      var regDateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, regDateFact, null, props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, null, props.RegistrationNumber.Name, document.RegistrationNumber);
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       document.IsAdjustment = false;
       
       // Сумма и валюта.
@@ -1082,7 +1060,6 @@ namespace Sungero.Capture.Server
       
       return null;
     }
-    
     
     /// <summary>
     /// Поиск корреспондента по извлеченным фактам.
