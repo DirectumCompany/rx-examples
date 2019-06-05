@@ -477,9 +477,11 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = recognizedDocument.Facts;
-      var subject = GetFieldValue(facts, "Letter", "Subject");
+      var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
+      var subject = GetFieldValue(subjectFact, "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
+      LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);      
       
       // Адресат.
       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
