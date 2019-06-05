@@ -109,6 +109,9 @@ namespace Sungero.Capture.Server
       {
         var document = CreateDocumentByRecognizedDocument(recognizedDocument, sourceFileName, responsible);
         package.Add(document);
+        
+        recognizedDocument.Info.DocumentId = document.Id;
+        recognizedDocument.Info.Save();
       }
       
       // Определить ведущий документ.
