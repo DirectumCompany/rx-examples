@@ -466,16 +466,17 @@ namespace Sungero.Capture.Server
     /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.RecognizedDocument letterсlassificationResult, IEmployee responsible)
+    public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-      var documentBody = GetDocumentBody(letterсlassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
+      var props = document.Info.Properties;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = letterсlassificationResult.Facts;
+      var facts = recognizedDocument.Facts;
       var subject = GetFieldValue(facts, "Letter", "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
@@ -498,10 +499,12 @@ namespace Sungero.Capture.Server
       
       // Заполнить данные корреспондента.
       document.Correspondent = GetCounterparty(facts);
-      document.InNumber = GetFieldValue(facts, "Letter", "Number");
-      var correspondentDate = GetFieldValue(facts, "Letter", "Date");
-      if (!string.IsNullOrEmpty(correspondentDate))
-        document.Dated = GetFieldDateTimeValue(facts, "Letter", "Date");
+      var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
+      document.Dated = GetFieldDateTimeValue(dateFact, "Date");
+      document.InNumber = GetFieldValue(numberFact, "Number");
+      LinkFactAndProperty(recognizedDocument, dateFact, props.RegistrationDate.Name, document.Dated);
+      LinkFactAndProperty(recognizedDocument, numberFact, props.RegistrationNumber.Name, document.InNumber);
       
       // Заполнить подписанта и контакт.
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
