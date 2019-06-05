@@ -336,6 +336,29 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить контактное лицо по имени.
+    /// </summary>
+    /// <param name="lastName">Фамилия.</param>
+    /// <param name="firstName">Имя в формате "И." или "Имя".</param>
+    /// <param name="middleName">Отчество в формате "О." или "Отчество".</param>
+    /// <returns>Контактное лицо.</returns>
+    public static IContact GetContactByName(string lastName, string firstName, string middleName)
+    {
+      var noBreakSpace = new string('\u00A0', 1);
+      var space = new string('\u0020', 1);
+      
+      var name = Functions.Module.ConcatFullName(lastName, firstName, middleName);
+      name = name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".");
+      
+      return Contacts.GetAll()
+        .Where(x => x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name ||
+               (x.Person != null
+                ? x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name
+                : false))
+        .FirstOrDefault();
+    }
+    
+    /// <summary>
     /// Получить подразделение из настроек сотрудника.
     /// </summary>
     /// <param name="employee">Сотрудник.</param>
@@ -456,7 +479,7 @@ namespace Sungero.Capture.Server
       var subject = GetFieldValue(facts, "Letter", "Subject");
       document.Subject = !string.IsNullOrEmpty(subject) ?
         string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
-
+      
       // Адресат.
       foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
       {
@@ -472,14 +495,28 @@ namespace Sungero.Capture.Server
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
         : GetDepartment(responsible);
-
+      
       // Заполнить данные корреспондента.
       document.Correspondent = GetCounterparty(facts);
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
       var correspondentDate = GetFieldValue(facts, "Letter", "Date");
       if (!string.IsNullOrEmpty(correspondentDate))
-        document.Dated = DateTime.Parse(correspondentDate);
-
+        document.Dated = GetFieldDateTimeValue(facts, "Letter", "Date");
+      
+      // Заполнить подписанта и контакт.
+      foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
+      {
+        var type = GetFieldValue(fact, "Type");
+        var surname = GetFieldValue(fact, "Surname");
+        var name = GetFieldValue(fact, "Name");
+        var patrn = GetFieldValue(fact, "Patrn");
+        
+        if (type == "SIGNATORY" && document.SignedBy == null)
+          document.SignedBy = GetContactByName(surname, name, patrn);
+        else if (type == "RESPONSIBLE" && document.Contact == null)
+          document.Contact = GetContactByName(surname, name, patrn);
+      }
+      
       document.Save();
       return document;
     }
@@ -1039,7 +1076,12 @@ namespace Sungero.Capture.Server
         // Поиск по ИНН/КПП.
         var foundByTin = new List<ICounterparty>();
         foreach (var fact in correspondentTINs)
-          foundByTin.AddRange(GetCounterparties(GetFieldValue(fact, "TIN"), GetFieldValue(fact, "TRRC")));
+        {
+          var tin = GetFieldValue(fact, "TIN");
+          var trrc = GetFieldValue(fact, "TRRC");
+          var counterparties = GetCounterparties(tin, trrc);
+          foundByTin.AddRange(counterparties);
+        }
         
         // Найден ровно 1.
         if (foundByTin.Count == 1)
