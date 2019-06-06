@@ -249,7 +249,9 @@ namespace Sungero.Capture.Server
       
       // Заполнить данные корреспондента.
       document.InNumber = GetFieldValue(facts, "Letter", "Number");
-      document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
+      var dateValue = GetFieldValue(facts, "Letter", "Date");
+      if (!string.IsNullOrEmpty(dateValue))
+        document.Dated = Functions.Module.GetShortDate(dateValue);
       var correspondentNames = GetFacts(facts, "Letter", "CorrespondentName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
       
@@ -335,8 +337,12 @@ namespace Sungero.Capture.Server
       
       // Заполнить дату и номер.
       DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "Document", "Date"), out date);
-      document.RegistrationDate = date;
+      var dateValue = GetFieldValue(facts, "FinancialDocument", "Date");
+      if (!string.IsNullOrEmpty(dateValue))
+      {
+        Calendar.TryParseDate(dateValue, out date);
+        document.RegistrationDate = date;        
+      }
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагентов по типу.
@@ -482,8 +488,12 @@ namespace Sungero.Capture.Server
       
       // Заполнить дату и номер.
       DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
+      var dateValue = GetFieldValue(facts, "FinancialDocument", "Date");
+      if (!string.IsNullOrEmpty(dateValue))
+      {
+        Calendar.TryParseDate(dateValue, out date);
+        document.RegistrationDate = date;        
+      }
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       
       // Заполнить сумму и валюту.
@@ -560,8 +570,12 @@ namespace Sungero.Capture.Server
       
       // Заполнить дату и номер.
       DateTime date;
-      Calendar.TryParseDate(GetFieldValue(facts, "FinancialDocument", "Date"), out date);
-      document.RegistrationDate = date;
+      var dateValue = GetFieldValue(facts, "FinancialDocument", "Date");
+      if (!string.IsNullOrEmpty(dateValue))
+      {
+        Calendar.TryParseDate(dateValue, out date);
+        document.RegistrationDate = date;        
+      }
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       document.IsAdjustment = false;
       
