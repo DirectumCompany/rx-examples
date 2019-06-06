@@ -708,7 +708,7 @@ namespace Sungero.Capture.Server
       if (document.Currency != null)
         LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
       
-      // Заполнить Номенклатуру.
+      // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
       {
         var good = document.Goods.AddNew();
@@ -718,6 +718,13 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+        
+        LinkFactAndProperty(recognizedDocument, fact, "Name", props.Goods.Properties.Name.Name, good.Name);
+        LinkFactAndProperty(recognizedDocument, fact, "UnitName", props.Goods.Properties.UnitName.Name, good.UnitName);
+        LinkFactAndProperty(recognizedDocument, fact, "Count", props.Goods.Properties.Count.Name, good.Count);
+        LinkFactAndProperty(recognizedDocument, fact, "Price", props.Goods.Properties.Price.Name, good.Price);
+        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", props.Goods.Properties.VatAmount.Name, good.VatAmount);
+        LinkFactAndProperty(recognizedDocument, fact, "Amount", props.Goods.Properties.TotalAmount.Name, good.TotalAmount);
       }
       document.Save();
       
@@ -869,6 +876,13 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+        
+        LinkFactAndProperty(recognizedDocument, fact, "Name", props.Goods.Properties.Name.Name, good.Name);
+        LinkFactAndProperty(recognizedDocument, fact, "UnitName", props.Goods.Properties.UnitName.Name, good.UnitName);
+        LinkFactAndProperty(recognizedDocument, fact, "Count", props.Goods.Properties.Count.Name, good.Count);
+        LinkFactAndProperty(recognizedDocument, fact, "Price", props.Goods.Properties.Price.Name, good.Price);
+        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", props.Goods.Properties.VatAmount.Name, good.VatAmount);
+        LinkFactAndProperty(recognizedDocument, fact, "Amount", props.Goods.Properties.TotalAmount.Name, good.TotalAmount);
       }
       document.Save();
       
@@ -971,6 +985,13 @@ namespace Sungero.Capture.Server
         good.Price = GetFieldNumericalValue(fact, "Price");
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
+        
+        LinkFactAndProperty(recognizedDocument, fact, "Name", props.Goods.Properties.Name.Name, good.Name);
+        LinkFactAndProperty(recognizedDocument, fact, "UnitName", props.Goods.Properties.UnitName.Name, good.UnitName);
+        LinkFactAndProperty(recognizedDocument, fact, "Count", props.Goods.Properties.Count.Name, good.Count);
+        LinkFactAndProperty(recognizedDocument, fact, "Price", props.Goods.Properties.Price.Name, good.Price);
+        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", props.Goods.Properties.VatAmount.Name, good.VatAmount);
+        LinkFactAndProperty(recognizedDocument, fact, "Amount", props.Goods.Properties.TotalAmount.Name, good.TotalAmount);
       }
       document.Save();
       
