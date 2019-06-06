@@ -1378,6 +1378,9 @@ namespace Sungero.Capture.Server
     /// <returns>Значение поля.</returns>
     public static string GetFieldValue(Structures.Module.Fact fact, string fieldName)
     {
+      if (fact == null)
+        return string.Empty;
+      
       var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
       if (field != null)
         return field.Value;
@@ -1399,7 +1402,7 @@ namespace Sungero.Capture.Server
         .SelectMany(f => f.Fields);
       var field = fields
         .OrderByDescending(f => f.Probability)
-        .FirstOrDefault(f => string.Equals(f.Name, fieldName, StringComparison.InvariantCultureIgnoreCase));
+        .FirstOrDefault(f => f.Name == fieldName);
       if (field != null)
         return field.Value;
       
