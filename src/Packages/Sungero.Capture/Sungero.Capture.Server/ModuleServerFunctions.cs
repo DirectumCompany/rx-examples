@@ -626,9 +626,11 @@ namespace Sungero.Capture.Server
       var facts = recognizedDocument.Facts;
       
       // Договор.
-      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
-      document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadDoc = GetLeadingDocumentName(leadingDocFact);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseName", props.LeadDoc.Name, document.LeadDoc);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseDate", props.LeadDoc.Name, document.LeadDoc);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseNumber", props.LeadDoc.Name, document.LeadDoc);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
@@ -695,11 +697,16 @@ namespace Sungero.Capture.Server
         }
       }
       
-      // Заполнить сумму и валюту.
-      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      // Сумма и валюта.
+      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
+      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      if (document.Currency != null)
+        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
       
       // Заполнить Номенклатуру.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -781,9 +788,11 @@ namespace Sungero.Capture.Server
       var facts = recognizedDocument.Facts;
       
       // Договор.
-      var leadingDocNames = GetFacts(facts, "FinancialDocument", "DocumentBaseName")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "DocumentBaseName").Probability);
-      document.Contract = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.Contract = GetLeadingDocumentName(leadingDocFact);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseName", props.Contract.Name, document.Contract);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseDate", props.Contract.Name, document.Contract);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseNumber", props.Contract.Name, document.Contract);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -840,10 +849,15 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
       // Сумма и валюта.
-      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
+      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      if (document.Currency != null)
+        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -937,10 +951,15 @@ namespace Sungero.Capture.Server
       document.IsAdjustment = false;
       
       // Сумма и валюта.
-      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      document.VatAmount = GetFieldNumericalValue(facts, "DocumentAmount", "VatAmount");
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
+      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
+      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      if (document.Currency != null)
+        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
