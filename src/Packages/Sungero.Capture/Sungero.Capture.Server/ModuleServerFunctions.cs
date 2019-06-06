@@ -750,10 +750,8 @@ namespace Sungero.Capture.Server
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
-      // Заполнить сумму и валюту.
-      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      // Сумма и валюта.
+      FillAmount(document, recognizedDocument);
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
@@ -762,63 +760,6 @@ namespace Sungero.Capture.Server
       RegisterDocument(document);
       
       return document;
-    }
-    
-    /// <summary>
-    /// Заполнить регистрационные данные.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
-    /// <param name="factName">Наименование факта.</param>
-    public static void FillRegistrationData(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument, string factName)
-    {
-      var facts = recognizedDocument.Facts;
-      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
-      
-      var props = document.Info.Properties;
-      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
-    }
-    
-    /// <summary>
-    /// Заполнить контрагента и НОР в акте.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
-    /// <param name="responsible">Ответственный сотрудник.</param>
-    public static void FillCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
-                                                       Structures.Module.RecognizedDocument recognizedDocument,
-                                                       IEmployee responsible)
-    {
-      // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
-      var facts = recognizedDocument.Facts;
-      var props = document.Info.Properties;
-      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
-      var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
-      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
-      var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
-      if (businessUnitWithFact != null)
-      {
-        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
-      }
-      else
-      {
-        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-      }
-      
-      var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
-      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
-      var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
-      var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
-      if (counterpartyWithFact != null)
-      {
-        document.Counterparty = counterpartyWithFact.Counterparty;
-        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
-      }
     }
     
     #endregion
@@ -1050,12 +991,8 @@ namespace Sungero.Capture.Server
       document.IsAdjustment = false;
       
       // Сумма и валюта.
-      var facts = recognizedDocument.Facts;
-      document.TotalAmount = GetFieldNumericalValue(facts, "DocumentAmount", "Amount");
-      var currencyCode = GetFieldValue(facts, "DocumentAmount", "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      document.Save();
-      
+      FillAmount(document, recognizedDocument);
+
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
@@ -1063,6 +1000,86 @@ namespace Sungero.Capture.Server
       RegisterDocument(document);
       
       return document;
+    }
+    
+    #endregion
+    
+    #region Заполнение полей
+    
+    /// <summary>
+    /// Заполнить сумму и валюту.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    public static void FillAmount(IAccountingDocumentBase document, Structures.Module.RecognizedDocument recognizedDocument)
+    {
+      var facts = recognizedDocument.Facts;
+      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      if (document.Currency != null)
+        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
+    }
+    
+    /// <summary>
+    /// Заполнить регистрационные данные.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="factName">Наименование факта.</param>
+    public static void FillRegistrationData(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument, string factName)
+    {
+      var facts = recognizedDocument.Facts;
+      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
+      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
+    }
+    
+    /// <summary>
+    /// Заполнить контрагента и НОР в акте.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="responsible">Ответственный сотрудник.</param>
+    public static void FillCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
+                                                       Structures.Module.RecognizedDocument recognizedDocument,
+                                                       IEmployee responsible)
+    {
+      // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
+      var facts = recognizedDocument.Facts;
+      var props = document.Info.Properties;
+      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
+      var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
+      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
+      var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
+      if (businessUnitWithFact != null)
+      {
+        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
+      }
+      else
+      {
+        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      }
+      
+      var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
+      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
+      var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
+      var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
+      if (counterpartyWithFact != null)
+      {
+        document.Counterparty = counterpartyWithFact.Counterparty;
+        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
+      }
     }
     
     #endregion
