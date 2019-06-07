@@ -635,9 +635,12 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
-      var subject = GetFieldValue(facts, "Letter", "Subject");
-      document.Subject = !string.IsNullOrEmpty(subject) ?
-        string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
+      var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
+      var subject = GetFieldValue(subjectFact, "Letter", "Subject");
+      document.Subject = !string.IsNullOrEmpty(subject)
+        ? string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower())
+        : string.Empty;
+      LinkFactAndProperty(letterClassificationResult, subjectFact, null, props.Subject.Name, props.Subject);
       
       document.Save();
       
