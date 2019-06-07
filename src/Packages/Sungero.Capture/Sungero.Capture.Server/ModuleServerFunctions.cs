@@ -373,7 +373,7 @@ namespace Sungero.Capture.Server
       
       var surname = GetFieldValue(fact, "Surname");
       var name = GetFieldValue(fact, "Name");
-      var patrn = GetFieldValue(fact, "Patrn");      
+      var patrn = GetFieldValue(fact, "Patrn");
       return GetContactByName(surname, name, patrn);
     }
     
@@ -509,8 +509,11 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee);
       
       // Заполнить данные нашей стороны.
-      var businessUnits = GetBusinessUnitsByFacts(facts);
-      document.BusinessUnit = GetBusinessUnit(businessUnits, responsible, document.Addressee);
+      var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
+      var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
+      document.BusinessUnit = businessUnitWithFact.BusinessUnit;
+      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, "BusinessUnit", props.BusinessUnit.Name, document.BusinessUnit);
+      
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
         : GetDepartment(responsible);
@@ -1255,67 +1258,69 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Поиск НОР по извлеченным фактам.
+    /// Поиск НОР, наиболее подходящей для ответственного и адресата.
     /// </summary>
-    /// <param name="businessUnits">НОР найденные по фактам.</param>
+    /// <param name="businessUnits">НОР, найденные по фактам.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <param name="addressee">Адресат.</param>
-    /// <returns>НОР.</returns>
-    public static Sungero.Company.IBusinessUnit GetBusinessUnit(List<IBusinessUnit> businessUnits, IEmployee responsible, IEmployee addressee)
+    /// <returns>НОР и соответствующий ей факт.</returns>
+    public static Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts, IEmployee responsible, IEmployee addressee)
     {
-      // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
       var businessUnitByAddressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(addressee);
+      var businessUnitByAddresseeWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByAddressee, null);
       
       // Попытаться уточнить по адресату.
-      var businessUnit = businessUnits.Any() && businessUnitByAddressee != null
-        ? businessUnitByAddressee
-        : businessUnits.FirstOrDefault();
+      var businessUnitWithFact = businessUnitsWithFacts.Any() && businessUnitByAddressee != null
+        ? businessUnitByAddresseeWithFact
+        : businessUnitsWithFacts.FirstOrDefault();
+      if (businessUnitWithFact != null)
+        return businessUnitWithFact;
       
-      return businessUnit ?? businessUnitByAddressee ?? Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
+      if (businessUnitByAddresseeWithFact != null)
+        return businessUnitByAddresseeWithFact;
+      
+      // Если и по адресату не найдено, то вернуть НОР из ответственного.
+      var businessUnitByResponsible = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      var businessUnitByResponsibleWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByResponsible, null);
+      return businessUnitByResponsibleWithFact;
     }
     
     /// <summary>
-    /// Поиск НОР по извлеченным фактам.
+    /// Получение списка НОР по извлеченным фактам.
     /// </summary>
     /// <param name="facts">Список фактов.</param>
-    /// <returns>НОР.</returns>
-    public static List<Sungero.Company.IBusinessUnit> GetBusinessUnitsByFacts(List<Structures.Module.Fact> facts)
+    /// <returns>Список НОР и соответствующих им фактов.</returns>
+    public static List<Capture.Structures.Module.BusinessUnitWithFact> GetBusinessUnitsWithFacts(List<Structures.Module.Fact> facts)
     {
       // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
-      var correspondentNames = new List<string>();
-      var correspondents = GetFacts(facts, "Letter", "CorrespondentName")
+      var businessUnitsByName = new List<Capture.Structures.Module.BusinessUnitWithFact>();
+      var correspondentNameFacts = GetFacts(facts, "Letter", "CorrespondentName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
-      foreach (var fact in correspondents)
+      foreach (var fact in correspondentNameFacts)
       {
         var name = GetFieldValue(fact, "CorrespondentName");
-        correspondentNames.Add(name.ToLower());
-      }
-      
-      // Поиск НОР по наименованию без ФС.
-      var foundByName = new List<IBusinessUnit>();
-      foreach (var correspondentName in correspondentNames)
-      {
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-          .Where(x => x.Name.ToLower().Contains(correspondentName));
-        foundByName.AddRange(businessUnits);
+          .Where(x => x.Name.ToLower().Contains(name));
+        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact)));
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
-      var correspondentTINs = GetFacts(facts, "Counterparty", "TIN")
+      var correspondentTinFacts = GetFacts(facts, "Counterparty", "TIN")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
-      if (!correspondentTINs.Any())
-        return foundByName;
+      if (!correspondentTinFacts.Any())
+        return businessUnitsByName;
       else
       {
         // Поиск по ИНН/КПП.
-        var foundByTin = new List<IBusinessUnit>();
-        foreach (var fact in correspondentTINs)
+        var foundByTin = new List<Capture.Structures.Module.BusinessUnitWithFact>();
+        foreach (var fact in correspondentTinFacts)
         {
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
           var businessUnits = GetBusinessUnits(tin, trrc);
-          foundByTin.AddRange(businessUnits);
+          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact)));
         }
         
         // Найдено по ИНН/КПП.
@@ -1323,10 +1328,10 @@ namespace Sungero.Capture.Server
           return foundByTin;
         
         // Не найдено. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
-        if (foundByName.Any())
-          return foundByName.Where(x => string.IsNullOrEmpty(x.TIN) && string.IsNullOrEmpty(x.TRRC)).ToList();
+        if (businessUnitsByName.Any())
+          return businessUnitsByName.Where(x => string.IsNullOrEmpty(x.BusinessUnit.TIN) && string.IsNullOrEmpty(x.BusinessUnit.TRRC)).ToList();
       }
-      return foundByName;
+      return businessUnitsByName;
     }
     
     /// <summary>
