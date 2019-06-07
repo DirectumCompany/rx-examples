@@ -571,15 +571,22 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(letterClassificationResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
-      var correspondentNames = GetFacts(facts, "Letter", "CorrespondentName")
+      var correspondentNameFacts = GetFacts(facts, "Letter", "CorrespondentName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
-      
-      if (correspondentNames.Count() > 0)
-        document.Correspondent = GetCorrespondentName(correspondentNames.First(),
-                                                      "CorrespondentName", "CorrespondentLegalForm");
-      if (correspondentNames.Count() > 1)
-        document.Recipient = GetCorrespondentName(correspondentNames.Last(),
-                                                  "CorrespondentName", "CorrespondentLegalForm");
+      if (correspondentNameFacts.Count() > 0)
+      {
+        var fact = correspondentNameFacts.First();
+        document.Correspondent = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
+        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentName", props.Correspondent.Name, document.Correspondent);
+        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentLegalForm", props.Correspondent.Name, document.Correspondent);
+      }
+      if (correspondentNameFacts.Count() > 1)
+      {
+        var fact = correspondentNameFacts.Last();
+        document.Recipient = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
+        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentName", props.Recipient.Name, document.Recipient);
+        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentLegalForm", props.Recipient.Name, document.Recipient);
+      }
       
       // Заполнить ИНН/КПП для КА и НОР.
       var tinTrrcFacts = GetFacts(facts, "Counterparty", "TIN")
@@ -642,7 +649,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
-      var subject = GetFieldValue(subjectFact, "Letter", "Subject");
+      var subject = GetFieldValue(subjectFact, "Subject");
       document.Subject = !string.IsNullOrEmpty(subject)
         ? string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower())
         : string.Empty;
