@@ -586,13 +586,19 @@ namespace Sungero.Capture.Server
         .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
       if (tinTrrcFacts.Count() > 0)
       {
-        document.CorrespondentTin = GetFieldValue(tinTrrcFacts.First(), "TIN");
-        document.CorrespondentTrrc = GetFieldValue(tinTrrcFacts.First(), "TRRC");
+        var fact = tinTrrcFacts.First();
+        document.CorrespondentTin = GetFieldValue(fact, "TIN");
+        document.CorrespondentTrrc = GetFieldValue(fact, "TRRC");
+        LinkFactAndProperty(letterClassificationResult, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
+        LinkFactAndProperty(letterClassificationResult, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
       }
       if (tinTrrcFacts.Count() > 1)
       {
-        document.RecipientTin = GetFieldValue(tinTrrcFacts.Last(), "TIN");
-        document.RecipientTrrc = GetFieldValue(tinTrrcFacts.Last(), "TRRC");
+        var fact = tinTrrcFacts.Last();
+        document.RecipientTin = GetFieldValue(fact, "TIN");
+        document.RecipientTrrc = GetFieldValue(fact, "TRRC");
+        LinkFactAndProperty(letterClassificationResult, fact, "TIN", props.RecipientTin.Name, document.RecipientTin);
+        LinkFactAndProperty(letterClassificationResult, fact, "TRRC", props.RecipientTrrc.Name, document.RecipientTrrc);
       }
       
       // В ответ на.
