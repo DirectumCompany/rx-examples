@@ -336,13 +336,8 @@ namespace Sungero.Capture.Server
       document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
       // Заполнить дату и номер.
-      DateTime date;
-      var dateValue = GetFieldValue(facts, "FinancialDocument", "Date");
-      if (!string.IsNullOrEmpty(dateValue))
-      {
-        Calendar.TryParseDate(dateValue, out date);
-        document.RegistrationDate = date;        
-      }
+      var dateFact = GetFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(dateFact, "Date");
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
       // Заполнить контрагентов по типу.
@@ -487,13 +482,8 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить дату и номер.
-      DateTime date;
-      var dateValue = GetFieldValue(facts, "FinancialDocument", "Date");
-      if (!string.IsNullOrEmpty(dateValue))
-      {
-        Calendar.TryParseDate(dateValue, out date);
-        document.RegistrationDate = date;        
-      }
+      var dateFact = GetFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(dateFact, "Date");
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       
       // Заполнить сумму и валюту.
@@ -569,13 +559,8 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить дату и номер.
-      DateTime date;
-      var dateValue = GetFieldValue(facts, "FinancialDocument", "Date");
-      if (!string.IsNullOrEmpty(dateValue))
-      {
-        Calendar.TryParseDate(dateValue, out date);
-        document.RegistrationDate = date;        
-      }
+      var dateFact = GetFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      document.RegistrationDate = GetFieldDateTimeValue(dateFact, "Date");
       document.RegistrationNumber = GetFieldValue(facts, "FinancialDocument", "Number");
       document.IsAdjustment = false;
       
@@ -931,6 +916,25 @@ namespace Sungero.Capture.Server
       
       // Добавить параметр минимальной вероятности для факта.
       Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
+    }
+    
+    /// <summary>
+    /// Получить значение поля типа DateTime из фактов.
+    /// </summary>
+    /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
+    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
+    /// <returns>Значение поля типа DateTime.</returns>
+    public static DateTime? GetFieldDateTimeValue(Structures.Module.Fact fact, string fieldName)
+    {
+      var recognizedDate = GetFieldValue(fact, fieldName);
+      if (string.IsNullOrWhiteSpace(recognizedDate))
+        return null;
+      
+      DateTime date;
+      if (Calendar.TryParseDate(recognizedDate, out date))
+        return date;
+      else
+        return null;
     }
     
     /// <summary>

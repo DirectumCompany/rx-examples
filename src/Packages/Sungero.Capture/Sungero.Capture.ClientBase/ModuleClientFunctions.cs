@@ -26,28 +26,41 @@ namespace Sungero.Capture.Client
       Logger.Debug("Begin of captured package processing...");
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
-        throw new ApplicationException(Resources.InvalidResponsibleId);
-      
+      {
+      	Logger.Error(Resources.InvalidResponsibleId);
+      	throw new ApplicationException(Resources.InvalidResponsibleId);
+      }
+              
       // Получить имена файлов.
       var filePath = GetScannedPackagePath(filesInfo, folder);
       var sourceFileName = GetScannedPackageName(instanceInfos);
       if (string.IsNullOrEmpty(filePath))
-        throw new ApplicationException(Resources.FileNotFoundFormat(filePath));
-      
+      {
+      	var errorMessage = Resources.FileNotFoundFormat(filePath);
+      	Logger.Error(errorMessage);
+      	throw new ApplicationException(errorMessage);
+      }
+              
       // Разделить пакет на документы.
       Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", sourceFileName);
       var arioUrl = Functions.Module.Remote.GetArioUrl();
       if (string.IsNullOrEmpty(arioUrl))
-        throw new ApplicationException(Resources.EmptyArioUrl);
-      
+      {
+      	Logger.Error(Resources.EmptyArioUrl);
+      	throw new ApplicationException(Resources.EmptyArioUrl);
+      }
+              
       var jsonClassificationResults = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
       
       // Принудительно обвалить захват, если Ario вернул ошибку. DCS запишет в лог и перезапустит процесс.
       var ErrorMessage = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(jsonClassificationResults);
       if (ErrorMessage != null && !string.IsNullOrWhiteSpace(ErrorMessage.Message))
-        throw new ApplicationException(ErrorMessage.Message);
-      
+      {
+      	Logger.Error(ErrorMessage.Message);
+      	throw new ApplicationException(ErrorMessage.Message);
+      }
+              
       // Обработать пакет.
       Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
       Functions.Module.Remote.ProcessSplitedPackage(sourceFileName, jsonClassificationResults, responsible);
@@ -68,12 +81,20 @@ namespace Sungero.Capture.Client
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
       if (fpClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
-      
+      {
+      	var errorMessage = Resources.ClassifierNotFoundFormat(firstPageClassifierName);
+      	Logger.Error(errorMessage);
+      	throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      }
+              
       var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
       if (typeClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
-      
+      {
+      	var errorMessage = Resources.ClassifierNotFoundFormat(firstPageClassifierName);
+      	Logger.Error(errorMessage);
+      	throw new ApplicationException(errorMessage);
+      }
+              
       var fpClassifierId = fpClassifier.Id.ToString();
       var typeClassifierId = typeClassifier.Id.ToString();
       
