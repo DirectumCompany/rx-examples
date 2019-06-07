@@ -362,6 +362,22 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить контактное лицо по извлечённому факту.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Контактное лицо.</returns>
+    public static IContact GetContactByFact(Sungero.Capture.Structures.Module.Fact fact)
+    {
+      if (fact == null)
+        return Contacts.Null;
+      
+      var surname = GetFieldValue(fact, "Surname");
+      var name = GetFieldValue(fact, "Name");
+      var patrn = GetFieldValue(fact, "Patrn");      
+      return GetContactByName(surname, name, patrn);
+    }
+    
+    /// <summary>
     /// Получить подразделение из настроек сотрудника.
     /// </summary>
     /// <param name="employee">Сотрудник.</param>
@@ -508,18 +524,21 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, dateFact, null, props.RegistrationDate.Name, document.Dated);
       LinkFactAndProperty(recognizedDocument, numberFact, null, props.RegistrationNumber.Name, document.InNumber);
       
-      // Заполнить подписанта и контакт.
-      foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
+      // Заполнить подписанта.
+      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
+      var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
+      if (document.SignedBy == null)
       {
-        var type = GetFieldValue(fact, "Type");
-        var surname = GetFieldValue(fact, "Surname");
-        var name = GetFieldValue(fact, "Name");
-        var patrn = GetFieldValue(fact, "Patrn");
-        
-        if (type == "SIGNATORY" && document.SignedBy == null)
-          document.SignedBy = GetContactByName(surname, name, patrn);
-        else if (type == "RESPONSIBLE" && document.Contact == null)
-          document.Contact = GetContactByName(surname, name, patrn);
+        document.SignedBy = GetContactByFact(signatoryFact);
+        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy);
+      }
+      
+      // Заполнить контакт.
+      var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
+      if (document.Contact == null)
+      {
+        document.Contact = GetContactByFact(responsibleFact);
+        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact);
       }
       
       document.Save();
