@@ -621,6 +621,7 @@ namespace Sungero.Capture.Server
       {
         var addressee = GetFieldValue(fact, "Addressee");
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
+        LinkFactAndProperty(letterClassificationResult, fact, null, props.Addressees.Name, document.Addressees);
       }
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
