@@ -596,11 +596,15 @@ namespace Sungero.Capture.Server
       }
       
       // В ответ на.
-      document.InResponseTo = GetFieldValue(facts, "Letter", "ResponseToNumber");
+      var responseToNumberFact = GetOrderedFacts(facts, "Letter", "ResponseToNumber").FirstOrDefault();
+      var responseToNumber = GetFieldValue(responseToNumberFact, "ResponseToNumber");
+      var responseToDateFact = GetOrderedFacts(facts, "Letter", "ResponseToDate").FirstOrDefault();
       var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "ResponseToDate"));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
-        ? document.InResponseTo
-        : string.Format("{0} {1} {2}", document.InResponseTo, Sungero.Docflow.Resources.From, responseToDate);
+        ? responseToNumber
+        : string.Format("{0} {1} {2}", responseToNumber, Sungero.Docflow.Resources.From, responseToDate);
+      LinkFactAndProperty(letterClassificationResult, responseToNumberFact, "ResponseToNumber", props.InResponseTo.Name, props.InResponseTo);
+      LinkFactAndProperty(letterClassificationResult, responseToDateFact, "ResponseToDate", props.InResponseTo.Name, props.InResponseTo);
       
       // Подписант и контакт.
       foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
@@ -611,9 +615,15 @@ namespace Sungero.Capture.Server
         var patrn = GetFieldValue(fact, "Patrn");
         
         if (type == "SIGNATORY")
+        {
           document.Signatory = Functions.Module.ConcatFullName(surname, name, patrn);
+          LinkFactAndProperty(letterClassificationResult, fact, null, props.Signatory.Name, props.Signatory);
+        }
         else
+        {
           document.Contact = Functions.Module.ConcatFullName(surname, name, patrn);
+          LinkFactAndProperty(letterClassificationResult, fact, null, props.Contact.Name, props.Contact);
+        }
       }
       
       // Заполнить данные нашей стороны.
