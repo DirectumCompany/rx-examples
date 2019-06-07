@@ -560,10 +560,17 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = letterClassificationResult.Facts;
+      var props = document.Info.Properties;
+      
+      // Заполнить дату и номер письма со стороны корреспондента.
+      var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
+      document.InNumber = GetFieldValue(numberFact, "Number");
+      document.Dated = Functions.Module.GetShortDate(GetFieldValue(dateFact, "Date"));
+      LinkFactAndProperty(letterClassificationResult, dateFact, "Date", props.Dated.Name, document.Dated);
+      LinkFactAndProperty(letterClassificationResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
-      document.InNumber = GetFieldValue(facts, "Letter", "Number");
-      document.Dated = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "Date"));
       var correspondentNames = GetFacts(facts, "Letter", "CorrespondentName")
         .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
       
