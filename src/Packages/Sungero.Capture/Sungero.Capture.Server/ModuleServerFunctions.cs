@@ -571,8 +571,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(letterClassificationResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
-      var correspondentNameFacts = GetFacts(facts, "Letter", "CorrespondentName")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
+      var correspondentNameFacts = GetOrderedFacts(facts, "Letter", "CorrespondentName");
       if (correspondentNameFacts.Count() > 0)
       {
         var fact = correspondentNameFacts.First();
@@ -589,8 +588,7 @@ namespace Sungero.Capture.Server
       }
       
       // Заполнить ИНН/КПП для КА и НОР.
-      var tinTrrcFacts = GetFacts(facts, "Counterparty", "TIN")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
+      var tinTrrcFacts = GetOrderedFacts(facts, "Counterparty", "TIN");
       if (tinTrrcFacts.Count() > 0)
       {
         var fact = tinTrrcFacts.First();
