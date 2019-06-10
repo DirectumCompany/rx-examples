@@ -227,9 +227,11 @@ namespace Sungero.Capture.Server
         return CreateMockWaybill(recognizedDocument);
       
       // Счет-фактура входящая.
-      if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName && isMockMode)
-        return CreateMockIncomingTaxInvoice(recognizedDocument);
-      
+      if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName)
+        return isMockMode
+          ? CreateMockIncomingTaxInvoice(recognizedDocument)
+          : CreateTaxInvoice(recognizedDocument, responsible);
+        
       // УПД.
       if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
         return CreateUniversalTransferDocument(recognizedDocument, responsible);
@@ -1051,6 +1053,42 @@ namespace Sungero.Capture.Server
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
+      
+      return document;
+    }
+    
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
+    {
+      var document = FinancialArchive.IncomingTaxInvoices.Create();
+      var props = document.Info.Properties;
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = recognizedDocument.Facts;
+      
+      // Договор.
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
+      
+      // Дата и номер.
+      FillRegistrationData(document, recognizedDocument, "Document");
+      
+      // Заполнить контрагента/НОР по типу.
+      FillCounterpartyAndBusinessUnit(document, recognizedDocument, responsible);
+      
+      // Подразделение и ответственный.
+      document.Department = GetDepartment(responsible);
+      document.ResponsibleEmployee = responsible;
+      
+      // Сумма и валюта.
+      FillAmount(document, recognizedDocument);
+      
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Регистрация.
+      RegisterDocument(document);
       
       return document;
     }
