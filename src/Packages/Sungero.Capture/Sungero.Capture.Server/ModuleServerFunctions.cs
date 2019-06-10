@@ -650,6 +650,8 @@ namespace Sungero.Capture.Server
     /// <returns>Поле.</returns>
     public static FactField GetField(Structures.Module.Fact fact, string fieldName)
     {
+      if (fact == null)
+        return null;        
       return fact.Fields.FirstOrDefault(f => f.Name == fieldName);
     }
     
@@ -661,9 +663,12 @@ namespace Sungero.Capture.Server
     /// <returns>Значение поля.</returns>
     public static string GetFieldValue(Structures.Module.Fact fact, string fieldName)
     {
-      var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
-      if (field != null)
-        return field.Value;
+      if (fact != null)
+      {
+        var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
+        if (field != null)
+          return field.Value;
+      }
       return string.Empty;
     }
 
@@ -675,6 +680,7 @@ namespace Sungero.Capture.Server
     /// <returns>Поле, полученное из Ario с наибольшей вероятностью.</returns>
     public static string GetFieldValue(List<Structures.Module.Fact> facts, string factName, string fieldName)
     {
+      
       IEnumerable<FactField> fields = facts
         .Where(f => f.Name == factName)
         .Where(f => f.Fields.Any())
