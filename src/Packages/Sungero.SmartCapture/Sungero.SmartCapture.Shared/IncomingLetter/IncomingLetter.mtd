@@ -139,32 +139,6 @@
       "Overridden": [
         "IsVisible"
       ]
-    },
-    {
-      "$type": "Sungero.Metadata.StandaloneFormMetadata, Sungero.Metadata",
-      "NameGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f",
-      "Name": "Card",
-      "Controls": [
-        {
-          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "03fde417-8254-4f08-950c-d543871033a8",
-          "Name": "MainGroup",
-          "ColumnDefinitions": [
-            {
-              "Percentage": 50.0
-            },
-            {
-              "Percentage": 50.0
-            }
-          ],
-          "IsAncestorMetadata": true,
-          "Overridden": [
-            "ColumnDefinitions"
-          ]
-        }
-      ],
-      "IsAncestorMetadata": true,
-      "Overridden": []
     }
   ],
   "HandledEvents": [
