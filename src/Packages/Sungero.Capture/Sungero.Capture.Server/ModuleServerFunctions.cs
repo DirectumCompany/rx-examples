@@ -775,12 +775,13 @@ namespace Sungero.Capture.Server
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
         
-        LinkFactAndProperty(recognizedDocument, fact, "Name", props.Goods.Properties.Name.Name, good.Name);
-        LinkFactAndProperty(recognizedDocument, fact, "UnitName", props.Goods.Properties.UnitName.Name, good.UnitName);
-        LinkFactAndProperty(recognizedDocument, fact, "Count", props.Goods.Properties.Count.Name, good.Count);
-        LinkFactAndProperty(recognizedDocument, fact, "Price", props.Goods.Properties.Price.Name, good.Price);
-        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", props.Goods.Properties.VatAmount.Name, good.VatAmount);
-        LinkFactAndProperty(recognizedDocument, fact, "Amount", props.Goods.Properties.TotalAmount.Name, good.TotalAmount);
+        var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
+        LinkFactAndProperty(recognizedDocument, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
+        LinkFactAndProperty(recognizedDocument, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
+        LinkFactAndProperty(recognizedDocument, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
+        LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
+        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
+        LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       document.Save();
       
@@ -933,12 +934,13 @@ namespace Sungero.Capture.Server
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
         
-        LinkFactAndProperty(recognizedDocument, fact, "Name", props.Goods.Properties.Name.Name, good.Name);
-        LinkFactAndProperty(recognizedDocument, fact, "UnitName", props.Goods.Properties.UnitName.Name, good.UnitName);
-        LinkFactAndProperty(recognizedDocument, fact, "Count", props.Goods.Properties.Count.Name, good.Count);
-        LinkFactAndProperty(recognizedDocument, fact, "Price", props.Goods.Properties.Price.Name, good.Price);
-        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", props.Goods.Properties.VatAmount.Name, good.VatAmount);
-        LinkFactAndProperty(recognizedDocument, fact, "Amount", props.Goods.Properties.TotalAmount.Name, good.TotalAmount);
+        var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
+        LinkFactAndProperty(recognizedDocument, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
+        LinkFactAndProperty(recognizedDocument, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
+        LinkFactAndProperty(recognizedDocument, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
+        LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
+        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
+        LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       document.Save();
       
@@ -1042,12 +1044,13 @@ namespace Sungero.Capture.Server
         good.VatAmount = GetFieldNumericalValue(fact, "VatAmount");
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
         
-        LinkFactAndProperty(recognizedDocument, fact, "Name", props.Goods.Properties.Name.Name, good.Name);
-        LinkFactAndProperty(recognizedDocument, fact, "UnitName", props.Goods.Properties.UnitName.Name, good.UnitName);
-        LinkFactAndProperty(recognizedDocument, fact, "Count", props.Goods.Properties.Count.Name, good.Count);
-        LinkFactAndProperty(recognizedDocument, fact, "Price", props.Goods.Properties.Price.Name, good.Price);
-        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", props.Goods.Properties.VatAmount.Name, good.VatAmount);
-        LinkFactAndProperty(recognizedDocument, fact, "Amount", props.Goods.Properties.TotalAmount.Name, good.TotalAmount);
+        var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
+        LinkFactAndProperty(recognizedDocument, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
+        LinkFactAndProperty(recognizedDocument, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
+        LinkFactAndProperty(recognizedDocument, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
+        LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
+        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
+        LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       document.Save();
       
