@@ -102,7 +102,8 @@
     "AfterSaveServer",
     "WriteHistoryServer",
     "ConvertingFromServer",
-    "CreatedServer"
+    "CreatedServer",
+    "ShowingClient"
   ],
   "HideFromCreationArea": true,
   "IconResourcesKeys": [],

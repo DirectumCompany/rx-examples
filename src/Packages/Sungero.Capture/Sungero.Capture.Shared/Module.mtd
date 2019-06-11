@@ -93,6 +93,25 @@
       "ReturnTypeFullName": "System.String"
     },
     {
+      "Name": "GetRecognizedDocumentProperties",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "isExact",
+          "ParameterType": "global::System.Boolean",
+          "ParameterTypeFullName": "System.Boolean"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::System.Collections.Generic.List<global::System.String>",
+      "ReturnTypeFullName": "System.Collections.Generic.List"
+    },
+    {
       "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [

@@ -993,8 +993,8 @@ namespace Sungero.Capture.Server
       // Заполнить контрагента/НОР по типу.
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, "SUPPLIER", "PAYER");
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
-      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;  
-        
+      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
+      
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -1135,7 +1135,7 @@ namespace Sungero.Capture.Server
       var sellerBusinessUnit = GetMostProbableBusinessUnit(recognizedDocument.Facts, "SELLER");
       if (sellerBusinessUnit != null && sellerBusinessUnit.BusinessUnit == counterpartyAndBusinessUnit.BusinessUnit)
         document = FinancialArchive.OutgoingTaxInvoices.Create();
-      else  
+      else
         document = FinancialArchive.IncomingTaxInvoices.Create();
       
       var props = document.Info.Properties;
@@ -1151,7 +1151,7 @@ namespace Sungero.Capture.Server
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
-            
+      
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -1186,7 +1186,7 @@ namespace Sungero.Capture.Server
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
-      // НОР и контрагент.      
+      // НОР и контрагент.
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
@@ -1263,9 +1263,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <remarks>Типы контрагентов BUYER и SELLER используются в большем количестве типов, поэтому они выбраны по умолчанию.</remarks>
     public static Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.RecognizedDocument recognizedDocument,
-                                                       IEmployee responsible,
-                                                       string counterpartyTypeFrom = "SELLER",
-                                                       string counterpartyTypeTo = "BUYER")
+                                                                                               IEmployee responsible,
+                                                                                               string counterpartyTypeFrom = "SELLER",
+                                                                                               string counterpartyTypeTo = "BUYER")
     {
       var result = new BusinessUnitAndCounterparty();
       // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
@@ -1818,6 +1818,30 @@ namespace Sungero.Capture.Server
         recognizedFact.PropertyValue = propertyStringValue;
         recognizedFact.IsExact = isExact;
       }
+    }
+    
+    /// <summary>
+    /// Получить список распознанных свойств документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="isExact">Точно ли распознано свойство: да/нет.</param>
+    /// <returns>Список распознанных свойств документа.</returns>
+    [Remote, Public]
+    public static List<string> GetRecognizedDocumentProperties(Docflow.IOfficialDocument document, bool isExact)
+    {
+      var result = new List<string>();
+      
+      if (document == null)
+        return result;
+      
+      var recognitionInfo = DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
+      if (recognitionInfo == null)
+        return result;
+      
+      var linkedFacts = recognitionInfo.Facts.Where(x => !string.IsNullOrEmpty(x.PropertyName));
+      result = linkedFacts.Where(x => x.IsExact == isExact).Select(x => x.PropertyName).Distinct().ToList();
+      
+      return result;
     }
     
     #endregion
