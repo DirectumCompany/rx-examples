@@ -989,33 +989,7 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
       // Заполнить контрагента/НОР по типу.
-      // В документах считаем что SUPPLIER - Контрагент, PAYER - НОР. Но также проверяем наоборот (мультинорность).
-      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name");
-      
-      var payerBusinessUnit = GetMostProbableBusinessUnit(counterpartyFacts, "PAYER");
-      var supplierBusinessUnit = GetMostProbableBusinessUnit(counterpartyFacts, "SUPPLIER");
-      var businessUnitWithFact = payerBusinessUnit ?? supplierBusinessUnit;
-      if (businessUnitWithFact != null)
-      {
-        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
-      }
-      else
-      {
-        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-      }
-      // Из контрагентов убираем тип, с которым нашли НОР.
-      var businessUnitType = GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType");
-      counterpartyFacts = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") != businessUnitType).ToList();
-      var supplierCounterparty = GetMostProbableCounterparty(facts, "SUPPLIER");
-      var payerCounterparty = GetMostProbableCounterparty(facts, "PAYER");
-      
-      var counterpartyWithFact = supplierCounterparty ?? payerCounterparty;
-      if (counterpartyWithFact != null)
-      {
-        document.Counterparty = counterpartyWithFact.Counterparty;
-        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
-      }
+      FillCounterpartyAndBusinessUnit(document, recognizedDocument, responsible, "SUPPLIER", "PAYER");
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -1222,7 +1196,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Заполнение полей
+    #region Заполнение свойств документа
     
     /// <summary>
     /// Заполнить сумму и валюту.
@@ -1268,16 +1242,22 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
+    /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
+    /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
+    /// <remarks>Типы контрагентов BUYER и SELLER используются в большем количестве типов, поэтому они выбраны по умолчанию.</remarks>
     public static void FillCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
                                                        Structures.Module.RecognizedDocument recognizedDocument,
-                                                       IEmployee responsible)
+                                                       IEmployee responsible,
+                                                       string counterpartyTypeFrom = "SELLER",
+                                                       string counterpartyTypeTo = "BUYER")
     {
       // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
       var facts = recognizedDocument.Facts;
       var props = document.Info.Properties;
-      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, "BUYER");
+      
+      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeTo);
       var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
-      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, "SELLER");
+      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeFrom);
       var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
       if (businessUnitWithFact != null)
       {
@@ -1289,9 +1269,12 @@ namespace Sungero.Capture.Server
         document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       }
       
-      var sellerCounterparty = GetMostProbableCounterparty(facts, "SELLER");
-      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
-      var buyerCounterparty = GetMostProbableCounterparty(facts, "BUYER");
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") != GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType")).ToList();
+      
+      var sellerCounterparty = GetMostProbableCounterparty(counterpartyFacts, counterpartyTypeFrom);
+      var counterpartyWithoutType = GetMostProbableCounterparty(counterpartyFacts, string.Empty);
+      var buyerCounterparty = GetMostProbableCounterparty(counterpartyFacts, counterpartyTypeTo);
       var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
       if (counterpartyWithFact != null)
       {
@@ -1321,9 +1304,8 @@ namespace Sungero.Capture.Server
     
     public static Structures.Module.BusinessUnitWithFact GetMostProbableBusinessUnit(List<Structures.Module.Fact> facts, string counterpartyType)
     {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
       
       foreach (var fact in counterpartyFacts)
       {
@@ -1339,9 +1321,8 @@ namespace Sungero.Capture.Server
     
     public static Structures.Module.CounterpartyWithFact GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
     {
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
       
       foreach (var fact in counterpartyFacts)
       {
@@ -1506,8 +1487,7 @@ namespace Sungero.Capture.Server
 
       // Отфильтровать закрытые сущности и копии НОР.
       var counterparties = Counterparties.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
       
       // Поиск по ИНН, если ИНН передан.
       if (searchByTin)
