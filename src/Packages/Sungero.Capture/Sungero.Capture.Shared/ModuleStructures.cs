@@ -56,15 +56,16 @@ namespace Sungero.Capture.Structures.Module
   
   partial class BusinessUnitWithFact
   {
-    public Sungero.Company.IBusinessUnit BusinessUnit{ get; set; }
+    public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
     public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
     public bool IsExact { get; set; }
   }
   
   partial class BusinessUnitAndCounterparty
   {
-    public Sungero.Company.IBusinessUnit BusinessUnit{ get; set; }
+    public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
+    public bool? IsBusinessUnitSeller { get; set; }    
   }
   
 }

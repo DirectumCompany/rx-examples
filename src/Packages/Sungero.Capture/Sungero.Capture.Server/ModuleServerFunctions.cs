@@ -228,7 +228,7 @@ namespace Sungero.Capture.Server
           ? CreateMockWaybill(recognizedDocument)
           : CreateWaybill(recognizedDocument, responsible);
       
-      // Счет-фактура входящая.
+      // Счет-фактура.
       if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName)
         return isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
@@ -1132,11 +1132,13 @@ namespace Sungero.Capture.Server
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
-      var sellerBusinessUnit = GetMostProbableBusinessUnit(recognizedDocument.Facts, "SELLER");
-      if (sellerBusinessUnit != null && sellerBusinessUnit.BusinessUnit == counterpartyAndBusinessUnit.BusinessUnit)
+      if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == false)
         document = FinancialArchive.OutgoingTaxInvoices.Create();
       else
         document = FinancialArchive.IncomingTaxInvoices.Create();
+      
+      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
+      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
       var props = document.Info.Properties;
       
@@ -1280,6 +1282,7 @@ namespace Sungero.Capture.Server
       if (businessUnitWithFact != null)
       {
         result.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        result.IsBusinessUnitSeller = sellerBusinessUnit == businessUnitWithFact;
         businessUnitCounterpartyType = GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType");
         LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
       }
