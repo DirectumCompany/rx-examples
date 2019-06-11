@@ -1708,7 +1708,8 @@ namespace Sungero.Capture.Server
     
     public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument,
                                            Structures.Module.Fact fact, string fieldName,
-                                           string propertyName, object propertyValue)
+                                           string propertyName, object propertyValue,
+                                           bool? isExact = null)
     {
       if (fact == null || propertyValue == null)
         return;
@@ -1724,6 +1725,7 @@ namespace Sungero.Capture.Server
       {
         recognizedFact.PropertyName = propertyName;
         recognizedFact.PropertyValue = propertyStringValue;
+        recognizedFact.IsExact = isExact;
       }
     }
     

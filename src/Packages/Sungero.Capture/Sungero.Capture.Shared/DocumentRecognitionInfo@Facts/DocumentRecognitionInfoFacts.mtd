@@ -101,6 +101,15 @@
       "Length": 1000,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "ec19a46f-20c5-461c-95d8-5157c446ec0d"
+    },
+    {
+      "$type": "Sungero.Metadata.BooleanPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "51e5ace9-3503-4068-b8c6-366825048f02",
+      "Name": "IsExact",
+      "CanBeSearch": false,
+      "Code": "IsExact",
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.BooleanEditorToBooleanBinder",
+      "PreviousPropertyGuid": "3c14d97c-fcfb-4719-beb4-92a3a1d9e0f1"
     }
   ],
   "PublicStructures": [],
