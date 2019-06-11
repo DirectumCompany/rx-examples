@@ -223,15 +223,17 @@ namespace Sungero.Capture.Server
           : CreateContractStatement(recognizedDocument, responsible);
       
       // Товарная накладная.
-      if (recognizedClass == Constants.Module.WaybillClassName && isMockMode)
-        return CreateMockWaybill(recognizedDocument);
+      if (recognizedClass == Constants.Module.WaybillClassName)
+        return isMockMode
+          ? CreateMockWaybill(recognizedDocument)
+          : CreateWaybill(recognizedDocument, responsible);
       
       // Счет-фактура входящая.
       if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName)
         return isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
           : CreateTaxInvoice(recognizedDocument, responsible);
-        
+      
       // УПД.
       if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
         return CreateUniversalTransferDocument(recognizedDocument, responsible);
@@ -432,9 +434,7 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return Sungero.Contracts.ContractualDocuments.Null;
       
-      DateTime docDate;
-      var date = Functions.Module.GetShortDate(GetFieldValue(fact, "DocumentBaseDate"));
-      Calendar.TryParseDate(date, out docDate);
+      var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
@@ -961,6 +961,74 @@ namespace Sungero.Capture.Server
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
+      
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать накладную.
+    /// </summary>
+    /// <param name="сlassificationResult">Результат обработки накладной в Ario.</param>
+    /// <param name="responsible">Ответственный сотрудник.</param>
+    /// <returns>Накладная.</returns>
+    public virtual Docflow.IOfficialDocument CreateWaybill(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
+    {
+      var document = FinancialArchive.Waybills.Create();
+      var props = document.Info.Properties;
+      var facts = recognizedDocument.Facts;
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      
+      // Документ-основание.
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
+      
+      // Дата и номер.
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+      
+      // Заполнить контрагента/НОР по типу.
+      // В документах считаем что SUPPLIER - Контрагент, PAYER - НОР. Но также проверяем наоборот (мультинорность).
+      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name");
+      
+      var payerBusinessUnit = GetMostProbableBusinessUnit(counterpartyFacts, "PAYER");
+      var supplierBusinessUnit = GetMostProbableBusinessUnit(counterpartyFacts, "SUPPLIER");
+      var businessUnitWithFact = payerBusinessUnit ?? supplierBusinessUnit;
+      if (businessUnitWithFact != null)
+      {
+        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
+      }
+      else
+      {
+        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      }
+      // Из контрагентов убираем тип, с которым нашли НОР.
+      var businessUnitType = GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType");
+      counterpartyFacts = counterpartyFacts.Where(f => GetFieldValue(f, "CounterpartyType") != businessUnitType).ToList();
+      var supplierCounterparty = GetMostProbableCounterparty(facts, "SUPPLIER");
+      var payerCounterparty = GetMostProbableCounterparty(facts, "PAYER");
+      
+      var counterpartyWithFact = supplierCounterparty ?? payerCounterparty;
+      if (counterpartyWithFact != null)
+      {
+        document.Counterparty = counterpartyWithFact.Counterparty;
+        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
+      }
+      
+      // Подразделение и ответственный.
+      document.Department = GetDepartment(responsible);
+      document.ResponsibleEmployee = responsible;
+      
+      // Сумма и валюта.
+      FillAmount(document, recognizedDocument);
+      
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Регистрация.
+      RegisterDocument(document);
       
       return document;
     }
