@@ -1276,9 +1276,11 @@ namespace Sungero.Capture.Server
       var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
       var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeFrom);
       var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
+      var businessUnitCounterpartyType = string.Empty;
       if (businessUnitWithFact != null)
       {
         result.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        businessUnitCounterpartyType = GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType");
         LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
       }
       else
@@ -1287,7 +1289,9 @@ namespace Sungero.Capture.Server
       }
       
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") != GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType")).ToList();
+        .Where(f => GetFieldValue(f, "CounterpartyType") != businessUnitCounterpartyType ||
+                    string.IsNullOrWhiteSpace(businessUnitCounterpartyType))
+        .ToList();
       
       var sellerCounterparty = GetMostProbableCounterparty(counterpartyFacts, counterpartyTypeFrom);
       var counterpartyWithoutType = GetMostProbableCounterparty(counterpartyFacts, string.Empty);
