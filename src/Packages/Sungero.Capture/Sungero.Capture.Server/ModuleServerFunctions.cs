@@ -832,7 +832,9 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "Document");
       
       // Заполнить контрагента/НОР по типу.
-      FillCounterpartyAndBusinessUnit(document, recognizedDocument, responsible);
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
+      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -989,8 +991,10 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
       // Заполнить контрагента/НОР по типу.
-      FillCounterpartyAndBusinessUnit(document, recognizedDocument, responsible, "SUPPLIER", "PAYER");
-      
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, "SUPPLIER", "PAYER");
+      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
+      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;  
+        
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -1117,9 +1121,23 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    /// <summary>
+    /// Создать счет-фактуру.
+    /// </summary>
+    /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns></returns>
     public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
     {
-      var document = FinancialArchive.IncomingTaxInvoices.Create();
+      // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
+      IAccountingDocumentBase document = null;
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      var sellerBusinessUnit = GetMostProbableBusinessUnit(recognizedDocument.Facts, "SELLER");
+      if (sellerBusinessUnit != null && sellerBusinessUnit.BusinessUnit == counterpartyAndBusinessUnit.BusinessUnit)
+        document = FinancialArchive.OutgoingTaxInvoices.Create();
+      else  
+        document = FinancialArchive.IncomingTaxInvoices.Create();
+      
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
@@ -1132,11 +1150,8 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
       
       // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "Document");
-      
-      // Заполнить контрагента/НОР по типу.
-      FillCounterpartyAndBusinessUnit(document, recognizedDocument, responsible);
-      
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+            
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -1171,8 +1186,10 @@ namespace Sungero.Capture.Server
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
-      // НОР и контрагент.
-      FillCounterpartyAndBusinessUnit(document, recognizedDocument, responsible);
+      // НОР и контрагент.      
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
+      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -1245,15 +1262,15 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <remarks>Типы контрагентов BUYER и SELLER используются в большем количестве типов, поэтому они выбраны по умолчанию.</remarks>
-    public static void FillCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
-                                                       Structures.Module.RecognizedDocument recognizedDocument,
+    public static Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.RecognizedDocument recognizedDocument,
                                                        IEmployee responsible,
                                                        string counterpartyTypeFrom = "SELLER",
                                                        string counterpartyTypeTo = "BUYER")
     {
+      var result = new BusinessUnitAndCounterparty();
       // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
       var facts = recognizedDocument.Facts;
-      var props = document.Info.Properties;
+      var props = AccountingDocumentBases.Info.Properties;
       
       var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeTo);
       var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
@@ -1261,12 +1278,12 @@ namespace Sungero.Capture.Server
       var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
       if (businessUnitWithFact != null)
       {
-        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        result.BusinessUnit = businessUnitWithFact.BusinessUnit;
         LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
       }
       else
       {
-        document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+        result.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       }
       
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
@@ -1278,9 +1295,10 @@ namespace Sungero.Capture.Server
       var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
       if (counterpartyWithFact != null)
       {
-        document.Counterparty = counterpartyWithFact.Counterparty;
+        result.Counterparty = counterpartyWithFact.Counterparty;
         LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
       }
+      return result;
     }
     
     #endregion
@@ -1307,6 +1325,10 @@ namespace Sungero.Capture.Server
       var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
         .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
       
+      if (!counterpartyFacts.Any())
+        counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "TIN")
+          .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
+      
       foreach (var fact in counterpartyFacts)
       {
         var tin = GetFieldValue(fact, "TIN");
@@ -1323,6 +1345,10 @@ namespace Sungero.Capture.Server
     {
       var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
         .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
+      
+      if (!counterpartyFacts.Any())
+        counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "TIN")
+          .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
       
       foreach (var fact in counterpartyFacts)
       {

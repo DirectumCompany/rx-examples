@@ -58,5 +58,12 @@ namespace Sungero.Capture.Structures.Module
   {
     public Sungero.Company.IBusinessUnit BusinessUnit{ get; set; }
     public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
-  }  
+  }
+  
+  partial class BusinessUnitAndCounterparty
+  {
+    public Sungero.Company.IBusinessUnit BusinessUnit{ get; set; }
+    public Sungero.Parties.ICounterparty Counterparty { get; set; }
+  }
+  
 }
