@@ -372,8 +372,19 @@ namespace Sungero.Capture.Server
       
       var surname = GetFieldValue(fact, "Surname");
       var name = GetFieldValue(fact, "Name");
-      var patrn = GetFieldValue(fact, "Patrn");
-      return Functions.Module.ConcatFullName(surname, name, patrn);
+      var patronymic = GetFieldValue(fact, "Patrn");
+      
+      // Собрать ФИО из фамилии, имени и отчества.
+      var parts = new List<string>();
+      
+      if (!string.IsNullOrWhiteSpace(surname))
+        parts.Add(surname);
+      if (!string.IsNullOrWhiteSpace(name))
+        parts.Add(name);
+      if (!string.IsNullOrWhiteSpace(patronymic))
+        parts.Add(patronymic);
+      
+      return string.Join(" ", parts);
     }
     
     /// <summary>
@@ -542,17 +553,17 @@ namespace Sungero.Capture.Server
       
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
-      var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
       if (document.SignedBy == null)
       {
+        var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.SignedBy = GetContactByFact(signatoryFact);
         LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy);
       }
       
       // Заполнить контакт.
-      var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
       if (document.Contact == null)
       {
+        var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetContactByFact(responsibleFact);
         LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact);
       }
@@ -630,28 +641,30 @@ namespace Sungero.Capture.Server
       
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
-      var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
       if (document.Signatory == null)
       {
+        var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.Signatory = GetFullNameByFact(signatoryFact);
         LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory);
       }
       
       // Заполнить контакт.
-      var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
       if (document.Contact == null)
       {
+        var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetFullNameByFact(responsibleFact);
         LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact);
       }
       
       // Заполнить данные нашей стороны.
-      foreach (var fact in GetFacts(facts, "Letter", "Addressee"))
+      var addresseeFacts = GetFacts(facts, "Letter", "Addressee");
+      foreach (var fact in addresseeFacts)
       {
         var addressee = GetFieldValue(fact, "Addressee");
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
-        LinkFactAndProperty(recognizedDocument, fact, null, props.Addressees.Name, addressee);
       }
+      foreach (var fact in addresseeFacts)
+        LinkFactAndProperty(recognizedDocument, fact, null, props.Addressees.Name, document.Addressees);
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
