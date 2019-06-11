@@ -343,16 +343,13 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Получить контактное лицо по имени.
     /// </summary>
-    /// <param name="lastName">Фамилия.</param>
-    /// <param name="firstName">Имя в формате "И." или "Имя".</param>
-    /// <param name="middleName">Отчество в формате "О." или "Отчество".</param>
+    /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
     /// <returns>Контактное лицо.</returns>
-    public static IContact GetContactByName(string lastName, string firstName, string middleName)
+    public static IContact GetContactByName(string name)
     {
       var noBreakSpace = new string('\u00A0', 1);
       var space = new string('\u0020', 1);
       
-      var name = Functions.Module.ConcatFullName(lastName, firstName, middleName);
       name = name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".");
       
       return Contacts.GetAll()
@@ -361,6 +358,22 @@ namespace Sungero.Capture.Server
                 ? x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name
                 : false))
         .FirstOrDefault();
+    }
+    
+    /// <summary>
+    /// Получить полное имя из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
+    public static string GetFullNameByFact(Sungero.Capture.Structures.Module.Fact fact)
+    {
+      if (fact == null)
+        return string.Empty;
+      
+      var surname = GetFieldValue(fact, "Surname");
+      var name = GetFieldValue(fact, "Name");
+      var patrn = GetFieldValue(fact, "Patrn");
+      return Functions.Module.ConcatFullName(surname, name, patrn);
     }
     
     /// <summary>
@@ -373,10 +386,8 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return Contacts.Null;
       
-      var surname = GetFieldValue(fact, "Surname");
-      var name = GetFieldValue(fact, "Name");
-      var patrn = GetFieldValue(fact, "Patrn");
-      return GetContactByName(surname, name, patrn);
+      var fullName = GetFullNameByFact(fact);
+      return GetContactByName(fullName);
     }
     
     /// <summary>
@@ -484,7 +495,7 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать входящее письмо в RX.
     /// </summary>
-    /// <param name="letterсlassificationResult">Результат обработки письма в Ario.</param>
+    /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
@@ -553,24 +564,24 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать входящее письмо с текстовыми полями.
     /// </summary>
-    /// <param name="letterClassificationResult">Результат обработки письма в Ario.</param>
+    /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognizedDocument letterClassificationResult)
+    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
+      var props = document.Info.Properties;
+      var facts = recognizedDocument.Facts;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = letterClassificationResult.Facts;
-      var props = document.Info.Properties;
       
       // Заполнить дату и номер письма со стороны корреспондента.
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
       document.InNumber = GetFieldValue(numberFact, "Number");
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(dateFact, "Date"));
-      LinkFactAndProperty(letterClassificationResult, dateFact, "Date", props.Dated.Name, document.Dated);
-      LinkFactAndProperty(letterClassificationResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
+      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Dated.Name, document.Dated);
+      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
       var correspondentNameFacts = GetOrderedFacts(facts, "Letter", "CorrespondentName");
@@ -578,15 +589,13 @@ namespace Sungero.Capture.Server
       {
         var fact = correspondentNameFacts.First();
         document.Correspondent = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentName", props.Correspondent.Name, document.Correspondent);
-        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentLegalForm", props.Correspondent.Name, document.Correspondent);
+        LinkFactAndProperty(recognizedDocument, fact, null, props.Correspondent.Name, document.Correspondent);
       }
       if (correspondentNameFacts.Count() > 1)
       {
         var fact = correspondentNameFacts.Last();
         document.Recipient = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentName", props.Recipient.Name, document.Recipient);
-        LinkFactAndProperty(letterClassificationResult, fact, "CorrespondentLegalForm", props.Recipient.Name, document.Recipient);
+        LinkFactAndProperty(recognizedDocument, fact, null, props.Recipient.Name, document.Recipient);
       }
       
       // Заполнить ИНН/КПП для КА и НОР.
@@ -596,16 +605,16 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.First();
         document.CorrespondentTin = GetFieldValue(fact, "TIN");
         document.CorrespondentTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(letterClassificationResult, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
-        LinkFactAndProperty(letterClassificationResult, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
+        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
+        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
       }
       if (tinTrrcFacts.Count() > 1)
       {
         var fact = tinTrrcFacts.Last();
         document.RecipientTin = GetFieldValue(fact, "TIN");
         document.RecipientTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(letterClassificationResult, fact, "TIN", props.RecipientTin.Name, document.RecipientTin);
-        LinkFactAndProperty(letterClassificationResult, fact, "TRRC", props.RecipientTrrc.Name, document.RecipientTrrc);
+        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.RecipientTin.Name, document.RecipientTin);
+        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.RecipientTrrc.Name, document.RecipientTrrc);
       }
       
       // В ответ на.
@@ -616,27 +625,24 @@ namespace Sungero.Capture.Server
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? responseToNumber
         : string.Format("{0} {1} {2}", responseToNumber, Sungero.Docflow.Resources.From, responseToDate);
-      LinkFactAndProperty(letterClassificationResult, responseToNumberFact, "ResponseToNumber", props.InResponseTo.Name, props.InResponseTo);
-      LinkFactAndProperty(letterClassificationResult, responseToDateFact, "ResponseToDate", props.InResponseTo.Name, props.InResponseTo);
+      LinkFactAndProperty(recognizedDocument, responseToNumberFact, "ResponseToNumber", props.InResponseTo.Name, document.InResponseTo);
+      LinkFactAndProperty(recognizedDocument, responseToDateFact, "ResponseToDate", props.InResponseTo.Name, document.InResponseTo);
       
-      // Подписант и контакт.
-      foreach (var fact in GetFacts(facts, "LetterPerson", "Surname"))
+      // Заполнить подписанта.
+      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
+      var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
+      if (document.Signatory == null)
       {
-        var type = GetFieldValue(fact, "Type");
-        var surname = GetFieldValue(fact, "Surname");
-        var name = GetFieldValue(fact, "Name");
-        var patrn = GetFieldValue(fact, "Patrn");
-        
-        if (type == "SIGNATORY")
-        {
-          document.Signatory = Functions.Module.ConcatFullName(surname, name, patrn);
-          LinkFactAndProperty(letterClassificationResult, fact, null, props.Signatory.Name, props.Signatory);
-        }
-        else
-        {
-          document.Contact = Functions.Module.ConcatFullName(surname, name, patrn);
-          LinkFactAndProperty(letterClassificationResult, fact, null, props.Contact.Name, props.Contact);
-        }
+        document.Signatory = GetFullNameByFact(signatoryFact);
+        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory);
+      }
+      
+      // Заполнить контакт.
+      var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
+      if (document.Contact == null)
+      {
+        document.Contact = GetFullNameByFact(responsibleFact);
+        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact);
       }
       
       // Заполнить данные нашей стороны.
@@ -644,7 +650,7 @@ namespace Sungero.Capture.Server
       {
         var addressee = GetFieldValue(fact, "Addressee");
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
-        LinkFactAndProperty(letterClassificationResult, fact, null, props.Addressees.Name, document.Addressees);
+        LinkFactAndProperty(recognizedDocument, fact, null, props.Addressees.Name, addressee);
       }
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
@@ -653,11 +659,11 @@ namespace Sungero.Capture.Server
       document.Subject = !string.IsNullOrEmpty(subject)
         ? string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower())
         : string.Empty;
-      LinkFactAndProperty(letterClassificationResult, subjectFact, null, props.Subject.Name, props.Subject);
+      LinkFactAndProperty(recognizedDocument, subjectFact, null, props.Subject.Name, document.Subject);
       
       document.Save();
       
-      var documentBody = GetDocumentBody(letterClassificationResult.BodyGuid);
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
       document.CreateVersionFrom(documentBody, "pdf");
       
       return document;
@@ -684,9 +690,7 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadDoc = GetLeadingDocumentName(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseName", props.LeadDoc.Name, document.LeadDoc);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseDate", props.LeadDoc.Name, document.LeadDoc);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseNumber", props.LeadDoc.Name, document.LeadDoc);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
@@ -854,9 +858,7 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseName", props.Contract.Name, document.Contract);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseDate", props.Contract.Name, document.Contract);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, "DocumentBaseNumber", props.Contract.Name, document.Contract);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -1350,7 +1352,7 @@ namespace Sungero.Capture.Server
         return businessUnitWithFact;
       
       // Если факты с ИНН/КПП не найдены, и по наименованию не найдено, то вернуть НОР из адресата.
-      if (businessUnitByAddresseeWithFact != null)
+      if (businessUnitByAddresseeWithFact.BusinessUnit != null)
         return businessUnitByAddresseeWithFact;
       
       // Если и по адресату не найдено, то вернуть НОР из ответственного.
