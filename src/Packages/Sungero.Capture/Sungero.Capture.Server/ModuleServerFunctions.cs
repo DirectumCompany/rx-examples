@@ -536,7 +536,7 @@ namespace Sungero.Capture.Server
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, "BusinessUnit", props.BusinessUnit.Name, document.BusinessUnit);
+      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, "BusinessUnit", props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsExact);
       
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
@@ -1339,7 +1339,7 @@ namespace Sungero.Capture.Server
         var trrc = GetFieldValue(fact, "TRRC");
         var bussinesUnits = GetBusinessUnits(tin, trrc);
         if (bussinesUnits.Any())
-          return Structures.Module.BusinessUnitWithFact.Create(bussinesUnits.First(), fact);
+          return Structures.Module.BusinessUnitWithFact.Create(bussinesUnits.First(), fact, true);
       }
       
       return null;
@@ -1434,7 +1434,7 @@ namespace Sungero.Capture.Server
     public static Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts, IEmployee responsible, IEmployee addressee)
     {
       var businessUnitByAddressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(addressee);
-      var businessUnitByAddresseeWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByAddressee, null);
+      var businessUnitByAddresseeWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByAddressee, null, false);
       
       // Попытаться уточнить по адресату.
       var businessUnitWithFact = businessUnitsWithFacts.Any() && businessUnitByAddressee != null
@@ -1449,7 +1449,7 @@ namespace Sungero.Capture.Server
       
       // Если и по адресату не найдено, то вернуть НОР из ответственного.
       var businessUnitByResponsible = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      var businessUnitByResponsibleWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByResponsible, null);
+      var businessUnitByResponsibleWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByResponsible, null, false);
       return businessUnitByResponsibleWithFact;
     }
     
@@ -1470,7 +1470,7 @@ namespace Sungero.Capture.Server
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
           .Where(x => x.Name.ToLower().Contains(name));
-        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact)));
+        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact, false)));
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
@@ -1487,7 +1487,7 @@ namespace Sungero.Capture.Server
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
           var businessUnits = GetBusinessUnits(tin, trrc);
-          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact)));
+          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact, true)));
         }
         
         // Найдено по ИНН/КПП.
@@ -1804,6 +1804,13 @@ namespace Sungero.Capture.Server
     {
       if (fact == null || propertyValue == null)
         return;
+      
+      if (isExact == null)
+      {
+        var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
+        if (field != null)
+          isExact = field.Probability > 80;
+      }
       
       var propertyStringValue = propertyValue.ToString();
       if (propertyValue is Sungero.Domain.Shared.IEntity)
