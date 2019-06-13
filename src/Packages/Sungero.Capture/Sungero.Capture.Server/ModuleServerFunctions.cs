@@ -1132,7 +1132,7 @@ namespace Sungero.Capture.Server
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
-      if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == false)
+      if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == true)
         document = FinancialArchive.OutgoingTaxInvoices.Create();
       else
         document = FinancialArchive.IncomingTaxInvoices.Create();
@@ -1278,12 +1278,10 @@ namespace Sungero.Capture.Server
       var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
       var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeFrom);
       var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
-      var businessUnitCounterpartyType = string.Empty;
       if (businessUnitWithFact != null)
       {
         result.BusinessUnit = businessUnitWithFact.BusinessUnit;
         result.IsBusinessUnitSeller = sellerBusinessUnit == businessUnitWithFact;
-        businessUnitCounterpartyType = GetFieldValue(businessUnitWithFact.Fact, "CounterpartyType");
         LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
       }
       else
@@ -1291,14 +1289,20 @@ namespace Sungero.Capture.Server
         result.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       }
       
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") != businessUnitCounterpartyType ||
-                    string.IsNullOrWhiteSpace(businessUnitCounterpartyType))
-        .ToList();
+      // Исключить из поиска контрагентов с типом НОР.
+      var sellerCounterparty = result.IsBusinessUnitSeller != true
+        ? GetMostProbableCounterparty(facts, counterpartyTypeFrom)
+        : null;
       
-      var sellerCounterparty = GetMostProbableCounterparty(counterpartyFacts, counterpartyTypeFrom);
-      var counterpartyWithoutType = GetMostProbableCounterparty(counterpartyFacts, string.Empty);
-      var buyerCounterparty = GetMostProbableCounterparty(counterpartyFacts, counterpartyTypeTo);
+      var buyerCounterparty = result.IsBusinessUnitSeller != false
+        ? GetMostProbableCounterparty(facts, counterpartyTypeTo)
+        : null;
+      
+      // Исключить из поиска факт с НОР.
+      if (businessUnitWithFact != null && businessUnitWithFact == businessUnitWithoutType)
+        facts = facts.Where(f => f.Id != businessUnitWithFact.Fact.Id).ToList();
+      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
+      
       var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
       if (counterpartyWithFact != null)
       {
@@ -1518,7 +1522,7 @@ namespace Sungero.Capture.Server
       if (!searchByTin && !searchByTrrc)
         return new List<ICounterparty>();
 
-      // Отфильтровать закрытые сущности и копии НОР.
+      // Отфильтровать закрытые сущности.
       var counterparties = Counterparties.GetAll()
         .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
       
