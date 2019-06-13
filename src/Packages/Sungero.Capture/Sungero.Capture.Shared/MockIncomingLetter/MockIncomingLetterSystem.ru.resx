@@ -171,4 +171,43 @@
   <data name="Property_RegistrationNumber" xml:space="preserve">
     <value>Номер документа</value>
   </data>
+  <data name="ControlGroup_812fa7c1ee734284a3458e74ae533761" xml:space="preserve">
+    <value>Основное</value>
+  </data>
+  <data name="Resource_3b8b809f288240f88f7e7446096e1ed8" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_3b8b809f288240f88f7e7446096e1ed8_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_132ee2a30e9c4614b8a1df223dedad31" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_132ee2a30e9c4614b8a1df223dedad31_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_842a9477e5f2479eacb79fbbe56ccd2a" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_842a9477e5f2479eacb79fbbe56ccd2a_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_be2e7b3b0c934025bd189aa01ba7f66c" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_b6b8a84b12bf4dfca14371690f1ae498" xml:space="preserve">
+    <value>Примечание</value>
+  </data>
+  <data name="Resource_3653e8a6c90940d29bc4de985ef7c3ac" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_3653e8a6c90940d29bc4de985ef7c3ac_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_f8703a39a2f048718e38bb4fc123a0fb" xml:space="preserve">
+    <value>От кого</value>
+  </data>
+  <data name="ControlGroup_2d1845ca5c9a476bb777e212c7e58e1e" xml:space="preserve">
+    <value>Кому</value>
+  </data>
 </root>
