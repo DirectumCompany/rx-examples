@@ -1297,11 +1297,20 @@ namespace Sungero.Capture.Server
       // В документах считаем что SELLER - Контрагент, BUYER - НОР. Но также проверяем наоборот (мультинорность).
       var facts = recognizedDocument.Facts;
       var props = AccountingDocumentBases.Info.Properties;
+      var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       
       var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeTo);
       var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
       var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeFrom);
-      var businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
+      Structures.Module.BusinessUnitWithFact businessUnitWithFact = null;
+      
+      // Уточнить НОР по ответственному (мультинорность).
+      if (sellerBusinessUnit != null)
+        businessUnitWithFact = Equals(sellerBusinessUnit.BusinessUnit, businessUnitByResponsible) ? sellerBusinessUnit : null;
+      
+      if (businessUnitWithFact == null)
+        businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
+      
       if (businessUnitWithFact != null)
       {
         result.BusinessUnit = businessUnitWithFact.BusinessUnit;
@@ -1310,7 +1319,7 @@ namespace Sungero.Capture.Server
       }
       else
       {
-        result.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+        result.BusinessUnit = businessUnitByResponsible;
       }
       
       // Исключить из поиска контрагентов с типом НОР.
