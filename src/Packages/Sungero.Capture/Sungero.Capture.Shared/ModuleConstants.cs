@@ -11,6 +11,8 @@ namespace Sungero.Capture.Constants
     
     public const string MinFactProbabilityKey = "MinFactProbability";
     
+    public const string TrustedFactProbabilityKey = "TrustedFactProbability";
+    
     public const string CaptureMockModeKey = "CaptureMockMode";
     
     public const string LetterClassName = "Письмо";

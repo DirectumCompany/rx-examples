@@ -144,7 +144,7 @@
   <data name="Property_Position" xml:space="preserve">
     <value>Position</value>
   </data>
-  <data name="Property_IsExact" xml:space="preserve">
+  <data name="Property_IsTrusted" xml:space="preserve">
     <value>TODO</value>
   </data>
 </root>

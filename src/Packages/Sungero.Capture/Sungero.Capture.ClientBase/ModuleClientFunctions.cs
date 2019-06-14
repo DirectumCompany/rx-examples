@@ -168,9 +168,10 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability)
+    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>
+    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
     {
-      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, minFactProbability);
+      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, minFactProbability, trustedFactProbability);
     }
   }
 }

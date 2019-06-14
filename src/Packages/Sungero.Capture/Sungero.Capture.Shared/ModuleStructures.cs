@@ -52,14 +52,14 @@ namespace Sungero.Capture.Structures.Module
   {
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
-    public bool IsExact { get; set; }
+    public bool IsTrusted { get; set; }
   }
   
   partial class BusinessUnitWithFact
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
     public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
-    public bool IsExact { get; set; }
+    public bool IsTrusted { get; set; }
   }
   
   partial class BusinessUnitAndCounterparty

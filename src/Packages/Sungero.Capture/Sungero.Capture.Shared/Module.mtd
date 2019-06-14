@@ -102,7 +102,7 @@
           "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
         },
         {
-          "Name": "isExact",
+          "Name": "isTrusted",
           "ParameterType": "global::System.Boolean",
           "ParameterTypeFullName": "System.Boolean"
         }

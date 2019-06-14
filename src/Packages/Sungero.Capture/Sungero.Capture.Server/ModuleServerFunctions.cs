@@ -79,14 +79,18 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
+    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>    
     [Remote]
-    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability)
+    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
     {
       // Добавить параметр адреса сервиса Ario.
       Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.ArioUrlKey, arioUrl);
       
       // Добавить параметр минимальной вероятности для факта.
       Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
+      
+      // Добавить параметр доверительной вероятности для факта.
+      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.TrustedFactProbabilityKey, trustedFactProbability);
     }
     
     #endregion
@@ -538,7 +542,7 @@ namespace Sungero.Capture.Server
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsExact);
+      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
@@ -549,7 +553,7 @@ namespace Sungero.Capture.Server
       if (correspondent != null)
       {
         document.Correspondent = correspondent.Counterparty;
-        LinkFactAndProperty(recognizedDocument, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsExact);
+        LinkFactAndProperty(recognizedDocument, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
       }
       
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
@@ -565,8 +569,8 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.SignedBy = GetContactByFact(signatoryFact);
-        var isExact = IsFieldExact(signatoryFact, "Type");
-        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isExact);
+        var isTrusted = IsTrustedField(signatoryFact, "Type");
+        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrusted);
       }
       
       // Заполнить контакт.
@@ -574,21 +578,14 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetContactByFact(responsibleFact);
-        var isExact = IsFieldExact(responsibleFact, "Type");
-        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isExact);
+        var isTrusted = IsTrustedField(responsibleFact, "Type");
+        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
       }
       
       document.Save();
       return document;
     }
-    
-    public static bool IsFieldExact(Structures.Module.Fact fact, string fieldName)
-    {
-      var field = GetField(fact, fieldName);
-      var minProbability = GetMinFactProbability();
-      return field != null ? field.Probability >= minProbability : false;      
-    }
-    
+            
     /// <summary>
     /// Создать входящее письмо с текстовыми полями.
     /// </summary>
@@ -662,8 +659,8 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.Signatory = GetFullNameByFact(signatoryFact);
-        var isExact = IsFieldExact(signatoryFact, "Type");
-        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory, isExact);
+        var isTrusted = IsTrustedField(signatoryFact, "Type");
+        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
       }
       
       // Заполнить контакт.
@@ -671,8 +668,8 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetFullNameByFact(responsibleFact);
-        var isExact = IsFieldExact(responsibleFact, "Type");
-        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isExact);
+        var isTrusted = IsTrustedField(responsibleFact, "Type");
+        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
       }
       
       // Заполнить данные нашей стороны.
@@ -846,8 +843,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      var isExact = IsFieldExact(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isExact);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
@@ -894,8 +891,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isExact = IsFieldExact(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isExact);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -1007,8 +1004,8 @@ namespace Sungero.Capture.Server
       // Документ-основание.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      var isExact = IsFieldExact(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isExact);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
@@ -1172,8 +1169,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      var isExact = IsFieldExact(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isExact);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
@@ -1315,7 +1312,7 @@ namespace Sungero.Capture.Server
       {
         result.BusinessUnit = businessUnitWithFact.BusinessUnit;
         result.IsBusinessUnitSeller = sellerBusinessUnit == businessUnitWithFact;
-        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name, businessUnitWithFact.IsExact);
+        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name, businessUnitWithFact.IsTrusted);
       }
       else
       {
@@ -1340,7 +1337,7 @@ namespace Sungero.Capture.Server
       if (counterpartyWithFact != null)
       {
         result.Counterparty = counterpartyWithFact.Counterparty;
-        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name, counterpartyWithFact.IsExact);
+        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name, counterpartyWithFact.IsTrusted);
       }
       return result;
     }
@@ -1790,6 +1787,18 @@ namespace Sungero.Capture.Server
       return minProbability;
     }
     
+    /// Получить значение вероятности доверия факту, при которой считаем что факт извлекся корректно.
+    /// </summary>
+    /// <returns>Вероятность доверия факту.</returns>
+    private static double GetTrustedFactProbability()
+    {
+      double trustedProbability = 0;
+      var paramValue = Functions.Module.GetDocflowParamsValue(Constants.Module.TrustedFactProbabilityKey);
+      if (!(paramValue is DBNull) && paramValue != null)
+        double.TryParse(paramValue.ToString(), out trustedProbability);
+      return trustedProbability;
+    }
+    
     /// <summary>
     /// Получить наименование контрагента.
     /// </summary>
@@ -1851,18 +1860,18 @@ namespace Sungero.Capture.Server
     public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument,
                                            Structures.Module.Fact fact, string fieldName,
                                            string propertyName, object propertyValue,
-                                           bool? isExact = null)
+                                           bool? isTrusted = null)
     {
       if (fact == null || propertyValue == null)
         return;
       
-      if (isExact == null && !string.IsNullOrEmpty(fieldName))
+      if (isTrusted == null && !string.IsNullOrEmpty(fieldName))
       {
         var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
         if (field != null)
         {
-          var minProbability = GetMinFactProbability();
-          isExact = field.Probability >= minProbability;
+          var trustedProbability = GetTrustedFactProbability();
+          isTrusted = field.Probability >= trustedProbability;
         }          
       }
       
@@ -1877,7 +1886,7 @@ namespace Sungero.Capture.Server
       {
         recognizedFact.PropertyName = propertyName;
         recognizedFact.PropertyValue = propertyStringValue;
-        recognizedFact.IsExact = isExact;
+        recognizedFact.IsTrusted = isTrusted;
       }
     }
     
@@ -1885,10 +1894,10 @@ namespace Sungero.Capture.Server
     /// Получить список распознанных свойств документа.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="isExact">Точно ли распознано свойство: да/нет.</param>
+    /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
     /// <returns>Список распознанных свойств документа.</returns>
     [Remote, Public]
-    public static List<string> GetRecognizedDocumentProperties(Docflow.IOfficialDocument document, bool isExact)
+    public static List<string> GetRecognizedDocumentProperties(Docflow.IOfficialDocument document, bool isTrusted)
     {
       var result = new List<string>();
       
@@ -1900,9 +1909,22 @@ namespace Sungero.Capture.Server
         return result;
       
       var linkedFacts = recognitionInfo.Facts.Where(x => !string.IsNullOrEmpty(x.PropertyName));
-      result = linkedFacts.Where(x => x.IsExact == isExact).Select(x => x.PropertyName).Distinct().ToList();
+      result = linkedFacts.Where(x => x.IsTrusted == isTrusted).Select(x => x.PropertyName).Distinct().ToList();
       
       return result;
+    }
+    
+    /// <summary>
+    /// Получить признак - доверять извлеченному полю или нет.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="fieldName">Имя поля.</param>
+    /// <returns>Признак, доверять извлеченному полю или нет.</returns>
+    public static bool IsTrustedField(Structures.Module.Fact fact, string fieldName)
+    {
+      var field = GetField(fact, fieldName);
+      var trustedProbability = GetTrustedFactProbability();
+      return field != null ? field.Probability >= trustedProbability : false;      
     }
     
     #endregion

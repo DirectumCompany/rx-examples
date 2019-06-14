@@ -105,9 +105,9 @@
     {
       "$type": "Sungero.Metadata.BooleanPropertyMetadata, Sungero.Metadata",
       "NameGuid": "51e5ace9-3503-4068-b8c6-366825048f02",
-      "Name": "IsExact",
+      "Name": "IsTrusted",
       "CanBeSearch": false,
-      "Code": "IsExact",
+      "Code": "IsTrusted",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.BooleanEditorToBooleanBinder",
       "PreviousPropertyGuid": "3c14d97c-fcfb-4719-beb4-92a3a1d9e0f1"
     }
