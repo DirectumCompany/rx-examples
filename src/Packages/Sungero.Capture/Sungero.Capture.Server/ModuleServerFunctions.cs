@@ -524,7 +524,7 @@ namespace Sungero.Capture.Server
       var subject = GetFieldValue(subjectFact, "Subject");
       if (!string.IsNullOrEmpty(subject))
       {
-        document.Subject = string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower());
+        document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
           
