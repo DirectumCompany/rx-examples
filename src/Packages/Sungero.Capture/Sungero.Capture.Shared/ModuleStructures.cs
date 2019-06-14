@@ -37,7 +37,7 @@ namespace Sungero.Capture.Structures.Module
     public int Id { get; set; }
     public string Name { get; set; }
     public string Value { get; set; }
-    public decimal Probability { get; set; }
+    public double Probability { get; set; }
   }
   
   partial class MockCounterparty
@@ -52,6 +52,7 @@ namespace Sungero.Capture.Structures.Module
   {
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
+    public bool IsExact { get; set; }
   }
   
   partial class BusinessUnitWithFact

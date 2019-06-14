@@ -175,7 +175,7 @@ namespace Sungero.Capture.Server
           {
             var fields = fact.Fields.Where(f => f != null)
               .Where(f => f.Probability >= minFactProbability)
-              .Select(f => FactField.Create(f.Id, f.Name, f.Value, (decimal)(f.Probability)));
+              .Select(f => FactField.Create(f.Id, f.Name, f.Value, f.Probability));
             recognizedDocument.Facts.Add(Fact.Create(fact.Id, fact.Name, fields.ToList()));
             
             foreach (var factField in fact.Fields)
@@ -522,10 +522,12 @@ namespace Sungero.Capture.Server
       var facts = recognizedDocument.Facts;
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
-      document.Subject = !string.IsNullOrEmpty(subject) ?
-        string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower()) : string.Empty;
-      LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
-      
+      if (!string.IsNullOrEmpty(subject))
+      {
+        document.Subject = string.Format("{0}{1}", subject.Substring(0,1).ToUpper(), subject.Remove(0,1).ToLower());
+        LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
+      }
+          
       // Адресат.
       var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
       var addressee = GetFieldValue(addresseeFact, "Addressee");
@@ -536,20 +538,26 @@ namespace Sungero.Capture.Server
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, "BusinessUnit", props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsExact);
+      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsExact);
       
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
         : GetDepartment(responsible);
       
       // Заполнить данные корреспондента.
-      document.Correspondent = GetCounterparty(facts);
+      var correspondent = GetCounterparty(facts);
+      if (correspondent != null)
+      {
+        document.Correspondent = correspondent.Counterparty;
+        LinkFactAndProperty(recognizedDocument, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsExact);
+      }
+      
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
       document.Dated = GetFieldDateTimeValue(dateFact, "Date");
       document.InNumber = GetFieldValue(numberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, dateFact, null, props.RegistrationDate.Name, document.Dated);
-      LinkFactAndProperty(recognizedDocument, numberFact, null, props.RegistrationNumber.Name, document.InNumber);
+      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Dated.Name, document.Dated);
+      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
@@ -557,7 +565,8 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.SignedBy = GetContactByFact(signatoryFact);
-        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy);
+        var isExact = IsFieldExact(signatoryFact, "Type");
+        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isExact);
       }
       
       // Заполнить контакт.
@@ -565,11 +574,19 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetContactByFact(responsibleFact);
-        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact);
+        var isExact = IsFieldExact(responsibleFact, "Type");
+        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isExact);
       }
       
       document.Save();
       return document;
+    }
+    
+    public static bool IsFieldExact(Structures.Module.Fact fact, string fieldName)
+    {
+      var field = GetField(fact, fieldName);
+      var minProbability = GetMinFactProbability();
+      return field != null ? field.Probability >= minProbability : false;      
     }
     
     /// <summary>
@@ -600,13 +617,13 @@ namespace Sungero.Capture.Server
       {
         var fact = correspondentNameFacts.First();
         document.Correspondent = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(recognizedDocument, fact, null, props.Correspondent.Name, document.Correspondent);
+        LinkFactAndProperty(recognizedDocument, fact, "CorrespondentName", props.Correspondent.Name, document.Correspondent);
       }
       if (correspondentNameFacts.Count() > 1)
       {
         var fact = correspondentNameFacts.Last();
         document.Recipient = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(recognizedDocument, fact, null, props.Recipient.Name, document.Recipient);
+        LinkFactAndProperty(recognizedDocument, fact, "CorrespondentName", props.Recipient.Name, document.Recipient);
       }
       
       // Заполнить ИНН/КПП для КА и НОР.
@@ -645,7 +662,8 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.Signatory = GetFullNameByFact(signatoryFact);
-        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory);
+        var isExact = IsFieldExact(signatoryFact, "Type");
+        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory, isExact);
       }
       
       // Заполнить контакт.
@@ -653,7 +671,8 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetFullNameByFact(responsibleFact);
-        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact);
+        var isExact = IsFieldExact(responsibleFact, "Type");
+        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isExact);
       }
       
       // Заполнить данные нашей стороны.
@@ -664,15 +683,16 @@ namespace Sungero.Capture.Server
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
       }
       foreach (var fact in addresseeFacts)
-        LinkFactAndProperty(recognizedDocument, fact, null, props.Addressees.Name, document.Addressees);
+        LinkFactAndProperty(recognizedDocument, fact, null, props.Addressees.Name, document.Addressees, true);
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
-      document.Subject = !string.IsNullOrEmpty(subject)
-        ? string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower())
-        : string.Empty;
-      LinkFactAndProperty(recognizedDocument, subjectFact, null, props.Subject.Name, document.Subject);
+      if (!string.IsNullOrEmpty(subject))
+      {
+        document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
+        LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);        
+      }
       
       document.Save();
       
@@ -703,7 +723,7 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadDoc = GetLeadingDocumentName(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc);
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
@@ -826,7 +846,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
+      var isExact = IsFieldExact(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isExact);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
@@ -873,7 +894,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract);
+      var isExact = IsFieldExact(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isExact);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -985,7 +1007,8 @@ namespace Sungero.Capture.Server
       // Документ-основание.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
+      var isExact = IsFieldExact(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isExact);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
@@ -1149,7 +1172,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument);
+      var isExact = IsFieldExact(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isExact);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
@@ -1282,7 +1306,7 @@ namespace Sungero.Capture.Server
       {
         result.BusinessUnit = businessUnitWithFact.BusinessUnit;
         result.IsBusinessUnitSeller = sellerBusinessUnit == businessUnitWithFact;
-        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name);
+        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name, businessUnitWithFact.IsExact);
       }
       else
       {
@@ -1307,7 +1331,7 @@ namespace Sungero.Capture.Server
       if (counterpartyWithFact != null)
       {
         result.Counterparty = counterpartyWithFact.Counterparty;
-        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name);
+        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name, counterpartyWithFact.IsExact);
       }
       return result;
     }
@@ -1367,7 +1391,7 @@ namespace Sungero.Capture.Server
         var trrc = GetFieldValue(fact, "TRRC");
         var counterparties = GetCounterparties(tin, trrc);
         if (counterparties.Any())
-          return Structures.Module.CounterpartyWithFact.Create(counterparties.First(), fact);
+          return Structures.Module.CounterpartyWithFact.Create(counterparties.First(), fact, true);
       }
       
       return null;
@@ -1378,23 +1402,28 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts">Список фактов.</param>
     /// <returns>Корреспондент.</returns>
-    public static Sungero.Parties.ICounterparty GetCounterparty(List<Structures.Module.Fact> facts)
+    public static Structures.Module.CounterpartyWithFact GetCounterparty(List<Structures.Module.Fact> facts)
     {
-      // Получить ИНН/КПП и наименования/ФС контрагентов из фактов.
+      var filteredCounterparties = Counterparties.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
+      
+      var foundByName = new List<Structures.Module.CounterpartyWithFact>();
       var correspondentNames = new List<string>();
+      // Получить ИНН/КПП и наименования/ФС контрагентов из фактов.
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
         var name = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
         correspondentNames.Add(name);
+        var counterparties = filteredCounterparties
+          .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        foreach (var counterparty in counterparties)
+        {
+          var counterpartyWithFact = Structures.Module.CounterpartyWithFact.Create(counterparty, fact, false);
+          foundByName.Add(counterpartyWithFact);
+        }
       }
-      
-      // Поиск корреспондентов по наименованию.
-      var foundByName = Counterparties.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment))
-        .Where(x => correspondentNames.Contains(x.Name))
-        .ToList();
-      
+                 
       // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.
       var correspondentTINs = GetFacts(facts, "Counterparty", "TIN");
       if (!correspondentTINs.Any())
@@ -1402,13 +1431,17 @@ namespace Sungero.Capture.Server
       else
       {
         // Поиск по ИНН/КПП.
-        var foundByTin = new List<ICounterparty>();
+        var foundByTin = new List<Structures.Module.CounterpartyWithFact>();
         foreach (var fact in correspondentTINs)
         {
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
           var counterparties = GetCounterparties(tin, trrc);
-          foundByTin.AddRange(counterparties);
+          foreach (var counterparty in counterparties)
+          {
+            var counterpartyWithFact = Structures.Module.CounterpartyWithFact.Create(counterparty, fact, true);
+            foundByTin.Add(counterpartyWithFact);
+          }
         }
         
         // Найден ровно 1.
@@ -1418,12 +1451,12 @@ namespace Sungero.Capture.Server
         // Найдено 0. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
         if (!foundByTin.Any())
           return foundByName
-            .Where(x => string.IsNullOrEmpty(x.TIN))
-            .Where(x => !CompanyBases.Is(x) || string.IsNullOrEmpty(CompanyBases.As(x).TRRC))
+            .Where(x => string.IsNullOrEmpty(x.Counterparty.TIN))
+            .Where(x => !CompanyBases.Is(x.Counterparty) || string.IsNullOrEmpty(CompanyBases.As(x.Counterparty).TRRC))
             .FirstOrDefault();
 
         // Найдено несколько. Уточнить поиск по наименованию.
-        foundByName = foundByTin.Where(x => correspondentNames.Any(n => n == x.Name)).ToList();
+        foundByName = foundByTin.Where(x => correspondentNames.Any(n => n == x.Counterparty.Name)).ToList();
         if (foundByName.Any())
           return foundByName.FirstOrDefault();
         else
@@ -1604,6 +1637,8 @@ namespace Sungero.Capture.Server
     /// <returns>Поле.</returns>
     public static FactField GetField(Structures.Module.Fact fact, string fieldName)
     {
+      if (fact == null)
+        return null;
       return fact.Fields.FirstOrDefault(f => f.Name == fieldName);
     }
     
@@ -1737,12 +1772,12 @@ namespace Sungero.Capture.Server
     /// Получить значение минимальной вероятности доверия факту.
     /// </summary>
     /// <returns>Минимальная вероятность доверия факту.</returns>
-    private static float GetMinFactProbability()
+    private static double GetMinFactProbability()
     {
-      float minProbability = 0;
+      double minProbability = 0;
       var paramValue = Functions.Module.GetDocflowParamsValue(Constants.Module.MinFactProbabilityKey);
       if (!(paramValue is DBNull) && paramValue != null)
-        float.TryParse(paramValue.ToString(), out minProbability);
+        double.TryParse(paramValue.ToString(), out minProbability);
       return minProbability;
     }
     
@@ -1812,11 +1847,14 @@ namespace Sungero.Capture.Server
       if (fact == null || propertyValue == null)
         return;
       
-      if (isExact == null)
+      if (isExact == null && !string.IsNullOrEmpty(fieldName))
       {
         var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
         if (field != null)
-          isExact = field.Probability > 80;
+        {
+          var minProbability = GetMinFactProbability();
+          isExact = field.Probability >= minProbability;
+        }          
       }
       
       var propertyStringValue = propertyValue.ToString();
