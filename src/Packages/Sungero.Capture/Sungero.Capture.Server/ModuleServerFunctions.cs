@@ -1917,14 +1917,27 @@ namespace Sungero.Capture.Server
       return result;
     }
     
-    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument,
-                                           Structures.Module.Fact fact, string fieldName,
-                                           string propertyName, object propertyValue,
+    /// <summary>
+    /// Проложить связь между фактом и свойством документа.
+    /// </summary>
+    /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
+    /// <param name="fact">Факт, который будет связан со свойством документа.</param>
+    /// <param name="fieldName">Поле, которое будет связано со свойством документа. Если не указано, то будут связаны все поля факта.</param>
+    /// <param name="propertyName">Имя свойства документа.</param>
+    /// <param name="propertyValue">Значение свойства.</param>
+    /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
+    /// <returns>Число.</returns>      
+    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument, 
+                                           Structures.Module.Fact fact, 
+                                           string fieldName, 
+                                           string propertyName, 
+                                           object propertyValue, 
                                            bool? isTrusted = null)
     {
       if (fact == null || propertyValue == null)
         return;
       
+      // Если параметр isTrusted не передан, то ориентируемся на вероятность из поля.      
       if (isTrusted == null && !string.IsNullOrEmpty(fieldName))
       {
         var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
