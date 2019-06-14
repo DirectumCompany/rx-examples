@@ -242,6 +242,10 @@ namespace Sungero.Capture.Server
       if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
         return CreateUniversalTransferDocument(recognizedDocument, responsible);
       
+      // Счет на оплату.
+      if (recognizedClass == Constants.Module.IncomingInvoiceClassName && !isMockMode)
+        return CreateIncomingInvoice(recognizedDocument, responsible);
+      
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(sourceFileName, recognizedDocument.BodyGuid, recognizedDocument.Message);
     }
@@ -1190,7 +1194,7 @@ namespace Sungero.Capture.Server
       
       return document;
     }
-    
+            
     #endregion
     
     #region УПД
@@ -1235,6 +1239,58 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
+    
+    #region Счет на оплату
+    
+    /// <summary>
+    /// Создать счет на оплату.
+    /// </summary>
+    /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Счет на оплату.</returns>
+    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
+    {
+      var document = Contracts.IncomingInvoices.Create();
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
+      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
+      var props = document.Info.Properties;
+      
+      // Заполнить основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = recognizedDocument.Facts;
+      
+      // Договор.
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
+      
+      // Дата и номер.
+      var DateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var NumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
+      document.Date = GetFieldDateTimeValue(DateFact, "Date");
+      document.Number = GetFieldValue(NumberFact, "Number");      
+      LinkFactAndProperty(recognizedDocument, DateFact, "Date", props.Date.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognizedDocument, NumberFact, "Number", props.Number.Name, document.RegistrationNumber);
+      
+      // Подразделение и ответственный.
+      document.Department = GetDepartment(responsible);
+      document.ResponsibleEmployee = responsible;
+      
+      // Сумма и валюта.
+      FillAmount(document, recognizedDocument);
+      
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
+      document.CreateVersionFrom(documentBody, "pdf");
+      
+      // Регистрация.
+      RegisterDocument(document);
+      
+      return document;
+    }
+    
+    #endregion 
     
     #region Заполнение свойств документа
     

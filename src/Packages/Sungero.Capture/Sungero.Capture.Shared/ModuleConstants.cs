@@ -25,6 +25,8 @@ namespace Sungero.Capture.Constants
     
     public const string UniversalTransferDocumentClassName = "Универсальный передаточный документ";
     
+    public const string IncomingInvoiceClassName = "Входящий счет на оплату";
+    
     public static class Initialize
     {
       public static readonly Guid MockIncomingLetterKindGuid = Guid.Parse("E37D0916-7814-441E-84EF-904B7B643497");
