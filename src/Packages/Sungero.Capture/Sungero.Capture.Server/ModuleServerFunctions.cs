@@ -1960,7 +1960,9 @@ namespace Sungero.Capture.Server
       if (recognitionInfo == null)
         return result;
       
-      var linkedFacts = recognitionInfo.Facts.Where(x => !string.IsNullOrEmpty(x.PropertyName));
+      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+      var linkedFacts = recognitionInfo.Facts.Where(x => !string.IsNullOrEmpty(x.PropertyName) &&
+                                                         !x.PropertyName.Any(с => с == '.'));
       result = linkedFacts.Where(x => x.IsTrusted == isTrusted).Select(x => x.PropertyName).Distinct().ToList();
       
       return result;
