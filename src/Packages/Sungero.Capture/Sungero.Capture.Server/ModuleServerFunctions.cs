@@ -79,7 +79,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
-    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>    
+    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>
     [Remote]
     public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
     {
@@ -168,7 +168,7 @@ namespace Sungero.Capture.Server
         
         // Факты и поля фактов.
         recognizedDocument.Facts = new List<Fact>();
-        var minFactProbability = GetMinFactProbability();
+        var minFactProbability = GetDocflowParamsNumbericValue(Constants.Module.MinFactProbabilityKey);
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
           var facts = packageProcessResult.ExtractionResult.Facts
@@ -535,7 +535,7 @@ namespace Sungero.Capture.Server
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
-          
+      
       // Адресат.
       var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
       var addressee = GetFieldValue(addresseeFact, "Addressee");
@@ -589,7 +589,7 @@ namespace Sungero.Capture.Server
       document.Save();
       return document;
     }
-            
+    
     /// <summary>
     /// Создать входящее письмо с текстовыми полями.
     /// </summary>
@@ -637,6 +637,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
         LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
       }
+      
       if (tinTrrcFacts.Count() > 1)
       {
         var fact = tinTrrcFacts.Last();
@@ -692,7 +693,7 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);        
+        LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
       
       document.Save();
@@ -736,10 +737,14 @@ namespace Sungero.Capture.Server
         document.CounterpartyName = seller.Name;
         document.CounterpartyTin = seller.Tin;
         document.CounterpartyTrrc = seller.Trrc;
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.CounterpartyName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.CounterpartyName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.CounterpartyTin.Name, seller.Tin);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.CounterpartyTrrc.Name, seller.Trrc);
+        var isTrusted = IsTrustedField(seller.Fact, "Name");
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.CounterpartyName.Name, seller.Name, isTrusted);
+        isTrusted = IsTrustedField(seller.Fact, "LegalForm");
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.CounterpartyName.Name, seller.Name, isTrusted);
+        isTrusted = IsTrustedField(seller.Fact, "TIN");
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.CounterpartyTin.Name, seller.Tin, isTrusted);
+        isTrusted = IsTrustedField(seller.Fact, "TRRC");
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.CounterpartyTrrc.Name, seller.Trrc, isTrusted);
       }
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
       if (buyer != null)
@@ -1194,7 +1199,7 @@ namespace Sungero.Capture.Server
       
       return document;
     }
-            
+    
     #endregion
     
     #region УПД
@@ -1270,7 +1275,7 @@ namespace Sungero.Capture.Server
       var DateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
       var NumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.Date = GetFieldDateTimeValue(DateFact, "Date");
-      document.Number = GetFieldValue(NumberFact, "Number");      
+      document.Number = GetFieldValue(NumberFact, "Number");
       LinkFactAndProperty(recognizedDocument, DateFact, "Date", props.Date.Name, document.RegistrationDate);
       LinkFactAndProperty(recognizedDocument, NumberFact, "Number", props.Number.Name, document.RegistrationNumber);
       
@@ -1290,7 +1295,7 @@ namespace Sungero.Capture.Server
       return document;
     }
     
-    #endregion 
+    #endregion
     
     #region Заполнение свойств документа
     
@@ -1489,7 +1494,7 @@ namespace Sungero.Capture.Server
           foundByName.Add(counterpartyWithFact);
         }
       }
-                 
+      
       // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.
       var correspondentTINs = GetFacts(facts, "Counterparty", "TIN");
       if (!correspondentTINs.Any())
@@ -1835,28 +1840,18 @@ namespace Sungero.Capture.Server
       return arioConnector.GetDocumentByGuid(documentGuid);
     }
     
-    /// Получить значение минимальной вероятности доверия факту.
+    /// <summary>
+    /// Получить значение численного параметра из docflow_params.
     /// </summary>
-    /// <returns>Минимальная вероятность доверия факту.</returns>
-    private static double GetMinFactProbability()
+    /// <param name="paramName">Наименование параметра.</param>
+    /// <returns>Значение параметра.</returns>
+    private static double GetDocflowParamsNumbericValue(string paramName)
     {
-      double minProbability = 0;
-      var paramValue = Functions.Module.GetDocflowParamsValue(Constants.Module.MinFactProbabilityKey);
+      double result = 0;
+      var paramValue = Functions.Module.GetDocflowParamsValue(paramName);
       if (!(paramValue is DBNull) && paramValue != null)
-        double.TryParse(paramValue.ToString(), out minProbability);
-      return minProbability;
-    }
-    
-    /// Получить значение вероятности доверия факту, при которой считаем что факт извлекся корректно.
-    /// </summary>
-    /// <returns>Вероятность доверия факту.</returns>
-    private static double GetTrustedFactProbability()
-    {
-      double trustedProbability = 0;
-      var paramValue = Functions.Module.GetDocflowParamsValue(Constants.Module.TrustedFactProbabilityKey);
-      if (!(paramValue is DBNull) && paramValue != null)
-        double.TryParse(paramValue.ToString(), out trustedProbability);
-      return trustedProbability;
+        double.TryParse(paramValue.ToString(), out result);
+      return result;
     }
     
     /// <summary>
@@ -1926,26 +1921,19 @@ namespace Sungero.Capture.Server
     /// <param name="propertyName">Имя свойства документа.</param>
     /// <param name="propertyValue">Значение свойства.</param>
     /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
-    /// <returns>Число.</returns>      
-    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument, 
-                                           Structures.Module.Fact fact, 
-                                           string fieldName, 
-                                           string propertyName, 
-                                           object propertyValue, 
+    public static void LinkFactAndProperty(Structures.Module.RecognizedDocument recognizedDocument,
+                                           Structures.Module.Fact fact,
+                                           string fieldName,
+                                           string propertyName,
+                                           object propertyValue,
                                            bool? isTrusted = null)
     {
       if (fact == null || propertyValue == null)
         return;
       
-      // Если параметр isTrusted не передан, то ориентируемся на вероятность из поля.      
-      if (isTrusted == null && !string.IsNullOrEmpty(fieldName))
+      if (isTrusted == null)
       {
-        var field = fact.Fields.FirstOrDefault(f => f.Name == fieldName);
-        if (field != null)
-        {
-          var trustedProbability = GetTrustedFactProbability();
-          isTrusted = field.Probability >= trustedProbability;
-        }          
+        isTrusted = IsTrustedField(fact, fieldName);
       }
       
       var propertyStringValue = propertyValue.ToString();
@@ -1996,8 +1984,18 @@ namespace Sungero.Capture.Server
     public static bool IsTrustedField(Structures.Module.Fact fact, string fieldName)
     {
       var field = GetField(fact, fieldName);
-      var trustedProbability = GetTrustedFactProbability();
-      return field != null ? field.Probability >= trustedProbability : false;      
+      if (field != null)
+      {
+        double trustedProbability;
+        var valueReceived = Sungero.Core.Cache.TryGetValue(Constants.Module.TrustedFactProbabilityKey, out trustedProbability);
+        if (!valueReceived)
+        {
+          trustedProbability = GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
+          Sungero.Core.Cache.AddOrUpdate(Constants.Module.TrustedFactProbabilityKey, trustedProbability, Calendar.Now.AddMinutes(10));
+        }
+        return field.Probability >= trustedProbability;
+      }
+      return false;
     }
     
     #endregion
