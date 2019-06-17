@@ -866,18 +866,7 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
       
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      if (string.IsNullOrEmpty(document.Subject))
-      {
-        document.Subject = "pdf";
-        document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;        
-      }
-      else
-      {
-         document.CreateVersionFrom(documentBody, "pdf");
-      }
+      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
@@ -1037,18 +1026,7 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
       
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      if (string.IsNullOrEmpty(document.Subject))
-      {
-        document.Subject = "pdf";
-        document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;        
-      }
-      else
-      {
-         document.CreateVersionFrom(documentBody, "pdf");
-      }
+      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
@@ -1207,18 +1185,8 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
       
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      if (string.IsNullOrEmpty(document.Subject))
-      {
-        document.Subject = "pdf";
-        document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;        
-      }
-      else
-      {
-         document.CreateVersionFrom(documentBody, "pdf");
-      }
+      CreateVersion(document, recognizedDocument);
+      
       // Регистрация.
       RegisterDocument(document);
       
@@ -1259,18 +1227,7 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
 
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      if (string.IsNullOrEmpty(document.Subject))
-      {
-        document.Subject = "pdf";
-        document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;        
-      }
-      else
-      {
-         document.CreateVersionFrom(documentBody, "pdf");
-      }
+      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
@@ -1321,18 +1278,7 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
       
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      if (string.IsNullOrEmpty(document.Subject))
-      {
-        document.Subject = "pdf";
-        document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;        
-      }
-      else
-      {
-         document.CreateVersionFrom(documentBody, "pdf");
-      }
+      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
@@ -2041,6 +1987,27 @@ namespace Sungero.Capture.Server
         return field.Probability >= trustedProbability;
       }
       return false;
+    }
+    
+    /// <summary>
+    /// Создать тело документа.
+    /// </summary>
+    /// <param name="document">Документ Rx.</param>
+    /// <param name="recognizedDocument">Результат обработки входящего документа в Арио.</param>
+    public static void CreateVersion(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument)
+    {
+      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      if (string.IsNullOrEmpty(document.Subject))
+      {
+        document.Subject = "pdf";
+        document.CreateVersionFrom(documentBody, "pdf");
+        document.Subject = string.Empty;        
+      }
+      else
+      {
+         document.CreateVersionFrom(documentBody, "pdf");
+      }
     }
     
     #endregion
