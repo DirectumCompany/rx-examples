@@ -871,7 +871,17 @@ namespace Sungero.Capture.Server
       FillAmount(document, recognizedDocument);
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      if (string.IsNullOrEmpty(document.Subject))
+      {
+        document.Subject = "pdf";
+        document.CreateVersionFrom(documentBody, "pdf");
+        document.Subject = string.Empty;        
+      }
+      else
+      {
+         document.CreateVersionFrom(documentBody, "pdf");
+      }
       
       // Регистрация.
       RegisterDocument(document);
@@ -1032,7 +1042,17 @@ namespace Sungero.Capture.Server
       FillAmount(document, recognizedDocument);
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      if (string.IsNullOrEmpty(document.Subject))
+      {
+        document.Subject = "pdf";
+        document.CreateVersionFrom(documentBody, "pdf");
+        document.Subject = string.Empty;        
+      }
+      else
+      {
+         document.CreateVersionFrom(documentBody, "pdf");
+      }
       
       // Регистрация.
       RegisterDocument(document);
@@ -1192,8 +1212,17 @@ namespace Sungero.Capture.Server
       FillAmount(document, recognizedDocument);
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
-      
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      if (string.IsNullOrEmpty(document.Subject))
+      {
+        document.Subject = "pdf";
+        document.CreateVersionFrom(documentBody, "pdf");
+        document.Subject = string.Empty;        
+      }
+      else
+      {
+         document.CreateVersionFrom(documentBody, "pdf");
+      }
       // Регистрация.
       RegisterDocument(document);
       
@@ -1235,7 +1264,17 @@ namespace Sungero.Capture.Server
       FillAmount(document, recognizedDocument);
 
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      if (string.IsNullOrEmpty(document.Subject))
+      {
+        document.Subject = "pdf";
+        document.CreateVersionFrom(documentBody, "pdf");
+        document.Subject = string.Empty;        
+      }
+      else
+      {
+         document.CreateVersionFrom(documentBody, "pdf");
+      }
       
       // Регистрация.
       RegisterDocument(document);
@@ -1287,7 +1326,17 @@ namespace Sungero.Capture.Server
       FillAmount(document, recognizedDocument);
       
       var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      if (string.IsNullOrEmpty(document.Subject))
+      {
+        document.Subject = "pdf";
+        document.CreateVersionFrom(documentBody, "pdf");
+        document.Subject = string.Empty;        
+      }
+      else
+      {
+         document.CreateVersionFrom(documentBody, "pdf");
+      }
       
       // Регистрация.
       RegisterDocument(document);
