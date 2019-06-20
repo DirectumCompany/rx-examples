@@ -124,7 +124,7 @@ namespace Sungero.Capture.Client
         .FirstOrDefault();
       if (fileElement == null)
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
-            
+      
       var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
       if (!File.Exists(filePath))
       {
@@ -143,7 +143,7 @@ namespace Sungero.Capture.Client
     public static string GetScannedPackageName(string instanceInfos)
     {
       if (!File.Exists(instanceInfos))
-        throw new ApplicationException(Resources.NoFilesInfoInPackage);  
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
       
       var filesXDoc = System.Xml.Linq.XDocument.Load(instanceInfos);
       var fileElement = filesXDoc
@@ -156,6 +156,36 @@ namespace Sungero.Capture.Client
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
       
       return fileElement.Element("FileDescription").Value;
+    }
+    
+    /// <summary>
+    /// Установить цвет у распознанных свойств в карточке документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    [Public]
+    public virtual void SetPropertiesColors(Sungero.Docflow.IOfficialDocument document)
+    {
+      // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
+      // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за ограничений платформы.
+      var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);
+      HighlightProperties(document, exactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Green);
+      
+      var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, false);
+      HighlightProperties(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Yellow);
+    }
+    
+    /// <summary>
+    /// Подсветить указанные свойства в карточке документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="propertyNames">Список имён свойств.</param>
+    /// <param name="color">Цвет.</param>
+    public virtual void HighlightProperties(Sungero.Docflow.IOfficialDocument document, List<string> propertyNames, Sungero.Core.Color color)
+    {
+      foreach (var property in propertyNames)
+      {
+        document.State.Properties[property].HighlightColor = color;
+      }
     }
     
     /// <summary>
