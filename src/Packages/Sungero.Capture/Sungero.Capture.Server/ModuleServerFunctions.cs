@@ -233,14 +233,22 @@ namespace Sungero.Capture.Server
           : CreateWaybill(recognizedDocument, responsible);
       
       // Счет-фактура.
-      if (recognizedClass == Constants.Module.IncomingTaxInvoiceClassName)
+      if (recognizedClass == Constants.Module.TaxInvoiceClassName)
         return isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
-          : CreateTaxInvoice(recognizedDocument, responsible);
+          : CreateTaxInvoice(recognizedDocument, responsible, false);
       
+      // Корректировочный счет-фактура.
+      if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
+        return CreateTaxInvoice(recognizedDocument, responsible, true);
+                  
       // УПД.
       if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
-        return CreateUniversalTransferDocument(recognizedDocument, responsible);
+        return CreateUniversalTransferDocument(recognizedDocument, responsible, false);
+      
+      //УКД
+      if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
+        return CreateUniversalTransferDocument(recognizedDocument, responsible, true);
       
       // Счет на оплату.
       if (recognizedClass == Constants.Module.IncomingInvoiceClassName && !isMockMode)
@@ -1150,7 +1158,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
@@ -1178,13 +1186,38 @@ namespace Sungero.Capture.Server
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
+      // Корректировочный документ.
+      if (isAdjustment)
+      {
+        document.IsAdjustment = true;
+        var correctionDateFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
+        var correctionNumberFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
+        var correctionDate = GetFieldDateTimeValue(correctionDateFact, "CorrectionDate");
+        var correctionNumber = GetFieldValue(correctionNumberFact, "CorrectionNumber");
+        if (correctionDate != null && !string.IsNullOrEmpty(correctionNumber))
+        {
+          if (FinancialArchive.IncomingTaxInvoices.Is(document))
+          {
+            document.Corrected = FinancialArchive.IncomingTaxInvoices.GetAll()
+              .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
+          }
+          else
+          {
+            document.Corrected = FinancialArchive.OutgoingTaxInvoices.GetAll()
+              .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
+          }
+          LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
+          LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
+        }
+      }
+              
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
+                 
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
@@ -1192,7 +1225,7 @@ namespace Sungero.Capture.Server
       
       return document;
     }
-    
+            
     #endregion
     
     #region УПД
@@ -1203,7 +1236,7 @@ namespace Sungero.Capture.Server
     /// <param name="сlassificationResult">Результат обработки УПД в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       var props = document.Info.Properties;
@@ -1222,7 +1255,20 @@ namespace Sungero.Capture.Server
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
-      document.IsAdjustment = false;
+      
+      // Корректировочный документ.
+      if (isAdjustment)
+      {
+        document.IsAdjustment = true;
+        var correctionDateFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
+        var correctionNumberFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
+        var correctionDate = GetFieldDateTimeValue(correctionDateFact, "CorrectionDate");
+        var correctionNumber = GetFieldValue(correctionNumberFact, "CorrectionNumber");
+        document.Corrected = FinancialArchive.UniversalTransferDocuments.GetAll()
+          .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
+        LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
+        LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
+      }
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
@@ -1326,6 +1372,26 @@ namespace Sungero.Capture.Server
       var props = document.Info.Properties;
       LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
       LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
+    }
+    
+    /// <summary>
+    /// Заполнить регистрационные данные.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="factName">Наименование факта.</param>
+    public static IAccountingDocumentBase GetCorrectedDocument(Structures.Module.RecognizedDocument recognizedDocument, string factName)
+    {
+      var facts = recognizedDocument.Facts;
+      var dateFact = GetOrderedFacts(facts, factName, "CorrectionDate").FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, factName, "CorrectionNumber").FirstOrDefault();
+      var date = GetFieldDateTimeValue(dateFact, "Date");
+      var number = GetFieldValue(numberFact, "Number");
+      if (date != null && !string.IsNullOrEmpty(number))
+      {
+        return AccountingDocumentBases.GetAll().FirstOrDefault(d => d.RegistrationNumber.Equals(number, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == date);
+      }
+      return null;
     }
     
     /// <summary>

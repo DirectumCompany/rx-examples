@@ -73,7 +73,7 @@ namespace Sungero.Capture.Client
       var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
       if (typeClassifier == null)
         throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
-      
+
       var fpClassifierId = fpClassifier.Id.ToString();
       var typeClassifierId = typeClassifier.Id.ToString();
       
@@ -98,7 +98,9 @@ namespace Sungero.Capture.Client
         { Constants.Module.ContractStatementClassName, "ContractStatement"},
         { Constants.Module.WaybillClassName, "Waybill"},
         { Constants.Module.UniversalTransferDocumentClassName, "GeneralTransferDocument"},
-        { Constants.Module.IncomingTaxInvoiceClassName, "TaxInvoice"},
+        { Constants.Module.GeneralCorrectionDocumentClassName, "GeneralCorrectionDocument"},
+        { Constants.Module.TaxInvoiceClassName, "TaxInvoice"},
+        { Constants.Module.TaxinvoiceCorrectionClassName, "TaxinvoiceCorrection"},
         { Constants.Module.IncomingInvoiceClassName, "IncomingInvoice"},
       };
     }

@@ -21,9 +21,13 @@ namespace Sungero.Capture.Constants
     
     public const string WaybillClassName = "Товарная накладная";
     
-    public const string IncomingTaxInvoiceClassName = "Счет-фактура";
+    public const string TaxInvoiceClassName = "Счет-фактура";
+    
+    public const string TaxinvoiceCorrectionClassName = "Корректировочный счет-фактура";
     
     public const string UniversalTransferDocumentClassName = "Универсальный передаточный документ";
+    
+    public const string GeneralCorrectionDocumentClassName = "Универсальный корректировочный документ";
     
     public const string IncomingInvoiceClassName = "Входящий счет на оплату";
     
