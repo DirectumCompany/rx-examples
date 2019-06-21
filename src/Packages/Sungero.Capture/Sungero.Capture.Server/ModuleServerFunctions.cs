@@ -2036,13 +2036,17 @@ namespace Sungero.Capture.Server
       foreach (var linkedFact in linkedFacts)
       {
         var propertyName = linkedFact.PropertyName;
-        object propertyValue = type.GetProperty(propertyName).GetValue(document);
-        var propertyStringValue = propertyValue is Sungero.Domain.Shared.IEntity
-          ? ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString()
-          : propertyValue.ToString();
-        
-        if (Equals(propertyStringValue, linkedFact.PropertyValue))
-          result.Add(propertyName);
+        var property = type.GetProperty(propertyName);
+        if (property != null)
+        {
+          object propertyValue = property.GetValue(document);
+          var propertyStringValue = propertyValue is Sungero.Domain.Shared.IEntity
+            ? ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString()
+            : propertyValue.ToString();
+          
+          if (Equals(propertyStringValue, linkedFact.PropertyValue))
+            result.Add(propertyName);
+        }
       }
       
       return result.Distinct().ToList();

@@ -182,9 +182,11 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightProperties(Sungero.Docflow.IOfficialDocument document, List<string> propertyNames, Sungero.Core.Color color)
     {
-      foreach (var property in propertyNames)
+      foreach (var propertyName in propertyNames)
       {
-        document.State.Properties[property].HighlightColor = color;
+        var property = document.GetType().GetProperty(propertyName);
+        if (property != null)
+          document.State.Properties[propertyName].HighlightColor = color;
       }
     }
     
