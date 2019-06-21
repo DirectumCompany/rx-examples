@@ -56,6 +56,59 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
+    /// Создать документ в DirectumRX на основе данных распознования.
+    /// </summary>
+    /// <param name="bodyFilePath">Путь до исходного файла.</param>
+    /// <param name="jsonFilePath">Путь до файла json с результатом распознавания.</param>
+    /// <param name="responsibleId">Id сотрудника ответственного за распознавание документов.</param>
+    public static void CreateDocumentByRecognitionData(string bodyFilePath, string jsonFilePath, string responsibleId)
+    {
+      Logger.Debug("Start CreateDocumentByRecognitionData");
+      
+      if (!System.IO.File.Exists(bodyFilePath))
+      {
+        Logger.ErrorFormat("File does not exist {0}", bodyFilePath);
+        return;
+      }
+      
+      if (!System.IO.File.Exists(jsonFilePath))
+      {
+        Logger.ErrorFormat("File does not exist {0}", jsonFilePath);
+        return;
+      }
+      
+      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
+      if (responsible == null)
+        throw new ApplicationException(Resources.InvalidResponsibleId);
+      Logger.DebugFormat("Responsible: {0}", responsible.Person.ShortName);
+      
+      var arioUrl = Sungero.Capture.Functions.Module.Remote.GetArioUrl();
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      
+      // Загрузить документ в Ario с преобразованием в pdf.
+      var convertionResults = arioConnector.ConvertDocumentToPdfAndGetGuid(System.IO.File.ReadAllBytes(bodyFilePath),
+                                                                           System.IO.Path.GetFileName(bodyFilePath));
+      if (convertionResults == null)
+        return;
+      var convertionResult = convertionResults.Results.FirstOrDefault();
+      if (convertionResult == null)
+        return;
+      var docPdfGuid = convertionResult.Guid;
+      Logger.DebugFormat("Document Ario Guid: {0}", docPdfGuid);
+      
+      // Заменить guid документа в исходном json'е на полученный из Ario.
+      var modifiedJson = arioConnector.UpdateGuidInClassificationResults(System.IO.File.ReadAllText(jsonFilePath), docPdfGuid);
+      Logger.Debug("Source Json updated.");
+      
+      // Обработать пакет.
+      Logger.Debug("Start ProcessSplitedPackage");
+      Functions.Module.Remote.ProcessSplitedPackage(System.IO.Path.GetFileName(bodyFilePath),
+                                                    modifiedJson, responsible);
+      Logger.Debug("Start ProcessSplitedPackage");
+      Logger.Debug("End CreateDocumentByRecognitionData");
+    }
+    
+    /// <summary>
     /// Разделить пакет на документы, классифицировать и извлечь из документов факты с помощью сервиса Ario.
     /// </summary>
     /// <param name="filePath">Путь к пакету.</param>
