@@ -2027,11 +2027,25 @@ namespace Sungero.Capture.Server
         return result;
       
       // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
-      var linkedFacts = recognitionInfo.Facts.Where(x => !string.IsNullOrEmpty(x.PropertyName) &&
-                                                         !x.PropertyName.Any(с => с == '.'));
-      result = linkedFacts.Where(x => x.IsTrusted == isTrusted).Select(x => x.PropertyName).Distinct().ToList();
+      var linkedFacts = recognitionInfo.Facts
+        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
+        .Where(x => x.IsTrusted == isTrusted);
       
-      return result;
+      // Взять только неизмененные пользователем свойства.
+      var type = document.GetType();
+      foreach (var linkedFact in linkedFacts)
+      {
+        var propertyName = linkedFact.PropertyName;
+        object propertyValue = type.GetProperty(propertyName).GetValue(document);
+        var propertyStringValue = propertyValue is Sungero.Domain.Shared.IEntity
+          ? ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString()
+          : propertyValue.ToString();
+        
+        if (Equals(propertyStringValue, linkedFact.PropertyValue))
+          result.Add(propertyName);
+      }
+      
+      return result.Distinct().ToList();
     }
     
     /// <summary>
@@ -2070,11 +2084,11 @@ namespace Sungero.Capture.Server
       {
         document.Subject = "pdf";
         document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;        
+        document.Subject = string.Empty;
       }
       else
       {
-         document.CreateVersionFrom(documentBody, "pdf");
+        document.CreateVersionFrom(documentBody, "pdf");
       }
     }
     
