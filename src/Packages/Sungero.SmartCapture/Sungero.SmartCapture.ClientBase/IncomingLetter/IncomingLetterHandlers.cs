@@ -70,6 +70,8 @@ namespace Sungero.SmartCapture
     {
       base.DatedValueInput(e);
       
+      // Для DateTime событие изменения отрабатывает, даже если даты одинаковые.
+      // Поэтому еще раз сравниваем только даты без учёта времени.
       if (e.OldValue.HasValue && e.NewValue.HasValue && Equals(e.OldValue.Value.Date, e.NewValue.Value.Date))
         return;
       
