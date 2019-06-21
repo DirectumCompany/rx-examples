@@ -1985,13 +1985,10 @@ namespace Sungero.Capture.Server
                                            object propertyValue,
                                            bool? isTrusted = null)
     {
-      if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
+      var propertyStringValue = GetPropertyStringValue(propertyValue);
+      if (string.IsNullOrWhiteSpace(propertyStringValue))
         return;
-      
-      var propertyStringValue = propertyValue.ToString();
-      if (propertyValue is Sungero.Domain.Shared.IEntity)
-        propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
-      
+            
       // Если значение определилось не из фактов,
       // для подсветки заносим это свойство и результату не доверяем.
       if (fact == null)
@@ -2050,19 +2047,31 @@ namespace Sungero.Capture.Server
         if (property != null)
         {
           object propertyValue = property.GetValue(document);
-          if (propertyValue != null)
-          {
-            var propertyStringValue = propertyValue is Sungero.Domain.Shared.IEntity
-              ? ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString()
-              : propertyValue.ToString();
-            
-            if (Equals(propertyStringValue, linkedFact.PropertyValue))
-              result.Add(propertyName);
-          }
+          var propertyStringValue = GetPropertyStringValue(propertyValue);
+          
+          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
+            result.Add(propertyName);
         }
       }
       
       return result.Distinct().ToList();
+    }
+    
+    /// <summary>
+    /// Получить строковое значение свойства.
+    /// </summary>
+    /// <param name="propertyValue">Значение свойства.</param>
+    /// <returns></returns>
+    /// <remarks>Для свойств типа сущность будет возвращена строка с Ид сущности.</remarks>
+    private static string GetPropertyStringValue(object propertyValue)
+    {
+      if (propertyValue == null)
+        return string.Empty;
+      
+      var propertyStringValue = propertyValue.ToString();
+      if (propertyValue is Sungero.Domain.Shared.IEntity)
+        propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
+      return propertyStringValue;
     }
     
     /// <summary>
