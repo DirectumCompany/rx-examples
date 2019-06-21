@@ -90,6 +90,8 @@ namespace Sungero.SmartCapture
       base.CorrespondentValueInput(e);
       
       this._obj.State.Properties.Correspondent.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.Contact.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.SignedBy.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
     }
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
@@ -102,6 +104,8 @@ namespace Sungero.SmartCapture
       
       // Восстановить обязательность корреспондента.
       _obj.State.Properties.Correspondent.IsRequired = true;
+      
+      Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
     }
   }
 }

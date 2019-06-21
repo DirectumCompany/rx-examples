@@ -40,10 +40,10 @@
           "Name": "From",
           "ColumnDefinitions": [
             {
-              "Percentage": 48.38
+              "Percentage": 50.0
             },
             {
-              "Percentage": 48.38
+              "Percentage": 50.0
             }
           ],
           "ColumnNumber": 0,

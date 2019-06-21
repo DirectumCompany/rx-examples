@@ -1985,26 +1985,36 @@ namespace Sungero.Capture.Server
                                            object propertyValue,
                                            bool? isTrusted = null)
     {
-      if (fact == null || propertyValue == null)
+      if (propertyValue == null || string.IsNullOrWhiteSpace(propertyValue.ToString()))
         return;
-      
-      if (isTrusted == null)
-      {
-        isTrusted = IsTrustedField(fact, fieldName);
-      }
       
       var propertyStringValue = propertyValue.ToString();
       if (propertyValue is Sungero.Domain.Shared.IEntity)
         propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
       
-      var facts = recognizedDocument.Info.Facts
-        .Where(f => f.FactId == fact.Id)
-        .Where(f => string.IsNullOrWhiteSpace(fieldName) || f.FieldName == fieldName);
-      foreach (var recognizedFact in facts)
+      // Если значение определилось не из фактов,
+      // для подсветки заносим это свойство и результату не доверяем.
+      if (fact == null)
       {
-        recognizedFact.PropertyName = propertyName;
-        recognizedFact.PropertyValue = propertyStringValue;
-        recognizedFact.IsTrusted = isTrusted;
+        var calculatedFact = recognizedDocument.Info.Facts.AddNew();
+        calculatedFact.PropertyName = propertyName;
+        calculatedFact.PropertyValue = propertyStringValue;
+        calculatedFact.IsTrusted = false;
+      }
+      else
+      {
+        if (isTrusted == null)
+          isTrusted = IsTrustedField(fact, fieldName);
+        
+        var facts = recognizedDocument.Info.Facts
+          .Where(f => f.FactId == fact.Id)
+          .Where(f => string.IsNullOrWhiteSpace(fieldName) || f.FieldName == fieldName);
+        foreach (var recognizedFact in facts)
+        {
+          recognizedFact.PropertyName = propertyName;
+          recognizedFact.PropertyValue = propertyStringValue;
+          recognizedFact.IsTrusted = isTrusted;
+        }
       }
     }
     
@@ -2040,12 +2050,15 @@ namespace Sungero.Capture.Server
         if (property != null)
         {
           object propertyValue = property.GetValue(document);
-          var propertyStringValue = propertyValue is Sungero.Domain.Shared.IEntity
-            ? ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString()
-            : propertyValue.ToString();
-          
-          if (Equals(propertyStringValue, linkedFact.PropertyValue))
-            result.Add(propertyName);
+          if (propertyValue != null)
+          {
+            var propertyStringValue = propertyValue is Sungero.Domain.Shared.IEntity
+              ? ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString()
+              : propertyValue.ToString();
+            
+            if (Equals(propertyStringValue, linkedFact.PropertyValue))
+              result.Add(propertyName);
+          }
         }
       }
       
