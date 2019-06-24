@@ -74,17 +74,15 @@
               SeparateLineForEachSender="False"
               MessageBodyEncoding=""
               UpdateHtmlCharsetOnMessageBodyEncoding="False"
-              CaptureMode="MarkAsRead" >
+              CaptureMode="Delete" >
 
         <Server>
           <clear />
-          <add Name="Type" Value="IMAP" />
+          <add Name="Type" Value="POP3" />
           <add Name="Server" Value="{HOST}" />
-          <add Name="Port" Value="{PORT}" />
-          <add Name="User" Value="{BOX}" />
+          <add Name="User" Value="{BOX}"/>
           <add Name="Password" Value="{BOX_PWD}" />
-          <add Name="ConnectTimeout" Value="0" />
-          <add Name="ReadTimeout" Value="-1" />
+          <add Name="EncryptionMode" Value="None" />
         </Server>
       </add>
     </Mail>
@@ -171,7 +169,7 @@
                 WorkingFolder="{DCS_PATH}\SomeCapture\AnyProgramSender2"
                 Program="{DCS_PATH}\SendToRX2.bat"
                 ProgramArguments="MailCaptureLine"
-                ProgramWorkingFolder="{DCS_PATH}\SomeCapture\AnyProgramSender\AnyProgramSender2_Temp"
+                ProgramWorkingFolder="{DCS_PATH}\SomeCapture\AnyProgramSender2\AnyProgramSender2_Temp"
                 TimeOutInSeconds="300"
                 TryCount="1"
                 WorkersCount="2"/>
