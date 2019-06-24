@@ -44,7 +44,7 @@ namespace Sungero.Capture.Client
         if (!filePaths.Any())
           throw new ApplicationException("Files not found");
       }
-      // Получить имена файлов.      
+      // Получить имена файлов.
       foreach (var filePath in filePaths)
       {
         // Разделить пакет на документы.
@@ -63,7 +63,7 @@ namespace Sungero.Capture.Client
         Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible);
         Logger.DebugFormat("End of splitted package \"{0}\" processing.", sourceFileName);
         Logger.Debug("End of captured package processing.");
-      }     
+      }
     }
     
     /// <summary>
@@ -186,7 +186,7 @@ namespace Sungero.Capture.Client
         .Element("InputFilesSection")
         .Element("Files")
         .Elements();
-        
+      
       if (!fileElements.Any())
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
       foreach (var fileElement in fileElements)
@@ -200,12 +200,12 @@ namespace Sungero.Capture.Client
         {
           filePaths.Add(filePath);
         }
-      }            
+      }
       return filePaths;
     }
     
     public static List<string> GetMailPackagePaths(string filesInfo, string folder)
-   {
+    {
       var filePaths = new List<string>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
@@ -282,14 +282,9 @@ namespace Sungero.Capture.Client
     
     /// <summary>
     /// Установить цвет у распознанных свойств в карточке документа.
-    /// Получить имя пакета документов со сканера.
     /// </summary>
-    /// <param name="document">Документ.</param>
     [Public]
     public virtual void SetPropertiesColors(Sungero.Docflow.IOfficialDocument document)
-    /// <param name="instanceInfos">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
-    /// <returns>Путь к пакету документов со сканера.</returns>
-    public static string GetSourceType(string deviceInfo)
     {
       // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за ограничений платформы.
@@ -299,14 +294,18 @@ namespace Sungero.Capture.Client
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, false);
       HighlightProperties(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Yellow);
     }
+    
+    public static string GetSourceType(string deviceInfo)
+    {
       if (!File.Exists(deviceInfo))
-        throw new ApplicationException(Resources.NoFilesInfoInPackage);  
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
       
       var filesXDoc = System.Xml.Linq.XDocument.Load(deviceInfo);
       var element = filesXDoc.Element("MailSourceInfo");
       if (element != null)
         return "mail";
-      return "folder";      
+      return "folder";
+    }
     
     /// <summary>
     /// Подсветить указанные свойства в карточке документа.
