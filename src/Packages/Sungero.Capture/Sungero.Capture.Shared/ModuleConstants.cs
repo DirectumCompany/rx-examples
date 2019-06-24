@@ -41,5 +41,12 @@ namespace Sungero.Capture.Constants
       
       public static readonly Guid MockIncomingTaxInvoiceGuid = Guid.Parse("69A7B4C2-7D6C-4F36-B760-B6D048EE40A4");
     }
+    
+    public static class CaptureSourceType
+    {
+      public const string Folder = "folder";
+      
+      public const string Mail = "mail";
+    }
   }
 }

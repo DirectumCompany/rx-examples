@@ -34,9 +34,9 @@ namespace Sungero.Capture.Client
       
       var source = GetSourceType(deviceInfo);
       var filePaths = new List<string>();
-      if (source == "mail")
+      if (source == Constants.Module.CaptureSourceType.Mail)
       {
-        filePaths = GetMailPackagePaths(filesInfo, folder);
+        var mailFiles = GetMailPackagePaths(filesInfo, folder);
       }
       else
       {
@@ -44,6 +44,7 @@ namespace Sungero.Capture.Client
         if (!filePaths.Any())
           throw new ApplicationException("Files not found");
       }
+      
       // Получить имена файлов.
       foreach (var filePath in filePaths)
       {
@@ -214,57 +215,60 @@ namespace Sungero.Capture.Client
       return filePaths;
     }
     
-    public static List<string> GetMailPackagePaths(string filesInfo, string folder)
+    /// <summary>
+    /// Получить пути до  захваченных с почты файлов.
+    /// </summary>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <returns>Пути до захваченных с почты файлов.</returns>
+    public static Structures.Module.CapturedMailFiles GetMailPackagePaths(string filesInfo, string folder)
     {
-      var filePaths = new List<string>();
+      var mailFiles = Structures.Module.CapturedMailFiles.Create();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
       {
         Logger.Error(Resources.NoFilesInfoInPackage);
-        return filePaths;
+        return mailFiles;
       }
       
       var fileElements = filesXDoc.Element("InputFilesSection").Element("Files").Elements();
       
-      var mailBodyElements = fileElements.Where(e => e.Element("FileDescription").Value.Equals("body.txt", StringComparison.InvariantCultureIgnoreCase) ||
-                                                e.Element("FileDescription").Value.Equals("body.html", StringComparison.InvariantCultureIgnoreCase));
+      // Найти путь до файла тела письма.
+      var hasHtmlBody = fileElements.Any(x => string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase));
+      var hasTxtBody = fileElements.Any(x => string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      var getAssociatedAppForHtml = Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication("body.html") != null;
       
-      if(mailBodyElements.Any())
-      {
-        foreach (var mailBodyElement in mailBodyElements)
-        {
-          var fileDescription = mailBodyElement.Element("FileDescription").Value;
-          if (Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication(fileDescription) != null)
-          {
-            filePaths.Add(Path.Combine(folder, Path.GetFileName(mailBodyElement.Element("FileName").Value)));
-            break;
-          }
-        }
-      }
+      if (getAssociatedAppForHtml && hasHtmlBody)
+        mailFiles.Body = Path.Combine(folder, "body.html");
+      else if (hasTxtBody)
+        mailFiles.Body = Path.Combine(folder, "body.txt");
       
-      var fileAttachments = fileElements.Where(f => !mailBodyElements.Contains(f));
-      foreach (var fileAttachment in fileAttachments)
+      // Обработать вложения.
+      var attachedElements = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
+                                                     !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      foreach (var attachedElement in attachedElements)
       {
-        var fileDescription = fileAttachment.Element("FileDescription").Value;
+        var fileDescription = attachedElement.Element("FileDescription").Value;
         
         //Если для файла нет приложения-обработчика, то платформа не даст создать документ.
-        var application = Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication(fileDescription);
-        if (application == null)
+        if (Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication(fileDescription) == null)
           continue;
         
         // Отбрасываем изображения из тела письма (например картинки из подписей).
         if (System.Text.RegularExpressions.Regex.IsMatch(fileDescription, @"^ATT\d+\s\d+\.\w+"))
           continue;
         
-        var filePath = Path.Combine(folder, Path.GetFileName(fileAttachment.Element("FileName").Value));
+        var filePath = Path.Combine(folder, Path.GetFileName(attachedElement.Element("FileName").Value));
         if (!File.Exists(filePath))
         {
           Logger.Error(Resources.FileNotFoundFormat(filePath));
           continue;
         }
-        filePaths.Add(filePath);
+        
+        mailFiles.Attachments.Add(filePath);
       }
-      return filePaths;
+      
+      return mailFiles;
     }
     
     /// <summary>
@@ -305,6 +309,11 @@ namespace Sungero.Capture.Client
       HighlightProperties(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Yellow);
     }
     
+    /// <summary>
+    /// Получить тип источника захвата.
+    /// </summary>
+    /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
+    /// <returns>Тип источника захвата.</returns>
     public static string GetSourceType(string deviceInfo)
     {
       if (!File.Exists(deviceInfo))
@@ -313,8 +322,8 @@ namespace Sungero.Capture.Client
       var filesXDoc = System.Xml.Linq.XDocument.Load(deviceInfo);
       var element = filesXDoc.Element("MailSourceInfo");
       if (element != null)
-        return "mail";
-      return "folder";
+        return Constants.Module.CaptureSourceType.Mail;
+      return Constants.Module.CaptureSourceType.Folder;
     }
     
     /// <summary>
