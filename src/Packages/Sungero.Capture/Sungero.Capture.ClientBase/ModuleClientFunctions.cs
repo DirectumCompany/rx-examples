@@ -17,6 +17,7 @@ namespace Sungero.Capture.Client
     /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <param name="responsibleId">ИД сотрудника, ответственного за обработку захваченных документов.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder,
@@ -33,17 +34,29 @@ namespace Sungero.Capture.Client
         throw new ApplicationException(Resources.EmptyArioUrl);
       
       var source = GetSourceType(deviceInfo);
-      var filePaths = new List<string>();
+      
       if (source == Constants.Module.CaptureSourceType.Mail)
-      {
-        var mailFiles = GetMailPackagePaths(filesInfo, folder);
-      }
-      else
-      {
-        filePaths = GetScannedPackagePath(filesInfo, folder);
-        if (!filePaths.Any())
-          throw new ApplicationException("Files not found");
-      }
+        ProcessMailPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName);
+      if (source == Constants.Module.CaptureSourceType.Folder)
+        ProcessScanPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
+    }
+    
+    /// <summary>
+    /// Обработать пакет пришедший со сканера.
+    /// </summary>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <param name="arioUrl">Host Ario.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
+    private static void ProcessScanPackage(string filesInfo, string folder,
+                                           string arioUrl, string firstPageClassifierName, string typeClassifierName,
+                                           Sungero.Company.IEmployee responsible)
+    {
+      var filePaths = GetScannedPackagePath(filesInfo, folder);
+      if (!filePaths.Any())
+        throw new ApplicationException("Files not found");
       
       // Получить имена файлов.
       foreach (var filePath in filePaths)
@@ -61,20 +74,47 @@ namespace Sungero.Capture.Client
         
         // Обработать пакет.
         Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
-        if (source == "mail")
-        {
-          var originalBody = new Structures.Module.Body();
-          originalBody.FileExtension = Path.GetExtension(filePath);
-          originalBody.File = System.IO.File.ReadAllBytes(filePath);
-          Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible, originalBody);
-        }
-        else
-        {
-          Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible, null);          
-        }
+        Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible, null);
         Logger.DebugFormat("End of splitted package \"{0}\" processing.", sourceFileName);
         Logger.Debug("End of captured package processing.");
       }
+    }
+    
+    /// <summary>
+    /// Обработать пакет пришедший с почты.
+    /// </summary>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <param name="arioUrl">Host Ario.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    private static void ProcessMailPackage(string filesInfo, string folder,
+                                           string arioUrl, string firstPageClassifierName, string typeClassifierName)
+    {
+      var mailFiles = GetMailPackagePaths(filesInfo, folder);
+      if (string.IsNullOrWhiteSpace(mailFiles.Body) && !mailFiles.Attachments.Any())
+        throw new ApplicationException("Files not found");
+      
+      // TODO Dmitriev: Создать входящее письмо.
+      // TODO Dmitriev: Получить json всех attachments письма. Вынести копипаст.
+      var classificationResults = new List<string>();
+      foreach (var attach in mailFiles.Attachments)
+      {
+        Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", attach);
+        var sourceFileName = System.IO.Path.GetFileName(attach);
+        var jsonClassificationResults = ProcessPackage(attach, arioUrl, firstPageClassifierName, typeClassifierName);
+        Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
+        
+        var errorMessage = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(jsonClassificationResults);
+        if (errorMessage != null && !string.IsNullOrWhiteSpace(errorMessage.Message))
+        {
+          Logger.Error(errorMessage.Message);
+          continue;
+        }
+        
+        classificationResults.Add(jsonClassificationResults);
+      }
+      // TODO Dmitriev: Отправить все json скопом на ProcessSplitedPackage.
     }
     
     /// <summary>
