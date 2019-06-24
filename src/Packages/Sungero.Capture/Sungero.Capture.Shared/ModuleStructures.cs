@@ -17,6 +17,13 @@ namespace Sungero.Capture.Structures.Module
     public List<Sungero.Capture.Structures.Module.Fact> Facts { get; set; }
     public string Message { get; set; }
     public IDocumentRecognitionInfo Info { get; set; }
+    public Sungero.Capture.Structures.Module.Body OriginalBody { get; set; }
+  }
+  
+  partial class Body
+  {
+    public byte[] File { get; set; }
+    public string FileExtension { get; set; }
   }
   
   /// <summary>

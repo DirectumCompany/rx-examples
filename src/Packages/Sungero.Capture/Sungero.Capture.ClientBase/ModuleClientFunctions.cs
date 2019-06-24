@@ -60,7 +60,17 @@ namespace Sungero.Capture.Client
         
         // Обработать пакет.
         Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
-        Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible);
+        if (source == "mail")
+        {
+          var originalBody = new Structures.Module.Body();
+          originalBody.FileExtension = Path.GetExtension(filePath);
+          originalBody.File = System.IO.File.ReadAllBytes(filePath);
+          Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible, originalBody);
+        }
+        else
+        {
+          Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible, null);          
+        }
         Logger.DebugFormat("End of splitted package \"{0}\" processing.", sourceFileName);
         Logger.Debug("End of captured package processing.");
       }
@@ -114,7 +124,7 @@ namespace Sungero.Capture.Client
       // Обработать пакет.
       Logger.Debug("Start ProcessSplitedPackage");
       Functions.Module.Remote.ProcessSplitedPackage(System.IO.Path.GetFileName(bodyFilePath),
-                                                    modifiedJson, responsible);
+                                                    modifiedJson, responsible, null);
       Logger.Debug("Start ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }

@@ -104,16 +104,15 @@ namespace Sungero.Capture.Server
     /// <param name="jsonClassificationResults">Json результатом классификации и извлечения фактов.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     [Remote]
-    public virtual void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible)
+    public virtual void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible, Structures.Module.Body originalbody)
     {
       // Создать документы по распознанным данным.
-      var recognizedDocuments = GetRecognizedDocuments(jsonClassificationResults);
+      var recognizedDocuments = GetRecognizedDocuments(jsonClassificationResults, originalbody);
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
       {
         var document = CreateDocumentByRecognizedDocument(recognizedDocument, sourceFileName, responsible);
         package.Add(document);
-        
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
       }
@@ -147,7 +146,7 @@ namespace Sungero.Capture.Server
       SendToResponsible(leadingDocument, addendums, responsible);
     }
     
-    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults)
+    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.Body originalBody)
     {
       var recognizedDocuments = new List<RecognizedDocument>();
       var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
@@ -160,6 +159,7 @@ namespace Sungero.Capture.Server
         recognizedDocument.BodyGuid = clsResult.DocumentGuid;
         recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognizedDocument.Message = packageProcessResult.Message;
+        recognizedDocument.OriginalBody = originalBody;
         var docInfo = DocumentRecognitionInfos.Create();
         docInfo.Name = recognizedDocument.PredictedClass;
         docInfo.RecognizedClass = recognizedDocument.PredictedClass;
@@ -236,12 +236,12 @@ namespace Sungero.Capture.Server
       if (recognizedClass == Constants.Module.TaxInvoiceClassName)
         return isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
-          : CreateTaxInvoice(recognizedDocument, responsible, false);
+          : CreateTaxInvoice(recognizedDocument, responsible, false, sourceFileName);
       
       // Корректировочный счет-фактура.
       if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
-        return CreateTaxInvoice(recognizedDocument, responsible, true);
-                  
+        return CreateTaxInvoice(recognizedDocument, responsible, true, sourceFileName);
+      
       // УПД.
       if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
         return CreateUniversalTransferDocument(recognizedDocument, responsible, false);
@@ -1158,7 +1158,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment, string filePath)
     {
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
@@ -1210,14 +1210,14 @@ namespace Sungero.Capture.Server
           LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
         }
       }
-              
+      
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-                 
+      
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
@@ -1225,7 +1225,7 @@ namespace Sungero.Capture.Server
       
       return document;
     }
-            
+    
     #endregion
     
     #region УПД
@@ -1988,7 +1988,7 @@ namespace Sungero.Capture.Server
       var propertyStringValue = GetPropertyStringValue(propertyValue);
       if (string.IsNullOrWhiteSpace(propertyStringValue))
         return;
-            
+      
       // Если значение определилось не из фактов,
       // для подсветки заносим это свойство и результату не доверяем.
       if (fact == null)
@@ -2104,17 +2104,49 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки входящего документа в Арио.</param>
     public static void CreateVersion(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument)
     {
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      if (string.IsNullOrEmpty(document.Subject))
+      using (var documentBody = GetDocumentBody(recognizedDocument.BodyGuid))
       {
-        document.Subject = "pdf";
-        document.CreateVersionFrom(documentBody, "pdf");
-        document.Subject = string.Empty;
-      }
-      else
-      {
-        document.CreateVersionFrom(documentBody, "pdf");
+        // Создание тел документов для которых требуется не требуется public body.
+        if (recognizedDocument.OriginalBody == null || recognizedDocument.OriginalBody.File == null)
+        {
+          // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+          if (string.IsNullOrEmpty(document.Subject))
+          {
+            document.Subject = "pdf";
+            document.CreateVersionFrom(documentBody, "pdf");
+            document.Subject = string.Empty;
+          }
+          else
+          {
+            document.CreateVersionFrom(documentBody, "pdf");
+          }
+          return;
+        }
+        
+        // Создание тел документов для которых требуется требуется public body.
+        var version = document.Versions.AddNew();
+        version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
+        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalBody.FileExtension);        
+        // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+        if (string.IsNullOrEmpty(document.Subject))
+        {
+          document.Subject = "pdf";
+          
+          using (var ms = new MemoryStream(recognizedDocument.OriginalBody.File))
+          {
+            version.Body.Write(ms);
+          }
+          version.PublicBody.Write(documentBody);
+          document.Subject = string.Empty;
+        }
+        else
+        {
+          using (var ms = new MemoryStream(recognizedDocument.OriginalBody.File))
+          {
+            version.Body.Write(ms);
+          }
+          version.PublicBody.Write(documentBody);
+        }
       }
     }
     
