@@ -255,7 +255,7 @@ namespace Sungero.Capture.Server
         return CreateIncomingInvoice(recognizedDocument, responsible);
       
       // Все нераспознанные документы создать простыми.
-      return CreateSimpleDocument(sourceFileName, recognizedDocument.BodyGuid, recognizedDocument.Message);
+      return CreateSimpleDocument(Path.GetFileName(sourceFileName), recognizedDocument);
     }
     
     /// <summary>
@@ -503,14 +503,12 @@ namespace Sungero.Capture.Server
     /// <param name="name">Имя документа.</param>
     /// <param name="documentGuid">Гуид тела документа.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateSimpleDocument(string name, string documentGuid, string note)
+    public static Docflow.IOfficialDocument CreateSimpleDocument(string name, Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = SimpleDocuments.Create();
       document.Name = !string.IsNullOrWhiteSpace(name) ? name : Resources.SimpleDocumentName;
-      document.Note = note;
-      var documentBody = GetDocumentBody(documentGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
-      documentBody = null;
+      document.Note = recognizedDocument.Message;
+      CreateVersion(document, recognizedDocument);
       document.Save();
       return document;
     }
@@ -529,8 +527,7 @@ namespace Sungero.Capture.Server
     {
       // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      CreateVersion(document, recognizedDocument);
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
@@ -702,12 +699,9 @@ namespace Sungero.Capture.Server
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
-      }
-      
-      document.Save();
-      
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      }      
+      document.Save();      
+      CreateVersion(document, recognizedDocument);
       
       return document;
     }
@@ -830,10 +824,8 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
-      document.Save();
-      
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      document.Save();     
+      CreateVersion(document, recognizedDocument);
       
       return document;
     }
@@ -991,9 +983,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       document.Save();
-      
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      CreateVersion(document, recognizedDocument);
       
       return document;
     }
@@ -1144,10 +1134,8 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
-      document.Save();
-      
-      var documentBody = GetDocumentBody(recognizedDocument.BodyGuid);
-      document.CreateVersionFrom(documentBody, "pdf");
+      document.Save();     
+      CreateVersion(document, recognizedDocument);
       
       return document;
     }
