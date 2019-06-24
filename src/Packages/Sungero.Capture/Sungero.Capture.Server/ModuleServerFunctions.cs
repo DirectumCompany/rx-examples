@@ -445,7 +445,7 @@ namespace Sungero.Capture.Server
     /// <returns>Документ с соответствующими номером и датой.</returns>
     /// <remarks>Будет возвращен первый попавшийся, если таких документов несколько.
     /// Будет возвращен null, если таких документов нет.</remarks>
-    private static Sungero.Contracts.IContractualDocument GetLeadingDocument(Fact fact)
+    private static Sungero.Contracts.IContractualDocument GetLeadingDocument(Fact fact, ICounterparty counterparty)
     {
       if (fact == null)
         return Sungero.Contracts.ContractualDocuments.Null;
@@ -454,7 +454,8 @@ namespace Sungero.Capture.Server
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
-                                                           x.RegistrationDate == docDate).FirstOrDefault();
+                                                           x.RegistrationDate == docDate && 
+                                                           (counterparty == null || x.Counterparty == counterparty)).FirstOrDefault();
     }
     
     /// <summary>
@@ -844,13 +845,7 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = recognizedDocument.Facts;
-      
-      // Договор.
-      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      var isTrusted = IsTrustedField(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
-      
+                  
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
       
@@ -858,6 +853,12 @@ namespace Sungero.Capture.Server
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
+      
+      // Договор.
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -1002,13 +1003,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      
-      // Документ-основание.
-      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
-      var isTrusted = IsTrustedField(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
-      
+                       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
@@ -1016,6 +1011,12 @@ namespace Sungero.Capture.Server
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, "SUPPLIER", "PAYER");
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
+      
+      // Документ-основание.
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -1167,7 +1168,7 @@ namespace Sungero.Capture.Server
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
       var isTrusted = IsTrustedField(leadingDocFact, "Type");
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
@@ -1293,7 +1294,7 @@ namespace Sungero.Capture.Server
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact);
+      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
       var isTrusted = IsTrustedField(leadingDocFact, "Type");
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
