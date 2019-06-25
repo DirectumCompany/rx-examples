@@ -660,6 +660,10 @@
       "Overridden": []
     }
   ],
+  "HandledEvents": [
+    "ShowingClient",
+    "RefreshClient"
+  ],
   "IconName": "MockIncomingLetter.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
@@ -673,6 +677,18 @@
     "IconName"
   ],
   "Properties": [
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "4bc39efb-1f46-4a1e-8b8c-04f2b90d6a8b",
+      "Name": "Subject",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
@@ -699,6 +715,9 @@
       "Name": "Dated",
       "CanBeSearch": false,
       "Code": "Dated",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "6e04681d-21d6-405e-bb01-775dc84ddb08"
     },
@@ -707,6 +726,9 @@
       "NameGuid": "a2b462b7-1556-4bb1-94ad-3a2accb4a66e",
       "Name": "InNumber",
       "Code": "InNumber",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "7fb9bbb8-aeaf-4613-9bfe-ab2f58755b79"
     },
@@ -715,6 +737,9 @@
       "NameGuid": "ea4e533b-6947-4f14-985e-f8ba015d459e",
       "Name": "InResponseTo",
       "Code": "InResponseTo",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "a2b462b7-1556-4bb1-94ad-3a2accb4a66e"
     },
@@ -723,6 +748,9 @@
       "NameGuid": "826e0ddb-4951-4a8c-b88f-35f2eb3e01ca",
       "Name": "Correspondent",
       "Code": "Correspondent",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "Length": 1000,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "ea4e533b-6947-4f14-985e-f8ba015d459e"
@@ -732,6 +760,9 @@
       "NameGuid": "c9b3ec95-aca3-452f-81d6-f6f2aa16574b",
       "Name": "Addressees",
       "Code": "Addressees",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "Length": 500,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "826e0ddb-4951-4a8c-b88f-35f2eb3e01ca"
@@ -741,6 +772,9 @@
       "NameGuid": "3ced94ec-bc43-4675-9f48-f13f9ce57ef4",
       "Name": "Signatory",
       "Code": "Signatory",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "c9b3ec95-aca3-452f-81d6-f6f2aa16574b"
     },
@@ -749,6 +783,9 @@
       "NameGuid": "800cd656-e78c-40cf-80c7-aca2f641c496",
       "Name": "Contact",
       "Code": "Contact",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "3ced94ec-bc43-4675-9f48-f13f9ce57ef4"
     },
@@ -757,6 +794,9 @@
       "NameGuid": "2fd1e157-c3d3-4e3c-88a8-49bd5b076bcd",
       "Name": "CorrespondentTin",
       "Code": "CorrespTin",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "800cd656-e78c-40cf-80c7-aca2f641c496"
     },
@@ -765,6 +805,9 @@
       "NameGuid": "f58a1704-aa67-40e6-a9a1-177ad40808fe",
       "Name": "CorrespondentTrrc",
       "Code": "CorrespTrrc",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "2fd1e157-c3d3-4e3c-88a8-49bd5b076bcd"
     },
@@ -773,6 +816,9 @@
       "NameGuid": "e65b8059-32cd-4f4a-9d83-569a1d687434",
       "Name": "RecipientTin",
       "Code": "RecipientTin",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "f58a1704-aa67-40e6-a9a1-177ad40808fe"
     },
@@ -781,6 +827,9 @@
       "NameGuid": "073c3f98-36e7-47a6-8627-2d761de68d76",
       "Name": "RecipientTrrc",
       "Code": "RecipientTrrc",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "e65b8059-32cd-4f4a-9d83-569a1d687434"
     },
@@ -789,6 +838,9 @@
       "NameGuid": "050616f5-04e3-4e7c-8dd0-1807a1113595",
       "Name": "Recipient",
       "Code": "Recipient",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "073c3f98-36e7-47a6-8627-2d761de68d76"
     }
