@@ -104,16 +104,16 @@ namespace Sungero.Capture.Server
     /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
     /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
-    /// <param name="originalbody">TODO: Артем, что это?</param>
+    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, string sourceFileName,
                                                                                                               IOfficialDocument leadingDocument, IEmployee responsible,
-                                                                                                              Structures.Module.Body originalbody)
+                                                                                                              Structures.Module.File originalFile)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
-      var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalbody);
+      var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
       {
@@ -156,7 +156,7 @@ namespace Sungero.Capture.Server
       return result;
     }
     
-    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.Body originalBody)
+    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.File originalFile)
     {
       var recognizedDocuments = new List<RecognizedDocument>();
       var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
@@ -169,7 +169,7 @@ namespace Sungero.Capture.Server
         recognizedDocument.BodyGuid = clsResult.DocumentGuid;
         recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognizedDocument.Message = packageProcessResult.Message;
-        recognizedDocument.OriginalBody = originalBody;
+        recognizedDocument.OriginalFile = originalFile;
         var docInfo = DocumentRecognitionInfos.Create();
         docInfo.Name = recognizedDocument.PredictedClass;
         docInfo.RecognizedClass = recognizedDocument.PredictedClass;
@@ -2138,7 +2138,7 @@ namespace Sungero.Capture.Server
       using (var documentBody = GetDocumentBody(recognizedDocument.BodyGuid))
       {
         // Создание тел документов для которых не требуется public body.
-        if (recognizedDocument.OriginalBody == null || recognizedDocument.OriginalBody.File == null)
+        if (recognizedDocument.OriginalFile == null || recognizedDocument.OriginalFile.Data == null)
         {
           // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
           if (string.IsNullOrEmpty(document.Subject))
@@ -2157,13 +2157,13 @@ namespace Sungero.Capture.Server
         // Создание тел документов для которых требуется public body.
         var version = document.Versions.AddNew();
         version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
-        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalBody.FileExtension);        
+        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalFile.Extension);        
         // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
         if (string.IsNullOrEmpty(document.Subject))
         {
           document.Subject = "pdf";
           
-          using (var ms = new MemoryStream(recognizedDocument.OriginalBody.File))
+          using (var ms = new MemoryStream(recognizedDocument.OriginalFile.Data))
           {
             version.Body.Write(ms);
           }
@@ -2172,7 +2172,7 @@ namespace Sungero.Capture.Server
         }
         else
         {
-          using (var ms = new MemoryStream(recognizedDocument.OriginalBody.File))
+          using (var ms = new MemoryStream(recognizedDocument.OriginalFile.Data))
           {
             version.Body.Write(ms);
           }
