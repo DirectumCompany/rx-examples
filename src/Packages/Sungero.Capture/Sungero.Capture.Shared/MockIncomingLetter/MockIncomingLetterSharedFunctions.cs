@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -21,13 +21,13 @@ namespace Sungero.Capture.Shared
      
      using (TenantInfo.Culture.SwitchTo())
      {
-       if (_obj.Correspondent != null)
+       if (!string.IsNullOrWhiteSpace(_obj.Correspondent))
          name += Sungero.RecordManagement.IncomingLetters.Resources.CorrespondentFrom + _obj.Correspondent;
        
        if (!string.IsNullOrWhiteSpace(_obj.InNumber))
          name += Sungero.Docflow.OfficialDocuments.Resources.Number + _obj.InNumber;
        
-       if (_obj.Dated != null)
+       if (!string.IsNullOrWhiteSpace(_obj.Dated))
          name += Sungero.Docflow.OfficialDocuments.Resources.DateFrom + _obj.Dated;
        
        if (!string.IsNullOrWhiteSpace(_obj.Subject))
