@@ -455,7 +455,7 @@ namespace Sungero.Capture.Server
       
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
                                                            x.RegistrationDate == docDate && 
-                                                           (counterparty == null || x.Counterparty == counterparty)).FirstOrDefault();
+                                                           (counterparty == null || x.Counterparty.Equals(counterparty))).FirstOrDefault();
     }
     
     /// <summary>
