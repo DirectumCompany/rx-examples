@@ -118,6 +118,7 @@ namespace Sungero.Capture.Server
       foreach (var recognizedDocument in recognizedDocuments)
       {
         var document = CreateDocumentByRecognizedDocument(recognizedDocument, sourceFileName, responsible);
+        document.Save();
         package.Add(document);
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -909,9 +910,8 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
+      document.Save();
       CreateVersion(document, recognizedDocument);
-      
       // Регистрация.
       RegisterDocument(document);
       
@@ -1067,7 +1067,7 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
+      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
@@ -1249,12 +1249,11 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
+      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
-      
       return document;
     }
     
@@ -1304,7 +1303,7 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-
+      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
@@ -1355,7 +1354,7 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
+      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.

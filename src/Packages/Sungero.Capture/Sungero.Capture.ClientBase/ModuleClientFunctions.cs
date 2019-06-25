@@ -114,7 +114,10 @@ namespace Sungero.Capture.Client
             string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
           //TODO Передать явно ведущий документ!!!
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, null, responsible, null);
+          var originalBody = new Structures.Module.Body();
+          originalBody.FileExtension = Path.GetExtension(attachment);
+          originalBody.File = System.IO.File.ReadAllBytes(attachment);
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, null, responsible, originalBody);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
         }
       }
