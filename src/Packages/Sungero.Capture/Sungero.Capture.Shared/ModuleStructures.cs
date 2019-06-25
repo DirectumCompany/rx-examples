@@ -75,7 +75,16 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     public bool? IsBusinessUnitSeller { get; set; }
   }
-  
+
+  partial class BusinessUnitAndCounterpartyWithFact
+  {
+    public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
+    public Sungero.Parties.ICounterparty Counterparty { get; set; }
+    public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
+    public string Type { get; set; }
+    public bool IsTrusted { get; set; }
+  }
+
   partial class CapturedMailFilesPaths
   {
     public string Body { get; set; }

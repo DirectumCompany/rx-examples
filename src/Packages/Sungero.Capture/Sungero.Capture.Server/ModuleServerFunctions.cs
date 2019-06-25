@@ -1417,14 +1417,63 @@ namespace Sungero.Capture.Server
       return null;
     }
     
+    #endregion
+    
+    #region Поиск контрагента/НОР
+    
+    private static List<Fact> GetCounterpartyFacts(List<Structures.Module.Fact> facts, string counterpartyType)
+    {
+      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
+        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
+      
+      if (!counterpartyFacts.Any())
+        counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "TIN")
+          .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
+      
+      return counterpartyFacts.ToList();
+    }
+    
     /// <summary>
-    /// Заполнить контрагента и НОР в акте.
+    /// Получить наши организации и контрагентов с фактами.
     /// </summary>
-    /// <param name="document">Документ.</param>
+    /// <param name="facts">Факты.</param>
+    /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
+    /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
+    /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
+    public static List<Structures.Module.BusinessUnitAndCounterpartyWithFact> GetBusinessUnitsAndCounterparties(List<Structures.Module.Fact> facts,
+                                                                                                                string counterpartyTypeFrom = "SELLER",
+                                                                                                                string counterpartyTypeTo = "BUYER")
+    {
+      var businessUnitsAndCounterparties = new List<Structures.Module.BusinessUnitAndCounterpartyWithFact>();
+      
+      var counterpartyFacts = GetCounterpartyFacts(facts, string.Empty);
+      counterpartyFacts.AddRange(GetCounterpartyFacts(facts, counterpartyTypeFrom));
+      counterpartyFacts.AddRange(GetCounterpartyFacts(facts, counterpartyTypeTo));
+      foreach (var fact in counterpartyFacts)
+      {
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        var businessUnit = GetBusinessUnits(tin, trrc).FirstOrDefault();
+        var counterparty = GetCounterparties(tin, trrc).FirstOrDefault();
+        
+        if (counterparty != null || businessUnit != null)
+        {
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), false);
+          businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
+        }
+      }
+      
+      return businessUnitsAndCounterparties;
+    }
+    
+    /// <summary>
+    /// Получить контрагента и НОР.
+    /// </summary>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
+    /// <returns>Наша организация и контрагент.</returns>
     /// <remarks>Типы контрагентов BUYER и SELLER используются в большем количестве типов, поэтому они выбраны по умолчанию.</remarks>
     public static Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.RecognizedDocument recognizedDocument,
                                                                                                IEmployee responsible,
@@ -1435,61 +1484,85 @@ namespace Sungero.Capture.Server
       var facts = recognizedDocument.Facts;
       var props = AccountingDocumentBases.Info.Properties;
       var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitWithFact = null;
       
-      var buyerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeTo);
-      var sellerBusinessUnit = GetMostProbableBusinessUnit(facts, counterpartyTypeFrom);
-      var businessUnitWithoutType = GetMostProbableBusinessUnit(facts, string.Empty);
-      Structures.Module.BusinessUnitWithFact businessUnitWithFact = null;
+      var businessUnitsAndCounterparties = GetBusinessUnitsAndCounterparties(facts, counterpartyTypeFrom, counterpartyTypeTo);
       
-      // Если НОР со стороны продавца/отправителя совпадает с НОР ответственного,
-      // то вероятно именно эта НОР должна быть записана в свойство BusinessUnit.
-      if (sellerBusinessUnit != null)
-        businessUnitWithFact = Equals(sellerBusinessUnit.BusinessUnit, businessUnitByResponsible) ? sellerBusinessUnit : null;
+      // Искать НОР.
+      var businessUnits = businessUnitsAndCounterparties.Where(x => x.BusinessUnit != null);
+      var buyerBusinessUnits = businessUnits.Where(x => x.Type == counterpartyTypeTo);
+      var sellerBusinessUnits = businessUnits.Where(x => x.Type == counterpartyTypeFrom);
+      var withoutTypeBusinessUnits = businessUnits.Where(x => x.Type == string.Empty);
       
-      // Общий пиоритет поиска НОР:
+      // Уточнить по ответственному
+      businessUnitWithFact = buyerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+      if (businessUnitWithFact == null)
+        businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+      if (businessUnitWithFact == null)
+        businessUnitWithFact = sellerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+      if (businessUnitWithFact != null)
+      {
+        var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);
+        businessUnitWithFact.IsTrusted = isTypeEmpty;
+        if (isTypeEmpty)
+          result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;
+        else
+          result.IsBusinessUnitSeller = null;
+      }
+      
+      // Общий пиоритет поиска НОР, если не смогли уточнить по ответственному:
       //   1. Явно найденная для типа контрагента counterpartyTypeTo. По умолчанию "BUYER".
       //   2. Явно найденная в контрагентах без типов.
       //   3. Явно найденная для типа контрагента counterpartyTypeFrom. По умолчанию "SELLER".
       if (businessUnitWithFact == null)
-        businessUnitWithFact = buyerBusinessUnit ?? businessUnitWithoutType ?? sellerBusinessUnit;
-      
-      if (businessUnitWithFact != null)
       {
-        result.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        var buyerBusinessUnit = buyerBusinessUnits.FirstOrDefault();
+        var sellerBusinessUnit = sellerBusinessUnits.FirstOrDefault();
+        var withoutTypeBusinessUnit = withoutTypeBusinessUnits.FirstOrDefault();
+        
+        businessUnitWithFact = buyerBusinessUnit ?? withoutTypeBusinessUnit ?? sellerBusinessUnit;
         result.IsBusinessUnitSeller = sellerBusinessUnit == businessUnitWithFact;
-        LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, businessUnitWithFact.BusinessUnit.Name, businessUnitWithFact.IsTrusted);
       }
-      else
+      
+      // Заполнить из ответственного, если не смогли определить по фактам.
+      if (businessUnitWithFact == null)
       {
-        result.BusinessUnit = businessUnitByResponsible;
+        businessUnitWithFact = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnitByResponsible, null, null, string.Empty, false);
+        result.IsBusinessUnitSeller = false;
       }
       
+      result.BusinessUnit = businessUnitWithFact.BusinessUnit;
+      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, result.BusinessUnit, businessUnitWithFact.IsTrusted);
+      
+
+      // Исключить из поиска НОР.
+      var сounterparties = businessUnitsAndCounterparties.Where(x => !Equals(x, businessUnitWithFact) && x.Counterparty != null).ToList();
+
       // Исключить из поиска контрагентов с типом НОР.
-      var sellerCounterparty = result.IsBusinessUnitSeller != true
-        ? GetMostProbableCounterparty(facts, counterpartyTypeFrom)
-        : null;
-      
-      var buyerCounterparty = result.IsBusinessUnitSeller != false
-        ? GetMostProbableCounterparty(facts, counterpartyTypeTo)
-        : null;
-      
-      // Исключить из поиска факт с НОР.
-      if (businessUnitWithFact != null && businessUnitWithFact == businessUnitWithoutType)
-        facts = facts.Where(f => f.Id != businessUnitWithFact.Fact.Id).ToList();
-      var counterpartyWithoutType = GetMostProbableCounterparty(facts, string.Empty);
-      
-      var counterpartyWithFact = sellerCounterparty ?? counterpartyWithoutType ?? buyerCounterparty;
+      if (result.IsBusinessUnitSeller == true)
+        сounterparties = сounterparties.Where(x => x.Type != counterpartyTypeFrom).ToList();
+      else
+        if (result.IsBusinessUnitSeller == false)
+          сounterparties = сounterparties.Where(x => x.Type != counterpartyTypeTo).ToList();
+
+
+      var buyerCounterparty = сounterparties.Where(x => x.Type == counterpartyTypeTo).FirstOrDefault();
+      var sellerCounterparty = сounterparties.Where(x => x.Type == counterpartyTypeFrom).FirstOrDefault();
+      var withoutTypeCounterparty = сounterparties.Where(x => x.Type == string.Empty).FirstOrDefault();
+
+      var counterpartyWithFact = sellerCounterparty ?? withoutTypeCounterparty ?? buyerCounterparty;
       if (counterpartyWithFact != null)
       {
         result.Counterparty = counterpartyWithFact.Counterparty;
-        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null, props.Counterparty.Name, counterpartyWithFact.Counterparty.Name, counterpartyWithFact.IsTrusted);
+        LinkFactAndProperty(recognizedDocument, counterpartyWithFact.Fact, null,
+                            props.Counterparty.Name, counterpartyWithFact.Counterparty, counterpartyWithFact.IsTrusted);
       }
+
+      // Если НОР нашли без типа, то пытаемся уточнить по типу контрагента.
+      result.IsBusinessUnitSeller = result.IsBusinessUnitSeller ?? !Equals(sellerCounterparty, counterpartyWithFact);
+
       return result;
     }
-    
-    #endregion
-    
-    #region Поиск контрагента/НОР
     
     public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
     {
@@ -1504,48 +1577,6 @@ namespace Sungero.Capture.Server
       counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
       counterparty.Fact = mostProbabilityFact;
       return counterparty;
-    }
-    
-    public static Structures.Module.BusinessUnitWithFact GetMostProbableBusinessUnit(List<Structures.Module.Fact> facts, string counterpartyType)
-    {
-      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
-      
-      if (!counterpartyFacts.Any())
-        counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "TIN")
-          .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
-      
-      foreach (var fact in counterpartyFacts)
-      {
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        var bussinesUnits = GetBusinessUnits(tin, trrc);
-        if (bussinesUnits.Any())
-          return Structures.Module.BusinessUnitWithFact.Create(bussinesUnits.First(), fact, true);
-      }
-      
-      return null;
-    }
-    
-    public static Structures.Module.CounterpartyWithFact GetMostProbableCounterparty(List<Structures.Module.Fact> facts, string counterpartyType)
-    {
-      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
-      
-      if (!counterpartyFacts.Any())
-        counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "TIN")
-          .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
-      
-      foreach (var fact in counterpartyFacts)
-      {
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
-        var counterparties = GetCounterparties(tin, trrc);
-        if (counterparties.Any())
-          return Structures.Module.CounterpartyWithFact.Create(counterparties.First(), fact, true);
-      }
-      
-      return null;
     }
     
     /// <summary>
@@ -1768,6 +1799,8 @@ namespace Sungero.Capture.Server
           
           if (strongTrrcBusinessUnits.Count > 0)
             return strongTrrcBusinessUnits;
+          
+          return strongTinBusinessUnits.Where(c => string.IsNullOrWhiteSpace(c.TRRC)).ToList();
         }
         
         return strongTinBusinessUnits;
