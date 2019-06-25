@@ -2095,7 +2095,7 @@ namespace Sungero.Capture.Server
     {
       using (var documentBody = GetDocumentBody(recognizedDocument.BodyGuid))
       {
-        // Создание тел документов для которых требуется не требуется public body.
+        // Создание тел документов для которых не требуется public body.
         if (recognizedDocument.OriginalBody == null || recognizedDocument.OriginalBody.File == null)
         {
           // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
@@ -2112,7 +2112,7 @@ namespace Sungero.Capture.Server
           return;
         }
         
-        // Создание тел документов для которых требуется требуется public body.
+        // Создание тел документов для которых требуется public body.
         var version = document.Versions.AddNew();
         version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
         version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalBody.FileExtension);        
