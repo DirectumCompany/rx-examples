@@ -104,7 +104,8 @@ namespace Sungero.Capture.Client
         throw new ApplicationException("Files not found");
       
       // TODO Dmitriev: Создать входящее письмо.
-
+      Functions.Module.Remote.CreateIncomingLetterFromEmailBody(mailFilesPaths.Body);
+      
       var relatedDocumentIds = new List<int>();
       foreach (var attachment in mailFilesPaths.Attachments)
       {
@@ -318,13 +319,15 @@ namespace Sungero.Capture.Client
       
       // Тело письма.
       var fileElements = filesXDoc.Element("InputFilesSection").Element("Files").Elements();
-      var hasHtmlBody = fileElements.Any(x => string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase));
-      var hasTxtBody = fileElements.Any(x => string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      var htmlBodyElement = fileElements.FirstOrDefault(x => string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase));
+      var txtBodyElement = fileElements.FirstOrDefault(x => string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      var hasHtmlBody = htmlBodyElement != null;
+      var hasTxtBody = txtBodyElement != null;
       var hasAssociatedAppForHtml = Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication("body.html") != null;
       if (hasAssociatedAppForHtml && hasHtmlBody)
-        mailFilesPaths.Body= Path.Combine(folder, "body.html");
+        mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(htmlBodyElement.Element("FileName").Value));
       else if (hasTxtBody)
-        mailFilesPaths.Body= Path.Combine(folder, "body.txt");
+        mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(txtBodyElement.Element("FileName").Value));
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
