@@ -332,8 +332,17 @@ namespace Sungero.Capture.Client
       else if (hasTxtBody)
         mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(txtBodyElement.Element("FileName").Value));
       
+      // Расширения файлов, которые умеет обрабатывать Арио.
+      var allowedFileExtensions = new List<string>() 
+      { 
+        ".jpg", ".jpeg", ".png", ".bmp", ".gif",
+        ".tif", ".tiff", ".pdf", ".doc", ".docx",
+        ".dot", ".dotx", ".rtf", ".odt", ".ott", 
+        ".txt", ".xls", ".xlsx", ".ods", ".pdf"        
+      };
+      
       // Вложения.
-      var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
+      var attachments = fileElements.Where(x => allowedFileExtensions.Contains(Path.GetExtension(x.Element("FileDescription").Value), StringComparer.InvariantCultureIgnoreCase) &&
                                            !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       foreach (var attachment in attachments)
       {
