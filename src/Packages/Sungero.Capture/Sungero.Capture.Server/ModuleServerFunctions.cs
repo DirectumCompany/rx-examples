@@ -733,6 +733,39 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    /// <summary>
+    /// Создать входящее письмо из тела email.
+    /// </summary>
+    /// <param name="mail">Путь до тела email.</param>
+    [Remote]
+    public virtual void CreateIncomingLetterFromEmailBody(string bodyPath)
+    {
+      System.Diagnostics.Debugger.Launch();
+      
+      if (!string.IsNullOrWhiteSpace(bodyPath))
+      {
+        var mailBody = System.IO.File.OpenRead(bodyPath);
+        var document = Sungero.RecordManagement.IncomingLetters.Create();
+        //CreateVersion(document, recognizedDocument);
+        // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+        if (string.IsNullOrEmpty(document.Subject))
+        {
+          document.Subject = "pdf";
+          document.CreateVersionFrom(mailBody, "pdf");
+          document.Subject = string.Empty;
+        }
+        else
+        {
+          document.CreateVersionFrom(mailBody, "pdf");
+        }
+        
+        // Заполнить основные свойства.
+        document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+        //document.Subject =
+        document.Save();
+      }
+    }
+    
     #endregion
     
     #region Акт
