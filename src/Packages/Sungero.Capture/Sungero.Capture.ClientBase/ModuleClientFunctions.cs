@@ -71,7 +71,7 @@ namespace Sungero.Capture.Client
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
-      var fileNames = GetScannedPackagePath(filesInfo, folder);
+      var fileNames = GetScannedPackagesPaths(filesInfo, folder);
       if (!fileNames.Any())
         throw new ApplicationException("Files not found");
       
@@ -99,14 +99,14 @@ namespace Sungero.Capture.Client
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
-      var mail = GetCapturedMailFilesPaths(filesInfo, folder);
-      if (string.IsNullOrWhiteSpace(mail.BodyPath) && !mail.AttachmentsPaths.Any())
+      var mailFiles = GetCapturedMailFilesPaths(filesInfo, folder);
+      if (string.IsNullOrWhiteSpace(mailFiles.BodyPath) && !mailFiles.AttachmentsPaths.Any())
         throw new ApplicationException("Files not found");
       
       // TODO Dmitriev: Создать входящее письмо.
 
       var relatedDocumentIds = new List<int>();
-      foreach (var attachment in mailFiles.Attachments)
+      foreach (var attachment in mailFiles.AttachmentsPaths)
       {
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment, firstPageClassifierName, typeClassifierName, false);
         if (classificationAndExtractionResult.Error == null ||
