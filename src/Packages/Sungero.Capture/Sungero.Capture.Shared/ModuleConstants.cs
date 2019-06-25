@@ -6,7 +6,7 @@ namespace Sungero.Capture.Constants
   public static class Module
   {
     public const string SimpleRelationRelationName = "Simple relation";
-        
+    
     public const string ArioUrlKey = "ArioUrl";
     
     public const string MinFactProbabilityKey = "MinFactProbability";
@@ -30,6 +30,9 @@ namespace Sungero.Capture.Constants
     public const string GeneralCorrectionDocumentClassName = "Универсальный корректировочный документ";
     
     public const string IncomingInvoiceClassName = "Входящий счет на оплату";
+    
+    [Sungero.Core.Public]
+    public const string IsCancelActionParamName = "IsCancelAction";
     
     public static class Initialize
     {

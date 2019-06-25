@@ -105,7 +105,8 @@ namespace Sungero.SmartCapture
       // Восстановить обязательность корреспондента.
       _obj.State.Properties.Correspondent.IsRequired = true;
       
-      Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
+      if (e.Params.Contains(Capture.PublicConstants.Module.IsCancelActionParamName))
+        Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
     }
   }
 }

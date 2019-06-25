@@ -130,22 +130,22 @@ namespace Sungero.Capture.Client
     /// Выполнить классификацию и распознавание для документа.
     /// </summary>
     /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="fileName">Имя классифицируемого файла.</param>
+    /// <param name="filePath">Пусть к классифицируемому файлу.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
     private static Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
-                                                                                                  string fileName,
+                                                                                                  string filePath,
                                                                                                   string firstPageClassifierName,
                                                                                                   string typeClassifierName,
                                                                                                   bool throwOnError = true)
     {
       var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
-      var filePath = System.IO.Path.GetFileName(fileName);
-      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", filePath);
+      var fileName = System.IO.Path.GetFileName(filePath);
+      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", fileName);
       classificationAndExtractionResult.Result = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
-      Logger.DebugFormat("End classification and facts extraction. File: {0}", filePath);
+      Logger.DebugFormat("End classification and facts extraction. File: {0}", fileName);
       
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(classificationAndExtractionResult.Result);
       classificationAndExtractionResult.Error = nativeError == null ? string.Empty : nativeError.Message;

@@ -79,6 +79,16 @@
       "Scope": "Both"
     }
   ],
+  "PublicConstants": [
+    {
+      "Name": "IsCancelActionParamName",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"IsCancelAction\""
+    }
+  ],
   "PublicFunctions": [
     {
       "Name": "GetClassRuleMapping",
