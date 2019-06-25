@@ -99,14 +99,14 @@ namespace Sungero.Capture.Client
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
-      var mailFiles = GetCapturedMailFilesPaths(filesInfo, folder);
-      if (string.IsNullOrWhiteSpace(mailFiles.BodyPath) && !mailFiles.AttachmentsPaths.Any())
+      var mailFilesPaths = GetCapturedMailFilesPaths(filesInfo, folder);
+      if (string.IsNullOrWhiteSpace(mailFilesPaths.Body) && !mailFilesPaths.Attachments.Any())
         throw new ApplicationException("Files not found");
       
       // TODO Dmitriev: Создать входящее письмо.
 
       var relatedDocumentIds = new List<int>();
-      foreach (var attachment in mailFiles.AttachmentsPaths)
+      foreach (var attachment in mailFilesPaths.Attachments)
       {
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment, firstPageClassifierName, typeClassifierName, false);
         if (classificationAndExtractionResult.Error == null ||
@@ -307,13 +307,13 @@ namespace Sungero.Capture.Client
     /// <returns>Пути до захваченных с почты файлов.</returns>
     public static Structures.Module.CapturedMailFilesPaths GetCapturedMailFilesPaths(string filesInfo, string folder)
     {
-      var mailFiles = Structures.Module.CapturedMailFilesPaths.Create();
-      mailFiles.AttachmentsPaths = new List<string>();
+      var mailFilesPaths = Structures.Module.CapturedMailFilesPaths.Create();
+      mailFilesPaths.Attachments = new List<string>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
       {
         Logger.Error(Resources.NoFilesInfoInPackage);
-        return mailFiles;
+        return mailFilesPaths;
       }
       
       // Тело письма.
@@ -322,9 +322,9 @@ namespace Sungero.Capture.Client
       var hasTxtBody = fileElements.Any(x => string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       var hasAssociatedAppForHtml = Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication("body.html") != null;
       if (hasAssociatedAppForHtml && hasHtmlBody)
-        mailFiles.BodyPath = Path.Combine(folder, "body.html");
+        mailFilesPaths.Body= Path.Combine(folder, "body.html");
       else if (hasTxtBody)
-        mailFiles.BodyPath = Path.Combine(folder, "body.txt");
+        mailFilesPaths.Body= Path.Combine(folder, "body.txt");
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
@@ -347,10 +347,10 @@ namespace Sungero.Capture.Client
           continue;
         }
         
-        mailFiles.AttachmentsPaths.Add(filePath);
+        mailFilesPaths.Attachments.Add(filePath);
       }
       
-      return mailFiles;
+      return mailFilesPaths;
     }
     
     /// <summary>

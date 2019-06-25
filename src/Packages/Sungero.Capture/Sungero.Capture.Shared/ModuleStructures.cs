@@ -78,8 +78,8 @@ namespace Sungero.Capture.Structures.Module
   
   partial class CapturedMailFilesPaths
   {
-    public string BodyPath { get; set; }
-    public List<string> AttachmentsPaths { get; set; }
+    public string Body { get; set; }
+    public List<string> Attachments { get; set; }
   }
   
   /// <summary>
