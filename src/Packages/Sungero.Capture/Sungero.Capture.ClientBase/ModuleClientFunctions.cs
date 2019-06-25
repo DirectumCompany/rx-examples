@@ -282,6 +282,7 @@ namespace Sungero.Capture.Client
     public static Structures.Module.CapturedMailFilesPaths GetCapturedMailFilesPaths(string filesInfo, string folder)
     {
       var mailFiles = Structures.Module.CapturedMailFilesPaths.Create();
+      mailFiles.AttachmentsPaths = new List<string>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
       {
