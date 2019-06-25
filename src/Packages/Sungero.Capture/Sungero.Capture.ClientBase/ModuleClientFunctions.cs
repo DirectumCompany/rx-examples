@@ -36,7 +36,7 @@ namespace Sungero.Capture.Client
       var source = GetSourceType(deviceInfo);
       
       if (source == Constants.Module.CaptureSourceType.Mail)
-        ProcessMailPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName);
+        ProcessMailPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
       if (source == Constants.Module.CaptureSourceType.Folder)
         ProcessScanPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
     }
@@ -71,28 +71,17 @@ namespace Sungero.Capture.Client
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
-      var filePaths = GetScannedPackagesPaths(filesInfo, folder);
-      if (!filePaths.Any())
+      var fileNames = GetScannedPackagePath(filesInfo, folder);
+      if (!fileNames.Any())
         throw new ApplicationException("Files not found");
       
-      // Получить имена файлов.
-      foreach (var filePath in filePaths)
+      foreach (var fileName in fileNames)
       {
-        // Разделить пакет на документы.
-        var sourceFileName = System.IO.Path.GetFileName(filePath);
-        Logger.DebugFormat("Begin of package \"{0}\" splitting and classification...", sourceFileName);
-        var jsonClassificationResults = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
-        Logger.DebugFormat("End of package \"{0}\" splitting and classification.", sourceFileName);
-        
-        // Принудительно обвалить захват, если Ario вернул ошибку. DCS запишет в лог и перезапустит процесс.
-        var ErrorMessage = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(jsonClassificationResults);
-        if (ErrorMessage != null && !string.IsNullOrWhiteSpace(ErrorMessage.Message))
-          throw new ApplicationException(ErrorMessage.Message);
-        
-        // Обработать пакет.
-        Logger.DebugFormat("Begin of splitted package \"{0}\" processing...", sourceFileName);
-        Functions.Module.Remote.ProcessSplitedPackage(filePath, jsonClassificationResults, responsible, null);
-        Logger.DebugFormat("End of splitted package \"{0}\" processing.", sourceFileName);
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, fileName, firstPageClassifierName, typeClassifierName);
+        Logger.DebugFormat("Begin package processing. File: {0}", fileName);
+        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, fileName, null, responsible, null);
+        Functions.Module.Remote.SendToResponsible(documents, responsible);
+        Logger.DebugFormat("End package processing. File: {0}", fileName);
         Logger.Debug("End of captured package processing.");
       }
     }
@@ -105,33 +94,69 @@ namespace Sungero.Capture.Client
     /// <param name="arioUrl">Host Ario.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
     private static void ProcessMailPackage(string filesInfo, string folder,
-                                           string arioUrl, string firstPageClassifierName, string typeClassifierName)
+                                           string arioUrl, string firstPageClassifierName, string typeClassifierName,
+                                           Sungero.Company.IEmployee responsible)
     {
       var mail = GetCapturedMailFilesPaths(filesInfo, folder);
       if (string.IsNullOrWhiteSpace(mail.BodyPath) && !mail.AttachmentsPaths.Any())
         throw new ApplicationException("Files not found");
       
       // TODO Dmitriev: Создать входящее письмо.
-      // TODO Dmitriev: Получить json всех attachments письма. Вынести копипаст.
-      var classificationResults = new List<string>();
-      foreach (var attachmentPath in mail.AttachmentsPaths)
+
+      var relatedDocumentIds = new List<int>();
+      foreach (var attachment in mailFiles.Attachments)
       {
-        Logger.DebugFormat("Begin of mail package \"{0}\" classification...", attachmentPath);
-        var sourceFileName = System.IO.Path.GetFileName(attachmentPath);
-        var jsonClassificationResults = ProcessPackage(attachmentPath, arioUrl, firstPageClassifierName, typeClassifierName);
-        Logger.DebugFormat("End of mail package \"{0}\" classification.", sourceFileName);
-        
-        var errorMessage = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(jsonClassificationResults);
-        if (errorMessage != null && !string.IsNullOrWhiteSpace(errorMessage.Message))
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment, firstPageClassifierName, typeClassifierName, false);
+        if (classificationAndExtractionResult.Error == null ||
+            string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
-          Logger.Error(errorMessage.Message);
-          continue;
+          //TODO Передать явно ведущий документ!!!
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, null, responsible, null);
+          relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
         }
-        
-        classificationResults.Add(jsonClassificationResults);
       }
-      // TODO Dmitriev: Отправить все json скопом на ProcessSplitedPackage.
+      
+      //TODO Передать явно ID ведущего документа!!!
+      var documentsToSend = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
+      documentsToSend.LeadingDocumentId = 0;
+      documentsToSend.RelatedDocumentIds = relatedDocumentIds;
+      Functions.Module.Remote.SendToResponsible(documentsToSend, responsible);
+    }
+    
+    /// <summary>
+    /// Выполнить классификацию и распознавание для документа.
+    /// </summary>
+    /// <param name="arioUrl">Host Ario.</param>
+    /// <param name="fileName">Имя классифицируемого файла.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
+    /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
+    private static Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
+                                                                                                  string fileName,
+                                                                                                  string firstPageClassifierName,
+                                                                                                  string typeClassifierName,
+                                                                                                  bool throwOnError = true)
+    {
+      var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
+      var filePath = System.IO.Path.GetFileName(fileName);
+      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", filePath);
+      classificationAndExtractionResult.Result = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      Logger.DebugFormat("End classification and facts extraction. File: {0}", filePath);
+      
+      var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(classificationAndExtractionResult.Result);
+      classificationAndExtractionResult.Error = nativeError == null ? string.Empty : nativeError.Message;
+      if (classificationAndExtractionResult.Error == null ||
+          string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
+        return classificationAndExtractionResult;
+      
+      if (throwOnError)
+        throw new ApplicationException(classificationAndExtractionResult.Error);
+      
+      Logger.Error(classificationAndExtractionResult.Error);
+      return classificationAndExtractionResult;
     }
     
     /// <summary>
@@ -181,8 +206,9 @@ namespace Sungero.Capture.Client
       
       // Обработать пакет.
       Logger.Debug("Start ProcessSplitedPackage");
-      Functions.Module.Remote.ProcessSplitedPackage(System.IO.Path.GetFileName(bodyFilePath),
-                                                    modifiedJson, responsible, null);
+      Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
+                                                                  System.IO.Path.GetFileName(bodyFilePath),
+                                                                  null, responsible, null);
       Logger.Debug("Start ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }

@@ -98,16 +98,22 @@ namespace Sungero.Capture.Server
     #region Общий процесс обработки захваченных документов
     
     /// <summary>
-    /// Создать документы в RX и отправить задачу на проверку.
+    /// Создать документы в RX.
     /// </summary>
+    /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
     /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
-    /// <param name="jsonClassificationResults">Json результатом классификации и извлечения фактов.</param>
+    /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
+    /// <param name="originalbody">TODO: Артем, что это?</param>
+    /// <returns>Список Id созданных документов.</returns>
     [Remote]
-    public virtual void ProcessSplitedPackage(string sourceFileName, string jsonClassificationResults, IEmployee responsible, Structures.Module.Body originalbody)
+    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, string sourceFileName,
+                                                                                                              IOfficialDocument leadingDocument, IEmployee responsible,
+                                                                                                              Structures.Module.Body originalbody)
     {
-      // Создать документы по распознанным данным.
-      var recognizedDocuments = GetRecognizedDocuments(jsonClassificationResults, originalbody);
+      var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
+      
+      var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalbody);
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
       {
@@ -118,32 +124,35 @@ namespace Sungero.Capture.Server
       }
       
       // Определить ведущий документ.
-      var leadingDocument = GetLeadingDocument(package);
+      if (leadingDocument == null)
+        leadingDocument = GetLeadingDocument(package);
+      result.LeadingDocumentId = leadingDocument.Id;
       
       // Связать приложения с ведущим документом.
-      var addendums = package.ToList();
-      addendums.Remove(leadingDocument);
-      int addendumNumber = 1;
-      var hasLeadingDocument = !SimpleAssignments.Is(leadingDocument);
-      var relation = hasLeadingDocument
+      var addendums = package;
+      if (addendums.Any(x => Equals(x, leadingDocument)))
+        addendums.Remove(leadingDocument);
+      var canBeLeadingDocument = !SimpleDocuments.Is(leadingDocument);
+      var relation = canBeLeadingDocument
         ? Docflow.PublicConstants.Module.AddendumRelationName
         : Constants.Module.SimpleRelationRelationName;
+      int simpleAddendumNumber = 1;
       foreach (var addendum in addendums)
       {
         if (SimpleDocuments.Is(addendum))
         {
-          addendum.Name = hasLeadingDocument
-            ? Resources.AttachmentNameFormat(addendumNumber)
-            : Resources.DocumentNameFormat(addendumNumber);
-          addendumNumber++;
+          addendum.Name = canBeLeadingDocument
+            ? Resources.AttachmentNameFormat(simpleAddendumNumber)
+            : Resources.DocumentNameFormat(simpleAddendumNumber);
+          simpleAddendumNumber++;
         }
         
         addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
       }
       
-      // Отправить пакет ответственному.
-      SendToResponsible(leadingDocument, addendums, responsible);
+      result.RelatedDocumentIds = package.Select(x => x.Id).ToList();
+      return result;
     }
     
     public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.Body originalBody)
@@ -492,6 +501,23 @@ namespace Sungero.Capture.Server
       task.Deadline = Calendar.Now.AddWorkingHours(4);
       task.Save();
       task.Start();
+    }
+    
+    /// <summary>
+    /// Отправить документы ответственному.
+    /// </summary>
+    /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
+    /// <param name="responsible">Сотрудник, ответственный за одработку распознанных документов.</param>
+    [Remote]
+    public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
+                                          Sungero.Company.IEmployee responsible)
+    {
+      var leadingDocument = OfficialDocuments.GetAll()
+        .FirstOrDefault(x => x.Id == documentsCreatedByRecognition.LeadingDocumentId);
+      var relatedDocuments = OfficialDocuments.GetAll()
+        .Where(x => documentsCreatedByRecognition.RelatedDocumentIds.Contains(x.Id))
+        .ToList();
+      SendToResponsible(leadingDocument, relatedDocuments, responsible);
     }
     
     #endregion

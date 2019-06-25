@@ -82,4 +82,21 @@ namespace Sungero.Capture.Structures.Module
     public List<string> AttachmentsPaths { get; set; }
   }
   
+  /// <summary>
+  /// Результат классификации и распознования документа.
+  /// </summary>
+  partial class ClassificationAndExtractionResult
+  {
+    public string Result { get; set; }
+    public string Error { get; set; }
+  }
+  
+  /// <summary>
+  /// Документы, созданные по результатам распознавания.
+  /// </summary>
+  partial class DocumentsCreatedByRecognitionResults
+  {
+    public int LeadingDocumentId { get; set; }
+    public List<int> RelatedDocumentIds { get; set; }
+  }
 }
