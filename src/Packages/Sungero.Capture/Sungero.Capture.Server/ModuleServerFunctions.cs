@@ -118,7 +118,6 @@ namespace Sungero.Capture.Server
       foreach (var recognizedDocument in recognizedDocuments)
       {
         var document = CreateDocumentByRecognizedDocument(recognizedDocument, sourceFileName, responsible);
-        document.Save();
         package.Add(document);
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -727,10 +726,9 @@ namespace Sungero.Capture.Server
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
-      }      
-      document.Save();      
-      CreateVersion(document, recognizedDocument);
-      
+      }           
+      CreateVersion(document, recognizedDocument);      
+      document.Save();
       return document;
     }
     
@@ -868,10 +866,9 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
-      }
-      document.Save();     
+      }     
       CreateVersion(document, recognizedDocument);
-      
+      document.Save();
       return document;
     }
     
@@ -910,11 +907,10 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      document.Save();
       CreateVersion(document, recognizedDocument);
       // Регистрация.
-      RegisterDocument(document);
-      
+      RegisterDocument(document);     
+      document.Save();
       return document;
     }
     
@@ -1026,9 +1022,8 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
-      document.Save();
       CreateVersion(document, recognizedDocument);
-      
+      document.Save();
       return document;
     }
     
@@ -1067,12 +1062,12 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
       
+      document.Save();
       return document;
     }
     
@@ -1177,10 +1172,9 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
-      }
-      document.Save();     
+      }    
       CreateVersion(document, recognizedDocument);
-      
+      document.Save();
       return document;
     }
     
@@ -1249,11 +1243,11 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
+      document.Save();
       return document;
     }
     
@@ -1303,12 +1297,11 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
-      
+      document.Save();
       return document;
     }
     
@@ -1354,12 +1347,11 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      document.Save();
       CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
-      
+      document.Save();
       return document;
     }
     
