@@ -103,7 +103,8 @@
     "WriteHistoryServer",
     "ConvertingFromServer",
     "CreatedServer",
-    "ShowingClient"
+    "ShowingClient",
+    "RefreshClient"
   ],
   "HideFromCreationArea": true,
   "IconResourcesKeys": [],
@@ -114,6 +115,42 @@
     "HideFromCreationArea"
   ],
   "Properties": [
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",
+      "Name": "RegistrationNumber",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "3e55f091-41a4-4e58-a9c5-dbe90782ccec",
+      "Name": "RegistrationDate",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "4bc39efb-1f46-4a1e-8b8c-04f2b90d6a8b",
+      "Name": "Subject",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
     {
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "bbbc063d-7367-4ea8-a777-5dd1bbe8e216",

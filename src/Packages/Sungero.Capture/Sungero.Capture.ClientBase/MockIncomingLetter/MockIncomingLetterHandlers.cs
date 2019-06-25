@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -68,27 +68,6 @@ namespace Sungero.Capture
     public virtual void CorrespondentValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
       this._obj.State.Properties.Correspondent.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
-    }
-
-    public override void SubjectValueInput(Sungero.Presentation.StringValueInputEventArgs e)
-    {
-      base.SubjectValueInput(e);
-      
-      this._obj.State.Properties.Subject.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
-    }
-
-    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
-    {
-      base.Refresh(e);
-      
-      Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
-    }
-
-    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
-    {
-      base.Showing(e);
-      
-      Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
     }
 
   }

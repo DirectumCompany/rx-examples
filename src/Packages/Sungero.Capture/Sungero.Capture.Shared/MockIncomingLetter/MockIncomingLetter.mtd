@@ -660,10 +660,6 @@
       "Overridden": []
     }
   ],
-  "HandledEvents": [
-    "ShowingClient",
-    "RefreshClient"
-  ],
   "IconName": "MockIncomingLetter.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
@@ -681,9 +677,6 @@
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "4bc39efb-1f46-4a1e-8b8c-04f2b90d6a8b",
       "Name": "Subject",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"

@@ -669,6 +669,24 @@
   ],
   "Properties": [
     {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",
+      "Name": "RegistrationNumber",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "3e55f091-41a4-4e58-a9c5-dbe90782ccec",
+      "Name": "RegistrationDate",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
       "Name": "Versions",
@@ -697,6 +715,9 @@
       "NameGuid": "ad279d7f-ab63-473b-91bf-7bc2df4cfa91",
       "Name": "LeadDoc",
       "Code": "LeadDoc",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "Length": 500,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "6e04681d-21d6-405e-bb01-775dc84ddb08"
@@ -706,6 +727,9 @@
       "NameGuid": "93992f96-1a3f-4766-b356-ccbc414daf34",
       "Name": "CounterpartyName",
       "Code": "CounterpartyNa",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "ad279d7f-ab63-473b-91bf-7bc2df4cfa91"
     },
@@ -714,6 +738,9 @@
       "NameGuid": "f40e02d0-1286-4338-ae62-80ae79fc3de9",
       "Name": "CounterpartyTin",
       "Code": "CounterpTin",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "93992f96-1a3f-4766-b356-ccbc414daf34"
     },
@@ -722,6 +749,9 @@
       "NameGuid": "8a3c6544-6101-43c6-a473-4eafc874fb39",
       "Name": "CounterpartyTrrc",
       "Code": "CounterpTrrc",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "f40e02d0-1286-4338-ae62-80ae79fc3de9"
     },
@@ -730,6 +760,9 @@
       "NameGuid": "e1db8029-01b7-48be-a9c8-e69251444cb8",
       "Name": "BusinessUnitName",
       "Code": "BusUnitName",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "8a3c6544-6101-43c6-a473-4eafc874fb39"
     },
@@ -738,6 +771,9 @@
       "NameGuid": "29ffbfc1-22b1-4d44-9e99-70f7d8f4faaa",
       "Name": "BusinessUnitTin",
       "Code": "BusUnitTin",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "e1db8029-01b7-48be-a9c8-e69251444cb8"
     },
@@ -746,6 +782,9 @@
       "NameGuid": "80fc31cb-720e-40b8-9890-02b031432c78",
       "Name": "BusinessUnitTrrc",
       "Code": "BusUnitTrrc",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "29ffbfc1-22b1-4d44-9e99-70f7d8f4faaa"
     },
@@ -754,6 +793,9 @@
       "NameGuid": "22a94f73-37f5-4367-8b73-8f65c163a067",
       "Name": "TotalAmount",
       "Code": "TotalAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "80fc31cb-720e-40b8-9890-02b031432c78"
     },
@@ -764,6 +806,9 @@
       "Code": "Currency",
       "EntityGuid": "ffc2629f-dc30-4106-a3ce-c402ae7d32b9",
       "FlatListInStandaloneLookup": true,
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
       "PreviousPropertyGuid": "22a94f73-37f5-4367-8b73-8f65c163a067"
     },
@@ -772,6 +817,9 @@
       "NameGuid": "d770eb82-501d-47fc-b2a4-5e300281603a",
       "Name": "VatAmount",
       "Code": "VatAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "ddf1869a-4e19-486a-9a37-4bc5a3961dc2"
     },
