@@ -76,10 +76,10 @@ namespace Sungero.Capture.Structures.Module
     public bool? IsBusinessUnitSeller { get; set; }
   }
   
-  partial class CapturedMailFiles
+  partial class CapturedMailFilesPaths
   {
-    public string Body { get; set; }
-    public List<string> Attachments { get; set; }
+    public string BodyPath { get; set; }
+    public List<string> AttachmentsPaths { get; set; }
   }
   
 }
