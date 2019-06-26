@@ -187,16 +187,30 @@ namespace Sungero.Capture.Client
       if (mailCaptureInstanceInfoElement == null)
         return result;
       
-      result.Subject = mailCaptureInstanceInfoElement.Attribute("Subject").Value;
+      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, "Subject");
       
       var fromElement = mailCaptureInstanceInfoElement.Element("From");
       if (fromElement == null)
         return result;
       
-      result.FromEmail = fromElement.Attribute("Address").Value;
-      result.Name = fromElement.Attribute("Name").Value;
+      result.FromEmail = GetAttributeStringValue(fromElement, "Address");
+      result.Name = GetAttributeStringValue(fromElement, "Name");
       
       return result;
+    }
+    
+    /// <summary>
+    /// Получить значение атрибута XElement.
+    /// </summary>
+    /// <param name="element">XElement.</param>
+    /// <param name="attributeName">Имя атрибута.</param>
+    /// <returns>Строковое значение атрибута. null, если атрибут отсутствует.</returns>
+    private static string GetAttributeStringValue(System.Xml.Linq.XElement element, string attributeName)
+    {
+      var attribute = element.Attribute(attributeName);
+      if (attribute != null)
+        return attribute.Value;
+      return null;
     }
     
     /// <summary>
