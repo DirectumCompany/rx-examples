@@ -101,15 +101,13 @@ namespace Sungero.Capture.Server
     /// Создать документы в RX.
     /// </summary>
     /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
-    /// <param name="sourceFileName">Имя исходного файла, полученного с DCS.</param>
+        /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
-    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
-    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, string sourceFileName,
-                                                                                                              IOfficialDocument leadingDocument, IEmployee responsible,
-                                                                                                              Structures.Module.File originalFile)
+    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.File originalFile,
+                                                                                                              IOfficialDocument leadingDocument, IEmployee responsible)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
@@ -117,7 +115,7 @@ namespace Sungero.Capture.Server
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
       {
-        var document = CreateDocumentByRecognizedDocument(recognizedDocument, sourceFileName, responsible);
+        var document = CreateDocumentByRecognizedDocument(recognizedDocument, originalFile.FileName, responsible);
         package.Add(document);
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -245,11 +243,11 @@ namespace Sungero.Capture.Server
       if (recognizedClass == Constants.Module.TaxInvoiceClassName)
         return isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
-          : CreateTaxInvoice(recognizedDocument, responsible, false, sourceFileName);
+          : CreateTaxInvoice(recognizedDocument, responsible, false);
       
       // Корректировочный счет-фактура.
       if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
-        return CreateTaxInvoice(recognizedDocument, responsible, true, sourceFileName);
+        return CreateTaxInvoice(recognizedDocument, responsible, true);
       
       // УПД.
       if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
@@ -1208,7 +1206,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns></returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment, string filePath)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.RecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
@@ -2212,7 +2210,7 @@ namespace Sungero.Capture.Server
         // Создание тел документов для которых требуется public body.
         var version = document.Versions.AddNew();
         version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
-        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalFile.Extension);
+        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(Path.GetExtension(recognizedDocument.OriginalFile.FileName));
         // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
         if (string.IsNullOrEmpty(document.Subject))
         {

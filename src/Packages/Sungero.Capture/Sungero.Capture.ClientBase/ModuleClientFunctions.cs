@@ -79,7 +79,9 @@ namespace Sungero.Capture.Client
       {
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, fileName, firstPageClassifierName, typeClassifierName);
         Logger.DebugFormat("Begin package processing. File: {0}", fileName);
-        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, fileName, null, responsible, null);
+        var originalFile = new Structures.Module.File();
+        originalFile.FileName = fileName;
+        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, null, responsible);
         Functions.Module.Remote.SendToResponsible(documents, responsible);
         Logger.DebugFormat("End package processing. File: {0}", fileName);
         Logger.Debug("End of captured package processing.");
@@ -115,9 +117,9 @@ namespace Sungero.Capture.Client
             string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
           var originalFile = new Structures.Module.File();
-          originalFile.Extension = Path.GetExtension(attachment);
+          originalFile.FileName = attachment;
           originalFile.Data = System.IO.File.ReadAllBytes(attachment);
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, emailDocument, responsible, originalFile);
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, emailDocument, responsible);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
         }
       }
@@ -244,9 +246,11 @@ namespace Sungero.Capture.Client
       
       // Обработать пакет.
       Logger.Debug("Start ProcessSplitedPackage");
+      var originalFile = new Structures.Module.File();
+      originalFile.FileName = System.IO.Path.GetFileName(bodyFilePath);
       Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
-                                                                  System.IO.Path.GetFileName(bodyFilePath),
-                                                                  null, responsible, null);
+                                                                  originalFile,
+                                                                  null, responsible);
       Logger.Debug("Start ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }
@@ -372,12 +376,12 @@ namespace Sungero.Capture.Client
         mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(txtBodyElement.Element("FileName").Value));
       
       // Расширения файлов, которые умеет обрабатывать Арио.
-      var allowedFileExtensions = new List<string>() 
-      { 
+      var allowedFileExtensions = new List<string>()
+      {
         ".jpg", ".jpeg", ".png", ".bmp", ".gif",
         ".tif", ".tiff", ".pdf", ".doc", ".docx",
-        ".dot", ".dotx", ".rtf", ".odt", ".ott", 
-        ".txt", ".xls", ".xlsx", ".ods", ".pdf"        
+        ".dot", ".dotx", ".rtf", ".odt", ".ott",
+        ".txt", ".xls", ".xlsx", ".ods", ".pdf"
       };
       
       // Вложения.
