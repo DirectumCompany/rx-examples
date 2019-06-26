@@ -463,7 +463,7 @@ namespace Sungero.Capture.Server
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
-                                                           x.RegistrationDate == docDate && 
+                                                           x.RegistrationDate == docDate &&
                                                            (counterparty == null || x.Counterparty.Equals(counterparty))).FirstOrDefault();
     }
     
@@ -749,8 +749,8 @@ namespace Sungero.Capture.Server
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
-      }           
-      CreateVersion(document, recognizedDocument);      
+      }
+      CreateVersion(document, recognizedDocument);
       document.Save();
       return document;
     }
@@ -872,7 +872,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
-      }     
+      }
       CreateVersion(document, recognizedDocument);
       document.Save();
       return document;
@@ -892,7 +892,7 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = recognizedDocument.Facts;
-                  
+      
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
       
@@ -915,7 +915,7 @@ namespace Sungero.Capture.Server
       FillAmount(document, recognizedDocument);
       CreateVersion(document, recognizedDocument);
       // Регистрация.
-      RegisterDocument(document);     
+      RegisterDocument(document);
       document.Save();
       return document;
     }
@@ -1047,7 +1047,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-                       
+      
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
@@ -1178,7 +1178,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
-      }    
+      }
       CreateVersion(document, recognizedDocument);
       document.Save();
       return document;
@@ -2091,33 +2091,39 @@ namespace Sungero.Capture.Server
       if (document == null)
         return result;
       
-      var recognitionInfo = DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
-      if (recognitionInfo == null)
-        return result;
-      
-      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
-      var linkedFacts = recognitionInfo.Facts
-        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
-        .Where(x => x.IsTrusted == isTrusted);
-      
-      // Взять только неизмененные пользователем свойства.
-      var type = document.GetType();
-      foreach (var linkedFact in linkedFacts)
-      {
-        var propertyName = linkedFact.PropertyName;
-        var property = type.GetProperty(propertyName);
-        if (property != null)
+      // Получить результаты распознавания документа без проверки прав.
+      // Сделано, чтобы не выдавать пользователям права на технический справочник.
+      AccessRights.AllowRead(
+        () =>
         {
-          object propertyValue = property.GetValue(document);
-          var propertyStringValue = GetPropertyStringValue(propertyValue);
+          var recognitionInfo = DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
+          if (recognitionInfo == null)
+            return;
           
-          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
-            result.Add(propertyName);
-        }
+          // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+          var linkedFacts = recognitionInfo.Facts
+            .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
+            .Where(x => x.IsTrusted == isTrusted);
+          
+          // Взять только неизмененные пользователем свойства.
+          var type = document.GetType();
+          foreach (var linkedFact in linkedFacts)
+          {
+            var propertyName = linkedFact.PropertyName;
+            var property = type.GetProperty(propertyName);
+            if (property != null)
+            {
+              object propertyValue = property.GetValue(document);
+              var propertyStringValue = GetPropertyStringValue(propertyValue);
+              
+              if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
+                result.Add(propertyName);
+            }
+          }
+        });
+        
+        return result.Distinct().ToList();
       }
-      
-      return result.Distinct().ToList();
-    }
     
     /// <summary>
     /// Получить строковое значение свойства.
@@ -2188,7 +2194,7 @@ namespace Sungero.Capture.Server
         // Создание тел документов для которых требуется public body.
         var version = document.Versions.AddNew();
         version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
-        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalFile.Extension);        
+        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(recognizedDocument.OriginalFile.Extension);
         // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
         if (string.IsNullOrEmpty(document.Subject))
         {
