@@ -32,7 +32,7 @@ namespace Sungero.Capture.Constants
     public const string IncomingInvoiceClassName = "Входящий счет на оплату";
     
     [Sungero.Core.Public]
-    public const string IsCancelActionParamName = "IsCancelAction";
+    public const string PropertiesAlreadyColoredParamName = "PropertiesAlreadyColored";
     
     public static class Initialize
     {

@@ -12,8 +12,6 @@ namespace Sungero.SmartCapture.Client
     public override void Cancel(Sungero.Domain.Client.ExecuteActionArgs e)
     {
       base.Cancel(e);
-      
-      e.Params.AddOrUpdate(Capture.PublicConstants.Module.IsCancelActionParamName, true);
     }
 
     public override bool CanCancel(Sungero.Domain.Client.CanExecuteActionArgs e)

@@ -397,6 +397,11 @@ namespace Sungero.Capture.Client
     [Public]
     public virtual void SetPropertiesColors(Sungero.Docflow.IOfficialDocument document)
     {
+      // Добавить признак, что свойства уже подсвечены, используется в Refresh документов.
+      var formParams = ((Sungero.Domain.Shared.IExtendedEntity)document).Params;
+      if (!formParams.ContainsKey(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
+        formParams.Add(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
+      
       // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за ограничений платформы.
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);

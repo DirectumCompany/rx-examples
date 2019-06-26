@@ -14,6 +14,7 @@ namespace Sungero.SmartCapture
     {
       base.Showing(e);
       
+      // Подсветка полей.
       Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
     }
 
@@ -93,6 +94,7 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Contact.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
       this._obj.State.Properties.SignedBy.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
     }
+    
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
       base.Refresh(e);
@@ -105,8 +107,15 @@ namespace Sungero.SmartCapture
       // Восстановить обязательность корреспондента.
       _obj.State.Properties.Correspondent.IsRequired = true;
       
-      if (e.Params.Contains(Capture.PublicConstants.Module.IsCancelActionParamName))
+      // При открытии карточки подсвечиваются распознанные свойства.
+      // При отмене изменений подсветки свойств не происходит (не вызывается Showing, также чистятся e.Params).
+      // Принудительно обновить подсветку полей после отмены изменений.
+      // В остальных случаях параметр будет добавлен при подсветке свойств.
+      if (!e.Params.Contains(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
+      {
         Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
+        e.Params.AddOrUpdate(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
+      }
     }
   }
 }

@@ -81,12 +81,12 @@
   ],
   "PublicConstants": [
     {
-      "Name": "IsCancelActionParamName",
+      "Name": "PropertiesAlreadyColoredParamName",
       "ParentClasses": [
         "Module"
       ],
       "TypeName": "System.String",
-      "Value": "\"IsCancelAction\""
+      "Value": "\"PropertiesAlreadyColored\""
     }
   ],
   "PublicFunctions": [
