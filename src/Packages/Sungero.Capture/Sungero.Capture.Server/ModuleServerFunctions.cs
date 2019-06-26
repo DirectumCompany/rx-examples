@@ -733,20 +733,23 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Создать входящее письмо из тела email.
+    /// Создать документ из тела email.
     /// </summary>
-    /// <param name="mail">Путь до тела email.</param>
+    /// <param name="mailInfo">Информация о захваченном письме.</param>
+    /// <param name="bodyPath">Путь до тела email.</param>
+    /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual void CreateIncomingLetterFromEmailBody(string bodyPath)
+    public virtual Sungero.Docflow.ISimpleDocument CreateDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, string bodyPath)
     {
-      if (System.IO.File.Exists(bodyPath))
-      {
-        var document = Sungero.Docflow.SimpleDocuments.Create();
-        document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-        document.Subject = "Created from Email";
-        document.CreateVersionFrom(bodyPath);
-        document.Save();
-      }
+      if (!System.IO.File.Exists(bodyPath))
+        throw new ApplicationException(Resources.FileNotFoundFormat(bodyPath));
+      
+      var document = Sungero.Docflow.SimpleDocuments.Create();
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
+      document.CreateVersionFrom(bodyPath);
+      document.Save();
+      return document;
     }
     
     #endregion

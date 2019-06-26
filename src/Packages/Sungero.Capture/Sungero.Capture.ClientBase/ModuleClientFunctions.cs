@@ -13,14 +13,14 @@ namespace Sungero.Capture.Client
     /// Создать документ на основе пакета документов со сканера.
     /// </summary>
     /// <param name="senderLine">Наименование линии.</param>
-    /// <param name="instanceInfos">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
+    /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <param name="responsibleId">ИД сотрудника, ответственного за обработку захваченных документов.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    public static void ProcessCapturedPackage(string senderLine, string instanceInfos, string deviceInfo, string filesInfo, string folder,
+    public static void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo, string filesInfo, string folder,
                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
       // Найти ответственного.
@@ -36,7 +36,7 @@ namespace Sungero.Capture.Client
       var source = GetSourceType(deviceInfo);
       
       if (source == Constants.Module.CaptureSourceType.Mail)
-        ProcessMailPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
+        ProcessMailPackage(filesInfo, folder, instanceInfo, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
       if (source == Constants.Module.CaptureSourceType.Folder)
         ProcessScanPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
     }
@@ -91,11 +91,12 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <param name="arioUrl">Host Ario.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    private static void ProcessMailPackage(string filesInfo, string folder,
+    private static void ProcessMailPackage(string filesInfo, string folder, string instanceInfo,
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
@@ -103,8 +104,8 @@ namespace Sungero.Capture.Client
       if (string.IsNullOrWhiteSpace(mailFilesPaths.Body) && !mailFilesPaths.Attachments.Any())
         throw new ApplicationException("Files not found");
       
-      // TODO Dmitriev: Создать входящее письмо.
-      Functions.Module.Remote.CreateIncomingLetterFromEmailBody(mailFilesPaths.Body);
+      var mailInfo = GetMailInfo(instanceInfo);
+      var emailDocument = Functions.Module.Remote.CreateDocumentFromEmailBody(mailInfo, mailFilesPaths.Body);
       
       var relatedDocumentIds = new List<int>();
       foreach (var attachment in mailFilesPaths.Attachments)
@@ -113,18 +114,16 @@ namespace Sungero.Capture.Client
         if (classificationAndExtractionResult.Error == null ||
             string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
-          //TODO Передать явно ведущий документ!!!
           var originalFile = new Structures.Module.File();
           originalFile.Extension = Path.GetExtension(attachment);
           originalFile.Data = System.IO.File.ReadAllBytes(attachment);
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, null, responsible, originalFile);
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, emailDocument, responsible, originalFile);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
         }
       }
       
-      //TODO Передать явно ID ведущего документа!!!
       var documentsToSend = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      documentsToSend.LeadingDocumentId = 0;
+      documentsToSend.LeadingDocumentId = emailDocument.Id;
       documentsToSend.RelatedDocumentIds = relatedDocumentIds;
       Functions.Module.Remote.SendToResponsible(documentsToSend, responsible);
     }
@@ -161,6 +160,42 @@ namespace Sungero.Capture.Client
       
       Logger.Error(classificationAndExtractionResult.Error);
       return classificationAndExtractionResult;
+    }
+    
+    /// <summary>
+    /// Получить информацию о захваченном письме.
+    /// </summary>
+    /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
+    /// <returns>Информация о захваченном письме.</returns>
+    private static Structures.Module.CapturedMailInfo GetMailInfo (string instanceInfo)
+    {
+      var result = Structures.Module.CapturedMailInfo.Create();
+      
+      if (!File.Exists(instanceInfo))
+        throw new ApplicationException(Resources.FileNotFoundFormat(instanceInfo));
+      
+      System.Diagnostics.Debugger.Launch();
+      var infoXDoc = System.Xml.Linq.XDocument.Load(instanceInfo);
+      if (infoXDoc == null)
+        return result;
+      
+      var mailCaptureInstanceInfoElement = infoXDoc
+        .Element("CaptureInstanceInfoList")
+        .Element("MailCaptureInstanceInfo");
+      
+      if (mailCaptureInstanceInfoElement == null)
+        return result;
+      
+      result.Subject = mailCaptureInstanceInfoElement.Attribute("Subject").Value;
+      
+      var fromElement = mailCaptureInstanceInfoElement.Element("From");
+      if (fromElement == null)
+        return result;
+      
+      result.FromEmail = fromElement.Attribute("Address").Value;
+      result.Name = fromElement.Attribute("Name").Value;
+      
+      return result;
     }
     
     /// <summary>

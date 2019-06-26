@@ -85,10 +85,24 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
 
+  
+  /// <summary>
+  /// Пути до файлов захваченного письма.
+  /// </summary>
   partial class CapturedMailFilesPaths
   {
     public string Body { get; set; }
     public List<string> Attachments { get; set; }
+  }
+  
+  /// <summary>
+  /// Информация о захваченном письме.
+  /// </summary>
+  partial class CapturedMailInfo
+  {
+    public string Name { get; set; }
+    public string FromEmail { get; set; }
+    public string Subject { get; set; }
   }
   
   /// <summary>
