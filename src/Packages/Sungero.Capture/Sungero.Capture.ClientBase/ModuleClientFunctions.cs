@@ -438,7 +438,9 @@ namespace Sungero.Capture.Client
         formParams.Add(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
       
       // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
-      // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за ограничений платформы.
+      // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
+      // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
+      // данная функция используется за пределами модуля. 
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);
       HighlightProperties(document, exactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Green);
       
