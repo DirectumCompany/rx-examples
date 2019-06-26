@@ -390,10 +390,6 @@ namespace Sungero.Capture.Client
         if (Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication(fileDescription) == null)
           continue;
         
-        // Отбрасываем изображения из тела письма (например картинки из подписей).
-        if (System.Text.RegularExpressions.Regex.IsMatch(fileDescription, @"^ATT\d+\s\d+\.\w+"))
-          continue;
-        
         var filePath = Path.Combine(folder, Path.GetFileName(attachment.Element("FileName").Value));
         if (!File.Exists(filePath))
         {
