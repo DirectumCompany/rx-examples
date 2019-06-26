@@ -167,14 +167,13 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <returns>Информация о захваченном письме.</returns>
-    private static Structures.Module.CapturedMailInfo GetMailInfo (string instanceInfo)
+    private static Structures.Module.CapturedMailInfo GetMailInfo(string instanceInfo)
     {
       var result = Structures.Module.CapturedMailInfo.Create();
       
       if (!File.Exists(instanceInfo))
         throw new ApplicationException(Resources.FileNotFoundFormat(instanceInfo));
       
-      System.Diagnostics.Debugger.Launch();
       var infoXDoc = System.Xml.Linq.XDocument.Load(instanceInfo);
       if (infoXDoc == null)
         return result;
