@@ -362,8 +362,13 @@ namespace Sungero.Capture.Client
       var hasHtmlBody = htmlBodyElement != null;
       var hasTxtBody = txtBodyElement != null;
       var hasAssociatedAppForHtml = Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication("body.html") != null;
-      if (hasAssociatedAppForHtml && hasHtmlBody)
-        mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(htmlBodyElement.Element("FileName").Value));
+      if (hasHtmlBody)
+      {
+        if (hasAssociatedAppForHtml)
+          mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(htmlBodyElement.Element("FileName").Value));
+        else
+          throw new ApplicationException("Associated application for HTML files not found.");
+      }
       else if (hasTxtBody)
         mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(txtBodyElement.Element("FileName").Value));
       

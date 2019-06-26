@@ -540,6 +540,29 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    /// <summary>
+    /// Создать документ из тела email.
+    /// </summary>
+    /// <param name="mailInfo">Информация о захваченном письме.</param>
+    /// <param name="bodyPath">Путь до тела email.</param>
+    /// <returns>ИД созданного документа.</returns>
+    [Remote]
+    public virtual Sungero.Docflow.ISimpleDocument CreateDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, string bodyPath)
+    {
+      if (!System.IO.File.Exists(bodyPath))
+        throw new ApplicationException(Resources.FileNotFoundFormat(bodyPath));
+      
+      var document = Sungero.Docflow.SimpleDocuments.Create();
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      document.Name = string.Format("Email от {0}", mailInfo.FromEmail);
+      if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
+        document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
+      document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
+      document.CreateVersionFrom(bodyPath);
+      document.Save();
+      return document;
+    }
+    
     #endregion
     
     #region Входящее письмо
@@ -728,26 +751,6 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }           
       CreateVersion(document, recognizedDocument);      
-      document.Save();
-      return document;
-    }
-    
-    /// <summary>
-    /// Создать документ из тела email.
-    /// </summary>
-    /// <param name="mailInfo">Информация о захваченном письме.</param>
-    /// <param name="bodyPath">Путь до тела email.</param>
-    /// <returns>ИД созданного документа.</returns>
-    [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, string bodyPath)
-    {
-      if (!System.IO.File.Exists(bodyPath))
-        throw new ApplicationException(Resources.FileNotFoundFormat(bodyPath));
-      
-      var document = Sungero.Docflow.SimpleDocuments.Create();
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
-      document.CreateVersionFrom(bodyPath);
       document.Save();
       return document;
     }
