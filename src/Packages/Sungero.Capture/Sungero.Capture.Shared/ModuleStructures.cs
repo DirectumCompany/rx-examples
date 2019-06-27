@@ -17,13 +17,14 @@ namespace Sungero.Capture.Structures.Module
     public List<Sungero.Capture.Structures.Module.Fact> Facts { get; set; }
     public string Message { get; set; }
     public IDocumentRecognitionInfo Info { get; set; }
-    public Sungero.Capture.Structures.Module.File OriginalFile { get; set; }
+    public Sungero.Capture.Structures.Module.FileInfo OriginalFile { get; set; }
   }
   
-  partial class File
+  partial class FileInfo
   {
     public byte[] Data { get; set; }
-    public string FileName { get; set; }
+    public string Path { get; set; }
+    public string Description { get; set; }
   }
   
   /// <summary>
@@ -87,12 +88,12 @@ namespace Sungero.Capture.Structures.Module
 
   
   /// <summary>
-  /// Пути до файлов захваченного письма.
+  /// Файлы захваченного письма.
   /// </summary>
-  partial class CapturedMailFilesPaths
+  partial class CapturedMailFiles
   {
-    public string Body { get; set; }
-    public List<string> Attachments { get; set; }
+    public Sungero.Capture.Structures.Module.FileInfo Body { get; set; }
+    public List<Sungero.Capture.Structures.Module.FileInfo> Attachments { get; set; }
   }
   
   /// <summary>

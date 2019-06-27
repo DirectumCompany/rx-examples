@@ -106,7 +106,7 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
-    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.File originalFile,
+    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.FileInfo originalFile,
                                                                                                               IOfficialDocument leadingDocument, IEmployee responsible)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
@@ -115,7 +115,7 @@ namespace Sungero.Capture.Server
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
       {
-        var document = CreateDocumentByRecognizedDocument(recognizedDocument, originalFile.FileName, responsible);
+        var document = CreateDocumentByRecognizedDocument(recognizedDocument, originalFile.Path, responsible);
         package.Add(document);
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -153,7 +153,7 @@ namespace Sungero.Capture.Server
       return result;
     }
     
-    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.File originalFile)
+    public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.FileInfo originalFile)
     {
       var recognizedDocuments = new List<RecognizedDocument>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
@@ -548,10 +548,10 @@ namespace Sungero.Capture.Server
     /// <param name="bodyPath">Путь до тела email.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, string bodyPath)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, Structures.Module.FileInfo body)
     {
-      if (!System.IO.File.Exists(bodyPath))
-        throw new ApplicationException(Resources.FileNotFoundFormat(bodyPath));
+      if (!System.IO.File.Exists(body.Path))
+        throw new ApplicationException(Resources.FileNotFoundFormat(body.Path));
       
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -559,7 +559,7 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
       document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
-      document.CreateVersionFrom(bodyPath);
+      document.CreateVersionFrom(body.Path);
       document.Save();
       return document;
     }
@@ -570,15 +570,15 @@ namespace Sungero.Capture.Server
     /// <param name="File">Файл.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.File file)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.FileInfo fileInfo)
     {
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.Name = Path.GetFileName(file.FileName);
+      document.Name = Path.GetFileName(fileInfo.Description);
       document.Save();
       
-      var application = GetAssociatedApplicationByFileName(file.FileName);
-      using (var body = new MemoryStream(file.Data))
+      var application = GetAssociatedApplicationByFileName(fileInfo.Path);
+      using (var body = new MemoryStream(fileInfo.Data))
       {
         document.CreateVersion();
         var version = document.LastVersion;
@@ -2220,7 +2220,7 @@ namespace Sungero.Capture.Server
       var pdfApp = Content.AssociatedApplications.GetByExtension("pdf");
       var originalFileApp = Content.AssociatedApplications.Null;
       if (needCreatePublicBody)
-        originalFileApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.FileName);
+        originalFileApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.Path);
       
       // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
       var subjectIsEmpty = string.IsNullOrEmpty(document.Subject);

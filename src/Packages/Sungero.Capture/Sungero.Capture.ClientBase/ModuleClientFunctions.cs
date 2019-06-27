@@ -79,8 +79,8 @@ namespace Sungero.Capture.Client
       {
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, fileName, firstPageClassifierName, typeClassifierName);
         Logger.DebugFormat("Begin package processing. File: {0}", fileName);
-        var originalFile = new Structures.Module.File();
-        originalFile.FileName = fileName;
+        var originalFile = new Structures.Module.FileInfo();
+        originalFile.Path = fileName;
         var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, null, responsible);
         Functions.Module.Remote.SendToResponsible(documents, responsible);
         Logger.DebugFormat("End package processing. File: {0}", fileName);
@@ -103,46 +103,44 @@ namespace Sungero.Capture.Client
                                            Sungero.Company.IEmployee responsible)
     {
       Logger.Debug("Captured Package Process. Captured package type is MAIL.");
-      var mailFilesPaths = GetCapturedMailFilesPaths(filesInfo, folder);
-      if (string.IsNullOrWhiteSpace(mailFilesPaths.Body) && !mailFilesPaths.Attachments.Any())
+      var mailFiles = GetCapturedMailFiles(filesInfo, folder);
+      if ((mailFiles.Body == null || !File.Exists(mailFiles.Body.Path)) && !mailFiles.Attachments.Any())
         throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
       
       var mailInfo = GetMailInfo(instanceInfo);
-      var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFilesPaths.Body);
+      var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body);
       Logger.Debug("Captured Package Process. Document from e-mail body created.");
       
       var relatedDocumentIds = new List<int>();
-      foreach (var attachment in mailFilesPaths.Attachments)
+      foreach (var attachment in mailFiles.Attachments)
       {
-        var originalFile = new Structures.Module.File();
-        originalFile.FileName = attachment;
-        originalFile.Data = System.IO.File.ReadAllBytes(attachment);
+        attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
         
-        Logger.DebugFormat("Captured Package Process. Attachment: {0}", originalFile.FileName);
+        Logger.DebugFormat("Captured Package Process. Attachment: {0}", attachment.Description);
         
-        if (!CanArioProcessFile(originalFile.FileName))
+        if (!CanArioProcessFile(attachment.Description))
         {
-          Logger.DebugFormat("Captured Package Process. Can't process file by Ario: {0}", originalFile.FileName);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(originalFile);
-          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", originalFile.FileName);
+          Logger.DebugFormat("Captured Package Process. Can't process file by Ario: {0}", attachment.Description);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment);
+          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
           relatedDocumentIds.Add(document.Id);
           continue;
         }
         
-        Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", originalFile.FileName);
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment, firstPageClassifierName, typeClassifierName, false);
+        Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", attachment.Description);
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment.Path, firstPageClassifierName, typeClassifierName, false);
         if (classificationAndExtractionResult.Error == null ||
             string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
-          Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", originalFile.FileName);
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, emailBodyDocument, responsible);
+          Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", attachment.Description);
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, emailBodyDocument, responsible);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
         }
         else
         {
-          Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", originalFile.FileName);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(originalFile);
-          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", originalFile.FileName);
+          Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", attachment.Description);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment);
+          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
           relatedDocumentIds.Add(document.Id);
         }
       }
@@ -303,8 +301,8 @@ namespace Sungero.Capture.Client
       
       // Обработать пакет.
       Logger.Debug("Start ProcessSplitedPackage");
-      var originalFile = new Structures.Module.File();
-      originalFile.FileName = System.IO.Path.GetFileName(bodyFilePath);
+      var originalFile = new Structures.Module.FileInfo();
+      originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
       Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
                                                                   originalFile,
                                                                   null, responsible);
@@ -401,15 +399,15 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Пути до захваченных с почты файлов.</returns>
-    public static Structures.Module.CapturedMailFilesPaths GetCapturedMailFilesPaths(string filesInfo, string folder)
+    public static Structures.Module.CapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
     {
-      var mailFilesPaths = Structures.Module.CapturedMailFilesPaths.Create();
-      mailFilesPaths.Attachments = new List<string>();
+      var mailFiles = Structures.Module.CapturedMailFiles.Create();
+      mailFiles.Attachments = new List<Structures.Module.FileInfo>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
       {
         Logger.Error(Resources.NoFilesInfoInPackage);
-        return mailFilesPaths;
+        return mailFiles;
       }
       
       // Тело письма.
@@ -420,19 +418,32 @@ namespace Sungero.Capture.Client
       var hasTxtBody = txtBodyElement != null;
       
       if (hasHtmlBody)
-      {
-        mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(htmlBodyElement.Element("FileName").Value));
-      }
+        mailFiles.Body = CreateFileInfoFromXelement(htmlBodyElement, folder);
       else if (hasTxtBody)
-        mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(txtBodyElement.Element("FileName").Value));
+        mailFiles.Body = CreateFileInfoFromXelement(txtBodyElement, folder);
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
                                                 !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       foreach (var attachment in attachments)
-        mailFilesPaths.Attachments.Add(Path.Combine(folder, Path.GetFileName(attachment.Element("FileName").Value)));
+        mailFiles.Attachments.Add(CreateFileInfoFromXelement(attachment, folder));
       
-      return mailFilesPaths;
+      return mailFiles;
+    }
+    
+    /// <summary>
+    /// Создать информацию о файле на основе xml элемента.
+    /// </summary>
+    /// <param name="xmlElement">Xml элемент.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <returns>Информация о файле.</returns>
+    private static Structures.Module.FileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
+    {
+      var fileInfo = Structures.Module.FileInfo.Create();
+      fileInfo.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element("FileName").Value));
+      fileInfo.Description = xmlElement.Element("FileDescription").Value;
+      
+      return fileInfo;
     }
     
     /// <summary>
