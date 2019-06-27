@@ -101,7 +101,7 @@ namespace Sungero.Capture.Server
     /// Создать документы в RX.
     /// </summary>
     /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
-        /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
+    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     /// <returns>Список Id созданных документов.</returns>
@@ -379,9 +379,9 @@ namespace Sungero.Capture.Server
       
       return Contacts.GetAll()
         .Where(x => (counterparty == null || x.Company.Equals(counterparty)) && (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name ||
-               (x.Person != null
-                ? x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name
-                : false)))
+                                                                                 (x.Person != null
+                                                                                  ? x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name
+                                                                                  : false)))
         .FirstOrDefault();
     }
     
@@ -423,7 +423,7 @@ namespace Sungero.Capture.Server
         return Contacts.Null;
       
       var fullName = GetFullNameByFact(fact);
-      return GetContactByName(fullName, counterparty);      
+      return GetContactByName(fullName, counterparty);
     }
     
     /// <summary>
@@ -623,7 +623,7 @@ namespace Sungero.Capture.Server
       document.Department = document.Addressee != null
         ? GetDepartment(document.Addressee)
         : GetDepartment(responsible);
-                  
+      
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
       if (document.SignedBy == null)
@@ -2063,7 +2063,7 @@ namespace Sungero.Capture.Server
                                            object propertyValue,
                                            bool? isTrusted = null)
     {
-      var propertyStringValue = GetPropertyStringValue(propertyValue);
+      var propertyStringValue = GetPropertyValueAsString(propertyValue);
       if (string.IsNullOrWhiteSpace(propertyStringValue))
         return;
       
@@ -2130,16 +2130,16 @@ namespace Sungero.Capture.Server
             if (property != null)
             {
               object propertyValue = property.GetValue(document);
-              var propertyStringValue = GetPropertyStringValue(propertyValue);
+              var propertyStringValue = GetPropertyValueAsString(propertyValue);
               
               if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
                 result.Add(propertyName);
             }
           }
         });
-        
-        return result.Distinct().ToList();
-      }
+      
+      return result.Distinct().ToList();
+    }
     
     /// <summary>
     /// Получить строковое значение свойства.
@@ -2147,7 +2147,7 @@ namespace Sungero.Capture.Server
     /// <param name="propertyValue">Значение свойства.</param>
     /// <returns></returns>
     /// <remarks>Для свойств типа сущность будет возвращена строка с Ид сущности.</remarks>
-    private static string GetPropertyStringValue(object propertyValue)
+    private static string GetPropertyValueAsString(object propertyValue)
     {
       if (propertyValue == null)
         return string.Empty;
@@ -2167,18 +2167,17 @@ namespace Sungero.Capture.Server
     public static bool IsTrustedField(Structures.Module.Fact fact, string fieldName)
     {
       var field = GetField(fact, fieldName);
-      if (field != null)
+      if (field == null)
+        return false;
+      
+      double trustedProbability;
+      var valueReceived = Sungero.Core.Cache.TryGetValue(Constants.Module.TrustedFactProbabilityKey, out trustedProbability);
+      if (!valueReceived)
       {
-        double trustedProbability;
-        var valueReceived = Sungero.Core.Cache.TryGetValue(Constants.Module.TrustedFactProbabilityKey, out trustedProbability);
-        if (!valueReceived)
-        {
-          trustedProbability = GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
-          Sungero.Core.Cache.AddOrUpdate(Constants.Module.TrustedFactProbabilityKey, trustedProbability, Calendar.Now.AddMinutes(10));
-        }
-        return field.Probability >= trustedProbability;
+        trustedProbability = GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
+        Sungero.Core.Cache.AddOrUpdate(Constants.Module.TrustedFactProbabilityKey, trustedProbability, Calendar.Now.AddMinutes(10));
       }
-      return false;
+      return field.Probability >= trustedProbability;
     }
     
     /// <summary>
