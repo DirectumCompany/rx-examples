@@ -156,6 +156,9 @@ namespace Sungero.Capture.Server
     public virtual List<Structures.Module.RecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.File originalFile)
     {
       var recognizedDocuments = new List<RecognizedDocument>();
+      if (string.IsNullOrWhiteSpace(jsonClassificationResults))
+        return recognizedDocuments;
+      
       var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
       foreach (var packageProcessResult in packageProcessResults)
       {
@@ -545,7 +548,7 @@ namespace Sungero.Capture.Server
     /// <param name="bodyPath">Путь до тела email.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, string bodyPath)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, string bodyPath)
     {
       if (!System.IO.File.Exists(bodyPath))
         throw new ApplicationException(Resources.FileNotFoundFormat(bodyPath));
@@ -558,6 +561,32 @@ namespace Sungero.Capture.Server
       document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
       document.CreateVersionFrom(bodyPath);
       document.Save();
+      return document;
+    }
+    
+    /// <summary>
+    /// Создать простой документ из файла.
+    /// </summary>
+    /// <param name="File">Файл.</param>
+    /// <returns>Простой документ.</returns>
+    [Remote]
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.File file)
+    {
+      var document = Sungero.Docflow.SimpleDocuments.Create();
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      document.Name = Path.GetFileName(file.FileName);
+      document.Save();
+      
+      var application = GetAssociatedApplicationByFileName(file.FileName);
+      using (var body = new MemoryStream(file.Data))
+      {
+        document.CreateVersion();
+        var version = document.LastVersion;
+        version.Body.Write(body);
+        version.AssociatedApplication = application;
+      }
+      document.Save();
+      
       return document;
     }
     
@@ -2187,50 +2216,58 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки входящего документа в Арио.</param>
     public static void CreateVersion(IOfficialDocument document, Structures.Module.RecognizedDocument recognizedDocument)
     {
-      using (var documentBody = GetDocumentBody(recognizedDocument.BodyGuid))
+      var needCreatePublicBody = recognizedDocument.OriginalFile != null && recognizedDocument.OriginalFile.Data != null;
+      var pdfApp = Content.AssociatedApplications.GetByExtension("pdf");
+      var originalFileApp = Content.AssociatedApplications.Null;
+      if (needCreatePublicBody)
+        originalFileApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.FileName);
+      
+      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
+      var subjectIsEmpty = string.IsNullOrEmpty(document.Subject);
+      if (subjectIsEmpty)
+        document.Subject = "tmp_Subject";
+      
+      document.CreateVersion();
+      var version = document.LastVersion;
+      
+      if (needCreatePublicBody)
       {
-        // Создание тел документов для которых не требуется public body.
-        if (recognizedDocument.OriginalFile == null || recognizedDocument.OriginalFile.Data == null)
-        {
-          // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-          if (string.IsNullOrEmpty(document.Subject))
-          {
-            document.Subject = "pdf";
-            document.CreateVersionFrom(documentBody, "pdf");
-            document.Subject = string.Empty;
-          }
-          else
-          {
-            document.CreateVersionFrom(documentBody, "pdf");
-          }
-          return;
-        }
-        
-        // Создание тел документов для которых требуется public body.
-        var version = document.Versions.AddNew();
-        version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
-        version.BodyAssociatedApplication = Content.AssociatedApplications.GetByExtension(Path.GetExtension(recognizedDocument.OriginalFile.FileName));
-        // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-        if (string.IsNullOrEmpty(document.Subject))
-        {
-          document.Subject = "pdf";
-          
-          using (var ms = new MemoryStream(recognizedDocument.OriginalFile.Data))
-          {
-            version.Body.Write(ms);
-          }
-          version.PublicBody.Write(documentBody);
-          document.Subject = string.Empty;
-        }
-        else
-        {
-          using (var ms = new MemoryStream(recognizedDocument.OriginalFile.Data))
-          {
-            version.Body.Write(ms);
-          }
-          version.PublicBody.Write(documentBody);
-        }
+        using (var publicBody = GetDocumentBody(recognizedDocument.BodyGuid))
+          version.PublicBody.Write(publicBody);
+        using (var body = new MemoryStream(recognizedDocument.OriginalFile.Data))
+          version.Body.Write(body);
+        version.AssociatedApplication = pdfApp;
+        version.BodyAssociatedApplication = originalFileApp;
       }
+      else
+      {
+        using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
+          version.Body.Write(body);
+        version.AssociatedApplication = pdfApp;
+      }
+      
+      // Очистить Subject, если он был пуст до создания версии.
+      if (subjectIsEmpty)
+        document.Subject = string.Empty;
+    }
+    
+    /// <summary>
+    /// Получить приложение-обработчик по имени файла.
+    /// </summary>
+    /// <param name="fileName">Имя или путь до файла.</param>
+    /// <returns>Приложение-обработчик</returns>
+    private static Sungero.Content.IAssociatedApplication GetAssociatedApplicationByFileName(string fileName)
+    {
+      var app = Sungero.Content.AssociatedApplications.Null;
+      var ext = System.IO.Path.GetExtension(fileName).TrimStart('.').ToLower();
+      app = Content.AssociatedApplications.GetByExtension(ext);
+      
+      // Взять приложение-обработчик unknown, если не смогли подобрать по расширению.
+      if (app == null)
+        app = Sungero.Content.AssociatedApplications.GetAll()
+          .SingleOrDefault(x => x.Sid == Sungero.Docflow.PublicConstants.Module.UnknownAppSid);
+      
+      return app;
     }
     
     #endregion

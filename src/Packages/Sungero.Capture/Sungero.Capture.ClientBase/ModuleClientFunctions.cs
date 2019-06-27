@@ -102,32 +102,75 @@ namespace Sungero.Capture.Client
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
+      Logger.Debug("Captured Package Process. Captured package type is MAIL.");
       var mailFilesPaths = GetCapturedMailFilesPaths(filesInfo, folder);
       if (string.IsNullOrWhiteSpace(mailFilesPaths.Body) && !mailFilesPaths.Attachments.Any())
-        throw new ApplicationException("Files not found");
+        throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
       
       var mailInfo = GetMailInfo(instanceInfo);
-      var emailDocument = Functions.Module.Remote.CreateDocumentFromEmailBody(mailInfo, mailFilesPaths.Body);
+      var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFilesPaths.Body);
+      Logger.Debug("Captured Package Process. Document from e-mail body created.");
       
       var relatedDocumentIds = new List<int>();
       foreach (var attachment in mailFilesPaths.Attachments)
       {
+        var originalFile = new Structures.Module.File();
+        originalFile.FileName = attachment;
+        originalFile.Data = System.IO.File.ReadAllBytes(attachment);
+        
+        Logger.DebugFormat("Captured Package Process. Attachment: {0}", originalFile.FileName);
+        
+        if (!CanArioProcessFile(originalFile.FileName))
+        {
+          Logger.DebugFormat("Captured Package Process. Can't process file by Ario: {0}", originalFile.FileName);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(originalFile);
+          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", originalFile.FileName);
+          relatedDocumentIds.Add(document.Id);
+          continue;
+        }
+        
+        Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", originalFile.FileName);
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment, firstPageClassifierName, typeClassifierName, false);
         if (classificationAndExtractionResult.Error == null ||
             string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
-          var originalFile = new Structures.Module.File();
-          originalFile.FileName = attachment;
-          originalFile.Data = System.IO.File.ReadAllBytes(attachment);
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, emailDocument, responsible);
+          Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", originalFile.FileName);
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, emailBodyDocument, responsible);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
+        }
+        else
+        {
+          Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", originalFile.FileName);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(originalFile);
+          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", originalFile.FileName);
+          relatedDocumentIds.Add(document.Id);
         }
       }
       
+      Logger.Debug("Captured Package Process. Send documents to responsible.");
       var documentsToSend = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      documentsToSend.LeadingDocumentId = emailDocument.Id;
+      documentsToSend.LeadingDocumentId = emailBodyDocument.Id;
       documentsToSend.RelatedDocumentIds = relatedDocumentIds;
       Functions.Module.Remote.SendToResponsible(documentsToSend, responsible);
+      Logger.Debug("Captured Package Process. Done.");
+    }
+    
+    /// <summary>
+    /// Определить может ли Ario обработать файл.
+    /// </summary>
+    /// <param name="fileName">Имя или путь до файла.</param>
+    /// <returns>True - может, False - иначе.</returns>
+    private static bool CanArioProcessFile(string fileName)
+    {
+      var ext = Path.GetExtension(fileName).TrimStart('.').ToLower();
+      var allowedExtensions = new List<string>()
+      {
+        "jpg", "jpeg", "png", "bmp", "gif",
+        "tif", "tiff", "pdf", "doc", "docx",
+        "dot", "dotx", "rtf", "odt", "ott",
+        "txt", "xls", "xlsx", "ods", "pdf"
+      };
+      return allowedExtensions.Contains(ext);
     }
     
     /// <summary>
@@ -343,15 +386,12 @@ namespace Sungero.Capture.Client
       foreach (var fileElement in fileElements)
       {
         var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
-        if (!File.Exists(filePath))
-        {
-          Logger.Error(Resources.FileNotFoundFormat(filePath));
-        }
-        else
-        {
+        if (File.Exists(filePath))
           filePaths.Add(filePath);
-        }
+        else
+          Logger.Error(Resources.FileNotFoundFormat(filePath));
       }
+      
       return filePaths;
     }
     
@@ -378,45 +418,19 @@ namespace Sungero.Capture.Client
       var txtBodyElement = fileElements.FirstOrDefault(x => string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       var hasHtmlBody = htmlBodyElement != null;
       var hasTxtBody = txtBodyElement != null;
-      var hasAssociatedAppForHtml = Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication("body.html") != null;
+      
       if (hasHtmlBody)
       {
-        if (hasAssociatedAppForHtml)
-          mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(htmlBodyElement.Element("FileName").Value));
-        else
-          throw new ApplicationException("Associated application for HTML files not found.");
+        mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(htmlBodyElement.Element("FileName").Value));
       }
       else if (hasTxtBody)
         mailFilesPaths.Body = Path.Combine(folder, Path.GetFileName(txtBodyElement.Element("FileName").Value));
       
-      // Расширения файлов, которые умеет обрабатывать Арио.
-      var allowedFileExtensions = new List<string>()
-      {
-        ".jpg", ".jpeg", ".png", ".bmp", ".gif",
-        ".tif", ".tiff", ".pdf", ".doc", ".docx",
-        ".dot", ".dotx", ".rtf", ".odt", ".ott",
-        ".txt", ".xls", ".xlsx", ".ods", ".pdf"
-      };
-      
       // Вложения.
-      var attachments = fileElements.Where(x => allowedFileExtensions.Contains(Path.GetExtension(x.Element("FileDescription").Value), StringComparer.InvariantCultureIgnoreCase) &&
-                                           !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
+                                                !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       foreach (var attachment in attachments)
-      {
-        // Если для файла нет приложения-обработчика, то платформа не даст создать документ.
-        var fileDescription = attachment.Element("FileDescription").Value;
-        if (Sungero.Content.Shared.ElectronicDocumentUtils.GetAssociatedApplication(fileDescription) == null)
-          continue;
-        
-        var filePath = Path.Combine(folder, Path.GetFileName(attachment.Element("FileName").Value));
-        if (!File.Exists(filePath))
-        {
-          Logger.Error(Resources.FileNotFoundFormat(filePath));
-          continue;
-        }
-        
-        mailFilesPaths.Attachments.Add(filePath);
-      }
+        mailFilesPaths.Attachments.Add(Path.Combine(folder, Path.GetFileName(attachment.Element("FileName").Value)));
       
       return mailFilesPaths;
     }
