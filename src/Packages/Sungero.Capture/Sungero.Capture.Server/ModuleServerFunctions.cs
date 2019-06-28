@@ -462,6 +462,9 @@ namespace Sungero.Capture.Server
       var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
+      if (string.IsNullOrWhiteSpace(number))
+        return Sungero.Contracts.ContractualDocuments.Null;
+      
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
                                                            x.RegistrationDate == docDate &&
                                                            (counterparty == null || x.Counterparty.Equals(counterparty))).FirstOrDefault();
@@ -1417,7 +1420,11 @@ namespace Sungero.Capture.Server
     public static void FillAmount(IAccountingDocumentBase document, Structures.Module.RecognizedDocument recognizedDocument)
     {
       var facts = recognizedDocument.Facts;
-      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      var documentAmountFacts = GetOrderedFacts(facts, "DocumentAmount", "Amount");
+      var documentAmountFact = documentAmountFacts.Where(a => a.Fields.Any(field => field.Name == "Currency")).FirstOrDefault();
+      if (documentAmountFact == null)
+        documentAmountFact = documentAmountFacts.FirstOrDefault();
+      
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       var currencyCode = GetFieldValue(documentAmountFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
@@ -1425,7 +1432,7 @@ namespace Sungero.Capture.Server
       var props = document.Info.Properties;
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
+        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency);
     }
     
     /// <summary>
