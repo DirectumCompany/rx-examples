@@ -277,7 +277,7 @@ namespace Sungero.Capture.Client
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
         throw new ApplicationException(Resources.InvalidResponsibleId);
-      Logger.DebugFormat("Responsible: {0}", responsible.Person.ShortName);
+      Logger.DebugFormat(Calendar.Now.ToString() + " Responsible: {0}", responsible.Person.ShortName);
       
       var arioUrl = Sungero.Capture.Functions.Module.Remote.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
@@ -291,20 +291,22 @@ namespace Sungero.Capture.Client
       if (convertionResult == null)
         return;
       var docPdfGuid = convertionResult.Guid;
-      Logger.DebugFormat("Document Ario Guid: {0}", docPdfGuid);
+      Logger.DebugFormat(Calendar.Now.ToString() + " Document Ario Guid: {0}", docPdfGuid);
       
       // Заменить guid документа в исходном json'е на полученный из Ario.
       var modifiedJson = arioConnector.UpdateGuidInClassificationResults(System.IO.File.ReadAllText(jsonFilePath), docPdfGuid);
-      Logger.Debug("Source Json updated.");
+      Logger.Debug(Calendar.Now.ToString() + " Source Json updated.");
       
       // Обработать пакет.
-      Logger.Debug("Start ProcessSplitedPackage");
+      Logger.Debug(Calendar.Now.ToString() + " Start ProcessSplitedPackage");
       var originalFile = new Structures.Module.FileInfo();
       originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
-      Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
+      var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
                                                                   originalFile,
                                                                   null, responsible);
-      Logger.Debug("Start ProcessSplitedPackage");
+      
+      Functions.Module.Remote.SendToResponsible(documents, responsible);
+      Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }
     
