@@ -192,15 +192,14 @@ namespace Sungero.Capture.Client
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
       var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
       classificationAndExtractionResult.Result = processResult;
-      if (nativeError == null)
+      if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
         return classificationAndExtractionResult;
-        
-      var errorMessage = nativeError.Message;
-      if (throwOnError)
-        throw new ApplicationException(errorMessage);
       
-      Logger.Error(errorMessage);
-      classificationAndExtractionResult.Error = errorMessage;
+      if (throwOnError)
+        throw new ApplicationException(nativeError.Message);
+      
+      Logger.Error(nativeError.Message);
+      classificationAndExtractionResult.Error = nativeError.Message;
       return classificationAndExtractionResult;
     }
     
