@@ -33,10 +33,12 @@ namespace Sungero.Capture.Client
       if (string.IsNullOrEmpty(arioUrl))
         throw new ApplicationException(Resources.EmptyArioUrl);
       
+      // Захват с почты.
       var source = GetSourceType(deviceInfo);
-      
       if (source == Constants.Module.CaptureSourceType.Mail)
         ProcessMailPackage(filesInfo, folder, instanceInfo, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
+      
+      // Захват с папки (сканера).
       if (source == Constants.Module.CaptureSourceType.Folder)
         ProcessScanPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
     }
@@ -71,19 +73,19 @@ namespace Sungero.Capture.Client
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
-      var fileNames = GetScannedPackagesPaths(filesInfo, folder);
-      if (!fileNames.Any())
-        throw new ApplicationException("Files not found");
+      var packagesPaths = GetScannedPackagesPaths(filesInfo, folder);
+      if (!packagesPaths.Any())
+        throw new ApplicationException("Package not found");
       
-      foreach (var fileName in fileNames)
+      foreach (var packagePath in packagesPaths)
       {
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, fileName, firstPageClassifierName, typeClassifierName);
-        Logger.DebugFormat("Begin package processing. File: {0}", fileName);
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, packagePath, firstPageClassifierName, typeClassifierName);
+        Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileInfo();
-        originalFile.Path = fileName;
+        originalFile.Path = packagePath;
         var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, null, responsible);
         Functions.Module.Remote.SendToResponsible(documents, responsible);
-        Logger.DebugFormat("End package processing. File: {0}", fileName);
+        Logger.DebugFormat("End package processing. Path: {0}", packagePath);
         Logger.Debug("End of captured package processing.");
       }
     }
@@ -186,22 +188,19 @@ namespace Sungero.Capture.Client
                                                                                                   string typeClassifierName,
                                                                                                   bool throwOnError = true)
     {
+      var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
       var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
-      var fileName = System.IO.Path.GetFileName(filePath);
-      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", fileName);
-      classificationAndExtractionResult.Result = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
-      Logger.DebugFormat("End classification and facts extraction. File: {0}", fileName);
-      
-      var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(classificationAndExtractionResult.Result);
-      classificationAndExtractionResult.Error = nativeError == null ? string.Empty : nativeError.Message;
-      if (classificationAndExtractionResult.Error == null ||
-          string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
+      classificationAndExtractionResult.Result = processResult;
+      if (nativeError == null)
         return classificationAndExtractionResult;
-      
+        
+      var errorMessage = nativeError.Message;
       if (throwOnError)
-        throw new ApplicationException(classificationAndExtractionResult.Error);
+        throw new ApplicationException(errorMessage);
       
-      Logger.Error(classificationAndExtractionResult.Error);
+      Logger.Error(errorMessage);
+      classificationAndExtractionResult.Error = errorMessage;
       return classificationAndExtractionResult;
     }
     
@@ -331,12 +330,15 @@ namespace Sungero.Capture.Client
 
       var fpClassifierId = fpClassifier.Id.ToString();
       var typeClassifierId = typeClassifier.Id.ToString();
-      
       Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
       
+      var fileName = System.IO.Path.GetFileName(filePath);
       var ruleMapping = GetClassRuleMapping();
-      return arioConnector.ClassifyAndExtractFacts(File.ReadAllBytes(filePath), Path.GetFileName(filePath), typeClassifierId, fpClassifierId, ruleMapping);
+      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", fileName);
+      var result = arioConnector.ClassifyAndExtractFacts(File.ReadAllBytes(filePath), fileName, typeClassifierId, fpClassifierId, ruleMapping);
+      Logger.DebugFormat("End classification and facts extraction. File: {0}", fileName);
+      return result;
     }
     
     /// <summary>
@@ -381,6 +383,7 @@ namespace Sungero.Capture.Client
       
       if (!fileElements.Any())
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
+      
       foreach (var fileElement in fileElements)
       {
         var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
@@ -424,7 +427,7 @@ namespace Sungero.Capture.Client
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
-                                                !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+                                           !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       foreach (var attachment in attachments)
         mailFiles.Attachments.Add(CreateFileInfoFromXelement(attachment, folder));
       
@@ -483,7 +486,7 @@ namespace Sungero.Capture.Client
       // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
-      // данная функция используется за пределами модуля. 
+      // данная функция используется за пределами модуля.
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);
       HighlightProperties(document, exactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Green);
       
