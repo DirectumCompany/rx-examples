@@ -115,7 +115,7 @@ namespace Sungero.Capture.Server
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
       {
-        var document = CreateDocumentByRecognizedDocument(recognizedDocument, originalFile.Path, responsible);
+        var document = CreateDocumentByRecognizedDocument(recognizedDocument,  responsible);
         package.Add(document);
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -219,7 +219,6 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
     public virtual IOfficialDocument CreateDocumentByRecognizedDocument(Structures.Module.RecognizedDocument recognizedDocument,
-                                                                        string sourceFileName,
                                                                         IEmployee responsible)
     {
       // Входящее письмо.
@@ -265,7 +264,7 @@ namespace Sungero.Capture.Server
         return CreateIncomingInvoice(recognizedDocument, responsible);
       
       // Все нераспознанные документы создать простыми.
-      return CreateSimpleDocument(Path.GetFileName(sourceFileName), recognizedDocument);
+      return CreateSimpleDocument(recognizedDocument);
     }
     
     /// <summary>
@@ -531,10 +530,10 @@ namespace Sungero.Capture.Server
     /// <param name="name">Имя документа.</param>
     /// <param name="documentGuid">Гуид тела документа.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateSimpleDocument(string name, Structures.Module.RecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateSimpleDocument(Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = SimpleDocuments.Create();
-      document.Name = !string.IsNullOrWhiteSpace(name) ? name : Resources.SimpleDocumentName;
+      document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Path) ? recognizedDocument.OriginalFile.Path : Resources.SimpleDocumentName;
       document.Note = recognizedDocument.Message;
       CreateVersion(document, recognizedDocument);
       document.Save();
