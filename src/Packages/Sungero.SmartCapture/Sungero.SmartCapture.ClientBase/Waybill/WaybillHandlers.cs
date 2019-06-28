@@ -13,12 +13,7 @@ namespace Sungero.SmartCapture
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
       base.Refresh(e);
-      
-      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired ||
-        (_obj.DocumentKind != null &&
-         (_obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Registrable ||
-          _obj.DocumentKind.GenerateDocumentName == true));
-      
+                  
       // Восстановить обязательность контрагента.
       _obj.State.Properties.Counterparty.IsRequired = true;
       
