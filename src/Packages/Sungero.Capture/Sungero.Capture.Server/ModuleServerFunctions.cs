@@ -530,13 +530,12 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать документ в Rx, тело документа загружается из Арио.
     /// </summary>
-    /// <param name="name">Имя документа.</param>
-    /// <param name="documentGuid">Гуид тела документа.</param>
+    /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateSimpleDocument(Structures.Module.RecognizedDocument recognizedDocument)
     {
       var document = SimpleDocuments.Create();
-      document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Path) ? recognizedDocument.OriginalFile.Path : Resources.SimpleDocumentName;
+      document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
       document.Note = recognizedDocument.Message;
       CreateVersion(document, recognizedDocument);
       document.Save();
