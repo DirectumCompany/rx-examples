@@ -26,23 +26,6 @@
       "Controls": [
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "9c0e981c-710f-4665-bcbc-2d8f5d8084d3",
-          "Name": "MainGroup",
-          "ColumnDefinitions": [
-            {
-              "Percentage": 62.0
-            },
-            {
-              "Percentage": 38.0
-            }
-          ],
-          "IsAncestorMetadata": true,
-          "Overridden": [
-            "ColumnDefinitions"
-          ]
-        },
-        {
-          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
           "Name": "PropertiesGroup",
           "IsAncestorMetadata": true,
