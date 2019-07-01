@@ -371,20 +371,24 @@ namespace Sungero.Capture.Server
     /// Получить контактное лицо по имени.
     /// </summary>
     /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
+    /// <param name="shortName">Имя в формате "Фамилия И.О.".</param>
+    /// <param name="counterparty">Контрагент, владелец контакта.</param>
     /// <returns>Контактное лицо.</returns>
-    public static IContact GetContactByName(string name, ICounterparty counterparty)
+    public static IContact GetContactByName(string name, string shortName, ICounterparty counterparty)
     {
       var noBreakSpace = new string('\u00A0', 1);
       var space = new string('\u0020', 1);
       
-      name = name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".");
+      name = name.ToLower().Replace(noBreakSpace, space);
       
-      return Contacts.GetAll()
-        .Where(x => (counterparty == null || x.Company.Equals(counterparty)) && (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name ||
-                                                                                 (x.Person != null
-                                                                                  ? x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name
-                                                                                  : false)))
-        .FirstOrDefault();
+      var contacts =  Contacts.GetAll()
+        .Where(x => (x.Name.ToLower().Replace(noBreakSpace, space) == name || 
+                     (x.Person != null && string.Equals(x.Person.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase))));
+                                                                                 
+      if (counterparty != null)
+        return contacts.Where(c => c.Company.Equals(counterparty)).FirstOrDefault();
+      
+      return   contacts.FirstOrDefault();
     }
     
     /// <summary>
@@ -415,9 +419,26 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить сокращенное имя из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Имя в формате "Фамилия И.О.".</returns>
+    public static string GetShortNameByFact(Sungero.Capture.Structures.Module.Fact fact)
+    {
+      if (fact == null)
+        return string.Empty;
+      
+      var surname = GetFieldValue(fact, "Surname");
+      var name = GetFieldValue(fact, "Name");
+      var patronymic = GetFieldValue(fact, "Patrn");
+      return Parties.PublicFunctions.Person.GetSurnameAndInitialsInTenantCulture(name, patronymic, surname);
+    }
+    
+    /// <summary>
     /// Получить контактное лицо по извлечённому факту.
     /// </summary>
     /// <param name="fact">Факт.</param>
+    /// <param name="counterparty">Контрагент - владелец контактного лица.</param>
     /// <returns>Контактное лицо.</returns>
     public static IContact GetContactByFact(Sungero.Capture.Structures.Module.Fact fact, ICounterparty counterparty)
     {
@@ -425,7 +446,8 @@ namespace Sungero.Capture.Server
         return Contacts.Null;
       
       var fullName = GetFullNameByFact(fact);
-      return GetContactByName(fullName, counterparty);
+      var shortName = GetShortNameByFact(fact);
+      return GetContactByName(fullName, shortName, counterparty);
     }
     
     /// <summary>
@@ -641,10 +663,9 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные нашей стороны.
-      // Убираем уже использованные факты для подбора, чтобы организация не искалась по тем же реквизитам что и контрагент.
-      var usedFactsId = recognizedDocument.Info.Facts.Select(f => f.Id).ToList();
-      var unusedFacts = facts.Where(f => !usedFactsId.Contains(f.Id)).ToList();
-      var businessUnitsWithFacts = GetBusinessUnitsWithFacts(unusedFacts);
+      // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
+      facts.Remove(correspondent.Fact);
+      var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
@@ -663,8 +684,7 @@ namespace Sungero.Capture.Server
         // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
         if (document.Correspondent == null && signedBy != null)
         {
-          document.Correspondent = signedBy.Company;
-          LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, document.Correspondent, false);
+          LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, signedBy.Company, false);
         }
         document.SignedBy = signedBy;
         var isTrusted = IsTrustedField(signatoryFact, "Type");
@@ -679,8 +699,7 @@ namespace Sungero.Capture.Server
         // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
         if (document.Correspondent == null && contact != null)
         {
-          document.Correspondent = contact.Company;
-          LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, document.Correspondent, false);
+          LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, contact.Company, false);
         }
         document.Contact = contact;
         var isTrusted = IsTrustedField(responsibleFact, "Type");
