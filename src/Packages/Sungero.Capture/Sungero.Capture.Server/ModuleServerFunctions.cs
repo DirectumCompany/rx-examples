@@ -137,7 +137,8 @@ namespace Sungero.Capture.Server
       int simpleAddendumNumber = 1;
       foreach (var addendum in addendums)
       {
-        if (SimpleDocuments.Is(addendum))
+        // У простых документов, захваченных с почты имя не меняется.
+        if (SimpleDocuments.Is(addendum) && originalFile.Data == null)
         {
           addendum.Name = canBeLeadingDocument
             ? Resources.AttachmentNameFormat(simpleAddendumNumber)
