@@ -77,10 +77,10 @@
           "Name": "Main",
           "ColumnDefinitions": [
             {
-              "Percentage": 48.45
+              "Percentage": 50.32
             },
             {
-              "Percentage": 47.83
+              "Percentage": 49.68
             }
           ],
           "ColumnNumber": 0,
@@ -194,10 +194,10 @@
           "Name": "Counterparty",
           "ColumnDefinitions": [
             {
-              "Percentage": 48.14
+              "Percentage": 50.0
             },
             {
-              "Percentage": 48.14
+              "Percentage": 50.0
             }
           ],
           "ColumnNumber": 0,
@@ -224,14 +224,6 @@
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "3a778908-f16c-48dd-bb8e-f2ad3e73e90d",
           "Name": "Company",
-          "ColumnDefinitions": [
-            {
-              "Percentage": 50.0
-            },
-            {
-              "Percentage": 50.0
-            }
-          ],
           "ColumnNumber": 0,
           "ColumnSpan": 1,
           "GroupType": "WithTitleNoBorder",
@@ -307,10 +299,10 @@
           "Name": "Terms",
           "ColumnDefinitions": [
             {
-              "Percentage": 47.83
+              "Percentage": 49.68
             },
             {
-              "Percentage": 48.45
+              "Percentage": 50.32
             }
           ],
           "ColumnNumber": 0,
