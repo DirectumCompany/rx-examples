@@ -151,16 +151,13 @@
     <value />
   </data>
   <data name="ControlGroup_206ae4d0d7974099833f610d54efe2e5" xml:space="preserve">
-    <value>From</value>
+    <value>Counterparty</value>
   </data>
   <data name="ControlGroup_2077bd852e534311892c886a62fe6ea6" xml:space="preserve">
     <value>Company</value>
   </data>
   <data name="ControlGroup_89c1893141584a7183cb0783f7e53057" xml:space="preserve">
     <value>Terms</value>
-  </data>
-  <data name="Control_808ac6aad9ed49d483b3ce057f331a82_EmptyText" xml:space="preserve">
-    <value />
   </data>
   <data name="CollectionDisplayName" xml:space="preserve">
     <value>Waybills</value>
