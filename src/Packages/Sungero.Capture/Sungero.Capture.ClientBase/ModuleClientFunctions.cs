@@ -108,6 +108,7 @@ namespace Sungero.Capture.Client
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
       if ((mailFiles.Body == null || !File.Exists(mailFiles.Body.Path)) && !mailFiles.Attachments.Any())
         throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
+      mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
       
       var mailInfo = GetMailInfo(instanceInfo);
       var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body);
