@@ -377,16 +377,16 @@ namespace Sungero.Capture.Server
     /// <param name="shortName">Имя в формате "Фамилия И.О.".</param>
     /// <param name="counterparty">Контрагент, владелец контакта.</param>
     /// <returns>Контактное лицо.</returns>
-    public static IContact GetContactByName(string name, string shortName, ICounterparty counterparty)
+    public static IContact GetContactByName(string name, string personShortName, ICounterparty counterparty)
     {
       var noBreakSpace = new string('\u00A0', 1);
       var space = new string('\u0020', 1);
       
-      name = name.ToLower().Replace(noBreakSpace, space);
-      
+      name = name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".");
+            
       var contacts =  Contacts.GetAll()
-        .Where(x => (x.Name.ToLower().Replace(noBreakSpace, space) == name || 
-                     (x.Person != null && string.Equals(x.Person.ShortName, shortName, StringComparison.InvariantCultureIgnoreCase))));
+      	.Where(x => (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name) ||
+                     (x.Person != null && string.Equals(x.Person.ShortName, personShortName, StringComparison.InvariantCultureIgnoreCase)));
                                                                                  
       if (counterparty != null)
         return contacts.Where(c => c.Company.Equals(counterparty)).FirstOrDefault();
@@ -676,7 +676,8 @@ namespace Sungero.Capture.Server
       
       // Заполнить данные нашей стороны.
       // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
-      facts.Remove(correspondent.Fact);
+      if (correspondent != null)
+      	facts.Remove(correspondent.Fact);
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
