@@ -109,6 +109,8 @@ namespace Sungero.Capture.Server
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.FileInfo originalFile,
                                                                                                               IOfficialDocument leadingDocument, IEmployee responsible)
     {
+      System.Diagnostics.Debugger.Launch();
+      
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
@@ -569,13 +571,13 @@ namespace Sungero.Capture.Server
     /// Создать документ из тела email.
     /// </summary>
     /// <param name="mailInfo">Информация о захваченном письме.</param>
-    /// <param name="bodyPath">Путь до тела email.</param>
+    /// <param name="bodyInfo">Путь до тела email.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, Structures.Module.FileInfo body)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, Structures.Module.FileInfo bodyInfo)
     {
-      if (!System.IO.File.Exists(body.Path))
-        throw new ApplicationException(Resources.FileNotFoundFormat(body.Path));
+      if (!System.IO.File.Exists(bodyInfo.Path))
+        throw new ApplicationException(Resources.FileNotFoundFormat(bodyInfo.Path));
       
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -583,8 +585,17 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
       document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
-      document.CreateVersionFrom(body.Path);
+      
+      var application = GetAssociatedApplicationByFileName(bodyInfo.Path);
+      using (var body = new MemoryStream(bodyInfo.Data))
+      {
+        document.CreateVersion();
+        var version = document.LastVersion;
+        version.Body.Write(body);
+        version.AssociatedApplication = application;
+      }
       document.Save();
+      
       return document;
     }
     
