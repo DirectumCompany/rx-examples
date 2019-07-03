@@ -108,9 +108,7 @@ namespace Sungero.Capture.Server
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.FileInfo originalFile,
                                                                                                               IOfficialDocument leadingDocument, IEmployee responsible)
-    {
-      System.Diagnostics.Debugger.Launch();
-      
+    {   
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
