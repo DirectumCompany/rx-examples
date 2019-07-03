@@ -204,10 +204,15 @@ namespace Sungero.Capture.Server
               fieldInfo.FieldProbability = factField.Probability;
               
               // Позиция подсветки фактов в теле документа.
-              var positions = factField.Positions.Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}",
-                                                                            Constants.Module.PositionElementDelimiter,
-                                                                            p.Page, p.Top, p.Left, p.Width, p.Height));
-              fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
+              if (factField.Positions != null)
+              {
+                var positions = factField.Positions
+                  .Where(p => p != null)
+                  .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}",
+                                             Constants.Module.PositionElementDelimiter,
+                                             p.Page, p.Top, p.Left, p.Width, p.Height));
+                fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
+              }
             }
           }
         }
@@ -387,10 +392,10 @@ namespace Sungero.Capture.Server
       var space = new string('\u0020', 1);
       
       name = name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".");
-            
+      
       var contacts =  Contacts.GetAll()
-      	.Where(x => (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name) ||
-                     (x.Person != null && string.Equals(x.Person.ShortName, personShortName, StringComparison.InvariantCultureIgnoreCase)));
+        .Where(x => (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name) ||
+               (x.Person != null && string.Equals(x.Person.ShortName, personShortName, StringComparison.InvariantCultureIgnoreCase)));
       
       if (counterparty != null)
         return contacts.Where(c => c.Company.Equals(counterparty)).FirstOrDefault();
@@ -681,7 +686,7 @@ namespace Sungero.Capture.Server
       // Заполнить данные нашей стороны.
       // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
       if (correspondent != null)
-      	facts.Remove(correspondent.Fact);
+        facts.Remove(correspondent.Fact);
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee);
