@@ -117,4 +117,49 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ControlGroup_e228398bcb8945d6a8d7103d89df5177" xml:space="preserve">
+    <value>Main</value>
+  </data>
+  <data name="ControlGroup_2e9db22e03ba4d179e0cbb7a81002ac4" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="ControlGroup_81bc1654b3c24eeb908827eb85c80a6a" xml:space="preserve">
+    <value>Company</value>
+  </data>
+  <data name="ControlGroup_f34634e71d7f4dd4a6e896d3325c3241" xml:space="preserve">
+    <value>Counterparty</value>
+  </data>
+  <data name="ControlGroup_d697d79d825a42fa9395d5be8c768ddf" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="ControlGroup_e8d2f6a5490041f5b667947823257cf4" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_027e9b829d4c4020bfdfeb1ff2a3085d" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="ControlGroup_61e49619548d4df5b009092e0763459d" xml:space="preserve">
+    <value>Date and Number</value>
+  </data>
+  <data name="ControlGroup_a4d03e190b1240818b8ba6de5333faa9" xml:space="preserve">
+    <value>Lifecycle</value>
+  </data>
+  <data name="ControlGroup_87881966aa4844faa068926d29501261" xml:space="preserve">
+    <value>Retention</value>
+  </data>
+  <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="Resource_9ad3461d21c94da4b0898738dbfe6076" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_8f91b21ba3744bd5807bb01130dff98f" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="ControlGroup_fc3b955f48274f55a84c7824410b1ef3" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_7eb4b0baaac24ffcbc732930d5bf43bf" xml:space="preserve">
+    <value />
+  </data>
 </root>
