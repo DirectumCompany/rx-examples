@@ -303,8 +303,8 @@ namespace Sungero.Capture.Client
       var originalFile = new Structures.Module.FileInfo();
       originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
       var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
-                                                                  originalFile,
-                                                                  null, responsible);
+                                                                                  originalFile,
+                                                                                  null, responsible);
       
       Functions.Module.Remote.SendToResponsible(documents, responsible);
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
@@ -490,25 +490,44 @@ namespace Sungero.Capture.Client
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);
-      HighlightProperties(document, exactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Green);
+      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Common.DarkSeaGreen);
       
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, false);
-      HighlightProperties(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Yellow);
+      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Common.PaleGoldenrod);
     }
     
     /// <summary>
-    /// Подсветить указанные свойства в карточке документа.
+    /// Подсветить указанные свойства в карточке документа и факты в теле.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="propertyNames">Список имён свойств.</param>
+    /// <param name="propertyNamesAndPositions">Список имён свойств и позиций подсветки.</param>
     /// <param name="color">Цвет.</param>
-    public virtual void HighlightProperties(Sungero.Docflow.IOfficialDocument document, List<string> propertyNames, Sungero.Core.Color color)
+    public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
-      foreach (var propertyName in propertyNames)
+      foreach (var propertyNameAndPosition in propertyNamesAndPositions)
       {
+        // Подсветка полей карточки.
+        var splitedPropertyNameAndPosition = propertyNameAndPosition.Split(Constants.Module.PropertyAndPositionDelimiter);
+        var propertyName = splitedPropertyNameAndPosition[0];
         var property = document.GetType().GetProperty(propertyName);
         if (property != null)
           document.State.Properties[propertyName].HighlightColor = color;
+        
+        // Подсветка фактов в теле документа.
+        if (splitedPropertyNameAndPosition.Count() > 1 && !string.IsNullOrWhiteSpace(splitedPropertyNameAndPosition[1]))
+        {
+          var fieldsPositions = splitedPropertyNameAndPosition[1].Split(Constants.Module.PositionsDelimiter);
+          foreach (var fieldPosition in fieldsPositions)
+          {
+            var pos = fieldPosition.Split(Constants.Module.PositionElementDelimiter);
+            document.State.Controls.Preview.HighlightAreas.Add(color,
+                                                               int.Parse(pos[0]), 
+                                                               double.Parse(pos[1]), 
+                                                               double.Parse(pos[2]), 
+                                                               double.Parse(pos[3]), 
+                                                               double.Parse(pos[4]));
+          }
+        }
       }
     }
     

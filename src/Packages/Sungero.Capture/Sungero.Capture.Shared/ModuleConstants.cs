@@ -33,6 +33,12 @@ namespace Sungero.Capture.Constants
     
     [Sungero.Core.Public]
     public const string PropertiesAlreadyColoredParamName = "PropertiesAlreadyColored";
+
+    public const char PositionsDelimiter = '#';
+    
+    public const char PositionElementDelimiter = '|';
+    
+    public const char PropertyAndPositionDelimiter = '-';
     
     public static class Initialize
     {

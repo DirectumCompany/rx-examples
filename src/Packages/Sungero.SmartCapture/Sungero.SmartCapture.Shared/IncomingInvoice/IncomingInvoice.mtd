@@ -173,10 +173,10 @@
           "Name": "Account",
           "ColumnDefinitions": [
             {
-              "Percentage": 50.76
+              "Percentage": 52.68
             },
             {
-              "Percentage": 45.59
+              "Percentage": 47.32
             }
           ],
           "ColumnNumber": 0,

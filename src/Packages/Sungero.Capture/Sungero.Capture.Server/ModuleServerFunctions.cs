@@ -204,6 +204,12 @@ namespace Sungero.Capture.Server
               fieldInfo.FieldName = factField.Name;
               fieldInfo.FieldValue = factField.Value;
               fieldInfo.FieldProbability = factField.Probability;
+              
+              // Позиция подсветки фактов в теле документа.
+              var positions = factField.Positions.Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}",
+                                                                            Constants.Module.PositionElementDelimiter,
+                                                                            p.Page, p.Top, p.Left, p.Width, p.Height));
+              fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
             }
           }
         }
@@ -387,7 +393,7 @@ namespace Sungero.Capture.Server
       var contacts =  Contacts.GetAll()
       	.Where(x => (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name) ||
                      (x.Person != null && string.Equals(x.Person.ShortName, personShortName, StringComparison.InvariantCultureIgnoreCase)));
-                                                                                 
+      
       if (counterparty != null)
         return contacts.Where(c => c.Company.Equals(counterparty)).FirstOrDefault();
       
@@ -2197,12 +2203,16 @@ namespace Sungero.Capture.Server
             {
               object propertyValue = property.GetValue(document);
               var propertyStringValue = GetPropertyValueAsString(propertyValue);
-              
               if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
-                result.Add(propertyName);
+              {
+                var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
+                                                        propertyName, linkedFact.Position);
+                result.Add(propertyAndPosition);
+              }
             }
           }
         });
+      
       
       return result.Distinct().ToList();
     }
