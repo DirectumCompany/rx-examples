@@ -179,7 +179,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.TextEditorToTextBinder",
           "ParentGuid": "812fa7c1-ee73-4284-a345-8e74ae533761",
           "PropertyGuid": "4bc39efb-1f46-4a1e-8b8c-04f2b90d6a8b",
-          "RowNumber": 4,
+          "RowNumber": 6,
           "RowSpan": 1,
           "Settings": [
             {
@@ -389,6 +389,32 @@
           "RowNumber": 0,
           "RowSpan": 1,
           "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "5fed93a6-b3f6-4fc1-91ac-2f4573bb0b8c",
+          "Name": "IsAdjustment",
+          "ColumnNumber": 0,
+          "ColumnSpan": 2,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.BooleanEditorToBooleanBinder",
+          "ParentGuid": "812fa7c1-ee73-4284-a345-8e74ae533761",
+          "PropertyGuid": "bbdbae6d-40ce-4443-aeb6-bf4a14565963",
+          "RowNumber": 4,
+          "RowSpan": 1,
+          "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "f67eefa7-dcef-470c-be65-d95c690673aa",
+          "Name": "Corrected",
+          "ColumnNumber": 0,
+          "ColumnSpan": 2,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
+          "ParentGuid": "812fa7c1-ee73-4284-a345-8e74ae533761",
+          "PropertyGuid": "c0aa900b-eb79-4558-8080-2b5ce3d9cf06",
+          "RowNumber": 5,
+          "RowSpan": 1,
+          "Settings": []
         }
       ],
       "IsAncestorMetadata": true,
@@ -400,13 +426,110 @@
     }
   ],
   "HandledEvents": [
-    "RefreshClient"
+    "RefreshClient",
+    "ShowingClient"
   ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "74c9ddd4-4bc4-42b6-8bb0-c91d5e21fb8a",
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",
   "Properties": [
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",
+      "Name": "RegistrationNumber",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "3e55f091-41a4-4e58-a9c5-dbe90782ccec",
+      "Name": "RegistrationDate",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "ed9f1bb0-d1cf-467e-8067-aca85212e44d",
+      "Name": "BusinessUnit",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "c30d80ad-f9f0-4b10-a2e1-b4d57e40604b",
+      "Name": "TotalAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "901644ff-87b0-485b-9146-13fd6ba7ede1",
+      "Name": "Currency",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.BooleanPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "bbdbae6d-40ce-4443-aeb6-bf4a14565963",
+      "Name": "IsAdjustment",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "c0aa900b-eb79-4558-8080-2b5ce3d9cf06",
+      "Name": "Corrected",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "aae1f6ae-d090-4c5a-963e-44c8b79dc92b",
+      "Name": "LeadingDocument",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
@@ -431,9 +554,13 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "cc53a990-5123-4f3a-b5ac-f3899be1f40a",
       "Name": "Counterparty",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "IsAncestorMetadata": true,
       "Overridden": [
-        "IsRequired"
+        "IsRequired",
+        "HandledEvents"
       ]
     }
   ],
