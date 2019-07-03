@@ -77,10 +77,10 @@
           "Name": "Main",
           "ColumnDefinitions": [
             {
-              "Percentage": 47.83
+              "Percentage": 49.68
             },
             {
-              "Percentage": 48.45
+              "Percentage": 50.32
             }
           ],
           "ColumnNumber": 0,
@@ -194,10 +194,10 @@
           "Name": "Counterparty",
           "ColumnDefinitions": [
             {
-              "Percentage": 47.83
+              "Percentage": 49.68
             },
             {
-              "Percentage": 48.45
+              "Percentage": 50.32
             }
           ],
           "ColumnNumber": 0,
@@ -302,10 +302,10 @@
           "Name": "Account",
           "ColumnDefinitions": [
             {
-              "Percentage": 47.83
+              "Percentage": 49.68
             },
             {
-              "Percentage": 48.45
+              "Percentage": 50.32
             }
           ],
           "ColumnNumber": 0,
