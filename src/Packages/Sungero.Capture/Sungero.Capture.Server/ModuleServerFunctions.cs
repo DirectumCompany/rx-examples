@@ -676,6 +676,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
       }
       
+      // Дата номер.
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
       document.Dated = GetFieldDateTimeValue(dateFact, "Date");
@@ -703,6 +704,7 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         var signedBy = GetContactByFact(signatoryFact, document.Correspondent);
+        
         // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
         if (document.Correspondent == null && signedBy != null)
         {
@@ -718,6 +720,7 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         var contact = GetContactByFact(responsibleFact, document.Correspondent);
+        
         // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
         if (document.Correspondent == null && contact != null)
         {
@@ -1689,7 +1692,8 @@ namespace Sungero.Capture.Server
       
       var foundByName = new List<Structures.Module.CounterpartyWithFact>();
       var correspondentNames = new List<string>();
-      // Получить ИНН/КПП и наименования/ФС контрагентов из фактов.
+      
+      // Получить ИНН/КПП и наименования + форму собственности контрагентов из фактов.
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
         var name = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
