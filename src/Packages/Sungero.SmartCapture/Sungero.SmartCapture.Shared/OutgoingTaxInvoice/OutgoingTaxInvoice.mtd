@@ -30,10 +30,10 @@
           "Name": "MainGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 49.96
+              "Percentage": 68.86
             },
             {
-              "Percentage": 50.04
+              "Percentage": 30.03
             }
           ],
           "IsAncestorMetadata": true,
@@ -581,7 +581,9 @@
         }
       ],
       "IsAncestorMetadata": true,
-      "Overridden": []
+      "Overridden": [
+        "IsVisible"
+      ]
     }
   ],
   "HandledEvents": [
