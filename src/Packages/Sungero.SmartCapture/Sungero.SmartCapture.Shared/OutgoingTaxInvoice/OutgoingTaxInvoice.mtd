@@ -30,10 +30,10 @@
           "Name": "MainGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 68.86
+              "Percentage": 69.63
             },
             {
-              "Percentage": 30.03
+              "Percentage": 30.37
             }
           ],
           "IsAncestorMetadata": true,
