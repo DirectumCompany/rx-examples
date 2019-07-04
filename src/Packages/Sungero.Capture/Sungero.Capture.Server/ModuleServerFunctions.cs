@@ -72,7 +72,7 @@ namespace Sungero.Capture.Server
         var recognitedDocument = RecognitedDocument.Create();
         var clsResult = packageProcessResult.ClassificationResult;
         recognitedDocument.ClassificationResultId = clsResult.Id;
-        recognitedDocument.BodyGuid = clsResult.DocumentGuid;
+        recognitedDocument.BodyGuid = packageProcessResult.Guid;
         recognitedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognitedDocument.Message = packageProcessResult.Message;
         // Факты и поля фактов.
