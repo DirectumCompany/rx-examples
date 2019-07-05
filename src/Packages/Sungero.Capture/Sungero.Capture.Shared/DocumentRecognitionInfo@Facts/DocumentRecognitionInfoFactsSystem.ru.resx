@@ -147,4 +147,10 @@
   <data name="Property_IsTrusted" xml:space="preserve">
     <value>Определен точно</value>
   </data>
+  <data name="Property_VerifiedValue" xml:space="preserve">
+    <value>Подтвержденное значение</value>
+  </data>
+  <data name="Property_FactLabel" xml:space="preserve">
+    <value>Метка факта</value>
+  </data>
 </root>

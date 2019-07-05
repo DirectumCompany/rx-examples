@@ -80,6 +80,7 @@
       "Name": "FieldValue",
       "CanBeSearch": false,
       "Code": "FieldValue",
+      "Length": 1000,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "0cc627d8-c826-4b8c-b0b9-44711abfaf75"
     },
@@ -110,6 +111,25 @@
       "Code": "IsTrusted",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.BooleanEditorToBooleanBinder",
       "PreviousPropertyGuid": "3c14d97c-fcfb-4719-beb4-92a3a1d9e0f1"
+    },
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "b2541443-e609-4bae-b167-30a13173068f",
+      "Name": "VerifiedValue",
+      "CanBeSearch": false,
+      "Code": "VerifiedValue",
+      "Length": 1000,
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+      "PreviousPropertyGuid": "51e5ace9-3503-4068-b8c6-366825048f02"
+    },
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "06cb566e-1dc6-4510-88e0-c4ae98588468",
+      "Name": "FactLabel",
+      "CanBeSearch": false,
+      "Code": "FactLabel",
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+      "PreviousPropertyGuid": "b2541443-e609-4bae-b167-30a13173068f"
     }
   ],
   "PublicStructures": [],

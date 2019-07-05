@@ -300,7 +300,8 @@
   ],
   "HandledEvents": [
     "RefreshClient",
-    "ShowingClient"
+    "ShowingClient",
+    "AfterSaveServer"
   ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "8dd00491-8fd0-4a7a-9cf3-8b6dc2e6455d",

@@ -108,7 +108,7 @@ namespace Sungero.Capture.Server
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.FileInfo originalFile,
                                                                                                               IOfficialDocument leadingDocument, IEmployee responsible)
-    {   
+    {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
@@ -669,7 +669,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee);
       
       // Заполнить данные корреспондента.
-      var correspondent = GetCounterparty(facts);
+      var correspondent = GetCounterparty(facts, props.Correspondent.Name);
       if (correspondent != null)
       {
         document.Correspondent = correspondent.Counterparty;
@@ -1683,8 +1683,9 @@ namespace Sungero.Capture.Server
     /// Поиск корреспондента по извлеченным фактам.
     /// </summary>
     /// <param name="facts">Список фактов.</param>
+    /// <param name="propertyName">Имя свойства.</param>
     /// <returns>Корреспондент.</returns>
-    public static Structures.Module.CounterpartyWithFact GetCounterparty(List<Structures.Module.Fact> facts)
+    public static Structures.Module.CounterpartyWithFact GetCounterparty(List<Structures.Module.Fact> facts, string propertyName)
     {
       var filteredCounterparties = Counterparties.GetAll()
         .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
@@ -1696,6 +1697,10 @@ namespace Sungero.Capture.Server
       // Получить ИНН/КПП и наименования + форму собственности контрагентов из фактов.
       foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
       {
+        var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
+        if (verifiedCounterparty != null)
+          return verifiedCounterparty;
+
         var name = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
         correspondentNames.Add(name);
         var counterparties = filteredCounterparties
@@ -1745,6 +1750,29 @@ namespace Sungero.Capture.Server
         else
           return foundByTin.FirstOrDefault();
       }
+    }
+    
+    public static Structures.Module.CounterpartyWithFact GetCounterpartyByVerifiedData(Structures.Module.Fact fact, string propertyName)
+    {
+      var factLabel = GetFactLabel(fact, propertyName);
+      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
+        .OrderByDescending(d => d.Id)
+        .FirstOrDefault();
+      if (recognitionInfo == null)
+        return null;
+      
+      var fieldRecognitionInfo = recognitionInfo.Facts
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
+      int counterpartyId;
+      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out counterpartyId))
+        return null;
+      
+      var filteredCounterparty = Counterparties.GetAll(x => x.Id == counterpartyId).FirstOrDefault();
+      if (filteredCounterparty == null)
+        return null;
+      
+      return Structures.Module.CounterpartyWithFact.Create(filteredCounterparty, fact, fieldRecognitionInfo.IsTrusted == true);
     }
     
     /// <summary>
@@ -2163,13 +2191,20 @@ namespace Sungero.Capture.Server
         var facts = recognizedDocument.Info.Facts
           .Where(f => f.FactId == fact.Id)
           .Where(f => string.IsNullOrWhiteSpace(fieldName) || f.FieldName == fieldName);
+        var factLabel = GetFactLabel(fact, propertyName);
         foreach (var recognizedFact in facts)
         {
           recognizedFact.PropertyName = propertyName;
           recognizedFact.PropertyValue = propertyStringValue;
           recognizedFact.IsTrusted = isTrusted;
+          recognizedFact.FactLabel = factLabel;
         }
       }
+    }
+    
+    public static string GetFactLabel(Structures.Module.Fact fact, string propertyName)
+    {
+      return fact.Name;
     }
     
     /// <summary>
@@ -2222,6 +2257,40 @@ namespace Sungero.Capture.Server
       
       
       return result.Distinct().ToList();
+    }
+    
+    [Public]
+    public static void StoreVerifiedPropertyValue(Docflow.IOfficialDocument document)
+    {
+      AccessRights.AllowRead(
+        () =>
+        {
+          var recognitionInfo = Capture.DocumentRecognitionInfos
+            .GetAll(x => x.DocumentId == document.Id)
+            .OrderByDescending(x => x.Id)
+            .FirstOrDefault();
+          if (recognitionInfo == null)
+            return;
+          
+          // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+          var linkedFacts = recognitionInfo.Facts
+            .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'));
+          
+          // Взять только измененные пользователем свойства.
+          var type = document.GetType();
+          foreach (var linkedFact in linkedFacts)
+          {
+            var propertyName = linkedFact.PropertyName;
+            var property = type.GetProperty(propertyName);
+            if (property != null)
+            {
+              object propertyValue = property.GetValue(document);
+              var propertyStringValue = GetPropertyValueAsString(propertyValue);
+              if (!string.IsNullOrWhiteSpace(propertyStringValue) && !Equals(propertyStringValue, linkedFact.PropertyValue))
+                linkedFact.VerifiedValue = propertyStringValue;
+            }
+          }
+        });
     }
     
     /// <summary>

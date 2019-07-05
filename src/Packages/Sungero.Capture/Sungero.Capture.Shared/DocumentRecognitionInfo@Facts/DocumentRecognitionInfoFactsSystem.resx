@@ -147,4 +147,10 @@
   <data name="Property_IsTrusted" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="Property_VerifiedValue" xml:space="preserve">
+    <value>Verified Value</value>
+  </data>
+  <data name="Property_FactLabel" xml:space="preserve">
+    <value>Fact Label</value>
+  </data>
 </root>
