@@ -1752,6 +1752,12 @@ namespace Sungero.Capture.Server
       }
     }
     
+    /// <summary>
+    /// Получить контрагента по результатам верификации пользователя.
+    /// </summary>
+    /// <param name="fact">Факт Арио.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <returns>Связку контрагент + факт.</returns>
     public static Structures.Module.CounterpartyWithFact GetCounterpartyByVerifiedData(Structures.Module.Fact fact, string propertyName)
     {
       var factLabel = GetFactLabel(fact, propertyName);
@@ -2202,6 +2208,13 @@ namespace Sungero.Capture.Server
       }
     }
     
+    /// <summary>
+    /// Получить метку факта.
+    /// </summary>
+    /// <param name="fact">Факт из Арио.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <returns>Метка факта.</returns>
+    /// <remarks>Используется для быстрого поиска факта в результатах извлечения фактов.</remarks>
     public static string GetFactLabel(Structures.Module.Fact fact, string propertyName)
     {
       return fact.Name;
@@ -2255,10 +2268,13 @@ namespace Sungero.Capture.Server
           }
         });
       
-      
       return result.Distinct().ToList();
     }
     
+    /// <summary>
+    /// Сохранить результат верификации заполнения свойств.
+    /// </summary>
+    /// <param name="document">Документ.</param>
     [Public]
     public static void StoreVerifiedPropertyValue(Docflow.IOfficialDocument document)
     {
