@@ -159,7 +159,7 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
-      "Name": "StoreVerifiedPropertyValue",
+      "Name": "StoreVerifiedPropertiesValues",
       "Parameters": [
         {
           "Name": "document",

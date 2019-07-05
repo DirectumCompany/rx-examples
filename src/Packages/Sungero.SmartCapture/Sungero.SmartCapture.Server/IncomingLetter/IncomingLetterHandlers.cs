@@ -14,7 +14,7 @@ namespace Sungero.SmartCapture
       base.AfterSave(e);
       
       // Сохранить подтверждённые пользователем значения.
-      Capture.PublicFunctions.Module.StoreVerifiedPropertyValue(_obj);
+      Capture.PublicFunctions.Module.StoreVerifiedPropertiesValues(_obj);
     }
   }
 }

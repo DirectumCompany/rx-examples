@@ -2276,7 +2276,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ.</param>
     [Public]
-    public static void StoreVerifiedPropertyValue(Docflow.IOfficialDocument document)
+    public static void StoreVerifiedPropertiesValues(Docflow.IOfficialDocument document)
     {
       AccessRights.AllowRead(
         () =>
