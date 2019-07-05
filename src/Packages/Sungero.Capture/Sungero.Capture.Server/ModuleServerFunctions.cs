@@ -1722,6 +1722,10 @@ namespace Sungero.Capture.Server
         var foundByTin = new List<Structures.Module.CounterpartyWithFact>();
         foreach (var fact in correspondentTINs)
         {
+        	var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
+        	if (verifiedCounterparty != null)
+        		return verifiedCounterparty;
+
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
           var counterparties = GetCounterparties(tin, trrc);
@@ -2217,7 +2221,18 @@ namespace Sungero.Capture.Server
     /// <remarks>Используется для быстрого поиска факта в результатах извлечения фактов.</remarks>
     public static string GetFactLabel(Structures.Module.Fact fact, string propertyName)
     {
-      return fact.Name;
+    	string factInfo = fact.Name + propertyName;
+    	foreach (var field in fact.Fields)
+    		factInfo += field.Name + field.Value;
+    	
+    	var factHash = string.Empty;
+    	using (MD5 md5Hash = MD5.Create())
+    	{
+    		byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(input));
+    		for (int i = 0; i < data.Length; i++)
+    			factHash += data[i].ToString("x2")
+    	}
+    	return factHash;
     }
     
     /// <summary>
