@@ -167,7 +167,7 @@ namespace Sungero.Capture.Server
         var recognizedDocument = RecognizedDocument.Create();
         var clsResult = packageProcessResult.ClassificationResult;
         recognizedDocument.ClassificationResultId = clsResult.Id;
-        recognizedDocument.BodyGuid = clsResult.DocumentGuid;
+        recognizedDocument.BodyGuid = packageProcessResult.Guid;
         recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognizedDocument.Message = packageProcessResult.Message;
         recognizedDocument.OriginalFile = originalFile;
