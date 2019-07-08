@@ -171,7 +171,119 @@
       "ReturnTypeFullName": "System.Void"
     }
   ],
-  "PublicStructures": [],
+  "PublicStructures": [
+    {
+      "Name": "Fact",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Id",
+          "TypeFullName": "global::System.Int32"
+        },
+        {
+          "Name": "Name",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Fields",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Capture.Structures.Module.IFactField>"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "FactField",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Id",
+          "TypeFullName": "global::System.Int32"
+        },
+        {
+          "Name": "Name",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Value",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Probability",
+          "TypeFullName": "global::System.Double"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "FileInfo",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Data",
+          "TypeFullName": "global::System.Byte[]"
+        },
+        {
+          "Name": "Path",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Description",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "RecognizedDocument",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "ClassificationResultId",
+          "TypeFullName": "global::System.Int32"
+        },
+        {
+          "Name": "BodyGuid",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "PredictedClass",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Facts",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Capture.Structures.Module.IFact>"
+        },
+        {
+          "Name": "Message",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Info",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.IDocumentRecognitionInfo"
+        },
+        {
+          "Name": "OriginalFile",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileInfo"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    }
+  ],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Capture",
   "ResourcesKeys": [

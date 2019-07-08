@@ -20,7 +20,7 @@ namespace Sungero.Capture.Client
     /// <param name="responsibleId">ИД сотрудника, ответственного за обработку захваченных документов.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    public static void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo, string filesInfo, string folder,
+    public virtual void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo, string filesInfo, string folder,
                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
       // Найти ответственного.
@@ -69,7 +69,7 @@ namespace Sungero.Capture.Client
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    private static void ProcessScanPackage(string filesInfo, string folder,
+    public virtual void ProcessScanPackage(string filesInfo, string folder,
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
@@ -100,7 +100,7 @@ namespace Sungero.Capture.Client
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    private static void ProcessMailPackage(string filesInfo, string folder, string instanceInfo,
+    public virtual void ProcessMailPackage(string filesInfo, string folder, string instanceInfo,
                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
                                            Sungero.Company.IEmployee responsible)
     {
@@ -183,11 +183,11 @@ namespace Sungero.Capture.Client
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    private static Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
-                                                                                                  string filePath,
-                                                                                                  string firstPageClassifierName,
-                                                                                                  string typeClassifierName,
-                                                                                                  bool throwOnError = true)
+    public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
+                                                                                                   string filePath,
+                                                                                                   string firstPageClassifierName,
+                                                                                                   string typeClassifierName,
+                                                                                                   bool throwOnError = true)
     {
       var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
@@ -319,7 +319,7 @@ namespace Sungero.Capture.Client
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <returns>Json с результатом классификации и извлечения фактов.</returns>
-    public static string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
+    public virtual string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
@@ -348,7 +348,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <returns></returns>
     [Public]
-    public static System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
+    public virtual System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
     {
       return new Dictionary<string, string>()
       {
@@ -407,7 +407,7 @@ namespace Sungero.Capture.Client
     public static Structures.Module.CapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
     {
       var mailFiles = Structures.Module.CapturedMailFiles.Create();
-      mailFiles.Attachments = new List<Structures.Module.FileInfo>();
+      mailFiles.Attachments = new List<Structures.Module.IFileInfo>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
       {
@@ -442,7 +442,7 @@ namespace Sungero.Capture.Client
     /// <param name="xmlElement">Xml элемент.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Информация о файле.</returns>
-    private static Structures.Module.FileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
+    private static Structures.Module.IFileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
     {
       var fileInfo = Structures.Module.FileInfo.Create();
       fileInfo.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element("FileName").Value));
