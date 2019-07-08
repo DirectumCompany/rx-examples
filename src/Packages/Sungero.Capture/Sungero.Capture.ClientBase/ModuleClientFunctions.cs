@@ -504,7 +504,7 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
-      #Warning Kotegov Временный фикс для корректировки позиции подсветки в предпросмотре.
+      #warning Kotegov Временный фикс для корректировки позиции подсветки в предпросмотре.
       double mpl = 4.16;
       
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)
@@ -526,7 +526,7 @@ namespace Sungero.Capture.Client
           foreach (var fieldPosition in fieldsPositions)
           {
             var pos = fieldPosition.Split(Constants.Module.PositionElementDelimiter);
-            #Warning Kotegov Временный фикс для корректировки цвета подсветки в предпросмотре.
+            #warning Kotegov Временный фикс для корректировки цвета подсветки в предпросмотре.
             var posColor = Sungero.Core.Colors.Common.Green;
             if (color == Sungero.Core.Colors.Highlights.Yellow)
               posColor = Sungero.Core.Colors.Common.Yellow;
