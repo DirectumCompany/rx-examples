@@ -504,6 +504,9 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
+      #Warning Kotegov Временный фикс для корректировки позиции подсветки в предпросмотре.
+      double mpl = 4.16;
+      
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)
       {
         // Подсветка полей карточки.
@@ -517,15 +520,23 @@ namespace Sungero.Capture.Client
         if (splitedPropertyNameAndPosition.Count() > 1 && !string.IsNullOrWhiteSpace(splitedPropertyNameAndPosition[1]))
         {
           var fieldsPositions = splitedPropertyNameAndPosition[1].Split(Constants.Module.PositionsDelimiter);
+          
+          
+          
           foreach (var fieldPosition in fieldsPositions)
           {
             var pos = fieldPosition.Split(Constants.Module.PositionElementDelimiter);
-            document.State.Controls.Preview.HighlightAreas.Add(color,
-                                                               int.Parse(pos[0]), 
-                                                               double.Parse(pos[1]), 
-                                                               double.Parse(pos[2]), 
-                                                               double.Parse(pos[3]), 
-                                                               double.Parse(pos[4]));
+            #Warning Kotegov Временный фикс для корректировки цвета подсветки в предпросмотре.
+            var posColor = Sungero.Core.Colors.Common.Green;
+            if (color == Sungero.Core.Colors.Highlights.Yellow)
+              posColor = Sungero.Core.Colors.Common.Yellow;
+            
+            document.State.Controls.Preview.HighlightAreas.Add(posColor,
+                                                               int.Parse(pos[0]),
+                                                               double.Parse(pos[1]) * mpl,
+                                                               double.Parse(pos[2]) * mpl,
+                                                               double.Parse(pos[3]) * mpl,
+                                                               double.Parse(pos[4]) * mpl);
           }
         }
       }
