@@ -465,6 +465,69 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить контактное лицо по извлечённому факту.
+    /// </summary>
+    /// <param name="fact">Факт Арио.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <param name="counterparty">Контрагент.</param>
+    /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
+    /// <returns>Контактное лицо.</returns>
+    public static Structures.Module.ContactWithFact GetContactByFact(Sungero.Capture.Structures.Module.Fact fact, string propertyName, ICounterparty counterparty, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.ContactWithFact.Create(Sungero.Parties.Contacts.Null, fact, false);
+      if (fact == null)
+        return result;
+      if (counterparty != null)
+      {
+        result = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString() ,counterpartyPropertyName);
+        if (result.Contact != null)
+          return result;
+      }
+      
+      var filteredContact =  GetContactByFact(fact, counterparty);
+      if (filteredContact == null)
+        return result;
+      result.Contact = filteredContact;
+      result.IsTrusted = GetField(fact, "Type").Probability > GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
+      return result;
+    }
+    
+    /// <summary>
+    /// Поиск контактного лица контрагента.
+    /// </summary>
+    /// <param name="fact">Факт Арио.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
+    /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
+    /// <returns>Контактное лицо.</returns>
+    public static Structures.Module.ContactWithFact GetContactByVerifiedData(Structures.Module.Fact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
+      var factLabel = GetFactLabel(fact, propertyName);
+      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+      	.Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) 
+      	       && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .OrderByDescending(d => d.Id)
+        .FirstOrDefault();
+      if (recognitionInfo == null)
+        return result;
+      
+      var fieldRecognitionInfo = recognitionInfo.Facts
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
+      int contactId;
+      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out contactId))
+        return result;
+      
+      var filteredContact = Contacts.GetAll(x => x.Id == contactId).FirstOrDefault();
+      if (filteredContact != null)
+      {
+        result.Contact = filteredContact;
+        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;        
+      }
+      return result;
+    }
+    
+    /// <summary>
     /// Получить подразделение из настроек сотрудника.
     /// </summary>
     /// <param name="employee">Сотрудник.</param>
@@ -701,37 +764,30 @@ namespace Sungero.Capture.Server
         : GetDepartment(responsible);
       
       // Заполнить подписанта.
-      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
-      if (document.SignedBy == null)
-      {
-        var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
-        var signedBy = GetContactByFact(signatoryFact, document.Correspondent);
-        
-        // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
-        if (document.Correspondent == null && signedBy != null)
-        {
-          LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, signedBy.Company, false);
-        }
-        document.SignedBy = signedBy;
-        var isTrusted = IsTrustedField(signatoryFact, "Type");
-        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrusted);
-      }
+      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");     
+      var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
+      var signedBy = GetContactByFact(signatoryFact, document.Info.Properties.SignedBy.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);
       
-      // Заполнить контакт.
-      if (document.Contact == null)
+      // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
+      if (document.Correspondent == null && signedBy.Contact != null)
       {
-        var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
-        var contact = GetContactByFact(responsibleFact, document.Correspondent);
-        
-        // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
-        if (document.Correspondent == null && contact != null)
-        {
-          LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, contact.Company, false);
-        }
-        document.Contact = contact;
-        var isTrusted = IsTrustedField(responsibleFact, "Type");
-        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
+        LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, signedBy.Contact.Company, signedBy.IsTrusted);
+      }  
+      document.SignedBy = signedBy.Contact;
+      var isTrustedSignatory = IsTrustedField(signatoryFact, "Type");
+      LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
+      
+      // Заполнить контакт.      
+      var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
+      var contact = GetContactByFact(responsibleFact, document.Info.Properties.Contact.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);      
+      // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
+      if (document.Correspondent == null && contact.Contact != null)
+      {
+        LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, contact.Contact.Company, contact.IsTrusted);
       }
+      document.Contact = contact.Contact;
+      var isTrustedContact = IsTrustedField(responsibleFact, "Type");
+      LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
       document.Save();
       return document;

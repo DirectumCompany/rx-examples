@@ -67,6 +67,13 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
+  partial class ContactWithFact
+  {
+    public Sungero.Parties.IContact Contact { get; set; }
+    public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
+    public bool IsTrusted { get; set; }
+  }
+  
   partial class BusinessUnitWithFact
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
