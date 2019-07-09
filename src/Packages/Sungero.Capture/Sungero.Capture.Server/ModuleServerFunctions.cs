@@ -112,7 +112,6 @@ namespace Sungero.Capture.Server
                                                                                                               IOfficialDocument leadingDocument, IEmployee responsible)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
       var package = new List<IOfficialDocument>();
       foreach (var recognizedDocument in recognizedDocuments)
@@ -553,7 +552,7 @@ namespace Sungero.Capture.Server
     /// <returns>Документ с соответствующими номером и датой.</returns>
     /// <remarks>Будет возвращен первый попавшийся, если таких документов несколько.
     /// Будет возвращен null, если таких документов нет.</remarks>
-    private static Sungero.Contracts.IContractualDocument GetLeadingDocument(Structures.Module.IFact fact, ICounterparty counterparty)
+    public static Sungero.Contracts.IContractualDocument GetLeadingDocument(Structures.Module.IFact fact, ICounterparty counterparty)
     {
       if (fact == null)
         return Sungero.Contracts.ContractualDocuments.Null;
@@ -1472,6 +1471,8 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
     {
       var document = Contracts.IncomingInvoices.Create();
+      
+      // Контрагент и НОР.
       var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;

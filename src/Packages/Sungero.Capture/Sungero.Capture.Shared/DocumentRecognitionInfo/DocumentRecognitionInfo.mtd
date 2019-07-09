@@ -2,6 +2,7 @@
   "$type": "Sungero.Metadata.EntityMetadata, Sungero.Metadata",
   "NameGuid": "ad488d0a-b498-4fe1-9df0-79ce2486ac3b",
   "Name": "DocumentRecognitionInfo",
+  "AccessRightsMode": "NoRight",
   "BaseGuid": "04581d26-0780-4cfd-b3cd-c2cafc5798b0",
   "CanBeNavigationPropertyType": true,
   "CanBeSearch": true,
@@ -126,6 +127,7 @@
   "HideFromCreationArea": true,
   "HideFromNavigationEditorCreationArea": true,
   "IconResourcesKeys": [],
+  "IsAutoCreated": true,
   "IsVisible": false,
   "LookupMode": "Standalone",
   "OperationsClass": "",
@@ -136,7 +138,8 @@
     "IsAutoCreated",
     "NeedWriteHistory",
     "CanBeSearch",
-    "LookupMode"
+    "LookupMode",
+    "AccessRightsMode"
   ],
   "Properties": [
     {
