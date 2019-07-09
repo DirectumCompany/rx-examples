@@ -70,7 +70,7 @@ namespace Sungero.Capture.Structures.Module
   partial class ContactWithFact
   {
     public Sungero.Parties.IContact Contact { get; set; }
-    public Sungero.Capture.Structures.Module.Fact Fact { get; set; }
+    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
     public bool IsTrusted { get; set; }
   }
   
