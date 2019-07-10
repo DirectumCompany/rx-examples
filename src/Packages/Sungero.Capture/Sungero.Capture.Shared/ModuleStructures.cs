@@ -81,6 +81,13 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
+  partial class EmployeeWithFact
+  {
+    public Sungero.Company.IEmployee Employee { get; set; }
+    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public bool IsTrusted { get; set; }
+  }
+  
   partial class BusinessUnitAndCounterparty
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
