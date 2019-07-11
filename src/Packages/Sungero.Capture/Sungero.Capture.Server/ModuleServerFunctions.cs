@@ -379,7 +379,7 @@ namespace Sungero.Capture.Server
                name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") || x.Name.ToLower() == name.ToLower())
         .FirstOrDefault();
     }
-        
+    
     /// <summary>
     /// Поиск адресата письма.
     /// </summary>
@@ -387,7 +387,7 @@ namespace Sungero.Capture.Server
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Адресат.</returns>
     public static Structures.Module.EmployeeWithFact GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact, string propertyName)
-    {      
+    {
       var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
       if (fact == null)
         return result;
@@ -413,7 +413,7 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
-      	.Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)
@@ -429,7 +429,7 @@ namespace Sungero.Capture.Server
       if (filteredEmployee != null)
       {
         result.Employee = filteredEmployee;
-        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;        
+        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
       }
       return result;
     }
@@ -558,8 +558,8 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
-      	.Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) 
-      	       && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
+               && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)
@@ -575,7 +575,7 @@ namespace Sungero.Capture.Server
       if (filteredContact != null)
       {
         result.Contact = filteredContact;
-        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;        
+        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
       }
       return result;
     }
@@ -817,7 +817,7 @@ namespace Sungero.Capture.Server
         : GetDepartment(responsible);
       
       // Заполнить подписанта.
-      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");     
+      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
       var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
       var signedBy = GetContactByFact(signatoryFact, document.Info.Properties.SignedBy.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);
       
@@ -825,14 +825,14 @@ namespace Sungero.Capture.Server
       if (document.Correspondent == null && signedBy.Contact != null)
       {
         LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, signedBy.Contact.Company, signedBy.IsTrusted);
-      }  
+      }
       document.SignedBy = signedBy.Contact;
       var isTrustedSignatory = IsTrustedField(signatoryFact, "Type");
       LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
       
-      // Заполнить контакт.      
+      // Заполнить контакт.
       var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
-      var contact = GetContactByFact(responsibleFact, document.Info.Properties.Contact.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);      
+      var contact = GetContactByFact(responsibleFact, document.Info.Properties.Contact.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
       if (document.Correspondent == null && contact.Contact != null)
       {
@@ -1849,9 +1849,9 @@ namespace Sungero.Capture.Server
         var foundByTin = new List<Structures.Module.CounterpartyWithFact>();
         foreach (var fact in correspondentTINs)
         {
-        	var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
-        	if (verifiedCounterparty != null)
-        		return verifiedCounterparty;
+          var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
+          if (verifiedCounterparty != null)
+            return verifiedCounterparty;
 
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
@@ -2348,18 +2348,18 @@ namespace Sungero.Capture.Server
     /// <remarks>Используется для быстрого поиска факта в результатах извлечения фактов.</remarks>
     public static string GetFactLabel(Structures.Module.IFact fact, string propertyName)
     {
-    	string factInfo = fact.Name + propertyName;
-    	foreach (var field in fact.Fields)
-    		factInfo += field.Name + field.Value;
-    	
-    	var factHash = string.Empty;
-    	using (MD5 md5Hash = MD5.Create())
-    	{
-    		byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(factInfo));
-    		for (int i = 0; i < data.Length; i++)
-    			factHash += data[i].ToString("x2");
-    	}
-    	return factHash;
+      string factInfo = fact.Name + propertyName;
+      foreach (var field in fact.Fields)
+        factInfo += field.Name + field.Value;
+      
+      var factHash = string.Empty;
+      using (MD5 md5Hash = MD5.Create())
+      {
+        byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(factInfo));
+        for (int i = 0; i < data.Length; i++)
+          factHash += data[i].ToString("x2");
+      }
+      return factHash;
     }
     
     /// <summary>
