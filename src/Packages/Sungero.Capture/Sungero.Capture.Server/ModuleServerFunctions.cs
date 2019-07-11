@@ -336,7 +336,7 @@ namespace Sungero.Capture.Server
       document.LeadDoc = GetLeadingDocumentName(leadingDocNames.FirstOrDefault());
       
       // Заполнить дату и номер.
-      var dateFact = GetFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var dateFact = GetFacts(facts, "Document", "Date").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(dateFact, "Date");
       document.RegistrationNumber = GetFieldValue(facts, "Document", "Number");
       
