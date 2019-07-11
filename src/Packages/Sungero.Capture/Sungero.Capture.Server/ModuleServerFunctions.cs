@@ -1664,11 +1664,25 @@ namespace Sungero.Capture.Server
       counterpartyFacts.AddRange(GetCounterpartyFacts(facts, counterpartyTypeTo));
       foreach (var fact in counterpartyFacts)
       {
+        // Сначала ищем по инн/кпп.
         var tin = GetFieldValue(fact, "TIN");
         var trrc = GetFieldValue(fact, "TRRC");
         var businessUnit = GetBusinessUnits(tin, trrc).FirstOrDefault();
         var counterparty = GetCounterparties(tin, trrc).FirstOrDefault();
         
+        if (counterparty != null || businessUnit != null)
+        {
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), true);
+          businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
+          continue;
+        }
+        
+        // Если не нашли по инн/кпп то ищем по наименованию, но не доверяем таким записям.
+        var name = GetCorrespondentName(fact, "Name", "LegalForm");
+        counterparty = Counterparties.GetAll()
+          .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        businessUnit = BusinessUnits.GetAll()
+        .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
           var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), false);
