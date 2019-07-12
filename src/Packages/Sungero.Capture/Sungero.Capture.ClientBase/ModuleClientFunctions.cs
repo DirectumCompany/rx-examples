@@ -475,14 +475,22 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Установить цвет у распознанных свойств в карточке документа.
+    /// Активировать режим верификации.
     /// </summary>
     [Public]
-    public virtual void SetPropertiesColors(Sungero.Docflow.IOfficialDocument document)
+    public virtual void ActivateVerivicationMode(Sungero.Docflow.IOfficialDocument document)
     {
-      // Добавить признак, что свойства уже подсвечены, используется в Refresh документов.
+      if (document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess)
+        return;
+      
+      // При открытии карточки подсвечиваются распознанные свойства.
+      // При отмене изменений подсветки свойств не происходит (не вызывается Showing, также чистятся e.Params).
+      // Принудительно обновить подсветку полей после отмены изменений.
+      // В остальных случаях параметр будет добавлен при подсветке свойств.
       var formParams = ((Sungero.Domain.Shared.IExtendedEntity)document).Params;
-      if (!formParams.ContainsKey(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
+      if (formParams.ContainsKey(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
+        return;
+      else
         formParams.Add(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
       
       // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
@@ -490,10 +498,10 @@ namespace Sungero.Capture.Client
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);
-      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Green);
+      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.GreenHighlightsColorCode));
       
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, false);
-      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Highlights.Yellow);
+      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode));
     }
     
     /// <summary>
@@ -507,6 +515,7 @@ namespace Sungero.Capture.Client
       #warning Kotegov Временный фикс для корректировки позиции подсветки в предпросмотре.
       double mpl = 4.16;
       
+      var yellowColor = Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode);
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)
       {
         // Подсветка полей карточки.
@@ -526,9 +535,8 @@ namespace Sungero.Capture.Client
           foreach (var fieldPosition in fieldsPositions)
           {
             var pos = fieldPosition.Split(Constants.Module.PositionElementDelimiter);
-            #warning Kotegov Временный фикс для корректировки цвета подсветки в предпросмотре.
             var posColor = Sungero.Core.Colors.Common.Green;
-            if (color == Sungero.Core.Colors.Highlights.Yellow)
+            if (color == yellowColor)
               posColor = Sungero.Core.Colors.Common.Yellow;
             
             document.State.Controls.Preview.HighlightAreas.Add(posColor,

@@ -91,6 +91,19 @@
   ],
   "PublicFunctions": [
     {
+      "Name": "ActivateVerivicationMode",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Client",
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    },
+    {
       "Name": "GetClassRuleMapping",
       "Placement": "Client",
       "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
@@ -142,19 +155,6 @@
         }
       ],
       "Placement": "Shared",
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    },
-    {
-      "Name": "SetPropertiesColors",
-      "Parameters": [
-        {
-          "Name": "document",
-          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
-          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
-        }
-      ],
-      "Placement": "Client",
       "ReturnType": "void",
       "ReturnTypeFullName": "System.Void"
     },

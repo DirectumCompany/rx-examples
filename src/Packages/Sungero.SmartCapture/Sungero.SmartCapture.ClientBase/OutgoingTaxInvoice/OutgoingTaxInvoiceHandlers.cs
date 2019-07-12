@@ -13,62 +13,62 @@ namespace Sungero.SmartCapture
     public override void CorrectedValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCorrectedValueInputEventArgs e)
     {
       base.CorrectedValueInput(e);
-      this._obj.State.Properties.Corrected.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.Corrected.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void IsAdjustmentValueInput(Sungero.Presentation.BooleanValueInputEventArgs e)
     {
       base.IsAdjustmentValueInput(e);
-      this._obj.State.Properties.IsAdjustment.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.IsAdjustment.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void CurrencyValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCurrencyValueInputEventArgs e)
     {
       base.CurrencyValueInput(e);
-      this._obj.State.Properties.Currency.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.Currency.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void TotalAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
     {
       base.TotalAmountValueInput(e);
-      this._obj.State.Properties.TotalAmount.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.TotalAmount.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void BusinessUnitValueInput(Sungero.Docflow.Client.OfficialDocumentBusinessUnitValueInputEventArgs e)
     {
       base.BusinessUnitValueInput(e);
-      this._obj.State.Properties.BusinessUnit.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.BusinessUnit.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void ContactValueInput(Sungero.Docflow.Client.AccountingDocumentBaseContactValueInputEventArgs e)
     {
       base.ContactValueInput(e);
-      this._obj.State.Properties.Contact.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.Contact.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void CounterpartyValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCounterpartyValueInputEventArgs e)
     {
       base.CounterpartyValueInput(e);
-      this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void RegistrationDateValueInput(Sungero.Presentation.DateTimeValueInputEventArgs e)
     {
       base.RegistrationDateValueInput(e);
-      this._obj.State.Properties.RegistrationDate.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.RegistrationDate.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void RegistrationNumberValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
       base.RegistrationNumberValueInput(e);
-      this._obj.State.Properties.RegistrationNumber.HighlightColor = Sungero.Core.Colors.Highlights.Empty;
+      this._obj.State.Properties.RegistrationNumber.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
     {
       base.Showing(e);
-      // Подсветка полей.
-      Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
+      
+      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
     }
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
@@ -82,15 +82,7 @@ namespace Sungero.SmartCapture
       if (_obj.Counterparty == null)
         _obj.State.Properties.Counterparty.IsEnabled = true;
       
-      // При открытии карточки подсвечиваются распознанные свойства.
-      // При отмене изменений подсветки свойств не происходит (не вызывается Showing, также чистятся e.Params).
-      // Принудительно обновить подсветку полей после отмены изменений.
-      // В остальных случаях параметр будет добавлен при подсветке свойств.
-      if (!e.Params.Contains(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
-      {
-        Sungero.Capture.PublicFunctions.Module.SetPropertiesColors(_obj);
-        e.Params.AddOrUpdate(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
-      }
+      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
     }
 
   }
