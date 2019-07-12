@@ -21,7 +21,7 @@ namespace Sungero.Capture.Client
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     public virtual void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo, string filesInfo, string folder,
-                                              string responsibleId, string firstPageClassifierName, string typeClassifierName)
+                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
     {
       // Найти ответственного.
       Logger.Debug("Begin of captured package processing...");
@@ -184,10 +184,10 @@ namespace Sungero.Capture.Client
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
     public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
-                                                                                                   string filePath,
-                                                                                                   string firstPageClassifierName,
-                                                                                                   string typeClassifierName,
-                                                                                                   bool throwOnError = true)
+                                                                                                  string filePath,
+                                                                                                  string firstPageClassifierName,
+                                                                                                  string typeClassifierName,
+                                                                                                  bool throwOnError = true)
     {
       var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
@@ -478,15 +478,14 @@ namespace Sungero.Capture.Client
     /// Активировать режим верификации.
     /// </summary>
     [Public]
-    public virtual void ActivateVerivicationMode(Sungero.Docflow.IOfficialDocument document)
+    public virtual void SwitchVerificationMode(Sungero.Docflow.IOfficialDocument document)
     {
       if (document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess)
         return;
       
-      // При открытии карточки подсвечиваются распознанные свойства.
-      // При отмене изменений подсветки свойств не происходит (не вызывается Showing, также чистятся e.Params).
-      // Принудительно обновить подсветку полей после отмены изменений.
-      // В остальных случаях параметр будет добавлен при подсветке свойств.
+      // Подсветить свойства карточки и факты в теле только один раз при открытии.
+      // Либо в событии Showing либо в Refrash.
+      // Вызов в Refrash необходим, т.к. при отмене изменений не вызывается Showing.
       var formParams = ((Sungero.Domain.Shared.IExtendedEntity)document).Params;
       if (formParams.ContainsKey(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
         return;

@@ -35,14 +35,14 @@ namespace Sungero.Capture
     {
       base.Refresh(e);
       
-      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
     {
       base.Showing(e);
       
-      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void DocumentKindValueInput(Sungero.Docflow.Client.OfficialDocumentDocumentKindValueInputEventArgs e)

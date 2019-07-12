@@ -14,7 +14,7 @@ namespace Sungero.SmartCapture
     {
       base.Showing(e);
       
-      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void ContactValueInput(Sungero.RecordManagement.Client.IncomingLetterContactValueInputEventArgs e)
@@ -106,7 +106,7 @@ namespace Sungero.SmartCapture
       // Восстановить обязательность корреспондента.
       _obj.State.Properties.Correspondent.IsRequired = true;
       
-      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
   }
 }

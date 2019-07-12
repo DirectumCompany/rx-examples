@@ -63,7 +63,7 @@ namespace Sungero.SmartCapture
     {
       base.Showing(e);
       
-      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
@@ -77,7 +77,7 @@ namespace Sungero.SmartCapture
       if (_obj.Counterparty == null)
         _obj.State.Properties.Counterparty.IsEnabled = true;
       
-      Sungero.Capture.PublicFunctions.Module.ActivateVerivicationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
   }
