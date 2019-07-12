@@ -541,7 +541,7 @@ namespace Sungero.Capture.Server
       if (filteredContact == null)
         return result;
       result.Contact = filteredContact;
-      result.IsTrusted = GetField(fact, "Type").Probability > GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
+      result.IsTrusted = IsTrustedField(fact, "Type");
       return result;
     }
     
@@ -610,7 +610,7 @@ namespace Sungero.Capture.Server
     {
       if (fact == null)
         return Sungero.Contracts.ContractualDocuments.Null;
-      
+            
       var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
@@ -620,6 +620,67 @@ namespace Sungero.Capture.Server
       return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
                                                            x.RegistrationDate == docDate &&
                                                            (counterparty == null || x.Counterparty.Equals(counterparty))).FirstOrDefault();
+    }
+    
+    /// <summary>
+    /// Получить ведущий документ по номеру и дате из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="counterparty">Контрагент.</param>
+    /// <param name="leadingDocPropertyName">Имя связанного свойства.</param>
+    /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
+    /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
+    public static Structures.Module.DocumentWithFact GetLeadingDocument(Structures.Module.IFact fact, ICounterparty counterparty, string leadingDocPropertyName, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.DocumentWithFact.Create(ContractualDocumentBases.Null, fact, false);
+      if (fact == null)
+        return result;
+      
+      if (string.IsNullOrEmpty(leadingDocPropertyName))
+      {
+        result = GetLeadingDocumentByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
+        if (result.Document != null)
+          return result;
+      }
+      
+      result.Document = GetLeadingDocument(fact, counterparty);
+      result.IsTrusted = IsTrustedField(fact, "Type");
+      return result;
+    }
+    
+    /// <summary>
+    /// Получить ведущий документ по результатам верификации пользователя.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
+    /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
+    /// <returns></returns>
+    public static Structures.Module.DocumentWithFact GetLeadingDocumentByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.DocumentWithFact.Create(ContractualDocumentBases.Null, fact, false);
+      var factLabel = GetFactLabel(fact, propertyName);
+      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+      	.Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) 
+      	       && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .OrderByDescending(d => d.Id)
+        .FirstOrDefault();
+      if (recognitionInfo == null)
+        return result;
+      
+      var fieldRecognitionInfo = recognitionInfo.Facts
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
+      int docId;
+      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out docId))
+        return result;
+      
+      var filteredDocument = ContractualDocumentBases.GetAll(x => x.Id == docId).FirstOrDefault();
+      if (filteredDocument != null)
+      {
+        result.Document = filteredDocument;
+        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;        
+      }
+      return result;
     }
     
     /// <summary>
@@ -1101,7 +1162,7 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "Document");
       
       // Заполнить контрагента/НОР по типу.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, document.Info.Properties.Counterparty.Name);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
@@ -1258,7 +1319,7 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
       // Заполнить контрагента/НОР по типу.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, "SUPPLIER", "PAYER");
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, document.Info.Properties.Counterparty.Name, "SUPPLIER", "PAYER");
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
@@ -1402,7 +1463,7 @@ namespace Sungero.Capture.Server
     {
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, document.Info.Properties.Counterparty.Name);
       if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == true)
         document = FinancialArchive.OutgoingTaxInvoices.Create();
       else
@@ -1485,7 +1546,7 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
       // НОР и контрагент.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, document.Info.Properties.Counterparty.Name);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
@@ -1536,7 +1597,7 @@ namespace Sungero.Capture.Server
       var document = Contracts.IncomingInvoices.Create();
       
       // Контрагент и НОР.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible);
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, document.Info.Properties.Counterparty.Name);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       var props = document.Info.Properties;
@@ -1547,9 +1608,9 @@ namespace Sungero.Capture.Server
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
-      var isTrusted = IsTrustedField(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
+      var leadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty, document.Info.Properties.LeadingDocument.Name, document.Info.Properties.Counterparty.Name);
+      document.LeadingDocument = leadingDocument.Document;
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
       
       // Дата и номер.
       var DateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
@@ -1664,6 +1725,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
     public static List<Structures.Module.BusinessUnitAndCounterpartyWithFact> GetBusinessUnitsAndCounterparties(List<Structures.Module.IFact> facts,
+                                                                                                                string counterpartyPropertyName,
                                                                                                                 string counterpartyTypeFrom = "SELLER",
                                                                                                                 string counterpartyTypeTo = "BUYER")
     {
@@ -1674,15 +1736,28 @@ namespace Sungero.Capture.Server
       counterpartyFacts.AddRange(GetCounterpartyFacts(facts, counterpartyTypeTo));
       foreach (var fact in counterpartyFacts)
       {
-        // Сначала ищем по инн/кпп.
+        ICounterparty counterparty = null;
+        bool isTrusted = true;
+        
+        // Сначала ищем по хэшу
+        if (string.IsNullOrEmpty(counterpartyPropertyName))
+        {
+          var counterpartyWithFact = GetCounterpartyByVerifiedData(fact, counterpartyPropertyName);
+          counterparty = counterpartyWithFact.Counterparty;
+          isTrusted = counterpartyWithFact.IsTrusted;
+        }
+                              
+        // Поиск по инн/кпп.
         var tin = GetFieldValue(fact, "TIN");
         var trrc = GetFieldValue(fact, "TRRC");
+        
         var businessUnit = GetBusinessUnits(tin, trrc).FirstOrDefault();
-        var counterparty = GetCounterparties(tin, trrc).FirstOrDefault();
+        if (counterparty == null)
+          counterparty = GetCounterparties(tin, trrc).FirstOrDefault();
         
         if (counterparty != null || businessUnit != null)
         {
-          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), true);
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), isTrusted);
           businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
           continue;
         }
@@ -1713,7 +1788,8 @@ namespace Sungero.Capture.Server
     /// <returns>Наша организация и контрагент.</returns>
     /// <remarks>Типы контрагентов BUYER и SELLER используются в большем количестве типов, поэтому они выбраны по умолчанию.</remarks>
     public static Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.IRecognizedDocument recognizedDocument,
-                                                                                               IEmployee responsible,
+                                                                                               IEmployee responsible,    
+                                                                                               string counterpartyPropertyName,                                                                                               
                                                                                                string counterpartyTypeFrom = "SELLER",
                                                                                                string counterpartyTypeTo = "BUYER")
     {
@@ -1723,7 +1799,7 @@ namespace Sungero.Capture.Server
       var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitWithFact = null;
       
-      var businessUnitsAndCounterparties = GetBusinessUnitsAndCounterparties(facts, counterpartyTypeFrom, counterpartyTypeTo);
+      var businessUnitsAndCounterparties = GetBusinessUnitsAndCounterparties(facts, counterpartyPropertyName, counterpartyTypeFrom, counterpartyTypeTo);
       
       // Искать НОР.
       var businessUnits = businessUnitsAndCounterparties.Where(x => x.BusinessUnit != null);
