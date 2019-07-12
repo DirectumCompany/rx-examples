@@ -610,7 +610,7 @@ namespace Sungero.Capture.Server
     {
       if (fact == null)
         return Sungero.Contracts.ContractualDocuments.Null;
-            
+      
       var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
       var number = GetFieldValue(fact, "DocumentBaseNumber");
       
@@ -661,8 +661,8 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentWithFact.Create(ContractualDocumentBases.Null, fact, false);
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
-      	.Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) 
-      	       && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
+               && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)
@@ -678,7 +678,7 @@ namespace Sungero.Capture.Server
       if (filteredDocument != null)
       {
         result.Document = filteredDocument;
-        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;        
+        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
       }
       return result;
     }
@@ -1463,7 +1463,7 @@ namespace Sungero.Capture.Server
     {
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
       IAccountingDocumentBase document = null;
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, document.Info.Properties.Counterparty.Name);
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, AccountingDocumentBases.Info.Properties.Counterparty.Name);
       if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == true)
         document = FinancialArchive.OutgoingTaxInvoices.Create();
       else
@@ -1647,19 +1647,24 @@ namespace Sungero.Capture.Server
     public static void FillAmount(IAccountingDocumentBase document, Structures.Module.IRecognizedDocument recognizedDocument)
     {
       var facts = recognizedDocument.Facts;
-      var documentAmountFacts = GetOrderedFacts(facts, "DocumentAmount", "Amount");
-      var documentAmountFact = documentAmountFacts.Where(a => a.Fields.Any(field => field.Name == "Currency")).FirstOrDefault();
-      if (documentAmountFact == null)
-        documentAmountFact = documentAmountFacts.FirstOrDefault();
-      
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
-      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      if (document.Currency != null)
+      var documentAmountFacts = GetOrderedFacts(facts, "DocumentAmount", "Amount");
+      
+      var documentAmountFact = documentAmountFacts.FirstOrDefault();
+      if (documentAmountFact != null)
+      {
+        document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      }
+      
+      var documentCurrencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
+      var documentCurrencyFact = documentAmountFacts.FirstOrDefault();
+      if (documentCurrencyFact != null)
+      {
+        var currencyCode = GetFieldValue(documentAmountFact, "Currency");
+        document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
         LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency);
+      }
     }
     
     /// <summary>
@@ -1746,7 +1751,7 @@ namespace Sungero.Capture.Server
           counterparty = counterpartyWithFact.Counterparty;
           isTrusted = counterpartyWithFact.IsTrusted;
         }
-                              
+        
         // Поиск по инн/кпп.
         var tin = GetFieldValue(fact, "TIN");
         var trrc = GetFieldValue(fact, "TRRC");
@@ -1767,7 +1772,7 @@ namespace Sungero.Capture.Server
         counterparty = Counterparties.GetAll()
           .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         businessUnit = BusinessUnits.GetAll()
-        .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+          .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
           var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), false);
@@ -1788,8 +1793,8 @@ namespace Sungero.Capture.Server
     /// <returns>Наша организация и контрагент.</returns>
     /// <remarks>Типы контрагентов BUYER и SELLER используются в большем количестве типов, поэтому они выбраны по умолчанию.</remarks>
     public static Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.IRecognizedDocument recognizedDocument,
-                                                                                               IEmployee responsible,    
-                                                                                               string counterpartyPropertyName,                                                                                               
+                                                                                               IEmployee responsible,
+                                                                                               string counterpartyPropertyName,
                                                                                                string counterpartyTypeFrom = "SELLER",
                                                                                                string counterpartyTypeTo = "BUYER")
     {
