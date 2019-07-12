@@ -842,6 +842,7 @@ namespace Sungero.Capture.Server
       var isTrustedContact = IsTrustedField(responsibleFact, "Type");
       LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -952,6 +953,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
       CreateVersion(document, recognizedDocument);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1075,6 +1077,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       CreateVersion(document, recognizedDocument);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1117,6 +1120,7 @@ namespace Sungero.Capture.Server
       CreateVersion(document, recognizedDocument);
       // Регистрация.
       RegisterDocument(document);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1230,6 +1234,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       CreateVersion(document, recognizedDocument);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1274,6 +1279,7 @@ namespace Sungero.Capture.Server
       // Регистрация.
       RegisterDocument(document);
       
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1381,6 +1387,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       CreateVersion(document, recognizedDocument);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1454,6 +1461,7 @@ namespace Sungero.Capture.Server
       
       // Регистрация.
       RegisterDocument(document);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1508,6 +1516,7 @@ namespace Sungero.Capture.Server
       
       // Регистрация.
       RegisterDocument(document);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
@@ -1560,6 +1569,7 @@ namespace Sungero.Capture.Server
       
       // Регистрация.
       RegisterDocument(document);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
