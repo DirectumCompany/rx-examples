@@ -538,12 +538,17 @@ namespace Sungero.Capture.Client
             if (color == yellowColor)
               posColor = Sungero.Core.Colors.Common.Yellow;
             
+            #warning Сейчас ширина и высота прибиты гвоздями, кастомизировать.
+            double previewWidth = 400;
+            double previewHeight = 600;
             document.State.Controls.Preview.HighlightAreas.Add(posColor,
                                                                int.Parse(pos[0]),
                                                                double.Parse(pos[1]) * mpl,
                                                                double.Parse(pos[2]) * mpl,
                                                                double.Parse(pos[3]) * mpl,
-                                                               double.Parse(pos[4]) * mpl);
+                                                               double.Parse(pos[4]) * mpl,
+                                                               previewWidth,
+                                                               previewHeight);
           }
         }
       }
