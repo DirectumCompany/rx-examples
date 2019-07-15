@@ -630,21 +630,21 @@ namespace Sungero.Capture.Server
     /// <param name="leadingDocPropertyName">Имя связанного свойства.</param>
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
-    public static Structures.Module.DocumentWithFact GetLeadingDocument(Structures.Module.IFact fact, ICounterparty counterparty, string leadingDocPropertyName, string counterpartyPropertyName)
+    public static Structures.Module.ContractWithFact GetLeadingDocument(Structures.Module.IFact fact, ICounterparty counterparty, string leadingDocPropertyName, string counterpartyPropertyName)
     {
-      var result = Structures.Module.DocumentWithFact.Create(ContractualDocumentBases.Null, fact, false);
+      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
       if (fact == null)
         return result;
       
       if (string.IsNullOrEmpty(leadingDocPropertyName))
       {
-        result = GetLeadingDocumentByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
-        if (result.Document != null)
+        result = GetContractByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
+        if (result.Contract != null)
           return result;
       }
       
-      result.Document = GetLeadingDocument(fact, counterparty);
-      result.IsTrusted = IsTrustedField(fact, "Type");
+      result.Contract = GetLeadingDocument(fact, counterparty);
+      result.IsTrusted = IsTrustedField(fact, "DocumentBaseNumber");
       return result;
     }
     
@@ -656,9 +656,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns></returns>
-    public static Structures.Module.DocumentWithFact GetLeadingDocumentByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    public static Structures.Module.ContractWithFact GetContractByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
     {
-      var result = Structures.Module.DocumentWithFact.Create(ContractualDocumentBases.Null, fact, false);
+      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
         .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
@@ -674,10 +674,10 @@ namespace Sungero.Capture.Server
       if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out docId))
         return result;
       
-      var filteredDocument = ContractualDocumentBases.GetAll(x => x.Id == docId).FirstOrDefault();
+      var filteredDocument = Contracts.ContractualDocuments.GetAll(x => x.Id == docId).FirstOrDefault();
       if (filteredDocument != null)
       {
-        result.Document = filteredDocument;
+        result.Contract = filteredDocument;
         result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
       }
       return result;
@@ -1607,10 +1607,10 @@ namespace Sungero.Capture.Server
       var facts = recognizedDocument.Facts;
       
       // Договор.
-      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      var leadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty, document.Info.Properties.LeadingDocument.Name, document.Info.Properties.Counterparty.Name);
-      document.LeadingDocument = leadingDocument.Document;
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
+      var contractFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      var contract = GetLeadingDocument(contractFact, document.Counterparty, document.Info.Properties.Contract.Name, document.Info.Properties.Counterparty.Name);
+      document.Contract = contract.Contract;
+      LinkFactAndProperty(recognizedDocument, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
       
       // Дата и номер.
       var DateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();

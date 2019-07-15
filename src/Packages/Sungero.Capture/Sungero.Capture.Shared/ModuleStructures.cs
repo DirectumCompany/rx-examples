@@ -88,9 +88,9 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
-  partial class DocumentWithFact
+  partial class ContractWithFact
   {
-    public Sungero.Docflow.IContractualDocumentBase Document { get; set; }
+    public Sungero.Contracts.IContractualDocument Contract { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
     public bool IsTrusted { get; set; }
   }
