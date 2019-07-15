@@ -129,9 +129,10 @@ namespace Sungero.Capture.Server
       
       // Связать приложения с ведущим документом.
       var addendums = package;
-      if (addendums.Any(x => Equals(x, leadingDocument)))
-        addendums.Remove(leadingDocument);
       var canBeLeadingDocument = !SimpleDocuments.Is(leadingDocument);
+      if (canBeLeadingDocument && addendums.Any(x => Equals(x, leadingDocument)))
+        addendums.Remove(leadingDocument);
+      
       var relation = canBeLeadingDocument
         ? Docflow.PublicConstants.Module.AddendumRelationName
         : Constants.Module.SimpleRelationRelationName;
@@ -146,8 +147,8 @@ namespace Sungero.Capture.Server
             : Resources.DocumentNameFormat(simpleAddendumNumber);
           simpleAddendumNumber++;
         }
-        
-        addendum.Relations.AddFrom(relation, leadingDocument);
+        if (addendum != leadingDocument)
+          addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
       }
       
@@ -1659,7 +1660,7 @@ namespace Sungero.Capture.Server
       
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
       // так как на данный момент функция используется только для обработки бухгалтерских документов,
-      // а в них все расчеты ведутся в одной валюте. 
+      // а в них все расчеты ведутся в одной валюте.
       var documentCurrencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
       var documentCurrencyFact = documentAmountFacts.FirstOrDefault();
       if (documentCurrencyFact != null)
@@ -1754,7 +1755,7 @@ namespace Sungero.Capture.Server
           if (counterpartyWithFact != null)
           {
             counterparty = counterpartyWithFact.Counterparty;
-            isTrusted = counterpartyWithFact.IsTrusted;            
+            isTrusted = counterpartyWithFact.IsTrusted;
           }
         }
         
