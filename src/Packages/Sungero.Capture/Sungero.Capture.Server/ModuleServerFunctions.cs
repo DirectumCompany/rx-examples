@@ -1745,11 +1745,14 @@ namespace Sungero.Capture.Server
         bool isTrusted = true;
         
         // Сначала ищем по хэшу
-        if (string.IsNullOrEmpty(counterpartyPropertyName))
+        if (!string.IsNullOrEmpty(counterpartyPropertyName))
         {
           var counterpartyWithFact = GetCounterpartyByVerifiedData(fact, counterpartyPropertyName);
-          counterparty = counterpartyWithFact.Counterparty;
-          isTrusted = counterpartyWithFact.IsTrusted;
+          if (counterpartyWithFact != null)
+          {
+            counterparty = counterpartyWithFact.Counterparty;
+            isTrusted = counterpartyWithFact.IsTrusted;            
+          }
         }
         
         // Поиск по инн/кпп.
