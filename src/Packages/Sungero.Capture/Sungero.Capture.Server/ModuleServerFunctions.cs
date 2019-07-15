@@ -1657,6 +1657,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       }
       
+      // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно.
       var documentCurrencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
       var documentCurrencyFact = documentAmountFacts.FirstOrDefault();
       if (documentCurrencyFact != null)
