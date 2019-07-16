@@ -143,10 +143,10 @@
           "Name": "From",
           "ColumnDefinitions": [
             {
-              "Percentage": 53.21
+              "Percentage": 54.97
             },
             {
-              "Percentage": 43.58
+              "Percentage": 45.03
             }
           ],
           "ColumnNumber": 0,
@@ -266,10 +266,10 @@
           "Name": "To",
           "ColumnDefinitions": [
             {
-              "Percentage": 52.94
+              "Percentage": 54.7
             },
             {
-              "Percentage": 43.85
+              "Percentage": 45.3
             }
           ],
           "ColumnNumber": 0,

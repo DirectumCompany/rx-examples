@@ -568,8 +568,8 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
-               && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
+               d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)
@@ -671,8 +671,8 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
-               && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
+               d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)
@@ -1172,8 +1172,8 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "Document");
       
       // Заполнить контрагента/НОР по типу.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, 
-                                                                       document.Info.Properties.Counterparty.Name, 
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible,
+                                                                       document.Info.Properties.Counterparty.Name,
                                                                        document.Info.Properties.BusinessUnit.Name);
       document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
       document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
@@ -1477,9 +1477,9 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
-      IAccountingDocumentBase document = null;
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible, 
-                                                                       AccountingDocumentBases.Info.Properties.Counterparty.Name, 
+      var document = AccountingDocumentBases.Null;
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible,
+                                                                       AccountingDocumentBases.Info.Properties.Counterparty.Name,
                                                                        AccountingDocumentBases.Info.Properties.BusinessUnit.Name);
       if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == true)
         document = FinancialArchive.OutgoingTaxInvoices.Create();
@@ -1751,7 +1751,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts">Факты.</param>
     /// <param name="counterpartyPropertyName">Имя свойства связанного с контрагентом.</param>
-    /// <param name="businessUnitPropertyName">Имя свойства связанного с НОР.</param> 
+    /// <param name="businessUnitPropertyName">Имя свойства связанного с НОР.</param>
     /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
@@ -1772,7 +1772,7 @@ namespace Sungero.Capture.Server
         IBusinessUnit businessUnit = null;
         bool isTrusted = true;
         
-        // Поиск по хэшу
+        // Поиск контрагента по хэшу.
         if (!string.IsNullOrEmpty(counterpartyPropertyName))
         {
           var counterpartyWithFact = GetCounterpartyByVerifiedData(fact, counterpartyPropertyName);
@@ -1783,6 +1783,7 @@ namespace Sungero.Capture.Server
           }
         }
         
+        // Поиск НОР по хэшу.
         if (!string.IsNullOrEmpty(businessUnitPropertyName))
         {
           var businessUnitWithFact = GetBusinessUnitByVerifiedData(fact, businessUnitPropertyName);
@@ -1831,7 +1832,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <param name="counterpartyPropertyName">Имя свойства связанного с контрагентом.</param>
-    /// <param name="businessUnitPropertyName">Имя свойства связанного с НОР.</param>     
+    /// <param name="businessUnitPropertyName">Имя свойства связанного с НОР.</param>
     /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <returns>Наша организация и контрагент.</returns>
@@ -1857,7 +1858,7 @@ namespace Sungero.Capture.Server
       var sellerBusinessUnits = businessUnits.Where(x => x.Type == counterpartyTypeFrom);
       var withoutTypeBusinessUnits = businessUnits.Where(x => x.Type == string.Empty);
       
-      // Уточнить по ответственному
+      // Уточнить по ответственному.
       businessUnitWithFact = buyerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
       if (businessUnitWithFact == null)
         businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
@@ -1897,7 +1898,6 @@ namespace Sungero.Capture.Server
       result.BusinessUnit = businessUnitWithFact.BusinessUnit;
       LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, result.BusinessUnit, businessUnitWithFact.IsTrusted);
       
-
       // Исключить из поиска НОР.
       var сounterparties = businessUnitsAndCounterparties.Where(x => !Equals(x, businessUnitWithFact) && x.Counterparty != null).ToList();
 
