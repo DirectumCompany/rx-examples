@@ -143,10 +143,10 @@
           "Name": "From",
           "ColumnDefinitions": [
             {
-              "Percentage": 50.0
+              "Percentage": 53.21
             },
             {
-              "Percentage": 50.0
+              "Percentage": 43.58
             }
           ],
           "ColumnNumber": 0,
@@ -199,7 +199,7 @@
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "1613c313-5961-4854-af02-f009153e602b",
           "Name": "Dated",
-          "ColumnNumber": 0,
+          "ColumnNumber": 1,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
           "ParentGuid": "f8703a39-a2f0-4871-8e38-bb4fc123a0fb",
@@ -212,7 +212,7 @@
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "6f7698ab-b887-4127-85c5-f62728bb13c6",
           "Name": "InNumber",
-          "ColumnNumber": 1,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
           "ParentGuid": "f8703a39-a2f0-4871-8e38-bb4fc123a0fb",
@@ -266,10 +266,10 @@
           "Name": "To",
           "ColumnDefinitions": [
             {
-              "Percentage": 50.0
+              "Percentage": 52.94
             },
             {
-              "Percentage": 50.0
+              "Percentage": 43.85
             }
           ],
           "ColumnNumber": 0,
