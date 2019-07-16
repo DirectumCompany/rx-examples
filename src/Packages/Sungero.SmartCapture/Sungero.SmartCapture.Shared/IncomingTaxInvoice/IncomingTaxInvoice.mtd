@@ -419,7 +419,7 @@
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "69d4014b-ac01-46f7-8a2d-b84ae7b2dd6c",
-          "Name": "Lifecycle",
+          "Name": "LifeCycle",
           "ColumnNumber": 0,
           "ColumnSpan": 1,
           "GroupType": "WithTitleNoBorder",
