@@ -126,29 +126,38 @@ namespace Sungero.Capture.Server
       if (leadingDocument == null)
         leadingDocument = GetLeadingDocument(package);
       result.LeadingDocumentId = leadingDocument.Id;
+
+      // Если ведущий документ SimpleDocument и он пришел из папки захвата, 
+      // то переименовываем его, для того чтобы в имени содержался его порядковый номер.
+      int simpleDocumentNumber = 1;
+      var leadingDocumentIsSimple = !SimpleDocuments.Is(leadingDocument);
+      if (!leadingDocumentIsSimple && string.IsNullOrEmpty(originalFile.Description))
+      {
+        leadingDocument.Name = Resources.DocumentNameFormat(simpleDocumentNumber);
+        leadingDocument.Save();
+        simpleDocumentNumber++;
+      }
       
       // Связать приложения с ведущим документом.
       var addendums = package;
-      var canBeLeadingDocument = !SimpleDocuments.Is(leadingDocument);
-      if (canBeLeadingDocument && addendums.Any(x => Equals(x, leadingDocument)))
+      if (addendums.Any(x => Equals(x, leadingDocument)))
         addendums.Remove(leadingDocument);
       
-      var relation = canBeLeadingDocument
+      var relation = leadingDocumentIsSimple
         ? Docflow.PublicConstants.Module.AddendumRelationName
         : Constants.Module.SimpleRelationRelationName;
-      int simpleAddendumNumber = 1;
+
       foreach (var addendum in addendums)
       {
-        // У простых документов, захваченных с почты имя не меняется.
+        // У простых документов, захваченных с почты, имя не меняется.
         if (SimpleDocuments.Is(addendum) && string.IsNullOrEmpty(originalFile.Description))
         {
-          addendum.Name = canBeLeadingDocument
-            ? Resources.AttachmentNameFormat(simpleAddendumNumber)
-            : Resources.DocumentNameFormat(simpleAddendumNumber);
-          simpleAddendumNumber++;
+          addendum.Name = leadingDocumentIsSimple
+            ? Resources.AttachmentNameFormat(simpleDocumentNumber)
+            : Resources.DocumentNameFormat(simpleDocumentNumber);
+          simpleDocumentNumber++;
         }
-        if (addendum != leadingDocument)
-          addendum.Relations.AddFrom(relation, leadingDocument);
+        addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
       }
       
