@@ -288,4 +288,25 @@
   <data name="ControlGroup_e83f2a4fd95846a8accc58562b8d1172" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="ControlGroup_9c0e981c710f4665bcbc2d8f5d8084d3" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="ControlGroup_8f91b21ba3744bd5807bb01130dff98f" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="Resource_9ad3461d21c94da4b0898738dbfe6076" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_199232915b2e4600b095caabab21587f" xml:space="preserve">
+    <value>Terms</value>
+  </data>
+  <data name="ControlGroup_82c787a498d643d48236a21f05121636" xml:space="preserve">
+    <value>Customer</value>
+  </data>
+  <data name="ControlGroup_9152a6a160364d25a0e29f2972b43a64" xml:space="preserve">
+    <value>Contractor</value>
+  </data>
 </root>
