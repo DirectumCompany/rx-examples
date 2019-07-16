@@ -73,10 +73,10 @@
           "Name": "Main",
           "ColumnDefinitions": [
             {
-              "Percentage": 48.59
+              "Percentage": 50.0
             },
             {
-              "Percentage": 48.59
+              "Percentage": 50.0
             }
           ],
           "ColumnNumber": 0,
@@ -93,7 +93,7 @@
           "ColumnNumber": 0,
           "ColumnSpan": 1,
           "ParentGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
-          "RowNumber": 3,
+          "RowNumber": 1,
           "RowSpan": 1,
           "SharedNestedGroupsAlignment": true
         },
@@ -105,7 +105,7 @@
           "ColumnSpan": 1,
           "GroupType": "WithTitleNoBorder",
           "ParentGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
-          "RowNumber": 5,
+          "RowNumber": 3,
           "RowSpan": 1
         },
         {
@@ -179,7 +179,7 @@
           "ColumnSpan": 1,
           "GroupType": "WithTitleNoBorder",
           "ParentGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
-          "RowNumber": 4,
+          "RowNumber": 2,
           "RowSpan": 1,
           "SharedNestedGroupsAlignment": true
         },
@@ -234,25 +234,6 @@
           "RowNumber": 3,
           "RowSpan": 1,
           "Settings": []
-        },
-        {
-          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "51e5b30b-6cac-4fca-9ee1-21e9d3095c2f",
-          "Name": "Counterparties",
-          "ColumnDefinitions": [
-            {
-              "Percentage": 48.83
-            },
-            {
-              "Percentage": 48.36
-            }
-          ],
-          "ColumnNumber": 0,
-          "ColumnSpan": 1,
-          "GroupType": "WithTitleNoBorder",
-          "ParentGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
-          "RowNumber": 1,
-          "RowSpan": 1
         },
         {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
@@ -411,25 +392,6 @@
           "Settings": []
         },
         {
-          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "f0e89f8e-ba94-462d-85ee-a6d6be2c360f",
-          "Name": "Terms",
-          "ColumnDefinitions": [
-            {
-              "Percentage": 50.0
-            },
-            {
-              "Percentage": 50.0
-            }
-          ],
-          "ColumnNumber": 0,
-          "ColumnSpan": 1,
-          "GroupType": "WithTitleNoBorder",
-          "ParentGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
-          "RowNumber": 2,
-          "RowSpan": 1
-        },
-        {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "8a50379b-a7cd-4702-bbd2-ff94a7d94cc8",
           "Name": "TotalAmount",
@@ -467,6 +429,44 @@
           "RowNumber": 1,
           "RowSpan": 1,
           "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "f0e89f8e-ba94-462d-85ee-a6d6be2c360f",
+          "Name": "Terms",
+          "ColumnDefinitions": [
+            {
+              "Percentage": 50.0
+            },
+            {
+              "Percentage": 50.0
+            }
+          ],
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "GroupType": "WithTitleNoBorder",
+          "ParentGuid": "be2e7b3b-0c93-4025-bd18-9aa01ba7f66c",
+          "RowNumber": 1,
+          "RowSpan": 1
+        },
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "51e5b30b-6cac-4fca-9ee1-21e9d3095c2f",
+          "Name": "Counterparties",
+          "ColumnDefinitions": [
+            {
+              "Percentage": 50.24
+            },
+            {
+              "Percentage": 49.76
+            }
+          ],
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "GroupType": "WithTitleNoBorder",
+          "ParentGuid": "be2e7b3b-0c93-4025-bd18-9aa01ba7f66c",
+          "RowNumber": 0,
+          "RowSpan": 1
         }
       ],
       "IsAncestorMetadata": true,
