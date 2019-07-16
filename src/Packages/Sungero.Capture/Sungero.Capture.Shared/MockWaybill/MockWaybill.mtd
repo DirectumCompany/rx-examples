@@ -26,46 +26,13 @@
       "Controls": [
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "9c0e981c-710f-4665-bcbc-2d8f5d8084d3",
-          "Name": "MainGroup",
+          "NameGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
+          "Name": "PropertiesGroup",
           "IsAncestorMetadata": true,
           "Overridden": [
             "Controls"
-          ]
-        },
-        {
-          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "fd86ec67-0272-447f-be45-80324ca8a699",
-          "Name": "PreviewGroup",
-          "ColumnNumber": 0,
-          "ColumnSpan": 1,
-          "ParentGuid": "9c0e981c-710f-4665-bcbc-2d8f5d8084d3",
-          "RowNumber": 0,
-          "RowSpan": 1
-        },
-        {
-          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
-          "NameGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
-          "Name": "PropertiesGroup",
-          "ColumnNumber": 1,
-          "ColumnSpan": 1,
-          "ParentGuid": "9c0e981c-710f-4665-bcbc-2d8f5d8084d3",
-          "RowNumber": 0,
-          "RowSpan": 1,
+          ],
           "SharedNestedGroupsAlignment": true
-        },
-        {
-          "$type": "Sungero.Metadata.PreviewControlMetadata, Sungero.Metadata",
-          "NameGuid": "9ad3461d-21c9-4da4-b089-8738dbfe6076",
-          "Name": "Preview",
-          "ColumnNumber": 0,
-          "ColumnSpan": 1,
-          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.PreviewBinder",
-          "HeaderLocation": "None",
-          "ParentGuid": "fd86ec67-0272-447f-be45-80324ca8a699",
-          "RowNumber": 0,
-          "RowSpan": 1,
-          "Settings": []
         },
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
