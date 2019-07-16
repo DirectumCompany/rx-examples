@@ -174,4 +174,7 @@
   <data name="Resource_9ad3461d21c94da4b0898738dbfe6076" xml:space="preserve">
     <value />
   </data>
+  <data name="ControlGroup_69d4014bac0146f78a2db84ae7b2dd6c" xml:space="preserve">
+    <value>Lifecycle</value>
+  </data>
 </root>
