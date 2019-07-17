@@ -1560,7 +1560,6 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
-      var props = document.Info.Properties;
       
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1580,18 +1579,7 @@ namespace Sungero.Capture.Server
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
       // Корректировочный документ.
-      if (isAdjustment)
-      {
-        document.IsAdjustment = true;
-        var correctionDateFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
-        var correctionNumberFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
-        var correctionDate = GetFieldDateTimeValue(correctionDateFact, "CorrectionDate");
-        var correctionNumber = GetFieldValue(correctionNumberFact, "CorrectionNumber");
-        document.Corrected = FinancialArchive.UniversalTransferDocuments.GetAll()
-          .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
-        LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
-        LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
-      }
+      FillCorrectedDocument(document, recognizedDocument, "FinancialDocument", isAdjustment);
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
@@ -1714,25 +1702,32 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить регистрационные данные.
+    /// Заполнить корректируемый документ.
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта.</param>
-    public static IAccountingDocumentBase GetCorrectedDocument(Structures.Module.IRecognizedDocument recognizedDocument, string factName)
+    /// <param name="factName">Корректировочный.</param>
+    public static void FillCorrectedDocument(IAccountingDocumentBase document,
+                                            Structures.Module.IRecognizedDocument recognizedDocument,
+                                            string factName,
+                                            bool isAdjustment)
     {
-      var facts = recognizedDocument.Facts;
-      var dateFact = GetOrderedFacts(facts, factName, "CorrectionDate").FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, factName, "CorrectionNumber").FirstOrDefault();
-      var date = GetFieldDateTimeValue(dateFact, "Date");
-      var number = GetFieldValue(numberFact, "Number");
-      if (date != null && !string.IsNullOrEmpty(number))
+      if (isAdjustment)
       {
-        return AccountingDocumentBases.GetAll().FirstOrDefault(d => d.RegistrationNumber.Equals(number, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == date);
+        document.IsAdjustment = true;
+        var correctionDateFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
+        var correctionNumberFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
+        var correctionDate = GetFieldDateTimeValue(correctionDateFact, "CorrectionDate");
+        var correctionNumber = GetFieldValue(correctionNumberFact, "CorrectionNumber");
+        
+        document.Corrected = FinancialArchive.UniversalTransferDocuments.GetAll()
+          .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
+        var props = document.Info.Properties;
+        LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
+        LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
       }
-      return null;
     }
-    
     #endregion
     
     #region Поиск контрагента/НОР
