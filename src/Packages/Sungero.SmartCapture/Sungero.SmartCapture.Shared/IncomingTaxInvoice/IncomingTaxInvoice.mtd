@@ -223,7 +223,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "812fa7c1-ee73-4284-a345-8e74ae533761",
           "PropertyGuid": "aae1f6ae-d090-4c5a-963e-44c8b79dc92b",
-          "RowNumber": 3,
+          "RowNumber": 5,
           "RowSpan": 1,
           "Settings": []
         },
@@ -399,7 +399,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.BooleanEditorToBooleanBinder",
           "ParentGuid": "812fa7c1-ee73-4284-a345-8e74ae533761",
           "PropertyGuid": "bbdbae6d-40ce-4443-aeb6-bf4a14565963",
-          "RowNumber": 4,
+          "RowNumber": 3,
           "RowSpan": 1,
           "Settings": []
         },
@@ -412,7 +412,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "812fa7c1-ee73-4284-a345-8e74ae533761",
           "PropertyGuid": "c0aa900b-eb79-4558-8080-2b5ce3d9cf06",
-          "RowNumber": 5,
+          "RowNumber": 4,
           "RowSpan": 1,
           "Settings": []
         },
