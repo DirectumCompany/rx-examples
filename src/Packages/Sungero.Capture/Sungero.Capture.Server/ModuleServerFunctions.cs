@@ -1844,11 +1844,11 @@ namespace Sungero.Capture.Server
       var withoutTypeBusinessUnits = businessUnits.Where(x => x.Type == string.Empty);
       
       // Уточнить по ответственному.
-      businessUnitWithFact = buyerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
-      if (businessUnitWithFact == null)
-        businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+      businessUnitWithFact = buyerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();      
       if (businessUnitWithFact == null)
         businessUnitWithFact = sellerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+      if (businessUnitWithFact == null)
+        businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
       if (businessUnitWithFact != null)
       {
         var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);
@@ -1861,8 +1861,8 @@ namespace Sungero.Capture.Server
       
       // Общий пиоритет поиска НОР, если не смогли уточнить по ответственному:
       //   1. Явно найденная для типа контрагента counterpartyTypeTo. По умолчанию "BUYER".
-      //   2. Явно найденная в контрагентах без типов.
-      //   3. Явно найденная для типа контрагента counterpartyTypeFrom. По умолчанию "SELLER".
+      //   2. Явно найденная для типа контрагента counterpartyTypeFrom. По умолчанию "SELLER".
+      //   3. Явно найденная в контрагентах без типов.      
       if (businessUnitWithFact == null)
       {
         var buyerBusinessUnit = buyerBusinessUnits.FirstOrDefault();
@@ -1877,7 +1877,6 @@ namespace Sungero.Capture.Server
       if (businessUnitWithFact == null)
       {
         businessUnitWithFact = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnitByResponsible, null, null, string.Empty, false);
-        result.IsBusinessUnitSeller = false;
       }
       
       result.BusinessUnit = businessUnitWithFact.BusinessUnit;
@@ -1898,7 +1897,7 @@ namespace Sungero.Capture.Server
       var sellerCounterparty = сounterparties.Where(x => x.Type == counterpartyTypeFrom).FirstOrDefault();
       var withoutTypeCounterparty = сounterparties.Where(x => x.Type == string.Empty).FirstOrDefault();
 
-      var counterpartyWithFact = sellerCounterparty ?? withoutTypeCounterparty ?? buyerCounterparty;
+      var counterpartyWithFact = sellerCounterparty ?? buyerCounterparty ?? withoutTypeCounterparty;
       if (counterpartyWithFact != null)
       {
         result.Counterparty = counterpartyWithFact.Counterparty;
