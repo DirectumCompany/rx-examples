@@ -127,7 +127,7 @@ namespace Sungero.Capture.Server
         leadingDocument = GetLeadingDocument(package);
       result.LeadingDocumentId = leadingDocument.Id;
 
-      // Если ведущий документ SimpleDocument и он пришел из папки захвата, 
+      // Если ведущий документ SimpleDocument и он пришел из папки захвата,
       // то переименовываем его, для того чтобы в имени содержался его порядковый номер.
       int simpleDocumentNumber = 1;
       var leadingDocumentIsSimple = !SimpleDocuments.Is(leadingDocument);
@@ -222,7 +222,7 @@ namespace Sungero.Capture.Server
                   .Where(p => p != null)
                   .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}",
                                              Constants.Module.PositionElementDelimiter,
-                                             p.Page, p.Top, p.Left, p.Width, p.Height, 
+                                             p.Page, p.Top, p.Left, p.Width, p.Height,
                                              pages.Where(x => x.Number == p.Page).Select(x => x.Width).FirstOrDefault(),
                                              pages.Where(x => x.Number == p.Page).Select(x => x.Height).FirstOrDefault()));
                 fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
@@ -680,7 +680,7 @@ namespace Sungero.Capture.Server
       }
       return result;
     }
-            
+    
     /// <summary>
     /// Отправить задачу на проверку документов.
     /// </summary>
@@ -1168,9 +1168,11 @@ namespace Sungero.Capture.Server
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
-      var isTrusted = IsTrustedField(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
+      var leadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty,
+                                               document.Info.Properties.LeadingDocument.Name,
+                                               document.Info.Properties.Counterparty.Name);
+      document.LeadingDocument = leadingDocument.Contract;
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -1645,26 +1647,38 @@ namespace Sungero.Capture.Server
     {
       var facts = recognizedDocument.Facts;
       var props = document.Info.Properties;
-      var documentAmountFacts = GetOrderedFacts(facts, "DocumentAmount", "Amount");
+      var amountFacts = GetOrderedFacts(facts, "DocumentAmount", "Amount");
       
-      var documentAmountFact = documentAmountFacts.FirstOrDefault();
-      if (documentAmountFact != null)
+      var amountFact = amountFacts.FirstOrDefault();
+      if (amountFact != null)
       {
-        document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
-        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+        document.TotalAmount = GetFieldNumericalValue(amountFact, "Amount");
+        LinkFactAndProperty(recognizedDocument, amountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       }
       
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
       // так как на данный момент функция используется только для обработки бухгалтерских документов,
       // а в них все расчеты ведутся в одной валюте.
-      var documentCurrencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
-      var documentCurrencyFact = documentCurrencyFacts.FirstOrDefault();
-      if (documentCurrencyFact != null)
+      var currencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
+      var currencyFact = currencyFacts.FirstOrDefault();
+      var currencyField = GetFieldByVerifiedData(currencyFact, document.Info.Properties.Currency.Name);
+      var isTrusted = true;
+      var currency = Commons.Currencies.Null;
+      if (currencyField != null)
       {
-        var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
-        document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency);
+        int currencyId;
+        if (int.TryParse(currencyField.VerifiedValue, out currencyId))
+          currency = Commons.Currencies.GetAll(x => x.Id == currencyId).FirstOrDefault();
       }
+      else
+      {
+        var currencyCode = GetFieldValue(currencyFact, "Currency");
+        isTrusted = IsTrustedField(currencyFact, "Currency");
+        currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      }
+      
+      document.Currency = currency;
+      LinkFactAndProperty(recognizedDocument, currencyFact, "Currency", props.Currency.Name, document.Currency, isTrusted);
     }
     
     /// <summary>
@@ -1694,9 +1708,9 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Наименование факта.</param>
     /// <param name="factName">Корректировочный.</param>
     public static void FillCorrectedDocument(IAccountingDocumentBase document,
-                                            Structures.Module.IRecognizedDocument recognizedDocument,
-                                            string factName,
-                                            bool isAdjustment)
+                                             Structures.Module.IRecognizedDocument recognizedDocument,
+                                             string factName,
+                                             bool isAdjustment)
     {
       if (isAdjustment)
       {
@@ -2031,7 +2045,7 @@ namespace Sungero.Capture.Server
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Связку контрагент + факт.</returns>
     public static Structures.Module.BusinessUnitWithFact GetBusinessUnitByVerifiedData(Structures.Module.IFact fact, string propertyName)
-    {      
+    {
       var businessUnitField = GetFieldByVerifiedData(fact, propertyName);
       if (businessUnitField == null)
         return null;
@@ -2045,7 +2059,7 @@ namespace Sungero.Capture.Server
       
       return Structures.Module.BusinessUnitWithFact.Create(filteredBusinessUnit, fact, businessUnitField.IsTrusted == true);
     }
-           
+    
     /// <summary>
     /// Поиск НОР, наиболее подходящей для ответственного и адресата.
     /// </summary>
@@ -2334,7 +2348,7 @@ namespace Sungero.Capture.Server
         return null;
       
       return recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();     
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
     }
     
     /// <summary>
@@ -2357,7 +2371,7 @@ namespace Sungero.Capture.Server
         return null;
       
       return recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();      
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
     }
     
     /// <summary>
