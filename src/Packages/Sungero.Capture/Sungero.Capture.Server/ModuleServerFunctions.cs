@@ -1661,24 +1661,12 @@ namespace Sungero.Capture.Server
       // а в них все расчеты ведутся в одной валюте.
       var currencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
       var currencyFact = currencyFacts.FirstOrDefault();
-      var currencyField = GetFieldByVerifiedData(currencyFact, document.Info.Properties.Currency.Name);
-      var isTrusted = true;
-      var currency = Commons.Currencies.Null;
-      if (currencyField != null)
-      {
-        int currencyId;
-        if (int.TryParse(currencyField.VerifiedValue, out currencyId))
-          currency = Commons.Currencies.GetAll(x => x.Id == currencyId).FirstOrDefault();
-      }
-      else
+      if (currencyFact != null)
       {
         var currencyCode = GetFieldValue(currencyFact, "Currency");
-        isTrusted = IsTrustedField(currencyFact, "Currency");
-        currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-      }
-      
-      document.Currency = currency;
-      LinkFactAndProperty(recognizedDocument, currencyFact, "Currency", props.Currency.Name, document.Currency, isTrusted);
+        document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+        LinkFactAndProperty(recognizedDocument, currencyFact, "Currency", props.Currency.Name, document.Currency);
+      }      
     }
     
     /// <summary>
