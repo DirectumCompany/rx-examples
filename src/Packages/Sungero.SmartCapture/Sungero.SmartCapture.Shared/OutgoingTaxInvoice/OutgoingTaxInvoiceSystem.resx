@@ -135,17 +135,8 @@
   <data name="ControlGroup_e8d2f6a5490041f5b667947823257cf4" xml:space="preserve">
     <value />
   </data>
-  <data name="ControlGroup_027e9b829d4c4020bfdfeb1ff2a3085d" xml:space="preserve">
-    <value>Location</value>
-  </data>
-  <data name="ControlGroup_61e49619548d4df5b009092e0763459d" xml:space="preserve">
-    <value>Date and Number</value>
-  </data>
   <data name="ControlGroup_a4d03e190b1240818b8ba6de5333faa9" xml:space="preserve">
     <value>Lifecycle</value>
-  </data>
-  <data name="ControlGroup_87881966aa4844faa068926d29501261" xml:space="preserve">
-    <value>Retention</value>
   </data>
   <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
     <value>Preview</value>
@@ -155,11 +146,5 @@
   </data>
   <data name="ControlGroup_8f91b21ba3744bd5807bb01130dff98f" xml:space="preserve">
     <value>Properties</value>
-  </data>
-  <data name="ControlGroup_fc3b955f48274f55a84c7824410b1ef3" xml:space="preserve">
-    <value />
-  </data>
-  <data name="ControlGroup_7eb4b0baaac24ffcbc732930d5bf43bf" xml:space="preserve">
-    <value />
   </data>
 </root>

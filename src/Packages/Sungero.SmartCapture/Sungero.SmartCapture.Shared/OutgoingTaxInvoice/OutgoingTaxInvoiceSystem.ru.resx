@@ -132,17 +132,8 @@
   <data name="ControlGroup_f34634e71d7f4dd4a6e896d3325c3241" xml:space="preserve">
     <value>Контрагент</value>
   </data>
-  <data name="ControlGroup_027e9b829d4c4020bfdfeb1ff2a3085d" xml:space="preserve">
-    <value>Местонахождение</value>
-  </data>
-  <data name="ControlGroup_61e49619548d4df5b009092e0763459d" xml:space="preserve">
-    <value>Дата и Номер</value>
-  </data>
   <data name="ControlGroup_a4d03e190b1240818b8ba6de5333faa9" xml:space="preserve">
     <value>Жизненный цикл</value>
-  </data>
-  <data name="ControlGroup_87881966aa4844faa068926d29501261" xml:space="preserve">
-    <value>Хранение</value>
   </data>
   <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
     <value>Предпросмотр</value>

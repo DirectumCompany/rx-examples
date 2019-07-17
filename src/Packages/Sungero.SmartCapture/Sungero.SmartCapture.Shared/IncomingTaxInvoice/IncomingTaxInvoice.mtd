@@ -30,10 +30,10 @@
           "Name": "MainGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 37.97
+              "Percentage": 62.03
             },
             {
-              "Percentage": 62.03
+              "Percentage": 37.97
             }
           ],
           "Overridden": [
@@ -44,7 +44,7 @@
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "fd86ec67-0272-447f-be45-80324ca8a699",
           "Name": "PreviewGroup",
-          "ColumnNumber": 1,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "Overridden": [
             "ColumnNumber"
@@ -57,7 +57,7 @@
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
           "Name": "PropertiesGroup",
-          "ColumnNumber": 0,
+          "ColumnNumber": 1,
           "ColumnSpan": 1,
           "Overridden": [
             "ColumnNumber",
