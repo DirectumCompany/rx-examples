@@ -569,26 +569,18 @@ namespace Sungero.Capture.Server
     public static Structures.Module.ContactWithFact GetContactByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
     {
       var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
-      var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
-               d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
-        .OrderByDescending(d => d.Id)
-        .FirstOrDefault();
-      if (recognitionInfo == null)
+      var contactField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
+      if (contactField == null)
         return result;
-      
-      var fieldRecognitionInfo = recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
       int contactId;
-      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out contactId))
+      if (!int.TryParse(contactField.VerifiedValue, out contactId))
         return result;
       
       var filteredContact = Contacts.GetAll(x => x.Id == contactId).FirstOrDefault();
       if (filteredContact != null)
       {
         result.Contact = filteredContact;
-        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
+        result.IsTrusted = contactField.IsTrusted == true;
       }
       return result;
     }
@@ -672,30 +664,23 @@ namespace Sungero.Capture.Server
     public static Structures.Module.ContractWithFact GetContractByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
     {
       var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
-      var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
-               d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
-        .OrderByDescending(d => d.Id)
-        .FirstOrDefault();
-      if (recognitionInfo == null)
+      var contractField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
+      if (contractField == null)
         return result;
       
-      var fieldRecognitionInfo = recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
       int docId;
-      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out docId))
+      if (!int.TryParse(contractField.VerifiedValue, out docId))
         return result;
       
       var filteredDocument = Contracts.ContractualDocuments.GetAll(x => x.Id == docId).FirstOrDefault();
       if (filteredDocument != null)
       {
         result.Contract = filteredDocument;
-        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
+        result.IsTrusted = contractField.IsTrusted == true;
       }
       return result;
     }
-    
+            
     /// <summary>
     /// Отправить задачу на проверку документов.
     /// </summary>
@@ -1673,12 +1658,12 @@ namespace Sungero.Capture.Server
       // так как на данный момент функция используется только для обработки бухгалтерских документов,
       // а в них все расчеты ведутся в одной валюте.
       var documentCurrencyFacts = GetOrderedFacts(facts, "DocumentAmount", "Currency");
-      var documentCurrencyFact = documentAmountFacts.FirstOrDefault();
+      var documentCurrencyFact = documentCurrencyFacts.FirstOrDefault();
       if (documentCurrencyFact != null)
       {
-        var currencyCode = GetFieldValue(documentAmountFact, "Currency");
+        var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
         document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency);
+        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency);
       }
     }
     
@@ -2025,56 +2010,42 @@ namespace Sungero.Capture.Server
     /// <returns>Связку контрагент + факт.</returns>
     public static Structures.Module.CounterpartyWithFact GetCounterpartyByVerifiedData(Structures.Module.IFact fact, string propertyName)
     {
-      var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
-        .OrderByDescending(d => d.Id)
-        .FirstOrDefault();
-      if (recognitionInfo == null)
+      var counterpartyUnitField = GetFieldByVerifiedData(fact, propertyName);
+      if (counterpartyUnitField == null)
         return null;
-      
-      var fieldRecognitionInfo = recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
       int counterpartyId;
-      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out counterpartyId))
+      if (!int.TryParse(counterpartyUnitField.VerifiedValue, out counterpartyId))
         return null;
       
       var filteredCounterparty = Counterparties.GetAll(x => x.Id == counterpartyId).FirstOrDefault();
       if (filteredCounterparty == null)
         return null;
       
-      return Structures.Module.CounterpartyWithFact.Create(filteredCounterparty, fact, fieldRecognitionInfo.IsTrusted == true);
+      return Structures.Module.CounterpartyWithFact.Create(filteredCounterparty, fact, counterpartyUnitField.IsTrusted == true);
     }
     
     /// <summary>
-    /// Получить контрагента по результатам верификации пользователя.
+    /// Получить нор по результатам верификации пользователя.
     /// </summary>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Связку контрагент + факт.</returns>
     public static Structures.Module.BusinessUnitWithFact GetBusinessUnitByVerifiedData(Structures.Module.IFact fact, string propertyName)
-    {
-      var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
-        .OrderByDescending(d => d.Id)
-        .FirstOrDefault();
-      if (recognitionInfo == null)
+    {      
+      var businessUnitField = GetFieldByVerifiedData(fact, propertyName);
+      if (businessUnitField == null)
         return null;
-      
-      var fieldRecognitionInfo = recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
       int businessUnitId;
-      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out businessUnitId))
+      if (!int.TryParse(businessUnitField.VerifiedValue, out businessUnitId))
         return null;
       
       var filteredBusinessUnit = BusinessUnits.GetAll(x => x.Id == businessUnitId).FirstOrDefault();
       if (filteredBusinessUnit == null)
         return null;
       
-      return Structures.Module.BusinessUnitWithFact.Create(filteredBusinessUnit, fact, fieldRecognitionInfo.IsTrusted == true);
+      return Structures.Module.BusinessUnitWithFact.Create(filteredBusinessUnit, fact, businessUnitField.IsTrusted == true);
     }
-    
+           
     /// <summary>
     /// Поиск НОР, наиболее подходящей для ответственного и адресата.
     /// </summary>
@@ -2344,6 +2315,49 @@ namespace Sungero.Capture.Server
         return date;
       else
         return null;
+    }
+    
+    /// <summary>
+    /// Получить запись, которая уже сопоставлялась с переданным фактом.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="propertyName">Имя свойства документа связанное с фактом.</param>
+    /// <returns>Связь факта с свойством.</returns>
+    public static IDocumentRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    {
+      var factLabel = GetFactLabel(fact, propertyName);
+      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
+        .OrderByDescending(d => d.Id)
+        .FirstOrDefault();
+      if (recognitionInfo == null)
+        return null;
+      
+      return recognitionInfo.Facts
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();     
+    }
+    
+    /// <summary>
+    /// Получить запись, которая уже сопоставлялась с переданным фактом, с дополнительной фильрацией по контрагенту.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="propertyName">Имя свойства документа связанное с фактом.</param>
+    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
+    /// <param name="counterpartyPropertyName">Имя свойства документа, содержащее контрагента.</param>
+    /// <returns>Связь факта с свойством.</returns>
+    public static IDocumentRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName, string counterpartyPropertyValue, string counterpartyPropertyName)
+    {
+      var factLabel = GetFactLabel(fact, propertyName);
+      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
+               && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .OrderByDescending(d => d.Id)
+        .FirstOrDefault();
+      if (recognitionInfo == null)
+        return null;
+      
+      return recognitionInfo.Facts
+        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();      
     }
     
     /// <summary>
