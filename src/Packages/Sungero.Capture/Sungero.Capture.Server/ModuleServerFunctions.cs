@@ -2582,7 +2582,7 @@ namespace Sungero.Capture.Server
           foreach (var linkedFact in linkedFacts)
           {
             var propertyName = linkedFact.PropertyName;
-            var property = type.GetProperty(propertyName);
+            var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
             if (property != null)
             {
               object propertyValue = property.GetValue(document);
@@ -2626,7 +2626,7 @@ namespace Sungero.Capture.Server
           foreach (var linkedFact in linkedFacts)
           {
             var propertyName = linkedFact.PropertyName;
-            var property = type.GetProperty(propertyName);
+            var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
             if (property != null)
             {
               object propertyValue = property.GetValue(document);

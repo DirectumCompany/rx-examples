@@ -511,7 +511,7 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
-      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode) 
+      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode)
         ? Sungero.Core.Colors.Common.Yellow
         : Sungero.Core.Colors.Common.Green;
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)
@@ -519,7 +519,7 @@ namespace Sungero.Capture.Client
         // Подсветка полей карточки.
         var splitedPropertyNameAndPosition = propertyNameAndPosition.Split(Constants.Module.PropertyAndPositionDelimiter);
         var propertyName = splitedPropertyNameAndPosition[0];
-        var property = document.GetType().GetProperty(propertyName);
+        var property = document.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
         if (property != null)
           document.State.Properties[propertyName].HighlightColor = color;
         
