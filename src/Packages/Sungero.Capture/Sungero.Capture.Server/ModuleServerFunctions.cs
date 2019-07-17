@@ -1740,7 +1740,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypeFrom">Тип контрагента-отправителя.</param>
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
-    public static List<Structures.Module.BusinessUnitAndCounterpartyWithFact> GetBusinessUnitsAndCounterparties(List<Structures.Module.IFact> facts,
+    public static List<Structures.Module.BusinessUnitAndCounterpartyWithFact> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> facts,
                                                                                                                 string counterpartyPropertyName,
                                                                                                                 string businessUnitPropertyName,
                                                                                                                 string counterpartyTypeFrom = "SELLER",
@@ -1835,7 +1835,7 @@ namespace Sungero.Capture.Server
       var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitWithFact = null;
       
-      var businessUnitsAndCounterparties = GetBusinessUnitsAndCounterparties(facts, counterpartyPropertyName, businessUnitPropertyName, counterpartyTypeFrom, counterpartyTypeTo);
+      var businessUnitsAndCounterparties = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyPropertyName, businessUnitPropertyName, counterpartyTypeFrom, counterpartyTypeTo);
       
       // Искать НОР.
       var businessUnits = businessUnitsAndCounterparties.Where(x => x.BusinessUnit != null);
@@ -2351,8 +2351,8 @@ namespace Sungero.Capture.Server
     {
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty)
-               && d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
+        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
+               d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)
