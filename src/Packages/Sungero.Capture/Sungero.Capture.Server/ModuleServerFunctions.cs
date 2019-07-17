@@ -193,6 +193,7 @@ namespace Sungero.Capture.Server
         var minFactProbability = GetDocflowParamsNumbericValue(Constants.Module.MinFactProbabilityKey);
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
+          var pages = packageProcessResult.ExtractionResult.DocumentPages;
           var facts = packageProcessResult.ExtractionResult.Facts
             .Where(f => !string.IsNullOrWhiteSpace(f.Name))
             .Where(f => f.Fields.Any())
@@ -219,9 +220,11 @@ namespace Sungero.Capture.Server
               {
                 var positions = factField.Positions
                   .Where(p => p != null)
-                  .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}",
+                  .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}",
                                              Constants.Module.PositionElementDelimiter,
-                                             p.Page, p.Top, p.Left, p.Width, p.Height));
+                                             p.Page, p.Top, p.Left, p.Width, p.Height, 
+                                             pages.Where(x => x.Number == p.Page).Select(x => x.Width).FirstOrDefault(),
+                                             pages.Where(x => x.Number == p.Page).Select(x => x.Height).FirstOrDefault()));
                 fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
               }
             }
