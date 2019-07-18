@@ -1843,6 +1843,20 @@ namespace Sungero.Capture.Server
         businessUnitWithFact = sellerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
       if (businessUnitWithFact == null)
         businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+           
+      // Общий пиоритет поиска НОР, если не смогли уточнить по ответственному:
+      //   1. Явно найденная для типа контрагента counterpartyTypeTo. По умолчанию "BUYER".
+      //   2. Явно найденная для типа контрагента counterpartyTypeFrom. По умолчанию "SELLER".
+      //   3. Явно найденная в контрагентах без типов.      
+      if (businessUnitWithFact == null)
+      {
+        var buyerBusinessUnit = buyerBusinessUnits.FirstOrDefault();
+        var sellerBusinessUnit = sellerBusinessUnits.FirstOrDefault();
+        var withoutTypeBusinessUnit = withoutTypeBusinessUnits.FirstOrDefault();
+        
+        businessUnitWithFact = buyerBusinessUnit ?? withoutTypeBusinessUnit ?? sellerBusinessUnit;        
+      }
+      
       if (businessUnitWithFact != null)
       {
         var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);       
@@ -1855,20 +1869,6 @@ namespace Sungero.Capture.Server
         {
           result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;          
         }
-      }
-      
-      // Общий пиоритет поиска НОР, если не смогли уточнить по ответственному:
-      //   1. Явно найденная для типа контрагента counterpartyTypeTo. По умолчанию "BUYER".
-      //   2. Явно найденная для типа контрагента counterpartyTypeFrom. По умолчанию "SELLER".
-      //   3. Явно найденная в контрагентах без типов.      
-      if (businessUnitWithFact == null)
-      {
-        var buyerBusinessUnit = buyerBusinessUnits.FirstOrDefault();
-        var sellerBusinessUnit = sellerBusinessUnits.FirstOrDefault();
-        var withoutTypeBusinessUnit = withoutTypeBusinessUnits.FirstOrDefault();
-        
-        businessUnitWithFact = buyerBusinessUnit ?? withoutTypeBusinessUnit ?? sellerBusinessUnit;
-        result.IsBusinessUnitSeller = sellerBusinessUnit == businessUnitWithFact;
       }
       
       // Заполнить из ответственного, если не смогли определить по фактам.
