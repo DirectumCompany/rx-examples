@@ -1855,11 +1855,11 @@ namespace Sungero.Capture.Server
         if (isTypeEmpty)
         {
           businessUnitWithFact.IsTrusted = false;
-          result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;
+          result.IsBusinessUnitSeller = null;
         }
         else
         {
-          result.IsBusinessUnitSeller = null;
+          result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;          
         }
       }
       
