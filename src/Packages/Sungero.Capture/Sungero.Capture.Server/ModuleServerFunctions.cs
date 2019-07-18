@@ -1851,12 +1851,16 @@ namespace Sungero.Capture.Server
         businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
       if (businessUnitWithFact != null)
       {
-        var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);
-        businessUnitWithFact.IsTrusted = isTypeEmpty;
+        var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);       
         if (isTypeEmpty)
+        {
+          businessUnitWithFact.IsTrusted = false;
           result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;
+        }
         else
+        {
           result.IsBusinessUnitSeller = null;
+        }
       }
       
       // Общий пиоритет поиска НОР, если не смогли уточнить по ответственному:
