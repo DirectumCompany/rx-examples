@@ -1485,12 +1485,6 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = recognizedDocument.Facts;
       
-      // Договор.
-      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      document.LeadingDocument = GetLeadingDocument(leadingDocFact, document.Counterparty);
-      var isTrusted = IsTrustedField(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
-      
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
       
