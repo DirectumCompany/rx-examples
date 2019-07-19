@@ -1726,7 +1726,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить наши организации и контрагентов с фактами.
+    /// Подобрать по факту контрагента и НОР.
     /// </summary>
     /// <param name="facts">Факты.</param>
     /// <param name="counterpartyPropertyName">Имя свойства связанного с контрагентом.</param>
@@ -2708,7 +2708,10 @@ namespace Sungero.Capture.Server
       else
       {
         using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
-          version.Body.Write(body);
+        {
+          version.Body.Write(body);          
+        }
+          
         version.AssociatedApplication = pdfApp;
       }
       
@@ -2737,5 +2740,25 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
+  
+    #region ШК
+    
+    public static List<string> GetBarcode(System.IO.Stream document)
+    {
+      var result = new List<string>();
+      try
+      {
+        var barcodeReader = new AsposeExtensions.BarcodeReader();
+        result = barcodeReader.ExtractBarcode(document);
+      }
+      catch (AsposeExtensions.BarcodeReaderException e)
+      {
+        Logger.Error(e.Message);
+      }
+      return result;      
+    }
+    
+    #endregion
+  
   }
 }

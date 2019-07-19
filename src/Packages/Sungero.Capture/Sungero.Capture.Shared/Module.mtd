@@ -77,6 +77,16 @@
       "NameGuid": "10f6f0a5-cb61-4048-ab19-1e52e12d4f10",
       "Name": "ArioExtensions",
       "Scope": "Both"
+    },
+    {
+      "NameGuid": "9d45c1af-ca0e-40c3-bcc8-b766b2145121",
+      "Name": "AsposeExtensions",
+      "Scope": "Both"
+    },
+    {
+      "NameGuid": "31d692fd-7aad-4156-bf02-93ce1d4f6e1d",
+      "Name": "AsposeBarcode",
+      "Scope": "Both"
     }
   ],
   "PublicConstants": [
