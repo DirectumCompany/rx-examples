@@ -431,7 +431,15 @@ namespace Sungero.Capture.Client
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
                                            !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
       foreach (var attachment in attachments)
+      {
+        var fileDescription = attachment.Element("FileDescription").Value;
+        
+        // Отбрасываем изображения из тела письма (помогает только для писем из аутлука).
+        if (System.Text.RegularExpressions.Regex.IsMatch(fileDescription, @"^ATT\d+\s\d+\.\w+"))
+          continue;
+        
         mailFiles.Attachments.Add(CreateFileInfoFromXelement(attachment, folder));
+      }
       
       return mailFiles;
     }
