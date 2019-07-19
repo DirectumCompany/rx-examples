@@ -2709,7 +2709,7 @@ namespace Sungero.Capture.Server
       {
         using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
         {
-          version.Body.Write(body);          
+          version.Body.Write(body);       
         }
           
         version.AssociatedApplication = pdfApp;
@@ -2743,19 +2743,37 @@ namespace Sungero.Capture.Server
   
     #region ШК
     
-    public static List<string> GetBarcode(System.IO.Stream document)
+    /// <summary>
+    /// Поиск на первой странице pdf документа штрихкода в формате Code128
+    /// и извлечение из него ид документа в системе.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <returns>Ид документа или null если ид не найден.</returns>
+    public static int? GetDocumentIdByBarcode(System.IO.Stream document)
     {
-      var result = new List<string>();
       try
       {
         var barcodeReader = new AsposeExtensions.BarcodeReader();
-        result = barcodeReader.ExtractBarcode(document);
+        // Тип штрихкода Code128 зашит в функции.
+        var barcodeList = barcodeReader.ExtractBarcode(document);
+        if (!barcodeList.Any())
+          return null;
+        var tenant = GetCurrentTenant();
+        var tenantId = string.Format("{0, 10}", tenant).Substring(0, 10).Trim();
+        var ourBarcodes = barcodeList.Where(b => b.Contains(tenantId));
+        foreach (var barcode in ourBarcodes)
+        {
+          int id;
+          var a = barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last();
+          if (int.TryParse(a, out id))
+            return id;
+        }
       }
       catch (AsposeExtensions.BarcodeReaderException e)
       {
         Logger.Error(e.Message);
       }
-      return result;      
+      return null;
     }
     
     #endregion
