@@ -114,6 +114,9 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
       var package = new List<IOfficialDocument>();
+      
+      PerformApprovalRegulationsAssignments(868);
+      
       foreach (var recognizedDocument in recognizedDocuments)
       {
         var document = CreateDocumentByRecognizedDocument(recognizedDocument,  responsible);
@@ -322,6 +325,21 @@ namespace Sungero.Capture.Server
       return leadingDocument;
     }
     
+    /// <summary>
+    /// Выполнить задания на контроль возврата пришедшего документа.
+    /// </summary>
+    /// <param name="documentId">Ид захваченного документа.</param>
+    public virtual void PerformApprovalRegulationsAssignments(int documentId)
+    {
+      var approvalRegulationsAssignments = Assignments.GetAll()
+        .Where(a => Sungero.Docflow.ApprovalCheckReturnAssignments.Is(a))
+        .Where(a => !a.Completed.HasValue)
+        //.Where(a => a.Attachments.Any(att => att.Id == documentId))
+        .GroupBy(a => a.MainTask.Id);
+        
+      foreach (var assignmentGroup in approvalRegulationsAssignments)
+        assignmentGroup.FirstOrDefault().Complete(Sungero.Docflow.ApprovalCheckReturnAssignment.Result.Signed);
+    }
     #endregion
     
     #region Фасад DirectumRX
@@ -830,6 +848,11 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      if (string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description))
+        document.DeliveryMethod = Sungero.Docflow.MailDeliveryMethods.GetAll().Where(m => Equals(m.Name, "Почта")).FirstOrDefault();
+      else
+        document.DeliveryMethod = Sungero.Docflow.MailDeliveryMethods.GetAll().Where(m => Equals(m.Name, "Эл. почта")).FirstOrDefault();
+      
       var facts = recognizedDocument.Facts;
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
@@ -1660,7 +1683,7 @@ namespace Sungero.Capture.Server
         var currencyCode = GetFieldValue(currencyFact, "Currency");
         document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
         LinkFactAndProperty(recognizedDocument, currencyFact, "Currency", props.Currency.Name, document.Currency);
-      }      
+      }
     }
     
     /// <summary>
@@ -1735,10 +1758,10 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypeTo">Тип контрагента-получателя.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
     public static List<Structures.Module.BusinessUnitAndCounterpartyWithFact> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> facts,
-                                                                                                                string counterpartyPropertyName,
-                                                                                                                string businessUnitPropertyName,
-                                                                                                                string counterpartyTypeFrom = "SELLER",
-                                                                                                                string counterpartyTypeTo = "BUYER")
+                                                                                                                           string counterpartyPropertyName,
+                                                                                                                           string businessUnitPropertyName,
+                                                                                                                           string counterpartyTypeFrom = "SELLER",
+                                                                                                                           string counterpartyTypeTo = "BUYER")
     {
       var businessUnitsAndCounterparties = new List<Structures.Module.BusinessUnitAndCounterpartyWithFact>();
       
@@ -1838,28 +1861,28 @@ namespace Sungero.Capture.Server
       var withoutTypeBusinessUnits = businessUnits.Where(x => x.Type == string.Empty);
       
       // Уточнить по ответственному.
-      businessUnitWithFact = buyerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();      
+      businessUnitWithFact = buyerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
       if (businessUnitWithFact == null)
         businessUnitWithFact = sellerBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
       if (businessUnitWithFact == null)
         businessUnitWithFact = withoutTypeBusinessUnits.Where(x => Equals(x.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
-           
+      
       // Общий пиоритет поиска НОР, если не смогли уточнить по ответственному:
       //   1. Явно найденная для типа контрагента counterpartyTypeTo. По умолчанию "BUYER".
       //   2. Явно найденная для типа контрагента counterpartyTypeFrom. По умолчанию "SELLER".
-      //   3. Явно найденная в контрагентах без типов.      
+      //   3. Явно найденная в контрагентах без типов.
       if (businessUnitWithFact == null)
       {
         var buyerBusinessUnit = buyerBusinessUnits.FirstOrDefault();
         var sellerBusinessUnit = sellerBusinessUnits.FirstOrDefault();
         var withoutTypeBusinessUnit = withoutTypeBusinessUnits.FirstOrDefault();
         
-        businessUnitWithFact = buyerBusinessUnit ?? withoutTypeBusinessUnit ?? sellerBusinessUnit;        
+        businessUnitWithFact = buyerBusinessUnit ?? withoutTypeBusinessUnit ?? sellerBusinessUnit;
       }
       
       if (businessUnitWithFact != null)
       {
-        var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);       
+        var isTypeEmpty = string.IsNullOrWhiteSpace(businessUnitWithFact.Type);
         if (isTypeEmpty)
         {
           businessUnitWithFact.IsTrusted = false;
@@ -1867,7 +1890,7 @@ namespace Sungero.Capture.Server
         }
         else
         {
-          result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;          
+          result.IsBusinessUnitSeller = businessUnitWithFact.Type == counterpartyTypeFrom;
         }
       }
       
