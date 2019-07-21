@@ -766,6 +766,7 @@ namespace Sungero.Capture.Server
       var document = SimpleDocuments.Create();
       document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
       document.Note = recognizedDocument.Message;
+      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
       CreateVersion(document, recognizedDocument);
       document.Save();
       return document;
@@ -785,6 +786,7 @@ namespace Sungero.Capture.Server
       
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDeliveryMethod(document, false);
       document.Name = string.Format("Email от {0}", mailInfo.FromEmail);
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
@@ -813,6 +815,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDeliveryMethod(document, true);
       document.Name = Path.GetFileName(fileInfo.Description);
       document.Save();
       
@@ -848,11 +851,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      if (string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description))
-        document.DeliveryMethod = Sungero.Docflow.MailDeliveryMethods.GetAll().Where(m => Equals(m.Name, "Почта")).FirstOrDefault();
-      else
-        document.DeliveryMethod = Sungero.Docflow.MailDeliveryMethods.GetAll().Where(m => Equals(m.Name, "Эл. почта")).FirstOrDefault();
-      
+      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
       var facts = recognizedDocument.Facts;
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
@@ -942,6 +941,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
       
       // Заполнить дату и номер письма со стороны корреспондента.
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
@@ -1056,6 +1056,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
       var facts = recognizedDocument.Facts;
       
       // Договор.
@@ -1177,6 +1178,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
       var facts = recognizedDocument.Facts;
       
       // Дата и номер.
@@ -1732,6 +1734,22 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
       }
     }
+    
+    /// <summary>
+    /// Заполнить способ доставки
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="isMailDeliveryMethod">Доставлен почтой.</param>
+    public static void FillDeliveryMethod(IOfficialDocument document, bool isMailDeliveryMethod)
+    {
+      if (isMailDeliveryMethod)
+        document.DeliveryMethod = MailDeliveryMethods.GetAll()
+          .Where(m => m.Name.Equals(MailDeliveryMethods.Resources.MailMethod, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+      else
+        document.DeliveryMethod = MailDeliveryMethods.GetAll()
+          .Where(m => m.Name.Equals(MailDeliveryMethods.Resources.EmailMethod, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+    }
+    
     #endregion
     
     #region Поиск контрагента/НОР

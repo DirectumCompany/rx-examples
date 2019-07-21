@@ -64,7 +64,10 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.SmartCapture",
-  "ResourcesKeys": [],
+  "ResourcesKeys": [
+    "DeliveryMethodMail",
+    "DeliveryMethodEMail"
+  ],
   "ServerAssemblyName": "Sungero.SmartCapture.Server",
   "ServerNamespace": "Sungero.SmartCapture.Server",
   "SharedAssemblyName": "Sungero.SmartCapture.Shared",
