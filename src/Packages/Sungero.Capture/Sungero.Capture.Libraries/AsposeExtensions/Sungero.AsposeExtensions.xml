@@ -1,0 +1,159 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sungero.AsposeExtensions</name>
+    </assembly>
+    <members>
+        <member name="M:Sungero.AsposeExtensions.BarcodeReader.Extract(System.IO.Stream)">
+            <summary>
+            Извлечь штрихкод из pdf документа.
+            </summary>
+            <param name="inputStream">Pdf документ.</param>
+            <returns>Список извлеченных штрихкодов</returns>
+            <remarks>Извлекает штрихкоды в формате Code128 только с первой страницы документа.</remarks>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.CheckIfExtensionIsSupported(System.String)">
+            <summary>
+            Проверить, поддерживается ли формат файла по его расширению.
+            </summary>
+            <param name="extension">Расширение файла.</param>
+            <returns>True/false.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.CheckIfExtensionIsSupportedForAnchorSearch(System.String)">
+            <summary>
+            Определить по расширению файла, нужно ли искать в нём символы-якоря.
+            </summary>
+            <param name="extension">Расширение файла.</param>
+            <returns>True/false.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.GeneratePdf(System.IO.MemoryStream,System.String)">
+            <summary>
+            Записать в поток документ в формате pdf.
+            </summary>
+            <param name="inputStream">Поток с входным документом.</param>
+            <param name="extension">Расширение входного документа.</param>
+            <returns>Поток с документом.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.GeneratePdfDocument(System.IO.MemoryStream,System.String)">
+            <summary>
+            Конвертировать документ в pdf и вернуть его в виде объекта Aspose.PDF.Document.
+            </summary>
+            <param name="inputStream">Поток с входным документом.</param>
+            <param name="extension">Расширение входного документа.</param>
+            <returns>PDF документ</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.AddSignatureMark(System.IO.Stream,System.String,System.String,System.String,System.Int32)">
+            <summary>
+            Добавить отметку о подписи к документу согласно символу-якорю.
+            </summary>
+            <param name="inputStream">Поток с входным документом.</param>
+            <param name="extension">Расширение файла.</param>
+            <param name="htmlMark">Строка, содержащая html для отметки об ЭП.</param>
+            <param name="anchorSymbol">Символ-якорь.</param>
+            <param name="searchablePagesNumber">Количество страниц для поиска символа.</param>
+            <returns>Поток с документом.</returns>
+            <remarks>Если символов-якорей в документе нет, то отметка проставляется на последней странице.</remarks>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.AddSignatureMarkToDocumentPage(System.IO.Stream,System.Int32,Aspose.Pdf.PdfPageStamp)">
+            <summary>
+            Добавить отметку о подписи на страницу документа.
+            </summary>
+            <param name="inputStream">Поток с входным документом.</param>
+            <param name="pageNumber">Номер страницы документа, на которую нужно проставить отметку.</param>
+            <param name="stamp">Отметка о подписи.</param>
+            <returns>Страница документа с отметкой о подписи.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.ConvertHtmlToPdf(System.IO.MemoryStream)">
+            <summary>
+            Преобразовать html в pdf.
+            </summary>
+            <param name="inputStream">Поток html.</param>
+            <returns>Поток pdf.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.CreateMarkFromHtml(System.String)">
+            <summary>
+            Преобразовать html для штампа в pdf.
+            </summary>
+            <param name="html">Строка html.</param>
+            <returns>Документ pdf.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.AddStampToDocument(Aspose.Pdf.Document,Aspose.Pdf.PdfPageStamp,System.Int32[])">
+            <summary>
+            Поставить штамп на документе. 
+            </summary>
+            <param name="document">Документ.</param>
+            <param name="stamp">Штамп.</param>
+            <param name="pageNumbers">Массив номеров страниц, на которые нужно поставить штамп.</param>
+            <returns>pdf документ со штампом.</returns>
+            <remarks>Координаты места простановки берутся из свойств штампа.</remarks>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.AddStampToDocument(Aspose.Pdf.Document,Aspose.Pdf.PdfPageStamp)">
+            <summary>
+            Поставить штамп на каждой странице документа, координаты места простановки берутся из свойств штампа. 
+            </summary>
+            <param name="document">Документ.</param>
+            <param name="stamp">Штамп.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.GetLastAnchorEntry(Aspose.Pdf.Page,System.String)">
+            <summary>
+            Получить последнее вхождение символа-якоря на странице.
+            </summary>
+            <param name="page">Страница.</param>
+            <param name="anchor">Символ-якорь.</param>
+            <returns>Фрагмент текста, являющийся последним вхождением. Null, если символ-якорь не найден.</returns>
+            <remarks>Последним считается вхождение, находящееся ниже по странице.
+            Если два вхождения располагаются на одном уровне - считается то, которое правее.</remarks>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.AddSignatureMarkToDocumentWithoutAnchorSearch(System.IO.Stream,Aspose.Pdf.PdfPageStamp)">
+            <summary>
+            Добавить отметку о подписи на последнюю страницу документа без поиска символов-якорей.
+            </summary>
+            <param name="inputStream">Поток с входным документом.</param>
+            <param name="stamp">Отметка о подписи.</param>
+            <returns>Документ с отметкой о подписи.</returns>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.ConvertImage(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Преобразовать изображение в pdf.
+            </summary>
+            <param name="inputStream">Поток с картинкой.</param>
+            <param name="resultStream">Поток для записи результата.</param>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.ConvertTiffToPDF(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Преобразовать tiff/tif в pdf.
+            </summary>
+            <param name="inputStream">Поток с картинкой.</param>
+            <param name="resultStream">Поток для записи результата.</param>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.ConvertImageWithoutScale(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Преобразовать изображение в pdf без подгона под а4.
+            </summary>
+            <param name="inputStream">Поток с картинкой.</param>
+            <param name="resultStream">Поток для записи результата.</param>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.Converter.ConvertGifToPdf(System.IO.Stream,System.IO.Stream)">
+            <summary>
+            Преобразовать изображение в формате gif в pdf.
+            </summary>
+            <param name="inputStream">Поток с картинкой.</param>
+            <param name="resultStream">Поток для записи результата.</param>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.TagReader.#ctor(System.IO.Stream)">
+            <summary>
+            Чтение документа Word.
+            </summary>
+            <param name="documentStream">Поток документа.</param>
+        </member>
+        <member name="M:Sungero.AsposeExtensions.TagReader.GetColumnByTag(System.String[])">
+            <summary>
+            Получить значения из колонок таблицы с определенными тегами.
+            </summary>
+            <param name="tags">Список тегов.</param>
+            <returns>Словарь значения колонок.</returns>
+            <remarks>Только первая таблица, в которой есть все указанные теги.</remarks>
+        </member>
+    </members>
+</doc>

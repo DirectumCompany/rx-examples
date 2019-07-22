@@ -2785,36 +2785,41 @@ namespace Sungero.Capture.Server
     #region ШК
     
     /// <summary>
-    /// Поиск на первой странице pdf документа штрихкода в формате Code128
-    /// и извлечение из него ид документа в системе.
+    /// Поиск шк в документе и извлечение из него ид документа в системе.
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <returns>Ид документа или null если ид не найден.</returns>
-    public static int? GetDocumentIdByBarcode(System.IO.Stream document)
+    /// <remarks>
+    /// Поиск шк осуществляется только на первой странице документа.
+    /// Формат шк - Code128.
+    /// </remarks>
+    public static List<int> GetDocumentIdByBarcode(System.IO.Stream document)
     {
+      var result = new List<int>();
       try
       {
-        var barcodeReader = new AsposeExtensions.BarcodeReader();
-        // Тип штрихкода Code128 зашит в функции.
-        var barcodeList = barcodeReader.ExtractBarcode(document);
+        var barcodeReader = new AsposeExtensions.BarcodeReader();        
+        var barcodeList = barcodeReader.Extract(document);
         if (!barcodeList.Any())
-          return null;
-        var tenant = GetCurrentTenant();
-        var tenantId = string.Format("{0, 10}", tenant).Substring(0, 10).Trim();
-        var ourBarcodes = barcodeList.Where(b => b.Contains(tenantId));
+          return result;
+        
+        var tenantId = GetCurrentTenant();
+        var formattedTenantId = Docflow.PublicFunctions.Module.FormatTenantIdForBarcode(tenantId).Trim();
+        var ourBarcodes = barcodeList.Where(b => b.Contains(formattedTenantId));
         foreach (var barcode in ourBarcodes)
         {
           int id;
+          // Формат штрихкода "id тенанта - id документа".
           var a = barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last();
           if (int.TryParse(a, out id))
-            return id;
+            result.Add(id);
         }
       }
       catch (AsposeExtensions.BarcodeReaderException e)
       {
         Logger.Error(e.Message);
       }
-      return null;
+      return result;
     }
     
     #endregion
