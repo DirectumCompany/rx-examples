@@ -308,7 +308,9 @@
     "CheckPackageTaskText",
     "SimpleDocumentName",
     "ClassifierNotFound",
-    "EmptyArioUrl"
+    "EmptyArioUrl",
+    "EmailBodyDocumentName",
+    "EmptySubject"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

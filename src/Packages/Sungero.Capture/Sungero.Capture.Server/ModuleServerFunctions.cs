@@ -787,10 +787,13 @@ namespace Sungero.Capture.Server
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       FillDeliveryMethod(document, false);
-      document.Name = string.Format("Email от {0}", mailInfo.FromEmail);
-      if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
+      document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
+      var mailSubject = mailInfo.Subject;
+      if (!string.IsNullOrWhiteSpace(mailSubject))
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
-      document.Subject = string.Format("Subject: {0}\nEmail from: {1} {2}", mailInfo.Subject, mailInfo.FromEmail, mailInfo.Name);
+      else
+        mailSubject = Resources.EmptySubject;      
+      document.Subject = mailSubject;
       
       var application = GetAssociatedApplicationByFileName(bodyInfo.Path);
       using (var body = new MemoryStream(bodyInfo.Data))

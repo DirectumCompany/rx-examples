@@ -156,4 +156,10 @@
   <data name="EmptyArioUrl" xml:space="preserve">
     <value>Не задан адрес сервиса Ario</value>
   </data>
+  <data name="EmailBodyDocumentName" xml:space="preserve">
+    <value>Электронное письмо от {0}</value>
+  </data>
+  <data name="EmptySubject" xml:space="preserve">
+    <value>Без содержания</value>
+  </data>
 </root>

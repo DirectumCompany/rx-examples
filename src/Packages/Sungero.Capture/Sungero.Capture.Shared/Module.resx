@@ -153,4 +153,10 @@
   <data name="EmptyArioUrl" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="EmailBodyDocumentName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="EmptySubject" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
