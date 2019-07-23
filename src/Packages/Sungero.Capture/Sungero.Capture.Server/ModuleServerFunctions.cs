@@ -2900,8 +2900,8 @@ namespace Sungero.Capture.Server
         {
           int id;
           // Формат штрихкода "id тенанта - id документа".
-          var a = barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last();
-          if (int.TryParse(a, out id))
+          var stringId = barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last();
+          if (int.TryParse(stringId, out id))
             result.Add(id);
         }
       }
