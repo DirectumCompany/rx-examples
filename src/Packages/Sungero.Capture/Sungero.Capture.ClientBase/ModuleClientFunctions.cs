@@ -434,7 +434,7 @@ namespace Sungero.Capture.Client
       {
         var fileDescription = attachment.Element("FileDescription").Value;
         
-        // Отбрасываем изображения из тела письма (помогает только для писем из аутлука).
+        // Отбросить изображения из тела письма (помогает только для писем из аутлука).
         if (System.Text.RegularExpressions.Regex.IsMatch(fileDescription, @"^ATT\d+\s\d+\.\w+"))
           continue;
         
