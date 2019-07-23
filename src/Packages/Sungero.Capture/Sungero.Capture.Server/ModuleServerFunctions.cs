@@ -42,6 +42,10 @@ namespace Sungero.Capture.Server
                                                                               Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
       
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(Contracts.Resources.IncomingInvoiceTypeName,
+                                                                              Capture.Server.MockIncomingInvoice.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
+            
       // Создать виды документов.
       var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
@@ -71,6 +75,13 @@ namespace Sungero.Capture.Server
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
                                                                               Capture.Server.MockIncomingTaxInvoice.ClassTypeGuid,
                                                                               actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingTaxInvoiceGuid);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(Contracts.Resources.IncomingInvoiceKindName,
+                                                                              Contracts.Resources.IncomingInvoiceKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Numerable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
+                                                                              Capture.Server.MockIncomingInvoice.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingInvoiceGuid);
       
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
@@ -289,8 +300,10 @@ namespace Sungero.Capture.Server
         return CreateUniversalTransferDocument(recognizedDocument, responsible, true);
       
       // Счет на оплату.
-      if (recognizedClass == Constants.Module.IncomingInvoiceClassName && !isMockMode)
-        return CreateIncomingInvoice(recognizedDocument, responsible);
+      if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
+        return isMockMode
+          ? CreateMockIncomingInvoice(recognizedDocument)
+          : CreateIncomingInvoice(recognizedDocument, responsible);
       
       // Все нераспознанные документы создать простыми.
       return CreateSimpleDocument(recognizedDocument);
@@ -1136,12 +1149,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      
+      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
+        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -1298,12 +1313,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      
+      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
+        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -1454,12 +1471,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      var currencyCode = GetFieldValue(documentAmountFact, "Currency");
-      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      
+      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentAmountFact, "Currency", props.Currency.Name, document.Currency.Name);
+        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -1604,6 +1623,74 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Счет на оплату
+    
+    /// <summary>
+    /// Создать накладную с текстовыми полями.
+    /// </summary>
+    /// <param name="letterсlassificationResult">Результат обработки накладной в Ario.</param>
+    /// <returns>Документ.</returns>
+    public static Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognizedDocument recognizedDocument)
+    {
+      var document = Sungero.Capture.MockIncomingInvoices.Create();
+      var props = document.Info.Properties;
+      
+      // Основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      var facts = recognizedDocument.Facts;
+                 
+      // Заполнить контрагентов по типу.
+      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
+      var seller = GetMostProbableMockCounterparty(facts, "SELLER");
+      if (seller != null)
+      {
+        document.SellerName = seller.Name;
+        document.SellerTin = seller.Tin;
+        document.SellerTrrc = seller.Trrc;
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
+        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
+      }
+                 
+      var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
+      if (buyer != null)
+      {
+        document.BuyerName = buyer.Name;
+        document.BuyerTin = buyer.Tin;
+        document.BuyerTrrc = buyer.Trrc;
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
+      }
+      
+      // Дата и номер.
+      var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
+      document.Date = GetFieldDateTimeValue(dateFact, "Date");
+      document.Number = GetFieldValue(numberFact, "Number");
+      
+      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
+      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number);
+      
+      // Сумма и валюта.
+      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      
+      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      if (document.Currency != null)
+        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+      
+      CreateVersion(document, recognizedDocument);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
+      document.Save();
+      return document;
+    }
     
     /// <summary>
     /// Создать счет на оплату.
