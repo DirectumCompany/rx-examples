@@ -1637,7 +1637,13 @@ namespace Sungero.Capture.Server
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = recognizedDocument.Facts;
-                 
+      
+      // Договор.
+      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      document.Contract = GetLeadingDocumentName(leadingDocFact);
+      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      
       // Заполнить контрагентов по типу.
       var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -1651,7 +1657,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
         LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
       }
-                 
+      
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
       if (buyer != null)
       {
@@ -1668,7 +1674,7 @@ namespace Sungero.Capture.Server
       var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.Date = GetFieldDateTimeValue(dateFact, "Date");
-      document.Number = GetFieldValue(numberFact, "Number");      
+      document.Number = GetFieldValue(numberFact, "Number");
       LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
       LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number);
       
