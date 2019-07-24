@@ -815,14 +815,23 @@ namespace Sungero.Capture.Server
       else
         mailSubject = Resources.EmptySubject;
       document.Subject = mailSubject;
-      
-      var application = GetAssociatedApplicationByFileName(bodyInfo.Path);
+
       using (var body = new MemoryStream(bodyInfo.Data))
       {
         document.CreateVersion();
         var version = document.LastVersion;
-        version.Body.Write(body);
-        version.AssociatedApplication = application;
+        var pdfConverter = new AsposeExtensions.Converter();
+        var pdfDocumentStream = pdfConverter.GeneratePdf(body, "html");
+        if (pdfDocumentStream != null)
+        {
+          version.Body.Write(pdfDocumentStream);
+          version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
+        }
+        else
+        {
+          version.Body.Write(body);
+          version.AssociatedApplication = GetAssociatedApplicationByFileName(bodyInfo.Path);
+        }
       }
       document.Save();
       

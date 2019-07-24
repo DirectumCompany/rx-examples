@@ -112,6 +112,7 @@ namespace Sungero.Capture.Client
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
       if ((mailFiles.Body == null || !File.Exists(mailFiles.Body.Path)) && !mailFiles.Attachments.Any())
         throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
+      RemoveImagesFromMailBody(mailFiles.Body.Path);
       mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
       
       var mailInfo = GetMailInfo(instanceInfo);
@@ -562,6 +563,17 @@ namespace Sungero.Capture.Client
           }
         }
       }
+    }
+    
+    /// <summary>
+    /// Удалить изображения из тела письма.
+    /// </summary>
+    /// <param name="path">Пусть к html-файлу письма.</param>
+    private static void RemoveImagesFromMailBody(string path)
+    {
+      var mailBody = File.ReadAllText(path);
+      mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
+      File.WriteAllText(path, mailBody);
     }
     
     /// <summary>
