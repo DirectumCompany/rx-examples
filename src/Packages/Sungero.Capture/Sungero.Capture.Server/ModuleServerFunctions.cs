@@ -1641,7 +1641,7 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isTrusted = IsTrustedField(leadingDocFact, "Type");
+      var isTrusted = IsTrustedField(leadingDocFact, "DocumentBaseName");
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.

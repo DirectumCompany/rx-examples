@@ -166,10 +166,10 @@
     <value>Контрагенты</value>
   </data>
   <data name="Property_Number" xml:space="preserve">
-    <value>Номер</value>
+    <value>Номер счета</value>
   </data>
   <data name="Property_Date" xml:space="preserve">
-    <value>Дата</value>
+    <value>Дата счета</value>
   </data>
   <data name="Property_SellerName" xml:space="preserve">
     <value>Продавец</value>
