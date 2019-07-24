@@ -159,9 +159,6 @@
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
   </data>
-  <data name="Property_VatAmount" xml:space="preserve">
-    <value>VatAmount</value>
-  </data>
   <data name="Property_Contract" xml:space="preserve">
     <value>Contract</value>
   </data>

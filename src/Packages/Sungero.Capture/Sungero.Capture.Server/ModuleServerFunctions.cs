@@ -1258,7 +1258,6 @@ namespace Sungero.Capture.Server
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var shipper = GetMostProbableMockCounterparty(facts, "SHIPPER");
       if (shipper != null)
       {
@@ -1691,7 +1690,7 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать счет на оплату с текстовыми полями.
     /// </summary>
-    /// <param name="letterсlassificationResult">Результат обработки счета на оплату в Ario.</param>
+    /// <param name="recognizedDocument">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognizedDocument recognizedDocument)
     {
@@ -1709,7 +1708,6 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
-      var counterpartyFacts = GetFacts(facts, "Counterparty", "Name");
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
       if (seller != null)
       {
@@ -1734,6 +1732,44 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
       }
       
+      // В могут прийти контрагенты без типа. Заполнить контрагентами без типа.
+      if (seller == null || buyer == null)
+      {
+        var withoutTypeFacts = GetFacts(facts, "Counterparty", "Name")
+          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")))
+          .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+        foreach (var fact in withoutTypeFacts)
+        {
+          var name = GetCorrespondentName(fact, "Name", "LegalForm");
+          
+          var tin = GetFieldValue(fact, "TIN");
+          var trrc = GetFieldValue(fact, "TRRC");
+          var type = GetFieldValue(fact, "CounterpartyType");
+          
+          if (string.IsNullOrWhiteSpace(document.SellerName))
+          {
+            document.SellerName = name;
+            document.SellerTin = tin;
+            document.SellerTrrc = trrc;
+            LinkFactAndProperty(recognizedDocument, fact, "Name", props.SellerName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.SellerName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.SellerTin.Name, tin);
+            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.SellerTrrc.Name, trrc);
+          }
+          // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
+          else if (string.IsNullOrWhiteSpace(document.BuyerName))
+          {
+            document.BuyerName = name;
+            document.BuyerTin = tin;
+            document.BuyerTrrc = trrc;
+            LinkFactAndProperty(recognizedDocument, fact, "Name", props.BuyerName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.BuyerName.Name, name);
+            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.BuyerTin.Name, tin);
+            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.BuyerTrrc.Name, trrc);
+          }
+        }
+      }
+            
       // Дата и номер.
       var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
@@ -1745,9 +1781,7 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
-      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");

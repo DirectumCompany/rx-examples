@@ -807,23 +807,15 @@
       "PreviousPropertyGuid": "0ef6ca9b-0394-4de1-a993-08a9548682b3"
     },
     {
-      "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
-      "NameGuid": "3ce66a85-04b3-46ed-97a9-ee6e6328cfe6",
-      "Name": "VatAmount",
-      "Code": "VatAmount3",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
-      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
-      "PreviousPropertyGuid": "2a4f5e07-48d2-4dae-8b0e-0134f5a3fbe1"
-    },
-    {
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "955f3aa5-d554-422c-ba1e-94a2e18580e8",
       "Name": "Contract",
       "Code": "Contract1",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
-      "PreviousPropertyGuid": "3ce66a85-04b3-46ed-97a9-ee6e6328cfe6"
+      "PreviousPropertyGuid": "2a4f5e07-48d2-4dae-8b0e-0134f5a3fbe1"
     }
   ],
   "PublicStructures": [],
