@@ -45,7 +45,7 @@ namespace Sungero.Capture.Server
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(Contracts.Resources.IncomingInvoiceTypeName,
                                                                               Capture.Server.MockIncomingInvoice.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
-            
+      
       // Создать виды документов.
       var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
@@ -117,20 +117,25 @@ namespace Sungero.Capture.Server
     /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
+    /// <param name="sendedByEmail">Сотрудник, ответственного за проверку документов.</param>
+    /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
-    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.IFileInfo originalFile,
-                                                                                                              IOfficialDocument leadingDocument, IEmployee responsible)
+    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults,
+                                                                                                              Structures.Module.IFileInfo originalFile,
+                                                                                                              IOfficialDocument leadingDocument,
+                                                                                                              IEmployee responsible,
+                                                                                                              bool sendedByEmail)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile);
+      var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
       
       PerformApprovalRegulationsAssignments(868);
       
       foreach (var recognizedDocument in recognizedDocuments)
       {
-        var document = CreateDocumentByRecognizedDocument(recognizedDocument,  responsible);
+        var document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible);
         package.Add(document);
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -179,7 +184,9 @@ namespace Sungero.Capture.Server
       return result;
     }
     
-    public virtual List<Structures.Module.IRecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults, Structures.Module.IFileInfo originalFile)
+    public virtual List<Structures.Module.IRecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults,
+                                                                                      Structures.Module.IFileInfo originalFile,
+                                                                                      bool sendedByEmail)
     {
       var recognizedDocuments = new List<IRecognizedDocument>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
@@ -196,6 +203,7 @@ namespace Sungero.Capture.Server
         recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognizedDocument.Message = packageProcessResult.Message;
         recognizedDocument.OriginalFile = originalFile;
+        recognizedDocument.SendedByEmail = sendedByEmail;
         var docInfo = DocumentRecognitionInfos.Create();
         docInfo.Name = recognizedDocument.PredictedClass;
         docInfo.RecognizedClass = recognizedDocument.PredictedClass;
@@ -779,7 +787,7 @@ namespace Sungero.Capture.Server
       var document = SimpleDocuments.Create();
       document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
       document.Note = recognizedDocument.Message;
-      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       CreateVersion(document, recognizedDocument);
       document.Save();
       return document;
@@ -799,7 +807,7 @@ namespace Sungero.Capture.Server
       
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, false);
+      FillDeliveryMethod(document, true);
       document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       var mailSubject = mailInfo.Subject;
       if (!string.IsNullOrWhiteSpace(mailSubject))
@@ -825,13 +833,14 @@ namespace Sungero.Capture.Server
     /// Создать простой документ из файла.
     /// </summary>
     /// <param name="File">Файл.</param>
+    /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo, bool sendedByEmail)
     {
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, true);
+      FillDeliveryMethod(document, sendedByEmail);
       document.Name = Path.GetFileName(fileInfo.Description);
       document.Save();
       
@@ -867,7 +876,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       var facts = recognizedDocument.Facts;
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
@@ -957,7 +966,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       
       // Заполнить дату и номер письма со стороны корреспондента.
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
@@ -1072,7 +1081,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       var facts = recognizedDocument.Facts;
       
       // Договор.
@@ -1197,7 +1206,7 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, string.IsNullOrEmpty(recognizedDocument.OriginalFile.Description));
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       var facts = recognizedDocument.Facts;
       
       // Дата и номер.
@@ -1932,15 +1941,16 @@ namespace Sungero.Capture.Server
     /// Заполнить способ доставки
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="isMailDeliveryMethod">Доставлен почтой.</param>
-    public static void FillDeliveryMethod(IOfficialDocument document, bool isMailDeliveryMethod)
+    /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
+    public static void FillDeliveryMethod(IOfficialDocument document, bool sendedByEmail)
     {
-      if (isMailDeliveryMethod)
-        document.DeliveryMethod = MailDeliveryMethods.GetAll()
-          .Where(m => m.Name.Equals(MailDeliveryMethods.Resources.MailMethod, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
-      else
-        document.DeliveryMethod = MailDeliveryMethods.GetAll()
-          .Where(m => m.Name.Equals(MailDeliveryMethods.Resources.EmailMethod, StringComparison.InvariantCultureIgnoreCase)).FirstOrDefault();
+      var methodName = sendedByEmail
+        ? MailDeliveryMethods.Resources.EmailMethod
+        : MailDeliveryMethods.Resources.MailMethod;
+      
+      document.DeliveryMethod = MailDeliveryMethods.GetAll()
+        .Where(m => m.Name.Equals(methodName, StringComparison.InvariantCultureIgnoreCase))
+        .FirstOrDefault();
     }
     
     #endregion

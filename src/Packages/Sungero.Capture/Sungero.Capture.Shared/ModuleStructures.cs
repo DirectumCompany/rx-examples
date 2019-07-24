@@ -19,6 +19,7 @@ namespace Sungero.Capture.Structures.Module
     public string Message { get; set; }
     public IDocumentRecognitionInfo Info { get; set; }
     public Sungero.Capture.Structures.Module.IFileInfo OriginalFile { get; set; }
+    public bool SendedByEmail { get; set; }
   }
   
   [Public]

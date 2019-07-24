@@ -36,7 +36,7 @@ namespace Sungero.Capture.Client
       // Захват с почты.
       var source = GetSourceType(deviceInfo);
       if (source == Constants.Module.CaptureSourceType.Mail)
-        ProcessMailPackage(filesInfo, folder, instanceInfo, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
+        ProcessEmailPackage(filesInfo, folder, instanceInfo, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
       
       // Захват с папки (сканера).
       if (source == Constants.Module.CaptureSourceType.Folder)
@@ -83,7 +83,11 @@ namespace Sungero.Capture.Client
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileInfo();
         originalFile.Path = packagePath;
-        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, originalFile, null, responsible);
+        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
+                                                                                    originalFile,
+                                                                                    null,
+                                                                                    responsible,
+                                                                                    false);
         Functions.Module.Remote.SendToResponsible(documents, responsible);
         Logger.DebugFormat("End package processing. Path: {0}", packagePath);
         Logger.Debug("End of captured package processing.");
@@ -91,7 +95,7 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Обработать пакет пришедший с почты.
+    /// Обработать пакет пришедший с эл.почты.
     /// </summary>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
@@ -100,9 +104,9 @@ namespace Sungero.Capture.Client
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    public virtual void ProcessMailPackage(string filesInfo, string folder, string instanceInfo,
-                                           string arioUrl, string firstPageClassifierName, string typeClassifierName,
-                                           Sungero.Company.IEmployee responsible)
+    public virtual void ProcessEmailPackage(string filesInfo, string folder, string instanceInfo,
+                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
+                                            Sungero.Company.IEmployee responsible)
     {
       Logger.Debug("Captured Package Process. Captured package type is MAIL.");
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
@@ -124,7 +128,7 @@ namespace Sungero.Capture.Client
         if (!CanArioProcessFile(attachment.Description))
         {
           Logger.DebugFormat("Captured Package Process. Can't process file by Ario: {0}", attachment.Description);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
           relatedDocumentIds.Add(document.Id);
           continue;
@@ -136,13 +140,17 @@ namespace Sungero.Capture.Client
             string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
           Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", attachment.Description);
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result, attachment, emailBodyDocument, responsible);
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
+                                                                                      attachment,
+                                                                                      emailBodyDocument,
+                                                                                      responsible,
+                                                                                      true);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
         }
         else
         {
           Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", attachment.Description);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
           relatedDocumentIds.Add(document.Id);
         }
@@ -304,7 +312,9 @@ namespace Sungero.Capture.Client
       originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
       var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
                                                                                   originalFile,
-                                                                                  null, responsible);
+                                                                                  null, 
+                                                                                  responsible,
+                                                                                  false);
       
       Functions.Module.Remote.SendToResponsible(documents, responsible);
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");

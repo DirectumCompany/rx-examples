@@ -293,6 +293,10 @@
           "Name": "OriginalFile",
           "IsNullable": true,
           "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileInfo"
+        },
+        {
+          "Name": "SendedByEmail",
+          "TypeFullName": "global::System.Boolean"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
