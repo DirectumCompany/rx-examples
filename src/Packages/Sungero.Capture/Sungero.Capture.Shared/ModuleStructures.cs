@@ -111,7 +111,6 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
 
-  
   /// <summary>
   /// Файлы захваченного письма.
   /// </summary>

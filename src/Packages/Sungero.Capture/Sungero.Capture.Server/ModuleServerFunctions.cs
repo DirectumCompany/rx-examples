@@ -349,7 +349,7 @@ namespace Sungero.Capture.Server
         .Where(a => !a.Completed.HasValue)
         //.Where(a => a.Attachments.Any(att => att.Id == documentId))
         .GroupBy(a => a.MainTask.Id);
-        
+      
       foreach (var assignmentGroup in approvalRegulationsAssignments)
         assignmentGroup.FirstOrDefault().Complete(Sungero.Docflow.ApprovalCheckReturnAssignment.Result.Signed);
     }
@@ -805,7 +805,7 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrWhiteSpace(mailSubject))
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
       else
-        mailSubject = Resources.EmptySubject;      
+        mailSubject = Resources.EmptySubject;
       document.Subject = mailSubject;
       
       var application = GetAssociatedApplicationByFileName(bodyInfo.Path);
@@ -1192,6 +1192,7 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
     {
       var document = FinancialArchive.ContractStatements.Create();
+      var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
@@ -1513,24 +1514,87 @@ namespace Sungero.Capture.Server
     /// <returns></returns>
     public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
+      // Определить направление документа, НОР и КА.
       // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
+      var facts = recognizedDocument.Facts;
+      var counterpartyTypes = new List<string>();
+      counterpartyTypes.Add("SELLER");
+      counterpartyTypes.Add("BUYER");
+      var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
+      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault();
+      var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       var document = AccountingDocumentBases.Null;
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible,
-                                                                       AccountingDocumentBases.Info.Properties.Counterparty.Name,
-                                                                       AccountingDocumentBases.Info.Properties.BusinessUnit.Name);
-      if (counterpartyAndBusinessUnit.IsBusinessUnitSeller == true)
-        document = FinancialArchive.OutgoingTaxInvoices.Create();
-      else
+      var props = AccountingDocumentBases.Info.Properties;
+      var buyerIsBusinessUnit = buyerFact != null && buyerFact.BusinessUnit != null;
+      var sellerIsBusinessUnit = sellerFact != null && sellerFact.BusinessUnit != null;
+      Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
+      Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;
+      if (buyerIsBusinessUnit && sellerIsBusinessUnit)
+      {
+        // Мультинорность. Уточнить НОР по ответственному.
+        if (Equals(sellerFact.BusinessUnit, businessUnitByResponsible))
+        {
+          // Исходящий документ.
+          document = FinancialArchive.OutgoingTaxInvoices.Create();
+          counterpartyFact = buyerFact;
+          businessUnitFact = sellerFact;
+        }
+        else
+        {
+          // Входящий документ.
+          document = FinancialArchive.IncomingTaxInvoices.Create();
+          counterpartyFact = sellerFact;
+          businessUnitFact = buyerFact;
+        }
+      }
+      else if (buyerIsBusinessUnit)
+      {
+        // Входящий документ.
         document = FinancialArchive.IncomingTaxInvoices.Create();
+        counterpartyFact = sellerFact;
+        businessUnitFact = buyerFact;
+      }
+      else if (sellerIsBusinessUnit)
+      {
+        // Исходящий документ.
+        document = FinancialArchive.OutgoingTaxInvoices.Create();
+        counterpartyFact = buyerFact;
+        businessUnitFact = sellerFact;
+      }
+      else
+      {
+        // НОР не найдена по фактам - НОР будет взята по ответственному.
+        if (buyerFact != null && buyerFact.Counterparty != null && (sellerFact == null || sellerFact.Counterparty == null))
+        {
+          // Исходящий документ, потому что buyer - контрагент, а другой информации нет.
+          document = FinancialArchive.OutgoingTaxInvoices.Create();
+          counterpartyFact = buyerFact;
+        }
+        else
+        {
+          // Входящий документ.
+          document = FinancialArchive.IncomingTaxInvoices.Create();
+          counterpartyFact = sellerFact;
+        }
+      }
       
-      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
-      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
-      
-      var props = document.Info.Properties;
+      document.Counterparty = counterpartyFact != null ? counterpartyFact.Counterparty : null;
+      if (document.Counterparty != null)
+      {
+        LinkFactAndProperty(recognizedDocument, counterpartyFact.Fact, null,
+                            props.Counterparty.Name, document.Counterparty, counterpartyFact.IsTrusted);
+      }
+      document.BusinessUnit = businessUnitFact != null && businessUnitFact.BusinessUnit != null
+        ? businessUnitFact.BusinessUnit
+        : businessUnitByResponsible;
+      if (businessUnitFact != null)
+        LinkFactAndProperty(recognizedDocument, businessUnitFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitFact.IsTrusted);
+      else
+        LinkFactAndProperty(recognizedDocument, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = recognizedDocument.Facts;
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
@@ -1539,8 +1603,8 @@ namespace Sungero.Capture.Server
       if (isAdjustment)
       {
         document.IsAdjustment = true;
-        var correctionDateFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
-        var correctionNumberFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
+        var correctionDateFact = GetOrderedFacts(facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
+        var correctionNumberFact = GetOrderedFacts(facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
         var correctionDate = GetFieldDateTimeValue(correctionDateFact, "CorrectionDate");
         var correctionNumber = GetFieldValue(correctionNumberFact, "CorrectionNumber");
         if (correctionDate != null && !string.IsNullOrEmpty(correctionNumber))
@@ -1942,6 +2006,81 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Подобрать по факту контрагента и НОР.
+    /// </summary>
+    /// <param name="allFacts">Факты.</param>
+    /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
+    /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
+    public static List<Structures.Module.BusinessUnitAndCounterpartyWithFact> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> allFacts,
+                                                                                                                           List<string> counterpartyTypes)
+    {
+      var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
+      var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
+      
+      // Фильтр фактов по типам.
+      var facts = new List<IFact>();
+      foreach (var counterpartyType in counterpartyTypes)
+        facts.AddRange(GetCounterpartyFacts(allFacts, counterpartyType));
+      
+      var businessUnitsAndCounterparties = new List<Structures.Module.BusinessUnitAndCounterpartyWithFact>();
+      foreach (var fact in facts)
+      {
+        var counterparty = Counterparties.Null;
+        var businessUnit = BusinessUnits.Null;
+        bool isTrusted = true;
+        
+        // Поиск контрагента по хэшу.
+        var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, counterpartyPropertyName);
+        if (verifiedCounterparty != null)
+        {
+          counterparty = verifiedCounterparty.Counterparty;
+          isTrusted = verifiedCounterparty.IsTrusted;
+        }
+        
+        // Поиск НОР по хэшу.
+        var verifiedBusinessUnit = GetBusinessUnitByVerifiedData(fact, businessUnitPropertyName);
+        if (verifiedBusinessUnit != null)
+        {
+          businessUnit = verifiedBusinessUnit.BusinessUnit;
+          isTrusted = verifiedBusinessUnit.IsTrusted;
+        }
+        
+        // Поиск по инн/кпп.
+        var tin = GetFieldValue(fact, "TIN");
+        var trrc = GetFieldValue(fact, "TRRC");
+        if (businessUnit == null)
+        {
+          businessUnit = GetBusinessUnits(tin, trrc).FirstOrDefault();
+        }
+        if (counterparty == null)
+        {
+          counterparty = GetCounterparties(tin, trrc).FirstOrDefault();
+        }
+        
+        if (counterparty != null || businessUnit != null)
+        {
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), isTrusted);
+          businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
+          continue;
+        }
+        
+        // Если не нашли по инн/кпп то ищем по наименованию, но не доверяем таким записям.
+        var name = GetCorrespondentName(fact, "Name", "LegalForm");
+        counterparty = Counterparties.GetAll()
+          .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        businessUnit = BusinessUnits.GetAll()
+          .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        if (counterparty != null || businessUnit != null)
+        {
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), isTrusted);
+          businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
+        }
+      }
+      
+      return businessUnitsAndCounterparties;
+    }
+    
+    /// <summary>
     /// Получить контрагента и НОР.
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
@@ -2326,8 +2465,7 @@ namespace Sungero.Capture.Server
         return new List<IBusinessUnit>();
 
       // Отфильтровать закрытые НОР.
-      var businessUnits = BusinessUnits.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
+      var businessUnits = BusinessUnits.GetAll().Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
       
       // Поиск по ИНН, если ИНН передан.
       if (searchByTin)
@@ -2346,10 +2484,8 @@ namespace Sungero.Capture.Server
           
           return strongTinBusinessUnits.Where(c => string.IsNullOrWhiteSpace(c.TRRC)).ToList();
         }
-        
         return strongTinBusinessUnits;
       }
-      
       return new List<IBusinessUnit>();
     }
     
@@ -2845,9 +2981,9 @@ namespace Sungero.Capture.Server
       {
         using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
         {
-          version.Body.Write(body);       
+          version.Body.Write(body);
         }
-          
+        
         version.AssociatedApplication = pdfApp;
       }
       
@@ -2876,7 +3012,7 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
-  
+    
     #region ШК
     
     /// <summary>
@@ -2893,7 +3029,7 @@ namespace Sungero.Capture.Server
       var result = new List<int>();
       try
       {
-        var barcodeReader = new AsposeExtensions.BarcodeReader();        
+        var barcodeReader = new AsposeExtensions.BarcodeReader();
         var barcodeList = barcodeReader.Extract(document);
         if (!barcodeList.Any())
           return result;
@@ -2918,6 +3054,6 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
-  
+    
   }
 }
