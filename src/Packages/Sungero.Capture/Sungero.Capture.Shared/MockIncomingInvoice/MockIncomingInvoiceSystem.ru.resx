@@ -198,11 +198,8 @@
   <data name="Property_VatAmount" xml:space="preserve">
     <value>В т. ч. НДС</value>
   </data>
-  <data name="Property_LeadingDocumentNumber" xml:space="preserve">
-    <value>Номер договора</value>
-  </data>
-  <data name="Property_LeadingDocumentDate" xml:space="preserve">
-    <value>Дата договора</value>
+  <data name="Property_Contract" xml:space="preserve">
+    <value>Договор</value>
   </data>
   <data name="ControlGroup_812fa7c1ee734284a3458e74ae533761" xml:space="preserve">
     <value>Основное</value>
@@ -223,15 +220,6 @@
     <value />
   </data>
   <data name="Control_842a9477e5f2479eacb79fbbe56ccd2a_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Resource_377d65117e1b423ebf32d80e4ab31f24" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Control_377d65117e1b423ebf32d80e4ab31f24_EmptyText" xml:space="preserve">
-    <value />
-  </data>
-  <data name="Resource_fd7a1ef6ba2c495d962e37ceb6708032" xml:space="preserve">
     <value />
   </data>
   <data name="ControlGroup_be2e7b3b0c934025bd189aa01ba7f66c" xml:space="preserve">

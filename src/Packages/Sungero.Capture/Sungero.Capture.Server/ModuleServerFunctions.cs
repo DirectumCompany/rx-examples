@@ -1625,9 +1625,9 @@ namespace Sungero.Capture.Server
     #region Счет на оплату
     
     /// <summary>
-    /// Создать накладную с текстовыми полями.
+    /// Создать счет на оплату с текстовыми полями.
     /// </summary>
-    /// <param name="letterсlassificationResult">Результат обработки накладной в Ario.</param>
+    /// <param name="letterсlassificationResult">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognizedDocument recognizedDocument)
     {
@@ -1668,8 +1668,7 @@ namespace Sungero.Capture.Server
       var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.Date = GetFieldDateTimeValue(dateFact, "Date");
-      document.Number = GetFieldValue(numberFact, "Number");
-      
+      document.Number = GetFieldValue(numberFact, "Number");      
       LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
       LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number);
       
