@@ -1741,7 +1741,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
       }
       
-      // В могут прийти контрагенты без типа. Заполнить контрагентами без типа.
+      // Могут прийти контрагенты без типа. Заполнить контрагентами без типа.
       if (seller == null || buyer == null)
       {
         var withoutTypeFacts = GetFacts(facts, "Counterparty", "Name")
@@ -1790,7 +1790,9 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
       LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");

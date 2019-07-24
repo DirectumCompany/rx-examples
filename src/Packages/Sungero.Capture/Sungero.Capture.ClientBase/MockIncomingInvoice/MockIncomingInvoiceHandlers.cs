@@ -10,6 +10,11 @@ namespace Sungero.Capture
   partial class MockIncomingInvoiceClientHandlers
   {
 
+    public virtual void VatAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
+    {
+      this._obj.State.Properties.VatAmount.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
     public virtual void ContractValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
       this._obj.State.Properties.Contract.HighlightColor = Sungero.Core.Colors.Empty;

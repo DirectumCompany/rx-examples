@@ -255,4 +255,7 @@
   <data name="ControlGroup_8ec5fcf831e446b28c4aef31c6fce4da" xml:space="preserve">
     <value>Terms</value>
   </data>
+  <data name="Property_VatAmount" xml:space="preserve">
+    <value>VatAmount</value>
+  </data>
 </root>

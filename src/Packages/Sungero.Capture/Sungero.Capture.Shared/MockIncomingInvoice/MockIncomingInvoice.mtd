@@ -213,12 +213,12 @@
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "e11c27f8-e087-44ca-b5d6-5d42b50f1656",
           "Name": "Currency",
-          "ColumnNumber": 1,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "8ec5fcf8-31e4-46b2-8c4a-ef31c6fce4da",
           "PropertyGuid": "2a4f5e07-48d2-4dae-8b0e-0134f5a3fbe1",
-          "RowNumber": 1,
+          "RowNumber": 2,
           "RowSpan": 1,
           "Settings": []
         },
@@ -336,6 +336,19 @@
           "ParentGuid": "7019a50f-df98-403d-9163-87fb55f99f5a",
           "PropertyGuid": "955f3aa5-d554-422c-ba1e-94a2e18580e8",
           "RowNumber": 2,
+          "RowSpan": 1,
+          "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "5048d758-1788-4769-b5af-5c6a68e4d9ae",
+          "Name": "VatAmount",
+          "ColumnNumber": 1,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+          "ParentGuid": "8ec5fcf8-31e4-46b2-8c4a-ef31c6fce4da",
+          "PropertyGuid": "fc26af68-afd1-45d1-9fc2-1af43ebaf39a",
+          "RowNumber": 1,
           "RowSpan": 1,
           "Settings": []
         }
@@ -537,12 +550,12 @@
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "090dd58a-9614-4139-ac9e-4beb0e64d632",
           "Name": "Currency",
-          "ColumnNumber": 1,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "4db291d2-8b99-4268-9b9c-56172317c774",
           "PropertyGuid": "2a4f5e07-48d2-4dae-8b0e-0134f5a3fbe1",
-          "RowNumber": 1,
+          "RowNumber": 2,
           "RowSpan": 1,
           "Settings": []
         },
@@ -660,6 +673,19 @@
           "ParentGuid": "2412a084-f2cc-4330-85ff-cb6ae812df15",
           "PropertyGuid": "955f3aa5-d554-422c-ba1e-94a2e18580e8",
           "RowNumber": 2,
+          "RowSpan": 1,
+          "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "695d6b6e-f2b1-4f84-8096-907d57ce69ae",
+          "Name": "VatAmount",
+          "ColumnNumber": 1,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+          "ParentGuid": "4db291d2-8b99-4268-9b9c-56172317c774",
+          "PropertyGuid": "fc26af68-afd1-45d1-9fc2-1af43ebaf39a",
+          "RowNumber": 1,
           "RowSpan": 1,
           "Settings": []
         }
@@ -816,6 +842,17 @@
       ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "2a4f5e07-48d2-4dae-8b0e-0134f5a3fbe1"
+    },
+    {
+      "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "fc26af68-afd1-45d1-9fc2-1af43ebaf39a",
+      "Name": "VatAmount",
+      "Code": "VatAmount3",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+      "PreviousPropertyGuid": "955f3aa5-d554-422c-ba1e-94a2e18580e8"
     }
   ],
   "PublicStructures": [],
