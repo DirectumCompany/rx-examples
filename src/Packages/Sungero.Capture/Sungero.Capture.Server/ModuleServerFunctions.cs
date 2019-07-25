@@ -130,6 +130,9 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
+      
+      PerformApprovalRegulationsAssignments(868);
+      
       foreach (var recognizedDocument in recognizedDocuments)
       {
         // Поиск документа по ШК.
@@ -375,19 +378,42 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Выполнить задания на контроль возврата пришедшего документа.
+    /// Выполнить задания на контроль возврата пришедшего документа или отправить уведомление ответственному за документ.
     /// </summary>
-    /// <param name="documentId">Ид захваченного документа.</param>
-    public virtual void PerformApprovalCheckReturnAssignments(int documentId)
+    /// <param name="documentId">Захваченный документ.</param>
+    public virtual void CompleteApprovalCheckReturnAssignment(IOfficialDocument document)
     {
+      // Выполнить задания на контроль возврата.
+      var documentsGroupGuid = Docflow.PublicConstants.Module.TaskMainGroup.ApprovalTask;
       var approvalRegulationsAssignments = Assignments.GetAll()
         .Where(a => Sungero.Docflow.ApprovalCheckReturnAssignments.Is(a))
         .Where(a => !a.Completed.HasValue)
-        //.Where(a => a.Attachments.Any(att => att.Id == documentId))
+        .Where(a => a.AttachmentDetails.Any(g => g.GroupId == documentsGroupGuid && g.AttachmentId == document.Id))
         .GroupBy(a => a.MainTask.Id);
       
       foreach (var assignmentGroup in approvalRegulationsAssignments)
         assignmentGroup.FirstOrDefault().Complete(Sungero.Docflow.ApprovalCheckReturnAssignment.Result.Signed);
+      
+      // Если нет заданий на контроль возврата, то отправить уведомление ответственному за документ.
+      if (approvalRegulationsAssignments.ToList().Count == 0)
+      {
+        var responsibleEmployee = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentResponsibleEmployee(document);
+        if (responsibleEmployee != null && responsibleEmployee.IsSystem != true)
+        {
+          var notice = SimpleTasks.Create();
+          notice.Subject = ApprovalTasks.Resources.DocumentSigned;
+          notice.Attachments.Add(document);
+          
+          if (notice.Subject.Length > notice.Info.Properties.Subject.Length)
+            notice.Subject = notice.Subject.Substring(0, notice.Info.Properties.Subject.Length);
+
+          var routeStep = notice.RouteSteps.AddNew();
+          routeStep.AssignmentType = Workflow.SimpleTaskRouteSteps.AssignmentType.Notice;
+          routeStep.Performer = responsibleEmployee;
+          routeStep.Deadline = null;
+          notice.Start();
+        }
+      }
     }
     #endregion
     
