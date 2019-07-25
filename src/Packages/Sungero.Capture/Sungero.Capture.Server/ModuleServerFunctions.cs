@@ -130,16 +130,36 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
-      
-      PerformApprovalRegulationsAssignments(868);
-      
       foreach (var recognizedDocument in recognizedDocuments)
       {
-        var document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible);
-        package.Add(document);
+        // Поиск документа по ШК.
+        var document = OfficialDocuments.Null;
+        using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
+        {
+          var docIds = GetDocumentIdByBarcode(body);
+          if (docIds != null && docIds.Any())
+          {
+            document = OfficialDocuments.GetAll().Where(x => x.Id == docIds.FirstOrDefault()).FirstOrDefault();
+            if (document != null)
+            {
+              CreateVersion(document, recognizedDocument);
+              document.Save();
+            }
+          }
+        }
+        
+        // Создание нового документа по фактам.
+        if (document == null)
+        {
+          document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible);
+          package.Add(document);
+        }
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
       }
+      
+      if (!package.Any())
+        return result;
       
       // Определить ведущий документ.
       if (leadingDocument == null)
@@ -272,49 +292,57 @@ namespace Sungero.Capture.Server
       // Входящее письмо.
       var recognizedClass = recognizedDocument.PredictedClass;
       var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+      var document = OfficialDocuments.Null;
       if (recognizedClass == Constants.Module.LetterClassName)
-        return isMockMode
+        document = isMockMode
           ? CreateMockIncomingLetter(recognizedDocument)
           : CreateIncomingLetter(recognizedDocument, responsible);
       
       // Акт выполненных работ.
-      if (recognizedClass == Constants.Module.ContractStatementClassName)
-        return isMockMode
+      else if (recognizedClass == Constants.Module.ContractStatementClassName)
+        document = isMockMode
           ? CreateMockContractStatement(recognizedDocument)
           : CreateContractStatement(recognizedDocument, responsible);
       
       // Товарная накладная.
-      if (recognizedClass == Constants.Module.WaybillClassName)
-        return isMockMode
+      else if (recognizedClass == Constants.Module.WaybillClassName)
+        document = isMockMode
           ? CreateMockWaybill(recognizedDocument)
           : CreateWaybill(recognizedDocument, responsible);
       
       // Счет-фактура.
-      if (recognizedClass == Constants.Module.TaxInvoiceClassName)
-        return isMockMode
+      else if (recognizedClass == Constants.Module.TaxInvoiceClassName)
+        document = isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
           : CreateTaxInvoice(recognizedDocument, responsible, false);
       
       // Корректировочный счет-фактура.
-      if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
-        return CreateTaxInvoice(recognizedDocument, responsible, true);
+      else if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
+        document = CreateTaxInvoice(recognizedDocument, responsible, true);
       
       // УПД.
-      if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
-        return CreateUniversalTransferDocument(recognizedDocument, responsible, false);
+      else if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
+        document = CreateUniversalTransferDocument(recognizedDocument, responsible, false);
       
-      //УКД
-      if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
-        return CreateUniversalTransferDocument(recognizedDocument, responsible, true);
+      // УКД.
+      else if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
+        document = CreateUniversalTransferDocument(recognizedDocument, responsible, true);
       
       // Счет на оплату.
-      if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
-        return isMockMode
+      else if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
+        document = isMockMode
           ? CreateMockIncomingInvoice(recognizedDocument)
           : CreateIncomingInvoice(recognizedDocument, responsible);
       
       // Все нераспознанные документы создать простыми.
-      return CreateSimpleDocument(recognizedDocument);
+      else
+        document = CreateSimpleDocument(recognizedDocument);
+      
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
+      CreateVersion(document, recognizedDocument);
+      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
+      document.Save();
+      return document;
     }
     
     /// <summary>
@@ -350,7 +378,7 @@ namespace Sungero.Capture.Server
     /// Выполнить задания на контроль возврата пришедшего документа.
     /// </summary>
     /// <param name="documentId">Ид захваченного документа.</param>
-    public virtual void PerformApprovalRegulationsAssignments(int documentId)
+    public virtual void PerformApprovalCheckReturnAssignments(int documentId)
     {
       var approvalRegulationsAssignments = Assignments.GetAll()
         .Where(a => Sungero.Docflow.ApprovalCheckReturnAssignments.Is(a))
@@ -787,9 +815,7 @@ namespace Sungero.Capture.Server
       var document = SimpleDocuments.Create();
       document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
       document.Note = recognizedDocument.Message;
-      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
-      CreateVersion(document, recognizedDocument);
-      document.Save();
+      
       return document;
     }
     
@@ -878,14 +904,11 @@ namespace Sungero.Capture.Server
     /// <returns>Документ.</returns>
     public static Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
     {
-      // Создать версию раньше заполнения содержания, потому что при создании версии пустое содержание заполнится значением по умолчанию.
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-      CreateVersion(document, recognizedDocument);
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       var facts = recognizedDocument.Facts;
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
@@ -957,8 +980,6 @@ namespace Sungero.Capture.Server
       var isTrustedContact = IsTrustedField(responsibleFact, "Type");
       LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
       return document;
     }
     
@@ -975,7 +996,6 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       
       // Заполнить дату и номер письма со стороны корреспондента.
       var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
@@ -1068,9 +1088,7 @@ namespace Sungero.Capture.Server
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
         LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
-      CreateVersion(document, recognizedDocument);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
@@ -1090,7 +1108,6 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       var facts = recognizedDocument.Facts;
       
       // Договор.
@@ -1195,9 +1212,6 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
-      CreateVersion(document, recognizedDocument);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
       return document;
     }
     
@@ -1215,7 +1229,6 @@ namespace Sungero.Capture.Server
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       var facts = recognizedDocument.Facts;
       
       // Дата и номер.
@@ -1242,11 +1255,10 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      CreateVersion(document, recognizedDocument);
+      
       // Регистрация.
       RegisterDocument(document);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
@@ -1359,9 +1371,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
-      CreateVersion(document, recognizedDocument);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
@@ -1403,13 +1413,10 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
       
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
       return document;
     }
     
@@ -1517,9 +1524,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
         LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
-      CreateVersion(document, recognizedDocument);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
@@ -1647,12 +1652,10 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
@@ -1692,12 +1695,10 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
@@ -1787,7 +1788,7 @@ namespace Sungero.Capture.Server
           }
         }
       }
-            
+      
       // Дата и номер.
       var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
@@ -1809,9 +1810,6 @@ namespace Sungero.Capture.Server
       if (document.Currency != null)
         LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
-      CreateVersion(document, recognizedDocument);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
       return document;
     }
     
@@ -1857,12 +1855,10 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      CreateVersion(document, recognizedDocument);
       
       // Регистрация.
       RegisterDocument(document);
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
+      
       return document;
     }
     
