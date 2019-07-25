@@ -573,7 +573,6 @@ namespace Sungero.Capture.Client
     {
       try
       {
-        System.Diagnostics.Debugger.Launch();
         var mailBody = File.ReadAllText(path);
         mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
         File.WriteAllText(path, mailBody);
