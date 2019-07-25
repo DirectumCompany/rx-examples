@@ -112,7 +112,7 @@ namespace Sungero.Capture.Client
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
       if ((mailFiles.Body == null || !File.Exists(mailFiles.Body.Path)) && !mailFiles.Attachments.Any())
         throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
-      RemoveImagesFromMailBody(mailFiles.Body.Path);
+      RemoveImagesFromEmailBody(mailFiles.Body.Path);
       mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
       
       var mailInfo = GetMailInfo(instanceInfo);
@@ -313,7 +313,7 @@ namespace Sungero.Capture.Client
       originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
       var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(modifiedJson,
                                                                                   originalFile,
-                                                                                  null, 
+                                                                                  null,
                                                                                   responsible,
                                                                                   false);
       
@@ -569,11 +569,19 @@ namespace Sungero.Capture.Client
     /// Удалить изображения из тела письма.
     /// </summary>
     /// <param name="path">Пусть к html-файлу письма.</param>
-    private static void RemoveImagesFromMailBody(string path)
+    private static void RemoveImagesFromEmailBody(string path)
     {
-      var mailBody = File.ReadAllText(path);
-      mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
-      File.WriteAllText(path, mailBody);
+      try
+      {
+        System.Diagnostics.Debugger.Launch();
+        var mailBody = File.ReadAllText(path);
+        mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
+        File.WriteAllText(path, mailBody);
+      }
+      catch(Exception ex)
+      {
+        Logger.ErrorFormat("RemoveImagesFromEmailBody: Cannot remove images from email body.", ex);
+      }
     }
     
     /// <summary>
