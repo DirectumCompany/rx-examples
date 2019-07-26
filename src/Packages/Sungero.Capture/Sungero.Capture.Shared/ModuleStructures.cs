@@ -102,6 +102,13 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     public bool? IsBusinessUnitSeller { get; set; }
   }
+  
+  partial class BusinessUnitAndCounterpartyFacts
+  {
+    public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact BusinessUnitFact { get; set; }
+    public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact CounterpartyFact { get; set; }
+  }
+
 
   partial class BusinessUnitAndCounterpartyWithFact
   {
