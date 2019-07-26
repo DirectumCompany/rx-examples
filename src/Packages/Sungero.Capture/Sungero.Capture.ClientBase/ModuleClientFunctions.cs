@@ -306,7 +306,7 @@ namespace Sungero.Capture.Client
       // Заменить guid документа в исходном json'е на полученный из Ario.
       var modifiedJson = arioConnector.UpdateGuidInClassificationResults(System.IO.File.ReadAllText(jsonFilePath), docPdfGuid);
       Logger.Debug(Calendar.Now.ToString() + " Source Json updated.");
-      */
+       */
       // Обработать пакет.
       Logger.Debug(Calendar.Now.ToString() + " Start ProcessSplitedPackage");
       var originalFile = new Structures.Module.FileInfo();
@@ -499,10 +499,7 @@ namespace Sungero.Capture.Client
     [Public]
     public virtual void SwitchVerificationMode(Sungero.Docflow.IOfficialDocument document)
     {
-      if (document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess)
-        return;
-      
-      // Подсветить свойства карточки и факты в теле только один раз при открытии.
+      // Активировать / скрыть вкладку, подсветить свойства карточки и факты в теле только один раз при открытии.
       // Либо в событии Showing либо в Refrash.
       // Вызов в Refrash необходим, т.к. при отмене изменений не вызывается Showing.
       var formParams = ((Sungero.Domain.Shared.IExtendedEntity)document).Params;
@@ -510,6 +507,15 @@ namespace Sungero.Capture.Client
         return;
       else
         formParams.Add(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
+      
+      // Активировать / скрыть вкладку.
+      if (document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess)
+      {
+        document.State.Pages.PreviewPage.IsVisible = false;
+        return;
+      }
+      document.State.Pages.PreviewPage.IsVisible = true;
+      document.State.Pages.PreviewPage.Activate();
       
       // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
