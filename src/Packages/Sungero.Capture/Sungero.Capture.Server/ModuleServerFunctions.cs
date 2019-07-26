@@ -1249,23 +1249,93 @@ namespace Sungero.Capture.Server
     /// <returns>Акт выполненных работ.</returns>
     public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
     {
-      var document = FinancialArchive.ContractStatements.Create();
+      // НОР и КА.
+      var facts = recognizedDocument.Facts;
+      var counterpartyTypes = new List<string>();
+      counterpartyTypes.Add("SELLER");
+      counterpartyTypes.Add("BUYER");
+      counterpartyTypes.Add(string.Empty);
+      var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
+      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault();
+      var nonTypeFacts = factMatches.Where(m => m.Type == string.Empty);
       var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-      var props = document.Info.Properties;
+      var document = FinancialArchive.ContractStatements.Create();
+      var props = AccountingDocumentBases.Info.Properties;
+      Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
+      Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;
+      
+      // НОР.
+      var businessUnitFindedNotExactly = false;
+      if (buyerFact != null)
+      {
+        // НОР по факту с типом BUYER.
+        businessUnitFact = buyerFact;
+      }
+      else
+      {
+        // НОР по факту без типа.
+        var nonTypeBusinessUnits = nonTypeFacts.Where(m => m.BusinessUnit != null);
+        
+        // Уточнить НОР по ответственному.
+        if (nonTypeBusinessUnits.Count() > 1)
+        {
+          businessUnitFact = nonTypeBusinessUnits.Where(m => Equals(m.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
+        }
+        else
+        {
+          // НОР не определилась по ответственному.
+          businessUnitFindedNotExactly = true;
+          businessUnitFact = nonTypeBusinessUnits.FirstOrDefault();
+        }
+        
+        // Подсветить жёлтым, если НОР было несколько.
+        if (nonTypeBusinessUnits.Count() > 1)
+          businessUnitFact.IsTrusted = false;
+      }
+      
+      // Контрагент.
+      if (sellerFact != null && sellerFact.Counterparty != null)
+      {
+        // Контрагент по факту с типом SELLER.
+        counterpartyFact = sellerFact;
+      }
+      else
+      {
+        // Контрагент по факту без типа. Исключить факт, по которому нашли НОР.
+        var nonTypeCounterparties = nonTypeFacts
+          .Where(m => m.Counterparty != null)
+          .Where(m => businessUnitFindedNotExactly || !Equals(m, businessUnitFact));
+        counterpartyFact = nonTypeCounterparties.FirstOrDefault();
+        
+        // Подсветить жёлтым, если контрагентов было несколько.
+        if (nonTypeCounterparties.Count() > 1)
+          counterpartyFact.IsTrusted = false;
+      }
+      
+      document.Counterparty = counterpartyFact != null ? counterpartyFact.Counterparty : null;
+      if (document.Counterparty != null)
+      {
+        LinkFactAndProperty(recognizedDocument, counterpartyFact.Fact, null,
+                            props.Counterparty.Name, document.Counterparty, counterpartyFact.IsTrusted);
+      }
+      
+      if (businessUnitFact != null && businessUnitFact.BusinessUnit != null)
+      {
+        document.BusinessUnit = businessUnitFact.BusinessUnit;
+        LinkFactAndProperty(recognizedDocument, businessUnitFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitFact.IsTrusted);
+      }
+      else
+      {
+        document.BusinessUnit = businessUnitByResponsible;
+        LinkFactAndProperty(recognizedDocument, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
+      }
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = recognizedDocument.Facts;
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "Document");
-      
-      // Заполнить контрагента/НОР по типу.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible,
-                                                                       document.Info.Properties.Counterparty.Name,
-                                                                       document.Info.Properties.BusinessUnit.Name);
-      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
-      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
@@ -1633,13 +1703,17 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, counterpartyFact.Fact, null,
                             props.Counterparty.Name, document.Counterparty, counterpartyFact.IsTrusted);
       }
-      document.BusinessUnit = businessUnitFact != null && businessUnitFact.BusinessUnit != null
-        ? businessUnitFact.BusinessUnit
-        : businessUnitByResponsible;
-      if (businessUnitFact != null)
+      
+      if (businessUnitFact != null && businessUnitFact.BusinessUnit != null)
+      {
+        document.BusinessUnit = businessUnitFact.BusinessUnit;
         LinkFactAndProperty(recognizedDocument, businessUnitFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitFact.IsTrusted);
+      }
       else
+      {
+        document.BusinessUnit = businessUnitByResponsible;
         LinkFactAndProperty(recognizedDocument, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
+      }
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
