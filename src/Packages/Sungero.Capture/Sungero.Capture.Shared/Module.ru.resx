@@ -162,4 +162,7 @@
   <data name="EmptySubject" xml:space="preserve">
     <value>Без содержания</value>
   </data>
+  <data name="NoticeToAuthorSubject" xml:space="preserve">
+    <value>Документ подписан контрагентом: {0}</value>
+  </data>
 </root>

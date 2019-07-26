@@ -159,4 +159,7 @@
   <data name="EmptySubject" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="NoticeToAuthorSubject" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

@@ -131,8 +131,6 @@ namespace Sungero.Capture.Server
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
       
-      PerformApprovalRegulationsAssignments(868);
-      
       foreach (var recognizedDocument in recognizedDocuments)
       {
         // Поиск документа по ШК.
@@ -146,7 +144,9 @@ namespace Sungero.Capture.Server
             if (document != null)
             {
               CreateVersion(document, recognizedDocument);
+              document.ExternalApprovalState = Docflow.OfficialDocument.ExchangeState.Signed;
               document.Save();
+              CompleteApprovalCheckReturnAssignment(document);
             }
           }
         }
@@ -380,7 +380,7 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Выполнить задания на контроль возврата пришедшего документа или отправить уведомление ответственному за документ.
     /// </summary>
-    /// <param name="documentId">Захваченный документ.</param>
+    /// <param name="document">Захваченный документ.</param>
     public virtual void CompleteApprovalCheckReturnAssignment(IOfficialDocument document)
     {
       // Выполнить задания на контроль возврата.
@@ -401,7 +401,7 @@ namespace Sungero.Capture.Server
         if (responsibleEmployee != null && responsibleEmployee.IsSystem != true)
         {
           var notice = SimpleTasks.Create();
-          notice.Subject = ApprovalTasks.Resources.DocumentSigned;
+          notice.Subject = Resources.NoticeToAuthorSubjectFormat(document);
           notice.Attachments.Add(document);
           
           if (notice.Subject.Length > notice.Info.Properties.Subject.Length)

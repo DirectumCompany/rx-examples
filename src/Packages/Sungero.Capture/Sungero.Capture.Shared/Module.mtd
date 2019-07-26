@@ -318,7 +318,8 @@
     "ClassifierNotFound",
     "EmptyArioUrl",
     "EmailBodyDocumentName",
-    "EmptySubject"
+    "EmptySubject",
+    "NoticeToAuthorSubject"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
