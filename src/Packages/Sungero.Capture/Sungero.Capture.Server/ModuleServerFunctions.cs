@@ -827,11 +827,11 @@ namespace Sungero.Capture.Server
       document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       var mailSubject = mailInfo.Subject;
       if (!string.IsNullOrWhiteSpace(mailSubject))
+      {
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
-      else
-        mailSubject = Resources.EmptySubject;
-      document.Subject = mailSubject;
-
+        document.Subject = mailSubject;
+      }
+      
       using (var body = new MemoryStream(bodyInfo.Data))
       {
         document.CreateVersion();
