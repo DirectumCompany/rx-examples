@@ -1400,20 +1400,46 @@ namespace Sungero.Capture.Server
       var document = FinancialArchive.Waybills.Create();
       var props = document.Info.Properties;
       var facts = recognizedDocument.Facts;
+
+      // НОР и КА.
+      var counterpartyTypes = new List<string>();
+      counterpartyTypes.Add("SUPPLIER");
+      counterpartyTypes.Add("PAYER");
+      counterpartyTypes.Add("SHIPPER");
+      counterpartyTypes.Add("CONSIGNEE");
+      
+      var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
+      var sellerFact = factMatches.Where(m => m.Type == "SUPPLIER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "SHIPPER").FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == "PAYER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "CONSIGNEE").FirstOrDefault();
+      var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      
+      var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact);
+      var counterpartyFact = counterpartyAndBusinessUnitFacts.CounterpartyFact;
+      var businessUnitFact = counterpartyAndBusinessUnitFacts.BusinessUnitFact;
+      
+      document.Counterparty = counterpartyFact != null ? counterpartyFact.Counterparty : null;
+      if (document.Counterparty != null)
+      {
+        LinkFactAndProperty(recognizedDocument, counterpartyFact.Fact, null,
+                            props.Counterparty.Name, document.Counterparty, counterpartyFact.IsTrusted);
+      }
+      
+      if (businessUnitFact != null && businessUnitFact.BusinessUnit != null)
+      {
+        document.BusinessUnit = businessUnitFact.BusinessUnit;
+        LinkFactAndProperty(recognizedDocument, businessUnitFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitFact.IsTrusted);
+      }
+      else
+      {
+        document.BusinessUnit = businessUnitByResponsible;
+        LinkFactAndProperty(recognizedDocument, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
+      }
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
       // Дата и номер.
       FillRegistrationData(document, recognizedDocument, "FinancialDocument");
-      
-      // Заполнить контрагента/НОР по типу.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible,
-                                                                       document.Info.Properties.Counterparty.Name,
-                                                                       document.Info.Properties.BusinessUnit.Name,
-                                                                       "SUPPLIER", "PAYER");
-      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
-      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
       
       // Документ-основание.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
@@ -1690,16 +1716,45 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
+      var props = document.Info.Properties;
+      var facts = recognizedDocument.Facts;
       
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
-      // НОР и контрагент.
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(recognizedDocument, responsible,
-                                                                       document.Info.Properties.Counterparty.Name,
-                                                                       document.Info.Properties.BusinessUnit.Name);
-      document.BusinessUnit = counterpartyAndBusinessUnit.BusinessUnit;
-      document.Counterparty = counterpartyAndBusinessUnit.Counterparty;
+      // НОР и КА.
+      var counterpartyTypes = new List<string>();
+      counterpartyTypes.Add("SELLER");
+      counterpartyTypes.Add("BUYER");
+      counterpartyTypes.Add("SHIPPER");
+      counterpartyTypes.Add("CONSIGNEE");
+      
+      var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
+      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "SHIPPER").FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "CONSIGNEE").FirstOrDefault();
+      var businessUnitByResponsible = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      
+      var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact);
+      var counterpartyFact = counterpartyAndBusinessUnitFacts.CounterpartyFact;
+      var businessUnitFact = counterpartyAndBusinessUnitFacts.BusinessUnitFact;
+      
+      document.Counterparty = counterpartyFact != null ? counterpartyFact.Counterparty : null;
+      if (document.Counterparty != null)
+      {
+        LinkFactAndProperty(recognizedDocument, counterpartyFact.Fact, null,
+                            props.Counterparty.Name, document.Counterparty, counterpartyFact.IsTrusted);
+      }
+      
+      if (businessUnitFact != null && businessUnitFact.BusinessUnit != null)
+      {
+        document.BusinessUnit = businessUnitFact.BusinessUnit;
+        LinkFactAndProperty(recognizedDocument, businessUnitFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitFact.IsTrusted);
+      }
+      else
+      {
+        document.BusinessUnit = businessUnitByResponsible;
+        LinkFactAndProperty(recognizedDocument, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
+      }
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -2231,6 +2286,23 @@ namespace Sungero.Capture.Server
           counterpartyFact.IsTrusted = false;
       }
       
+      return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnitFact, counterpartyFact);
+    }
+    
+    public static Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
+                                                                                                         Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact)
+    {
+      Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
+      Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;
+      
+      // НОР.
+      if (buyerFact != null)
+        businessUnitFact = buyerFact;
+      
+      // Контрагент.
+      if (sellerFact != null && sellerFact.Counterparty != null)
+        counterpartyFact = sellerFact;
+
       return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnitFact, counterpartyFact);
     }
     
