@@ -271,42 +271,11 @@ namespace Sungero.Capture.Client
     public static void CreateDocumentByRecognitionData(string bodyFilePath, string jsonFilePath, string responsibleId)
     {
       Logger.Debug("Start CreateDocumentByRecognitionData");
-      /*
-      if (!System.IO.File.Exists(bodyFilePath))
-      {
-        Logger.ErrorFormat("File does not exist {0}", bodyFilePath);
-        return;
-      }*/
-      /*
-      if (!System.IO.File.Exists(jsonFilePath))
-      {
-        Logger.ErrorFormat("File does not exist {0}", jsonFilePath);
-        return;
-      }*/
-      
       var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
       if (responsible == null)
         throw new ApplicationException(Resources.InvalidResponsibleId);
       Logger.DebugFormat(Calendar.Now.ToString() + " Responsible: {0}", responsible.Person.ShortName);
-      /*
-      var arioUrl = Sungero.Capture.Functions.Module.Remote.GetArioUrl();
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      
-      // Загрузить документ в Ario с преобразованием в pdf.
-      var convertionResults = arioConnector.ConvertDocumentToPdfAndGetGuid(System.IO.File.ReadAllBytes(bodyFilePath),
-                                                                           System.IO.Path.GetFileName(bodyFilePath));
-      if (convertionResults == null)
-        return;
-      var convertionResult = convertionResults.Results.FirstOrDefault();
-      if (convertionResult == null)
-        return;
-      var docPdfGuid = convertionResult.Guid;
-      Logger.DebugFormat(Calendar.Now.ToString() + " Document Ario Guid: {0}", docPdfGuid);
-      
-      // Заменить guid документа в исходном json'е на полученный из Ario.
-      var modifiedJson = arioConnector.UpdateGuidInClassificationResults(System.IO.File.ReadAllText(jsonFilePath), docPdfGuid);
-      Logger.Debug(Calendar.Now.ToString() + " Source Json updated.");
-       */
+
       // Обработать пакет.
       Logger.Debug(Calendar.Now.ToString() + " Start ProcessSplitedPackage");
       var originalFile = new Structures.Module.FileInfo();
