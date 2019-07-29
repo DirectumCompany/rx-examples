@@ -497,49 +497,13 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
       if (fact == null)
         return result;
-      
-      result = GetEmployeeByVerifiedData(fact, propertyName);
-      if (result.Employee != null)
-        return result;
-      
+            
       var addressee = GetFieldValue(fact, "Addressee");
       result.Employee = GetEmployeeByName(addressee);
       result.IsTrusted = GetField(fact, "Addressee").Probability > GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
       return result;
     }
-    
-    /// <summary>
-    /// Поиск сотрудника по истории соспоставления фактов.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <returns>Сотрудник.</returns>
-    public static Structures.Module.EmployeeWithFact GetEmployeeByVerifiedData(Sungero.Capture.Structures.Module.IFact fact, string propertyName)
-    {
-      var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
-      var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
-        .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
-        .OrderByDescending(d => d.Id)
-        .FirstOrDefault();
-      if (recognitionInfo == null)
-        return result;
-      
-      var fieldRecognitionInfo = recognitionInfo.Facts
-        .Where(f => f.FactLabel == factLabel && !string.IsNullOrWhiteSpace(f.VerifiedValue)).First();
-      int employeeId;
-      if (!int.TryParse(fieldRecognitionInfo.VerifiedValue, out employeeId))
-        return result;
-      
-      var filteredEmployee = Employees.GetAll(x => x.Id == employeeId).FirstOrDefault();
-      if (filteredEmployee != null)
-      {
-        result.Employee = filteredEmployee;
-        result.IsTrusted = fieldRecognitionInfo.IsTrusted == true;
-      }
-      return result;
-    }
-    
+        
     /// <summary>
     /// Получить контактное лицо по имени.
     /// </summary>
