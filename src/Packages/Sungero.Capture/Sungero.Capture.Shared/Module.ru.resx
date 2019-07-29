@@ -165,4 +165,7 @@
   <data name="NoticeToAuthorSubject" xml:space="preserve">
     <value>Документ подписан контрагентом: {0}</value>
   </data>
+  <data name="VersionCreateFromBarcode" xml:space="preserve">
+    <value>Версия создана службой ввода документов.</value>
+  </data>
 </root>

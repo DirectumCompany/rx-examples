@@ -143,7 +143,7 @@ namespace Sungero.Capture.Server
             document = OfficialDocuments.GetAll().Where(x => x.Id == docIds.FirstOrDefault()).FirstOrDefault();
             if (document != null)
             {
-              CreateVersion(document, recognizedDocument);
+              CreateVersion(document, recognizedDocument, Resources.VersionCreateFromBarcode);
               document.ExternalApprovalState = Docflow.OfficialDocument.ExchangeState.Signed;
               document.Save();
               CompleteApprovalCheckReturnAssignment(document);
@@ -3141,7 +3141,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ Rx.</param>
     /// <param name="recognizedDocument">Результат обработки входящего документа в Арио.</param>
-    public static void CreateVersion(IOfficialDocument document, Structures.Module.IRecognizedDocument recognizedDocument)
+    public static void CreateVersion(IOfficialDocument document, Structures.Module.IRecognizedDocument recognizedDocument, string versionNote = "")
     {
       var needCreatePublicBody = recognizedDocument.OriginalFile != null && recognizedDocument.OriginalFile.Data != null;
       var pdfApp = Content.AssociatedApplications.GetByExtension("pdf");
@@ -3175,6 +3175,9 @@ namespace Sungero.Capture.Server
         
         version.AssociatedApplication = pdfApp;
       }
+      
+      if (!string.IsNullOrEmpty(versionNote))
+        version.Note = versionNote;
       
       // Очистить Subject, если он был пуст до создания версии.
       if (subjectIsEmpty)

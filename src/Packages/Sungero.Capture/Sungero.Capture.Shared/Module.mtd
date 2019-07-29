@@ -319,7 +319,8 @@
     "EmptyArioUrl",
     "EmailBodyDocumentName",
     "EmptySubject",
-    "NoticeToAuthorSubject"
+    "NoticeToAuthorSubject",
+    "VersionCreateFromBarcode"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
