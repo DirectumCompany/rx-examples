@@ -2234,16 +2234,17 @@ namespace Sungero.Capture.Server
         if (nonTypeBusinessUnits.Count() > 1)
         {
           businessUnitFact = nonTypeBusinessUnits.Where(m => Equals(m.BusinessUnit, businessUnitByResponsible)).FirstOrDefault();
-        }
-        else
-        {
+          
           // НОР не определилась по ответственному.
-          businessUnitFindedNotExactly = true;
-          businessUnitFact = nonTypeBusinessUnits.FirstOrDefault();
+          if (businessUnitFact == null)
+            businessUnitFindedNotExactly = true;
         }
         
-        // Подсветить жёлтым, если НОР было несколько.
-        if (nonTypeBusinessUnits.Count() > 1)
+        if (businessUnitFact == null)
+          businessUnitFact = nonTypeBusinessUnits.FirstOrDefault();
+        
+        // Подсветить жёлтым, если НОР было несколько и определить по ответственному не удалось.
+        if (businessUnitFindedNotExactly)
           businessUnitFact.IsTrusted = false;
       }
       
@@ -2258,11 +2259,11 @@ namespace Sungero.Capture.Server
         // Контрагент по факту без типа. Исключить факт, по которому нашли НОР.
         var nonTypeCounterparties = nonTypeFacts
           .Where(m => m.Counterparty != null)
-          .Where(m => businessUnitFindedNotExactly || !Equals(m, businessUnitFact));
+          .Where(m => !Equals(m, businessUnitFact));
         counterpartyFact = nonTypeCounterparties.FirstOrDefault();
         
         // Подсветить жёлтым, если контрагентов было несколько.
-        if (nonTypeCounterparties.Count() > 1)
+        if (nonTypeCounterparties.Count() > 1 || businessUnitFindedNotExactly)
           counterpartyFact.IsTrusted = false;
       }
       
