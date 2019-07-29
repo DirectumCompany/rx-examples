@@ -3,6 +3,17 @@
   "NameGuid": "09cbbe65-8245-4489-b40c-d2dc0289a922",
   "Name": "UniversalTransferDocument",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "58986e23-2b0a-4082-af37-bd1991bc6f7e",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {

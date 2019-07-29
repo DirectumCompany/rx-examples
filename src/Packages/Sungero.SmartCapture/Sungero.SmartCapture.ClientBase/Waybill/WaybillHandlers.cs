@@ -74,7 +74,7 @@ namespace Sungero.SmartCapture
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
       base.Refresh(e);
-                  
+      
       // Восстановить обязательность контрагента.
       _obj.State.Properties.Counterparty.IsRequired = true;
       

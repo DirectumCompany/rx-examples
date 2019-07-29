@@ -3,6 +3,17 @@
   "NameGuid": "296576eb-c935-4fbe-a719-03d957fdaebc",
   "Name": "IncomingTaxInvoice",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "74c9ddd4-4bc4-42b6-8bb0-c91d5e21fb8a",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {

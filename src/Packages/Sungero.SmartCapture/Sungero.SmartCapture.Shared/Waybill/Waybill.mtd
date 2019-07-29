@@ -3,6 +3,17 @@
   "NameGuid": "7c2f5c32-e221-4e09-96f8-48c74a9940bb",
   "Name": "Waybill",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "4e81f9ca-b95a-4fd4-bf76-ea7176c215a7",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {

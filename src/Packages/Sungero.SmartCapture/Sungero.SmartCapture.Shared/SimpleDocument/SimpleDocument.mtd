@@ -3,6 +3,17 @@
   "NameGuid": "1d27283f-19ec-4f06-86d2-50bb3f4f3c43",
   "Name": "SimpleDocument",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "09584896-81e2-4c83-8f6c-70eb8321e1d0",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {

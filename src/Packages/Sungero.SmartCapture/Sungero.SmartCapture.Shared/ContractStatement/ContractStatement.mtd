@@ -3,6 +3,17 @@
   "NameGuid": "ce74f1c2-c639-408d-bae5-695189b5db85",
   "Name": "ContractStatement",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "f2f5774d-5ca3-4725-b31d-ac618f6b8850",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {

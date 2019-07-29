@@ -9,16 +9,21 @@ namespace Sungero.SmartCapture.Client
 {
   partial class IncomingLetterActions
   {
-    public override void Cancel(Sungero.Domain.Client.ExecuteActionArgs e)
+    public override void CancelRegistration(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      base.Cancel(e);
+      base.CancelRegistration(e);
+      
+      // Отменить подсветку рег.номера и даты.
+      this._obj.State.Properties.RegistrationNumber.HighlightColor = Sungero.Core.Colors.Empty;
+      this._obj.State.Properties.RegistrationDate.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override bool CanCancel(Sungero.Domain.Client.CanExecuteActionArgs e)
+    public override bool CanCancelRegistration(Sungero.Domain.Client.CanExecuteActionArgs e)
     {
-      return base.CanCancel(e);
+      return base.CanCancelRegistration(e);
     }
 
   }
+
 
 }

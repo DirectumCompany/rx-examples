@@ -3,6 +3,17 @@
   "NameGuid": "b4d090eb-8fde-4354-8aac-d4e98d79c852",
   "Name": "OutgoingTaxInvoice",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "f50c4d8a-56bc-43ef-bac3-856f57ca70be",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {
