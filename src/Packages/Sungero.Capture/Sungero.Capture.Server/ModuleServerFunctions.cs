@@ -3090,39 +3090,33 @@ namespace Sungero.Capture.Server
       if (document == null)
         return result;
       
-      // Получить результаты распознавания документа без проверки прав.
-      // Сделано, чтобы не выдавать пользователям права на технический справочник.
-      AccessRights.AllowRead(
-        () =>
+      var recognitionInfo = DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
+      if (recognitionInfo == null)
+        return result;
+      
+      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+      var linkedFacts = recognitionInfo.Facts
+        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
+        .Where(x => x.IsTrusted == isTrusted);
+      
+      // Взять только неизмененные пользователем свойства.
+      var type = document.GetType();
+      foreach (var linkedFact in linkedFacts)
+      {
+        var propertyName = linkedFact.PropertyName;
+        var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+        if (property != null)
         {
-          var recognitionInfo = DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
-          if (recognitionInfo == null)
-            return;
-          
-          // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
-          var linkedFacts = recognitionInfo.Facts
-            .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
-            .Where(x => x.IsTrusted == isTrusted);
-          
-          // Взять только неизмененные пользователем свойства.
-          var type = document.GetType();
-          foreach (var linkedFact in linkedFacts)
+          object propertyValue = property.GetValue(document);
+          var propertyStringValue = GetPropertyValueAsString(propertyValue);
+          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
           {
-            var propertyName = linkedFact.PropertyName;
-            var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
-            if (property != null)
-            {
-              object propertyValue = property.GetValue(document);
-              var propertyStringValue = GetPropertyValueAsString(propertyValue);
-              if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
-              {
-                var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
-                                                        propertyName, linkedFact.Position);
-                result.Add(propertyAndPosition);
-              }
-            }
+            var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
+                                                    propertyName, linkedFact.Position);
+            result.Add(propertyAndPosition);
           }
-        });
+        }
+      }
       
       return result.Distinct().ToList();
     }
