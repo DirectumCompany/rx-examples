@@ -857,11 +857,10 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       FillDeliveryMethod(document, true);
       document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
-      var mailSubject = mailInfo.Subject;
-      if (!string.IsNullOrWhiteSpace(mailSubject))
+      if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
       {
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
-        document.Subject = mailSubject;
+        document.Subject = mailInfo.Subject;
       }
       
       using (var body = new MemoryStream(bodyInfo.Data))
