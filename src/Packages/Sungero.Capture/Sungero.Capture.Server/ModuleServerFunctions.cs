@@ -3214,6 +3214,9 @@ namespace Sungero.Capture.Server
     {
       var needCreatePublicBody = recognizedDocument.OriginalFile != null && recognizedDocument.OriginalFile.Data != null;
       var pdfApp = Content.AssociatedApplications.GetByExtension("pdf");
+      if (pdfApp == Content.AssociatedApplications.Null)
+        pdfApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.Path);
+      
       var originalFileApp = Content.AssociatedApplications.Null;
       if (needCreatePublicBody)
         originalFileApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.Path);
