@@ -105,6 +105,19 @@
   ],
   "PublicFunctions": [
     {
+      "Name": "EnableRequisitesForVerification",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IAccountingDocumentBase",
+          "ParameterTypeFullName": "Sungero.Docflow.IAccountingDocumentBase, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Client",
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    },
+    {
       "Name": "GetClassRuleMapping",
       "Placement": "Client",
       "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"

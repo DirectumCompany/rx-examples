@@ -83,6 +83,7 @@ namespace Sungero.SmartCapture
         _obj.State.Properties.Counterparty.IsEnabled = true;
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+      Sungero.Capture.PublicFunctions.Module.EnableRequisitesForVerification(_obj);
     }
 
   }

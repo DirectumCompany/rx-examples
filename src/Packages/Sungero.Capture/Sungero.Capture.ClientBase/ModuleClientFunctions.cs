@@ -541,6 +541,43 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
+    /// Разблокировать реквизиты для верификации после автонумерации/регистрации.
+    /// </summary>
+    /// <param name="document">Документ для верификации.</param>
+    [Public]
+    public void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
+    {
+      // Проверить возможность изменения реквизитов.
+      if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))
+        return;
+      
+      if (!(document.AccessRights.CanUpdate() && !Locks.GetLockInfo(document).IsLockedByOther && document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess))
+        return;
+
+      var properties = document.State.Properties;
+      properties.Name.IsEnabled = !document.DocumentKind.GenerateDocumentName.Value;
+      properties.DocumentKind.IsEnabled = true;
+      properties.Subject.IsEnabled = true;  
+      properties.BusinessUnit.IsEnabled = true;
+      properties.Department.IsEnabled = true;
+      properties.Counterparty.IsEnabled = true;
+      properties.Assignee.IsEnabled = true;   
+      
+      properties.DeliveryMethod.IsEnabled = true;
+      properties.DocumentRegister.IsEnabled = true;
+      properties.CaseFile.IsEnabled = true;
+      properties.PlacedToCaseFileDate.IsEnabled = true;
+      properties.RegistrationNumber.IsEnabled = true;
+      properties.RegistrationDate.IsEnabled = true;
+      properties.LifeCycleState.IsEnabled = true;
+      properties.InternalApprovalState.IsEnabled = true;
+      properties.ExternalApprovalState.IsEnabled = true;
+      properties.ExecutionState.IsEnabled = true;
+      properties.ControlExecutionState.IsEnabled = true;
+      properties.Tracking.IsEnabled = true;
+    }
+    
+    /// <summary>
     /// Удалить изображения из тела письма.
     /// </summary>
     /// <param name="path">Пусть к html-файлу письма.</param>
