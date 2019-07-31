@@ -172,8 +172,8 @@ namespace Sungero.Capture.Server
       // Если ведущий документ SimpleDocument и он пришел из папки захвата,
       // то переименовываем его, для того чтобы в имени содержался его порядковый номер.
       int simpleDocumentNumber = 1;
-      var leadingDocumentIsSimple = !SimpleDocuments.Is(leadingDocument);
-      if (!leadingDocumentIsSimple && string.IsNullOrEmpty(originalFile.Description))
+      var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
+      if (leadingDocumentIsSimple && string.IsNullOrEmpty(originalFile.Description))
       {
         leadingDocument.Name = Resources.DocumentNameFormat(simpleDocumentNumber);
         leadingDocument.Save();
@@ -186,8 +186,8 @@ namespace Sungero.Capture.Server
         addendums.Remove(leadingDocument);
       
       var relation = leadingDocumentIsSimple
-        ? Docflow.PublicConstants.Module.AddendumRelationName
-        : Constants.Module.SimpleRelationRelationName;
+        ? Constants.Module.SimpleRelationRelationName
+        : Docflow.PublicConstants.Module.AddendumRelationName;
 
       foreach (var addendum in addendums)
       {
@@ -195,8 +195,8 @@ namespace Sungero.Capture.Server
         if (SimpleDocuments.Is(addendum) && string.IsNullOrEmpty(originalFile.Description))
         {
           addendum.Name = leadingDocumentIsSimple
-            ? Resources.AttachmentNameFormat(simpleDocumentNumber)
-            : Resources.DocumentNameFormat(simpleDocumentNumber);
+            ? Resources.DocumentNameFormat(simpleDocumentNumber)
+            : Resources.AttachmentNameFormat(simpleDocumentNumber);
           simpleDocumentNumber++;
         }
         addendum.Relations.AddFrom(relation, leadingDocument);
