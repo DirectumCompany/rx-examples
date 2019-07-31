@@ -577,10 +577,18 @@ namespace Sungero.Capture.Client
     /// <param name="path">Пусть к html-файлу письма.</param>
     private static void RemoveImagesFromEmailBody(string path)
     {
+      // Нет смысла удалять изображения в файлах, расширение которых не html.
+      if (Path.GetExtension(path).ToLower() != ".html")
+        return;
+
       try
       {
         var mailBody = File.ReadAllText(path);
         mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
+        
+        // В некоторых случаях Aspose не может распознать файл как html, поэтому добавляем тег html, если его нет.
+        if (!mailBody.Contains("<html"))
+          mailBody = string.Format("<html>{0}</html>", mailBody);        
         File.WriteAllText(path, mailBody);
       }
       catch(Exception ex)

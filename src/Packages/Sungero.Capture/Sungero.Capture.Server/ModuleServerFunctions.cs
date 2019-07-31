@@ -869,7 +869,7 @@ namespace Sungero.Capture.Server
         var version = document.LastVersion;
         var pdfConverter = new AsposeExtensions.Converter();
         var pdfDocumentStream = pdfConverter.GeneratePdf(body, "html");
-        if (pdfDocumentStream != null)
+        if (pdfDocumentStream != null && Path.GetExtension(bodyInfo.Path).ToLower() == ".html")
         {
           version.Body.Write(pdfDocumentStream);
           version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
