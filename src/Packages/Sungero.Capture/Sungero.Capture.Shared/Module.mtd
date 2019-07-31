@@ -76,6 +76,16 @@
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Capture",
+  "Jobs": [
+    {
+      "NameGuid": "161f7d1d-3592-4b71-a998-955b08437924",
+      "Name": "ChangeVerificationState",
+      "Daily": "Repeat",
+      "GenerateHandler": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 5
+    }
+  ],
   "Libraries": [
     {
       "NameGuid": "10f6f0a5-cb61-4048-ab19-1e52e12d4f10",

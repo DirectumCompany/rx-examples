@@ -203,7 +203,7 @@ namespace Sungero.Capture.Server
         addendum.Save();
       }
       
-      result.RelatedDocumentIds = package.Select(x => x.Id).ToList();
+      result.RelatedDocumentIds = package.Select(x => x.Id).ToList();      
       return result;
     }
     
@@ -3128,5 +3128,61 @@ namespace Sungero.Capture.Server
     
     #endregion
     
+    #region Фоновый процесс для мониторинга выполненных задач верификации.
+        
+    public static void ChangeVerificationState()
+    {
+      var documentIds = Docflow.OfficialDocuments.GetAll().Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess).Select(d => d.Id).ToList();
+      
+      // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов, 
+      // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.      
+      var processedIds = new List<int?>();
+      var verificationTaskSubject = Resources.CheckPackage;
+      foreach(var documentId in documentIds)
+      {
+        if (processedIds.Contains(documentId))
+          continue;
+        var tasks = SimpleTasks.GetAll().Where(t => t.AttachmentDetails.Any(att => att.AttachmentId == documentId) 
+                                               && t.Subject.Contains(verificationTaskSubject)).OrderByDescending(s => s.Started);
+        if (tasks.Any())
+        {
+          // Обрабатываем только последнюю задачу по документу.
+          var task = tasks.FirstOrDefault();
+          var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
+          processedIds.AddRange(attachmentIds);
+          var assigments = Assignments.GetAll().Where(a => a.Task.Equals(task) && a.Status != Workflow.Assignment.Status.Completed);
+          var subTasks = GetSubtasksForTaskRecursive(task);
+          if (!assigments.Any() && !subTasks.Any())
+          {
+            foreach (var id in attachmentIds)
+            {
+              if (id == null)
+                continue;
+              var document = OfficialDocuments.Get((int)id);
+              document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
+              document.Save();
+            }           
+          }
+        }                   
+      }
+    }
+    
+    public static List<ITask> GetSubtasksForTaskRecursive(ITask task)
+    {
+      var subTasks = Tasks.GetAll(p => ((p.ParentAssignment != null && task.Equals(p.ParentAssignment.Task)) ||
+                                        (p.ParentAssignment == null && task.Equals(p.ParentTask))) &&
+                                  p.Status == Workflow.Task.Status.InProcess).ToList();
+
+      var result = new List<ITask>();
+      result.AddRange(subTasks);
+
+      foreach (var subTask in subTasks)
+        result.AddRange(GetSubtasksForTaskRecursive(subTask));
+
+      return result;
+    }
+    
+    #endregion
+        
   }
 }

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -8,6 +8,14 @@ namespace Sungero.Capture.Server
 {
   public class ModuleJobs
   {
+
+    /// <summary>
+    /// Фоновый процесс для мониторинга выполненных задач верификации.
+    /// </summary>
+    public virtual void ChangeVerificationState()
+    {
+      Functions.Module.ChangeVerificationState();
+    }
 
   }
 }
