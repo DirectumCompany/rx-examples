@@ -880,7 +880,10 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
       {
         document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
-        document.Subject = mailInfo.Subject;
+        var subject = mailInfo.Subject;
+        if (subject.Length > Docflow.SimpleDocuments.Info.Properties.Subject.Length)
+          subject = subject.Substring(0, Docflow.SimpleDocuments.Info.Properties.Subject.Length);
+        document.Subject = subject;
       }
       
       using (var body = new MemoryStream(bodyInfo.Data))
