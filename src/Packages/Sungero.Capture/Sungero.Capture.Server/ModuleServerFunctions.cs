@@ -885,10 +885,11 @@ namespace Sungero.Capture.Server
       document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
       {
-        document.Name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
+        var name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
+        document.Name = Docflow.PublicFunctions.OfficialDocument.AddClosingQuote(name, document);
         var subject = mailInfo.Subject;
-        if (subject.Length > Docflow.SimpleDocuments.Info.Properties.Subject.Length)
-          subject = subject.Substring(0, Docflow.SimpleDocuments.Info.Properties.Subject.Length);
+        if (subject.Length > document.Info.Properties.Subject.Length)
+          subject = subject.Substring(0, document.Info.Properties.Subject.Length);
         document.Subject = subject;
       }
       
