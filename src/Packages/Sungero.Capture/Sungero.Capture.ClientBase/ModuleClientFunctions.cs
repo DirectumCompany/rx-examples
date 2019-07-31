@@ -569,12 +569,6 @@ namespace Sungero.Capture.Client
       properties.PlacedToCaseFileDate.IsEnabled = true;
       properties.RegistrationNumber.IsEnabled = true;
       properties.RegistrationDate.IsEnabled = true;
-      properties.LifeCycleState.IsEnabled = true;
-      properties.InternalApprovalState.IsEnabled = true;
-      properties.ExternalApprovalState.IsEnabled = true;
-      properties.ExecutionState.IsEnabled = true;
-      properties.ControlExecutionState.IsEnabled = true;
-      properties.Tracking.IsEnabled = true;
     }
     
     /// <summary>
