@@ -497,7 +497,7 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
       if (fact == null)
         return result;
-            
+      
       var addressee = GetFieldValue(fact, "Addressee");
       result.Employee = GetEmployeeByName(addressee);
       result.IsTrusted = GetField(fact, "Addressee").Probability > GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
@@ -784,22 +784,43 @@ namespace Sungero.Capture.Server
         return;
       
       var task = SimpleTasks.Create();
-      task.Subject = Resources.CheckPackageTaskNameFormat(leadingDocument);
-      task.ActiveText = Resources.CheckPackageTaskText;
+      
+      if (documents.Count == 0)
+        task.Subject = Resources.CheckDocumentTaskNameFormat(leadingDocument);
+      else
+        task.Subject = Resources.CheckPackageTaskNameFormat(leadingDocument);
+      
       var step = task.RouteSteps.AddNew();
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
       step.Performer = responsible;
       
-      // Вложить в задачу и выдать права на документы ответственному.
-      leadingDocument.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
-      leadingDocument.Save();
-      task.Attachments.Add(leadingDocument);
-      foreach (var document in documents)
+      var allSetDocuments = documents;
+      allSetDocuments.Add(leadingDocument);
+      
+      var simpleDocumentsCount = 0;
+      var simpleDocuments = string.Empty;
+      foreach (var document in allSetDocuments)
       {
+        // Собрать ссылки на неклассифицированные документы.
+        if (Docflow.SimpleDocuments.Is(document))
+        {
+          simpleDocuments = string.Format("{0}\n    {1}", simpleDocuments, Hyperlinks.Get(document));
+          simpleDocumentsCount++;
+        }
+        // Вложить в задачу и выдать права на документы ответственному.
         document.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
         document.Save();
         task.Attachments.Add(document);
       }
+      
+      task.ActiveText = Resources.CheckPackageTaskText;
+      if (simpleDocuments.Length > 0)
+      {
+        var failedClassifyTaskText = simpleDocumentsCount == 1 ? Resources.FailedClassifyDocumentTaskTextFormat(simpleDocuments) 
+          : Resources.FailedClassifyDocumentsTaskTextFormat(simpleDocuments);
+        task.ActiveText = string.Format("{0}\n\n{1}", task.ActiveText, failedClassifyTaskText);
+      }
+      
       task.NeedsReview = false;
       task.Deadline = Calendar.Now.AddWorkingHours(4);
       task.Save();
@@ -836,7 +857,6 @@ namespace Sungero.Capture.Server
     {
       var document = SimpleDocuments.Create();
       document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
-      document.Note = recognizedDocument.Message;
       
       return document;
     }

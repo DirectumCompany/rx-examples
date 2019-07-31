@@ -162,4 +162,13 @@
   <data name="VersionCreateFromBarcode" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="CheckDocumentTaskName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="FailedClassifyDocumentsTaskText" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

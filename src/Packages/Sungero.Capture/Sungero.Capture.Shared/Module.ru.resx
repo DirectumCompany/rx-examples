@@ -142,10 +142,12 @@
     <value>Приложение №{0}</value>
   </data>
   <data name="CheckPackageTaskText" xml:space="preserve">
-    <value>- Проверьте, что реквизиты всех документов комплекта заполнены верно.
-- При необходимости измените типы документов и дозаполните карточки.
-- При необходимости зарегистрируйте поступившие документы.
-- Отправьте документы в работу или отметьте как устаревшие при ошибках занесения.</value>
+    <value>Убедитесь, что комплект документов занесен в полном объеме.
+На закладке «Верификация» проверьте корректность данных, которые заполнились автоматически.
+Зарегистрируйте документы, которые подлежат регистрации.
+При необходимости у приложений смените тип документа.
+Отправьте документы на дальнейшую обработку.
+Если документ занесен ошибочно, удалите его.</value>
   </data>
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>Документ</value>
@@ -164,5 +166,14 @@
   </data>
   <data name="VersionCreateFromBarcode" xml:space="preserve">
     <value>Версия создана службой ввода документов.</value>
+  </data>
+  <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
+    <value>Службе ввода документов не удалось классифицировать документ:{0}</value>
+  </data>
+  <data name="CheckDocumentTaskName" xml:space="preserve">
+    <value>Проверьте документ: {0}</value>
+  </data>
+  <data name="FailedClassifyDocumentsTaskText" xml:space="preserve">
+    <value>Службе ввода документов не удалось классифицировать документы:{0}</value>
   </data>
 </root>

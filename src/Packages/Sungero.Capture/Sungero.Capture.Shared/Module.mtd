@@ -342,7 +342,10 @@
     "EmptyArioUrl",
     "EmailBodyDocumentName",
     "NoticeToAuthorSubject",
-    "VersionCreateFromBarcode"
+    "VersionCreateFromBarcode",
+    "FailedClassifyDocumentTaskText",
+    "CheckDocumentTaskName",
+    "FailedClassifyDocumentsTaskText"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
