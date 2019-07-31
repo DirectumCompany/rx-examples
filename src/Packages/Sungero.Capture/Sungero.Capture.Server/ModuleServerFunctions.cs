@@ -203,7 +203,7 @@ namespace Sungero.Capture.Server
         addendum.Save();
       }
       
-      result.RelatedDocumentIds = package.Select(x => x.Id).ToList();      
+      result.RelatedDocumentIds = package.Select(x => x.Id).ToList();
       return result;
     }
     
@@ -783,43 +783,49 @@ namespace Sungero.Capture.Server
       if (leadingDocument == null)
         return;
       
+      // Собрать пакет документов. Порядок важен, чтобы ведущий был первым.
+      var package = new List<IOfficialDocument>();
+      package.Add(leadingDocument);
+      package.AddRange(documents);
+      
+      // Тема.
       var task = SimpleTasks.Create();
+      task.Subject = package.Count() > 1
+        ? Resources.CheckPackageTaskNameFormat(leadingDocument)
+        : Resources.CheckDocumentTaskNameFormat(leadingDocument);
       
-      if (documents.Count == 0)
-        task.Subject = Resources.CheckDocumentTaskNameFormat(leadingDocument);
-      else
-        task.Subject = Resources.CheckPackageTaskNameFormat(leadingDocument);
-      
-      var step = task.RouteSteps.AddNew();
-      step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
-      step.Performer = responsible;
-      
-      var allSetDocuments = documents;
-      allSetDocuments.Add(leadingDocument);
-      
-      var simpleDocumentsCount = 0;
-      var simpleDocuments = string.Empty;
-      foreach (var document in allSetDocuments)
+      // Вложить в задачу и выдать права на документы ответственному.
+      var notClassifiedDocumentsHyperlinks = new List<string>();
+      foreach (var document in package)
       {
-        // Собрать ссылки на неклассифицированные документы.
-        if (Docflow.SimpleDocuments.Is(document))
-        {
-          simpleDocuments = string.Format("{0}\n    {1}", simpleDocuments, Hyperlinks.Get(document));
-          simpleDocumentsCount++;
-        }
-        // Вложить в задачу и выдать права на документы ответственному.
         document.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
         document.Save();
         task.Attachments.Add(document);
+        
+        // Собрать ссылки на неклассифицированные документы.
+        if (Docflow.SimpleDocuments.Is(document))
+          notClassifiedDocumentsHyperlinks.Add(Hyperlinks.Get(document));
       }
       
+      // Текст задачи.
       task.ActiveText = Resources.CheckPackageTaskText;
-      if (simpleDocuments.Length > 0)
+      
+      // Добавить в текст задачи список не классифицированных документов.
+      if (notClassifiedDocumentsHyperlinks.Any())
       {
-        var failedClassifyTaskText = simpleDocumentsCount == 1 ? Resources.FailedClassifyDocumentTaskTextFormat(simpleDocuments) 
-          : Resources.FailedClassifyDocumentsTaskTextFormat(simpleDocuments);
-        task.ActiveText = string.Format("{0}\n\n{1}", task.ActiveText, failedClassifyTaskText);
+        var failedClassifyTaskText = notClassifiedDocumentsHyperlinks.Count() == 1 
+          ? Resources.FailedClassifyDocumentTaskText
+          : Resources.FailedClassifyDocumentsTaskText;
+        
+        var notClassifiedDocumentsHyperlinksLabel = string.Join("\n    ", notClassifiedDocumentsHyperlinks);
+        
+        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedClassifyTaskText, notClassifiedDocumentsHyperlinksLabel);
       }
+      
+      // Маршрут.
+      var step = task.RouteSteps.AddNew();
+      step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
+      step.Performer = responsible;
       
       task.NeedsReview = false;
       task.Deadline = Calendar.Now.AddWorkingHours(4);
@@ -3152,20 +3158,20 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Фоновый процесс для мониторинга выполненных задач верификации.
-        
+    
     public static void ChangeVerificationState()
     {
       var documentIds = Docflow.OfficialDocuments.GetAll().Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess).Select(d => d.Id).ToList();
       
-      // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов, 
-      // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.      
+      // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов,
+      // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.
       var processedIds = new List<int?>();
       var verificationTaskSubject = Resources.CheckPackage;
       foreach(var documentId in documentIds)
       {
         if (processedIds.Contains(documentId))
           continue;
-        var tasks = SimpleTasks.GetAll().Where(t => t.AttachmentDetails.Any(att => att.AttachmentId == documentId) 
+        var tasks = SimpleTasks.GetAll().Where(t => t.AttachmentDetails.Any(att => att.AttachmentId == documentId)
                                                && t.Subject.Contains(verificationTaskSubject)).OrderByDescending(s => s.Started);
         if (tasks.Any())
         {
@@ -3184,9 +3190,9 @@ namespace Sungero.Capture.Server
               var document = OfficialDocuments.Get((int)id);
               document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
               document.Save();
-            }           
+            }
           }
-        }                   
+        }
       }
     }
     
@@ -3206,6 +3212,6 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
-        
+    
   }
 }

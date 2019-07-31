@@ -53,8 +53,9 @@ namespace Sungero.SmartCapture.Module.Shell.Server
                                Sungero.Docflow.ApprovalSendingAssignments.Is(q) && Sungero.Docflow.ApprovalSendingAssignments.As(q).CollapsedStagesTypesSen.Any(s => stageTypes.Contains(s.StageType.Value)) ||
                                // Контроль возврата.
                                showCheckReturn && Sungero.Docflow.ApprovalCheckReturnAssignments.Is(q) ||
-                               // Обработка комплектов документов.
-                               showProcessPackage && q.Subject.Contains(Sungero.Capture.Resources.CheckPackage) ||
+                               // Проверка комплектов документов.
+                               showProcessPackage && (q.Subject.Contains(Sungero.Capture.Resources.CheckPackage) || 
+                                                      q.Subject.Contains(Sungero.Capture.Resources.CheckDocument)) ||
                                // Прочие задания.
                                showOther && (Sungero.Docflow.ApprovalSimpleAssignments.Is(q) || Sungero.Docflow.ApprovalCheckingAssignments.Is(q)));
       

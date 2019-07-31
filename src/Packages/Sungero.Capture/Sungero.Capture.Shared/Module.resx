@@ -171,4 +171,7 @@
   <data name="FailedClassifyDocumentsTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="CheckDocument" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

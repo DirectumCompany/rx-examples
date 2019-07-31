@@ -136,7 +136,7 @@
     <value>Документ с ИД {0} не найден.</value>
   </data>
   <data name="CheckPackage" xml:space="preserve">
-    <value>Проверьте комплект документов</value>
+    <value>Проверьте комплект документов:</value>
   </data>
   <data name="AttachmentName" xml:space="preserve">
     <value>Приложение №{0}</value>
@@ -145,7 +145,7 @@
     <value>Убедитесь, что комплект документов занесен в полном объеме.
 На закладке «Верификация» проверьте корректность данных, которые заполнились автоматически.
 Зарегистрируйте документы, которые подлежат регистрации.
-При необходимости у приложений смените тип документа.
+При необходимости у приложений и простых документов смените тип.
 Отправьте документы на дальнейшую обработку.
 Если документ занесен ошибочно, удалите его.</value>
   </data>
@@ -168,12 +168,15 @@
     <value>Версия создана службой ввода документов.</value>
   </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
-    <value>Службе ввода документов не удалось классифицировать документ:{0}</value>
+    <value>Службе ввода документов не удалось классифицировать документ:</value>
   </data>
   <data name="CheckDocumentTaskName" xml:space="preserve">
     <value>Проверьте документ: {0}</value>
   </data>
   <data name="FailedClassifyDocumentsTaskText" xml:space="preserve">
-    <value>Службе ввода документов не удалось классифицировать документы:{0}</value>
+    <value>Службе ввода документов не удалось классифицировать документы:</value>
+  </data>
+  <data name="CheckDocument" xml:space="preserve">
+    <value>Проверьте документ:</value>
   </data>
 </root>

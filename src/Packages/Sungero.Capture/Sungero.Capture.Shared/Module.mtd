@@ -345,7 +345,8 @@
     "VersionCreateFromBarcode",
     "FailedClassifyDocumentTaskText",
     "CheckDocumentTaskName",
-    "FailedClassifyDocumentsTaskText"
+    "FailedClassifyDocumentsTaskText",
+    "CheckDocument"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
