@@ -426,6 +426,11 @@ namespace Sungero.Capture.Server
       return currentTenant != null ? currentTenant.Id : string.Empty;
     }
     
+    /// <summary>
+    /// Попытаться зарегистрировать документ.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    [Public]
     public virtual void RegisterDocument(IOfficialDocument document)
     {
       // Присвоить номер, если вид документа - нумеруемый.

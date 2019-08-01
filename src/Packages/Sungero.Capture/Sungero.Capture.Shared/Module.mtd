@@ -159,6 +159,18 @@
       "ReturnTypeFullName": "System.Collections.Generic.List"
     },
     {
+      "Name": "RegisterDocument",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    },
+    {
       "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [

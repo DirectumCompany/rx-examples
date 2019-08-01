@@ -10,6 +10,14 @@ namespace Sungero.SmartCapture
   partial class UniversalTransferDocumentServerHandlers
   {
 
+    public override void Saving(Sungero.Domain.SavingEventArgs e)
+    {
+      base.Saving(e);
+      
+      // Зарегистрировать документ.
+      Capture.PublicFunctions.Module.RegisterDocument(_obj);
+    }
+
     public override void AfterSave(Sungero.Domain.AfterSaveEventArgs e)
     {
       base.AfterSave(e);
