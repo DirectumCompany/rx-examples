@@ -3133,7 +3133,7 @@ namespace Sungero.Capture.Server
       var processedIds = new List<int?>();
       var verificationTaskSubject = Resources.CheckPackage;
       var verificationTasks = SimpleTasks.GetAll()
-          .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id && t.Subject.Contains(verificationTaskSubject));
+        .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id && t.Subject.Contains(verificationTaskSubject));
       foreach(var documentId in documentIds)
       {
         if (processedIds.Contains(documentId))
@@ -3160,9 +3160,9 @@ namespace Sungero.Capture.Server
             var document = OfficialDocuments.Get((int)id);
             document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
             document.Save();
-            }
-        }        
+          }
         }
+      }
     }
             
     #endregion
