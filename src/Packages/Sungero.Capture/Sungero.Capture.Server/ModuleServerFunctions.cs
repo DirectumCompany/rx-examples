@@ -818,7 +818,7 @@ namespace Sungero.Capture.Server
       // Добавить в текст задачи список не классифицированных документов.
       if (notClassifiedDocumentsHyperlinks.Any())
       {
-        var failedClassifyTaskText = notClassifiedDocumentsHyperlinks.Count() == 1 
+        var failedClassifyTaskText = notClassifiedDocumentsHyperlinks.Count() == 1
           ? Resources.FailedClassifyDocumentTaskText
           : Resources.FailedClassifyDocumentsTaskText;
         
@@ -902,21 +902,27 @@ namespace Sungero.Capture.Server
       {
         document.CreateVersion();
         var version = document.LastVersion;
-        var pdfConverter = new AsposeExtensions.Converter();
-        var pdfDocumentStream = pdfConverter.GeneratePdf(body, "html");
-        if (pdfDocumentStream != null && Path.GetExtension(bodyInfo.Path).ToLower() == ".html")
+        if (Path.GetExtension(bodyInfo.Path).ToLower() == ".html")
         {
-          version.Body.Write(pdfDocumentStream);
-          version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
+          var pdfConverter = new AsposeExtensions.Converter();
+          using (var pdfDocumentStream = pdfConverter.GeneratePdf(body, "html"))
+          {
+            if (pdfDocumentStream != null)
+            {
+              version.Body.Write(pdfDocumentStream);
+              version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
+            }
+          }
         }
-        else
+        
+        // Если тело письма не удалось преобразовать в pdf или расширение не html, то в тело пишем исходный файл.
+        if (version.Body.Size == 0)
         {
           version.Body.Write(body);
           version.AssociatedApplication = GetAssociatedApplicationByFileName(bodyInfo.Path);
         }
       }
       document.Save();
-      
       return document;
     }
     
