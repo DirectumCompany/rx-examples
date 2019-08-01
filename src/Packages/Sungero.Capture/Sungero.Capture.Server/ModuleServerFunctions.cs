@@ -798,6 +798,8 @@ namespace Sungero.Capture.Server
       task.Subject = package.Count() > 1
         ? Resources.CheckPackageTaskNameFormat(leadingDocument)
         : Resources.CheckDocumentTaskNameFormat(leadingDocument);
+      if (task.Subject.Length > task.Info.Properties.Subject.Length)
+        task.Subject = task.Subject.Substring(0, task.Info.Properties.Subject.Length);
       
       // Вложить в задачу и выдать права на документы ответственному.
       var notClassifiedDocumentsHyperlinks = new List<string>();
