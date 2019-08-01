@@ -107,6 +107,7 @@ namespace Sungero.Capture.Structures.Module
   {
     public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact BusinessUnitFact { get; set; }
     public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact CounterpartyFact { get; set; }
+    public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
   }
 
 
