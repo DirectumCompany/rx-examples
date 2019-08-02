@@ -551,7 +551,7 @@ namespace Sungero.Capture.Client
       if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))
         return;
       
-      if (!(document.AccessRights.CanUpdate() && !Locks.GetLockInfo(document).IsLockedByOther && document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess))
+      if (!(document.AccessRights.CanUpdate() && document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess))
         return;
 
       var properties = document.State.Properties;

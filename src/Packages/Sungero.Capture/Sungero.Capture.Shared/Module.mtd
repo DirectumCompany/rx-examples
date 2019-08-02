@@ -358,7 +358,8 @@
     "FailedClassifyDocumentTaskText",
     "CheckDocumentTaskName",
     "FailedClassifyDocumentsTaskText",
-    "CheckDocument"
+    "CheckDocument",
+    "FailedClassifyDocumentsTaskName"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

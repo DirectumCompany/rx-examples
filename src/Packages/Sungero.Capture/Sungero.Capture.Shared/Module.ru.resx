@@ -127,7 +127,7 @@
     <value>В метаданных пакета, сформированного DCS, нет информации о содержащихся в нём файлах.</value>
   </data>
   <data name="DocumentName" xml:space="preserve">
-    <value>Документ №{0}</value>
+    <value>Простой документ №{0}</value>
   </data>
   <data name="CheckPackageTaskName" xml:space="preserve">
     <value>Проверьте комплект документов: {0}</value>
@@ -178,5 +178,8 @@
   </data>
   <data name="CheckDocument" xml:space="preserve">
     <value>Проверьте документ:</value>
+  </data>
+  <data name="FailedClassifyDocumentsTaskName" xml:space="preserve">
+    <value>Проверьте комплект, поступивший от службы ввода документов.</value>
   </data>
 </root>

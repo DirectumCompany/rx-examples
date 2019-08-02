@@ -795,7 +795,10 @@ namespace Sungero.Capture.Server
       
       // Тема.
       var task = SimpleTasks.Create();
-      task.Subject = package.Count() > 1
+      // Если все документы
+      task.Subject = Docflow.SimpleDocuments.Is(leadingDocument)
+        ? Resources.FailedClassifyDocumentsTaskName
+        : package.Count() > 1
         ? Resources.CheckPackageTaskNameFormat(leadingDocument)
         : Resources.CheckDocumentTaskNameFormat(leadingDocument);
       if (task.Subject.Length > task.Info.Properties.Subject.Length)
