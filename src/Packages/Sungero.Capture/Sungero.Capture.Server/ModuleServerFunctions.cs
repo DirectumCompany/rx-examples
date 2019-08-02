@@ -3124,51 +3124,6 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
-    
-    #region Фоновый процесс для мониторинга выполненных задач верификации.
-    
-    public static void ChangeVerificationState()
-    {
-      var documentIds = Docflow.OfficialDocuments.GetAll().Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess).Select(d => d.Id).ToList();
-      
-      // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов,
-      // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.
-      var processedIds = new List<int?>();
-      var verificationTaskSubject = Resources.CheckPackage;
-      var verificationTasks = SimpleTasks.GetAll()
-        .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id && t.Subject.Contains(verificationTaskSubject));
-      foreach(var documentId in documentIds)
-      {
-        if (processedIds.Contains(documentId))
-          continue;
-        
-        var documentVerificationTasks = verificationTasks
-          .Where(vt => vt.AttachmentDetails.Any(att => att.AttachmentId == documentId))
-          .OrderByDescending(s => s.Started);
-        if (!documentVerificationTasks.Any())
-          continue;
-        
-        // Для того чтобы считать что документ верифицирован, достаточно чтобы последняя задача была выполнена.
-        var task = documentVerificationTasks.FirstOrDefault();
-        var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
-        processedIds.AddRange(attachmentIds);
-        var subTasks = Tasks.GetAll().Where(t => t.MainTaskId.HasValue && t.MainTaskId.Value == task.Id && t.Status != Workflow.Task.Status.Completed);
-        if (!subTasks.Any())
-        {
-          foreach (var id in attachmentIds)
-          {
-            if (id == null)
-              continue;
-            
-            var document = OfficialDocuments.Get((int)id);
-            document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
-            document.Save();
-          }
-        }
-      }
-    }
-            
-    #endregion
-    
+           
   }
 }
