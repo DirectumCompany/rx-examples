@@ -168,18 +168,18 @@
     <value>Версия создана службой ввода документов.</value>
   </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
-    <value>Службе ввода документов не удалось классифицировать документ:</value>
+    <value>Службе ввода не удалось классифицировать документ:</value>
   </data>
   <data name="CheckDocumentTaskName" xml:space="preserve">
     <value>Проверьте документ: {0}</value>
   </data>
   <data name="FailedClassifyDocumentsTaskText" xml:space="preserve">
-    <value>Службе ввода документов не удалось классифицировать документы:</value>
+    <value>Службе ввода не удалось классифицировать документы:</value>
   </data>
   <data name="CheckDocument" xml:space="preserve">
     <value>Проверьте документ:</value>
   </data>
   <data name="FailedClassifyDocumentsTaskName" xml:space="preserve">
-    <value>Проверьте комплект, поступивший от службы ввода документов.</value>
+    <value>Проверьте комплект документов, поступивший от службы ввода.</value>
   </data>
 </root>
