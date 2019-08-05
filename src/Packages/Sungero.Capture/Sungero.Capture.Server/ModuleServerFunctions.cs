@@ -1899,8 +1899,8 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
       
       // Дата.
-      var dateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
+      var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.Date = GetFieldDateTimeValue(dateFact, "Date");
       LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
       
