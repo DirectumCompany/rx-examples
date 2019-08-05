@@ -1620,10 +1620,12 @@ namespace Sungero.Capture.Server
       var counterpartyTypes = new List<string>();
       counterpartyTypes.Add("SELLER");
       counterpartyTypes.Add("BUYER");
+      counterpartyTypes.Add("SHIPPER");
+      counterpartyTypes.Add("CONSIGNEE");
       
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault();
-      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault();
+      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "SHIPPER").FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "CONSIGNEE").FirstOrDefault();
       
       var buyerIsBusinessUnit = buyerFact != null && buyerFact.BusinessUnit != null;
       var sellerIsBusinessUnit = sellerFact != null && sellerFact.BusinessUnit != null;
