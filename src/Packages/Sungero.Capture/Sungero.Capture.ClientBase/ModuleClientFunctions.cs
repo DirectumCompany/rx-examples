@@ -469,8 +469,8 @@ namespace Sungero.Capture.Client
     public virtual void SwitchVerificationMode(Sungero.Docflow.IOfficialDocument document)
     {
       // Активировать / скрыть вкладку, подсветить свойства карточки и факты в теле только один раз при открытии.
-      // Либо в событии Showing либо в Refrash.
-      // Вызов в Refrash необходим, т.к. при отмене изменений не вызывается Showing.
+      // Либо в событии Showing либо в Refresh.
+      // Вызов в Refresh необходим, т.к. при отмене изменений не вызывается Showing.
       var formParams = ((Sungero.Domain.Shared.IExtendedEntity)document).Params;
       if (formParams.ContainsKey(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
         return;

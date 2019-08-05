@@ -1898,13 +1898,22 @@ namespace Sungero.Capture.Server
       document.Contract = contract.Contract;
       LinkFactAndProperty(recognizedDocument, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
       
-      // Дата и номер.
-      var DateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
-      var NumberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
-      document.Date = GetFieldDateTimeValue(DateFact, "Date");
-      document.Number = GetFieldValue(NumberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, DateFact, "Date", props.Date.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, NumberFact, "Number", props.Number.Name, document.RegistrationNumber);
+      // Дата.
+      var dateFact = GetOrderedFacts(facts, "Document", "Date").FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, "Document", "Number").FirstOrDefault();
+      document.Date = GetFieldDateTimeValue(dateFact, "Date");
+      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
+      
+      // Номер.
+      var number = GetFieldValue(numberFact, "Number");
+      Nullable<bool> isTrustedNumber = null;
+      if (number.Length > document.Info.Properties.Number.Length)
+      {
+        number = number.Substring(0, document.Info.Properties.Number.Length);
+        isTrustedNumber = false;
+      }
+      document.Number = number;
+      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number, isTrustedNumber);
       
       // Подразделение и ответственный.
       document.Department = GetDepartment(responsible);
@@ -2009,12 +2018,20 @@ namespace Sungero.Capture.Server
       var facts = recognizedDocument.Facts;
       var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
       var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
+      Nullable<bool> isTrustedNumber = null;
+      
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      document.RegistrationNumber = GetFieldValue(regNumberFact, "Number");
+      var regNumber = GetFieldValue(regNumberFact, "Number");;
+      if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
+      {
+        regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
+        isTrustedNumber = false;
+      }
+      document.RegistrationNumber = regNumber;
       
       var props = document.Info.Properties;
       LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
     }
     
     /// <summary>
