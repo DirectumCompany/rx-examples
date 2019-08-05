@@ -10,12 +10,24 @@ namespace Sungero.SmartCapture
   partial class ContractStatementServerHandlers
   {
 
+    public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
+    {
+      base.BeforeSave(e);
+      
+      // Проверить возможность нумерации документа.
+      Capture.PublicFunctions.Module.CheckPossibilityNumberingDocument(_obj, e);
+    }
+
     public override void Saving(Sungero.Domain.SavingEventArgs e)
     {
       base.Saving(e);
       
-      // Зарегистрировать документ.
-      Capture.PublicFunctions.Module.RegisterDocument(_obj);
+      // Попытаться пронумеровать документ, если он еще не пронумерован.
+      if (_obj.RegistrationState != Docflow.OfficialDocument.RegistrationState.Registered)
+      {
+        if (Capture.PublicFunctions.Module.RegisterDocument(_obj))
+          _obj.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
+      }
     }
 
     public override void AfterSave(Sungero.Domain.AfterSaveEventArgs e)

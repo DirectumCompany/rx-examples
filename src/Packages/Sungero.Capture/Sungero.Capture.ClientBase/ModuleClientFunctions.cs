@@ -547,28 +547,31 @@ namespace Sungero.Capture.Client
     [Public]
     public void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
     {
-      // Проверить возможность изменения реквизитов.
-      if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))
-        return;
-      
-      if (!(document.AccessRights.CanUpdate() && document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess))
-        return;
+      if (document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
+      {
+        // Проверить возможность изменения реквизитов.
+        if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))
+          return;
+        
+        if (!(document.AccessRights.CanUpdate() && document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess))
+          return;
 
-      var properties = document.State.Properties;
-      properties.Name.IsEnabled = !document.DocumentKind.GenerateDocumentName.Value;
-      properties.DocumentKind.IsEnabled = true;
-      properties.Subject.IsEnabled = true;  
-      properties.BusinessUnit.IsEnabled = true;
-      properties.Department.IsEnabled = true;
-      properties.Counterparty.IsEnabled = true;
-      properties.Assignee.IsEnabled = true;   
-      
-      properties.DeliveryMethod.IsEnabled = true;
-      properties.DocumentRegister.IsEnabled = true;
-      properties.CaseFile.IsEnabled = true;
-      properties.PlacedToCaseFileDate.IsEnabled = true;
-      properties.RegistrationNumber.IsEnabled = true;
-      properties.RegistrationDate.IsEnabled = true;
+        var properties = document.State.Properties;
+        properties.Name.IsEnabled = !document.DocumentKind.GenerateDocumentName.Value;
+        properties.DocumentKind.IsEnabled = true;
+        properties.Subject.IsEnabled = true;
+        properties.BusinessUnit.IsEnabled = true;
+        properties.Department.IsEnabled = true;
+        properties.Counterparty.IsEnabled = true;
+        properties.Assignee.IsEnabled = true;
+        
+        properties.DeliveryMethod.IsEnabled = true;
+        properties.DocumentRegister.IsEnabled = true;
+        properties.CaseFile.IsEnabled = true;
+        properties.PlacedToCaseFileDate.IsEnabled = true;
+        properties.RegistrationNumber.IsEnabled = true;
+        properties.RegistrationDate.IsEnabled = true;
+      }
     }
     
     /// <summary>

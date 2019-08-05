@@ -182,4 +182,13 @@
   <data name="FailedClassifyDocumentsTaskName" xml:space="preserve">
     <value>Проверьте комплект документов, поступивший от службы ввода.</value>
   </data>
+  <data name="NeedToNumberDocument" xml:space="preserve">
+    <value>Необходимо пронумеровать документ.</value>
+  </data>
+  <data name="SetDocumentNumber" xml:space="preserve">
+    <value>Необходимо заполнить номер документа.</value>
+  </data>
+  <data name="SetDocumentDate" xml:space="preserve">
+    <value>Необходимо заполнить дату документа.</value>
+  </data>
 </root>

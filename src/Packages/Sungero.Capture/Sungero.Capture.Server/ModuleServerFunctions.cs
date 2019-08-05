@@ -427,29 +427,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Попытаться зарегистрировать документ.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    [Public]
-    public virtual void RegisterDocument(IOfficialDocument document)
-    {
-      // Присвоить номер, если вид документа - нумеруемый.
-      var number = document.RegistrationNumber;
-      var date = document.RegistrationDate;
-      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable)
-      {
-        var isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, number, date);
-        if (isRegistered)
-          return;
-      }
-      
-      // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
-      if (date != null && string.IsNullOrWhiteSpace(number))
-        document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
-          Environment.NewLine + document.Note;
-    }
-    
-    /// <summary>
     /// Получить значение параметра из docflow_params.
     /// </summary>
     /// <param name="paramName">Наименование параметра.</param>
@@ -1973,9 +1950,9 @@ namespace Sungero.Capture.Server
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
       var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
       var counterpartyMatched = facts.CounterpartyFact != null &&
-                                facts.CounterpartyFact.Counterparty != null;
+        facts.CounterpartyFact.Counterparty != null;
       var businessUnitMatched = facts.BusinessUnitFact != null &&
-                                facts.BusinessUnitFact.BusinessUnit != null;
+        facts.BusinessUnitFact.BusinessUnit != null;
       
       if (counterpartyMatched)
         LinkFactAndProperty(recognizedDocument, facts.CounterpartyFact.Fact, null,
@@ -3085,6 +3062,66 @@ namespace Sungero.Capture.Server
     
     #endregion
     
+    #region Регистрация
+    
+    /// <summary>
+    /// Попытаться зарегистрировать документ.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    [Public]
+    public virtual bool RegisterDocument(IOfficialDocument document)
+    {
+      // Присвоить номер, если вид документа - нумеруемый.
+      var number = document.RegistrationNumber;
+      var date = document.RegistrationDate;
+      if (document.DocumentKind != null)
+      {
+        var isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, number, date);
+        if (isRegistered)
+          return isRegistered;
+      }
+      
+      // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
+      if (date != null && string.IsNullOrWhiteSpace(number))
+        document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
+          Environment.NewLine + document.Note;
+      return false;
+    }
+    
+    /// <summary>
+    /// Проверить возможность нумерации документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    [Public]
+    public virtual void CheckPossibilityNumberingDocument(IOfficialDocument document, Sungero.Core.IValidationArgs e)
+    {
+      if ((document.DocumentKind != null) &&
+          (document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable) &&
+          (document.RegistrationState != Docflow.OfficialDocument.RegistrationState.Registered))
+      {
+        var registers = Docflow.PublicFunctions.OfficialDocument.GetDocumentRegistersByDocument(document, Docflow.RegistrationSetting.SettingType.Numeration);
+        
+        if ((registers == null || !registers.Any()) || (registers.Count > 1) ||
+            (string.IsNullOrWhiteSpace(document.RegistrationNumber)) || (!document.RegistrationDate.HasValue))
+          e.AddWarning(Capture.Resources.NeedToNumberDocument);
+        
+        // TODO Zamerov, 35685: может вернуться null вместо пустого списка.
+        if (registers == null || !registers.Any())
+          e.AddWarning(Docflow.Resources.NumberingSettingsRequired);
+
+        if (registers.Count > 1)
+          e.AddWarning(Sungero.Docflow.Resources.NumberingSettingsRequired);
+        
+        if (string.IsNullOrWhiteSpace(document.RegistrationNumber))
+          e.AddWarning(Capture.Resources.SetDocumentNumber);
+        
+        if (!document.RegistrationDate.HasValue)
+          e.AddWarning(Capture.Resources.SetDocumentDate);
+      }
+    }
+
+    #endregion
+    
     #region ШК
     
     /// <summary>
@@ -3126,6 +3163,51 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
-           
+    
+    #region Фоновый процесс для мониторинга выполненных задач верификации.
+    
+    public static void ChangeVerificationState()
+    {
+      var documentIds = Docflow.OfficialDocuments.GetAll().Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess).Select(d => d.Id).ToList();
+      
+      // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов,
+      // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.
+      var processedIds = new List<int?>();
+      var verificationTaskSubject = Resources.CheckPackage;
+      var verificationTasks = SimpleTasks.GetAll()
+        .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id && t.Subject.Contains(verificationTaskSubject));
+      foreach(var documentId in documentIds)
+      {
+        if (processedIds.Contains(documentId))
+          continue;
+        
+        var documentVerificationTasks = verificationTasks
+          .Where(vt => vt.AttachmentDetails.Any(att => att.AttachmentId == documentId))
+          .OrderByDescending(s => s.Started);
+        if (!documentVerificationTasks.Any())
+          continue;
+        
+        // Для того чтобы считать что документ верифицирован, достаточно чтобы последняя задача была выполнена.
+        var task = documentVerificationTasks.FirstOrDefault();
+        var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
+        processedIds.AddRange(attachmentIds);
+        var subTasks = Tasks.GetAll().Where(t => t.MainTaskId.HasValue && t.MainTaskId.Value == task.Id && t.Status != Workflow.Task.Status.Completed);
+        if (!subTasks.Any())
+        {
+          foreach (var id in attachmentIds)
+          {
+            if (id == null)
+              continue;
+            
+            var document = OfficialDocuments.Get((int)id);
+            document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
+            document.Save();
+          }
+        }
+      }
+    }
+    
+    #endregion
+    
   }
 }

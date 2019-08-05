@@ -115,6 +115,22 @@
   ],
   "PublicFunctions": [
     {
+      "Name": "CheckPossibilityNumberingDocument",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "e",
+          "ParameterType": "Sungero.Core.IValidationArgs"
+        }
+      ],
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    },
+    {
       "Name": "EnableRequisitesForVerification",
       "Parameters": [
         {
@@ -167,8 +183,8 @@
           "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
         }
       ],
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
+      "ReturnType": "global::System.Boolean",
+      "ReturnTypeFullName": "System.Boolean"
     },
     {
       "Name": "SendToResponsible",
@@ -359,7 +375,10 @@
     "CheckDocumentTaskName",
     "FailedClassifyDocumentsTaskText",
     "CheckDocument",
-    "FailedClassifyDocumentsTaskName"
+    "FailedClassifyDocumentsTaskName",
+    "NeedToNumberDocument",
+    "SetDocumentNumber",
+    "SetDocumentDate"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
