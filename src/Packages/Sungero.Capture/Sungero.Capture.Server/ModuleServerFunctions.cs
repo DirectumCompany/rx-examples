@@ -2915,7 +2915,7 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
     /// <returns>Список распознанных свойств документа.</returns>
-    [Remote, Public]
+    [Remote(IsPure = true), Public]
     public static List<string> GetRecognizedDocumentProperties(Docflow.IOfficialDocument document, bool isTrusted)
     {
       var result = new List<string>();
