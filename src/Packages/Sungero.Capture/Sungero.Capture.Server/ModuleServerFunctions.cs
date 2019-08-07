@@ -457,7 +457,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
     /// <returns>Список сотрудников найденных по имени.</returns>
-    public static IQueryable<IEmployee> GetEmployeeByName(string name)
+    public static IQueryable<IEmployee> GetEmployeesByName(string name)
     {
       var noBreakSpace = new string('\u00A0', 1);
       var space = new string('\u0020', 1);
@@ -480,10 +480,10 @@ namespace Sungero.Capture.Server
         return result;
       
       var addressee = GetFieldValue(fact, "Addressee");
-      var employes = GetEmployeeByName(addressee);
-      result.Employee = employes.FirstOrDefault();
+      var employees = GetEmployeesByName(addressee);
+      result.Employee = employees.FirstOrDefault();
       result.IsTrusted = false;
-      if (employes.Count() == 1)
+      if (employees.Count() == 1)
         result.IsTrusted = GetField(fact, "Addressee").Probability > GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
               
       return result;
@@ -528,7 +528,7 @@ namespace Sungero.Capture.Server
     /// <param name="shortName">Имя в формате "Фамилия И.О.".</param>
     /// <param name="counterparty">Контрагент, владелец контакта.</param>
     /// <returns>Контактное лицо.</returns>
-    public static IQueryable<IContact> GetContactByName(string name, string personShortName, ICounterparty counterparty)
+    public static IQueryable<IContact> GetContactsByName(string name, string personShortName, ICounterparty counterparty)
     {
       var noBreakSpace = new string('\u00A0', 1);
       var space = new string('\u0020', 1);
@@ -601,7 +601,7 @@ namespace Sungero.Capture.Server
       
       var fullName = GetFullNameByFact(fact);
       var shortName = GetShortNameByFact(fact);
-      return GetContactByName(fullName, shortName, counterparty);
+      return GetContactsByName(fullName, shortName, counterparty);
     }
     
     /// <summary>
@@ -688,7 +688,7 @@ namespace Sungero.Capture.Server
     /// <returns>Документ с соответствующими номером и датой.</returns>
     /// <remarks>Будет возвращен первый попавшийся, если таких документов несколько.
     /// Будет возвращен null, если таких документов нет.</remarks>
-    public static IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocument(Structures.Module.IFact fact, ICounterparty counterparty)
+    public static IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Structures.Module.IFact fact, ICounterparty counterparty)
     {
       if (fact == null)
         return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
@@ -724,7 +724,7 @@ namespace Sungero.Capture.Server
         if (result.Contract != null)
           return result;
       }
-      var contracts = GetLeadingDocument(fact, counterparty);
+      var contracts = GetLeadingDocuments(fact, counterparty);
       result.IsTrusted = false;
       result.Contract = contracts.FirstOrDefault();
       if (contracts.Count() == 1)
@@ -1468,7 +1468,7 @@ namespace Sungero.Capture.Server
       
       // Документ-основание.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
-      var contractualDocuments = GetLeadingDocument(leadingDocFact, document.Counterparty);
+      var contractualDocuments = GetLeadingDocuments(leadingDocFact, document.Counterparty);
       document.LeadingDocument = contractualDocuments.FirstOrDefault();
       var isTrusted = false;
       if (contractualDocuments.Count() == 1)
