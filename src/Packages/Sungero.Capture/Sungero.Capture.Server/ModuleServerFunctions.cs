@@ -3122,10 +3122,6 @@ namespace Sungero.Capture.Server
           return isRegistered;
       }
       
-      // Записать номер/дату в примечании, если вид не нумеруемый или регистрируемый или не получилось пронумеровать.
-      if (date != null && string.IsNullOrWhiteSpace(number))
-        document.Note = Exchange.Resources.IncomingNotNumeratedDocumentNoteFormat(date.Value.Date.ToString("d"), number) +
-          Environment.NewLine + document.Note;
       return false;
     }
     
