@@ -204,6 +204,11 @@
           "Name": "responsible",
           "ParameterType": "global::Sungero.Company.IEmployee",
           "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "isCapturedFromEmail",
+          "ParameterType": "global::System.Boolean",
+          "ParameterTypeFullName": "System.Boolean"
         }
       ],
       "Placement": "Shared",

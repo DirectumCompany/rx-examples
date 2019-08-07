@@ -88,7 +88,7 @@ namespace Sungero.Capture.Client
                                                                                     null,
                                                                                     responsible,
                                                                                     false);
-        Functions.Module.Remote.SendToResponsible(documents, responsible);
+        Functions.Module.Remote.SendToResponsible(documents, responsible, false);
         Logger.DebugFormat("End package processing. Path: {0}", packagePath);
         Logger.Debug("End of captured package processing.");
       }
@@ -161,7 +161,7 @@ namespace Sungero.Capture.Client
       var documentsToSend = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       documentsToSend.LeadingDocumentId = emailBodyDocument.Id;
       documentsToSend.RelatedDocumentIds = relatedDocumentIds;
-      Functions.Module.Remote.SendToResponsible(documentsToSend, responsible);
+      Functions.Module.Remote.SendToResponsible(documentsToSend, responsible, true);
       Logger.Debug("Captured Package Process. Done.");
     }
     
@@ -286,7 +286,7 @@ namespace Sungero.Capture.Client
                                                                                   responsible,
                                                                                   false);
       
-      Functions.Module.Remote.SendToResponsible(documents, responsible);
+      Functions.Module.Remote.SendToResponsible(documents, responsible, false);
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }

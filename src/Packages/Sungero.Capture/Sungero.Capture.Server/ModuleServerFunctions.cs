@@ -766,9 +766,11 @@ namespace Sungero.Capture.Server
     /// <param name="leadingDocument">Основной документ.</param>
     /// <param name="documents">Прочие документы.</param>
     /// <param name="responsible">Ответственный.</param>
+    /// <param name="isCapturedFromEmail">Признак того, что пакет пришел с эл. почты.</param>
     /// <returns>Простая задача.</returns>
     [Public, Remote]
-    public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents, Company.IEmployee responsible)
+    public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
+                                          Company.IEmployee responsible, bool isCapturedFromEmail)
     {
       if (leadingDocument == null)
         return;
@@ -798,7 +800,8 @@ namespace Sungero.Capture.Server
         task.Attachments.Add(document);
         
         // Собрать ссылки на неклассифицированные документы.
-        if (Docflow.SimpleDocuments.Is(document))
+        // Не нужно считать тело письма неклассифицированным документом и писать об этом.
+        if (Docflow.SimpleDocuments.Is(document) && (!isCapturedFromEmail || document.Id != leadingDocument.Id))
           notClassifiedDocumentsHyperlinks.Add(Hyperlinks.Get(document));
       }
       
@@ -833,16 +836,17 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
     /// <param name="responsible">Сотрудник, ответственный за одработку распознанных документов.</param>
+    /// <param name="isCapturedFromEmail">Признак того, что пакет пришел с эл. почты.</param>
     [Remote]
     public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
-                                          Sungero.Company.IEmployee responsible)
+                                          Sungero.Company.IEmployee responsible, bool isCapturedFromEmail)
     {
       var leadingDocument = OfficialDocuments.GetAll()
         .FirstOrDefault(x => x.Id == documentsCreatedByRecognition.LeadingDocumentId);
       var relatedDocuments = OfficialDocuments.GetAll()
         .Where(x => documentsCreatedByRecognition.RelatedDocumentIds.Contains(x.Id))
         .ToList();
-      SendToResponsible(leadingDocument, relatedDocuments, responsible);
+      SendToResponsible(leadingDocument, relatedDocuments, responsible, isCapturedFromEmail);
     }
     
     #endregion
