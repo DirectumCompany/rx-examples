@@ -482,10 +482,7 @@ namespace Sungero.Capture.Server
       var addressee = GetFieldValue(fact, "Addressee");
       var employees = GetEmployeesByName(addressee);
       result.Employee = employees.FirstOrDefault();
-      result.IsTrusted = false;
-      if (employees.Count() == 1)
-        result.IsTrusted = GetField(fact, "Addressee").Probability > GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
-              
+      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;              
       return result;
     }
     
@@ -628,10 +625,7 @@ namespace Sungero.Capture.Server
       if (!filteredContacts.Any())
         return result;
       result.Contact = filteredContacts.FirstOrDefault();
-      result.IsTrusted = false;
-      if (filteredContacts.Count() == 1)
-        result.IsTrusted = IsTrustedField(fact, "Type");
-      
+      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, "Type") : false;      
       return result;
     }
     
@@ -725,10 +719,8 @@ namespace Sungero.Capture.Server
           return result;
       }
       var contracts = GetLeadingDocuments(fact, counterparty);
-      result.IsTrusted = false;
       result.Contract = contracts.FirstOrDefault();
-      if (contracts.Count() == 1)
-        result.IsTrusted = IsTrustedField(fact, "DocumentBaseNumber");
+      result.IsTrusted = (contracts.Count() == 1) ? IsTrustedField(fact, "DocumentBaseNumber") : false;
       return result;
     }
     
@@ -1470,10 +1462,7 @@ namespace Sungero.Capture.Server
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       var contractualDocuments = GetLeadingDocuments(leadingDocFact, document.Counterparty);
       document.LeadingDocument = contractualDocuments.FirstOrDefault();
-      var isTrusted = false;
-      if (contractualDocuments.Count() == 1)
-        isTrusted = IsTrustedField(leadingDocFact, "Type");
-      
+      var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, "Type") : false;     
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
