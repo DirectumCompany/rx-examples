@@ -83,7 +83,7 @@
       "Daily": "Repeat",
       "GenerateHandler": true,
       "MonthSchedule": "Monthly",
-      "TimePeriod": 5
+      "TimePeriod": 60
     }
   ],
   "Libraries": [
