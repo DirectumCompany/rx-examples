@@ -2156,7 +2156,7 @@ namespace Sungero.Capture.Server
         }
         if (counterparty == null)
         {
-          var counterparties = GetCounterparties(tin, trrc);
+          var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
           if (counterparties.Count > 1)
             isTrusted = false;
           counterparty = counterparties.FirstOrDefault();
@@ -2330,7 +2330,7 @@ namespace Sungero.Capture.Server
 
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
-          var counterparties = GetCounterparties(tin, trrc);
+          var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
           foreach (var counterparty in counterparties)
           {
             var counterpartyWithFact = Structures.Module.CounterpartyWithFact.Create(counterparty, fact, true);
@@ -2488,51 +2488,7 @@ namespace Sungero.Capture.Server
       }
       return businessUnitsByName;
     }
-    
-    /// <summary>
-    /// Получить список контрагентов по ИНН/КПП.
-    /// </summary>
-    /// <param name="tin">ИНН.</param>
-    /// <param name="trrc">КПП.</param>
-    /// <returns>Список контрагентов.</returns>
-    public static List<ICounterparty> GetCounterparties(string tin, string trrc)
-    {
-      var searchByTin = !string.IsNullOrWhiteSpace(tin);
-      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
-      
-      if (!searchByTin && !searchByTrrc)
-        return new List<ICounterparty>();
-
-      // Отфильтровать закрытые сущности.
-      var counterparties = Counterparties.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
-      
-      // Поиск по ИНН, если ИНН передан.
-      if (searchByTin)
-      {
-        var strongTinCounterparties = counterparties.Where(x => x.TIN == tin).ToList();
-        
-        // Поиск по КПП, если КПП передан.
-        if (searchByTrrc)
-        {
-          var strongTrrcCompanies = strongTinCounterparties
-            .Where(c => CompanyBases.Is(c))
-            .Where(c => !string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC) && CompanyBases.As(c).TRRC == trrc)
-            .ToList();
-          
-          if (strongTrrcCompanies.Count > 0)
-            return strongTrrcCompanies;
-          
-          return strongTinCounterparties.Where(c => CompanyBases.Is(c) &&
-                                               string.IsNullOrWhiteSpace(CompanyBases.As(c).TRRC)).ToList();
-        }
-        
-        return strongTinCounterparties;
-      }
-      
-      return counterparties.ToList();
-    }
-    
+           
     /// <summary>
     /// Получить список НОР по ИНН/КПП.
     /// </summary>
