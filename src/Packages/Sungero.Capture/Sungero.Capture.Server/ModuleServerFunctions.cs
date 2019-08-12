@@ -524,7 +524,7 @@ namespace Sungero.Capture.Server
     /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
     /// <param name="shortName">Имя в формате "Фамилия И.О.".</param>
     /// <param name="counterparty">Контрагент, владелец контакта.</param>
-    /// <returns>Контактное лицо.</returns>
+    /// <returns>Коллекция контактных лиц.</returns>
     public static IQueryable<IContact> GetContactsByName(string name, string personShortName, ICounterparty counterparty)
     {
       var noBreakSpace = new string('\u00A0', 1);
@@ -539,7 +539,7 @@ namespace Sungero.Capture.Server
       if (counterparty != null)
         return contacts.Where(c => c.Company.Equals(counterparty));
       
-      return   contacts;
+      return contacts;
     }
     
     /// <summary>
@@ -590,8 +590,8 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <param name="counterparty">Контрагент - владелец контактного лица.</param>
-    /// <returns>Контактное лицо.</returns>
-    public static IQueryable<IContact> GetContactByFact(Sungero.Capture.Structures.Module.IFact fact, ICounterparty counterparty)
+    /// <returns>Список контактных лиц.</returns>
+    public static IQueryable<IContact> GetContactsByFact(Sungero.Capture.Structures.Module.IFact fact, ICounterparty counterparty)
     {
       if (fact == null)
         return new List<IContact>().AsQueryable();
@@ -621,7 +621,7 @@ namespace Sungero.Capture.Server
           return result;
       }
       
-      var filteredContacts =  GetContactByFact(fact, counterparty);
+      var filteredContacts =  GetContactsByFact(fact, counterparty);
       if (!filteredContacts.Any())
         return result;
       result.Contact = filteredContacts.FirstOrDefault();
@@ -679,9 +679,7 @@ namespace Sungero.Capture.Server
     /// Получить ведущий документ по номеру и дате из факта.
     /// </summary>
     /// <param name="fact">Факт.</param>
-    /// <returns>Документ с соответствующими номером и датой.</returns>
-    /// <remarks>Будет возвращен первый попавшийся, если таких документов несколько.
-    /// Будет возвращен null, если таких документов нет.</remarks>
+    /// <returns>Список документов с подходящими номером и датой.</returns>
     public static IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Structures.Module.IFact fact, ICounterparty counterparty)
     {
       if (fact == null)
@@ -1462,7 +1460,7 @@ namespace Sungero.Capture.Server
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       var contractualDocuments = GetLeadingDocuments(leadingDocFact, document.Counterparty);
       document.LeadingDocument = contractualDocuments.FirstOrDefault();
-      var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, "Type") : false;     
+      var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, "DocumentBaseName") : false;     
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
