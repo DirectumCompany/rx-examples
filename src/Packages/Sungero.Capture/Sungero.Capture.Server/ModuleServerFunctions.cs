@@ -3072,6 +3072,7 @@ namespace Sungero.Capture.Server
       return false;
     }
     
+    #warning Нигде не используется, но может еще пригодиться. 
     /// <summary>
     /// Проверить возможность нумерации документа.
     /// </summary>

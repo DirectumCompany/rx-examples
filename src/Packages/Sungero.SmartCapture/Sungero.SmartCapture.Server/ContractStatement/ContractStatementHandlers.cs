@@ -12,10 +12,7 @@ namespace Sungero.SmartCapture
 
     public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
     {
-      base.BeforeSave(e);
-      
-      // Проверить возможность нумерации документа.
-      Capture.PublicFunctions.Module.CheckPossibilityNumberingDocument(_obj, e);
+      base.BeforeSave(e);            
     }
 
     public override void Saving(Sungero.Domain.SavingEventArgs e)
