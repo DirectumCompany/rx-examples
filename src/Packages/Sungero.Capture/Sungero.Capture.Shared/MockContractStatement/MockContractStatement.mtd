@@ -1019,6 +1019,10 @@
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
   ],
+  "HandledEvents": [
+    "ShowingClient",
+    "RefreshClient"
+  ],
   "IconName": "MockContractStatement.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
@@ -1031,6 +1035,15 @@
     "IconName"
   ],
   "Properties": [
+    {
+      "$type": "Sungero.Metadata.EnumPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "9b7cc9f8-d575-45a0-b9e3-e6c820a1fc83",
+      "Name": "VerificationState",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "IsVisibility"
+      ]
+    },
     {
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",

@@ -10,6 +10,19 @@ namespace Sungero.Capture
   partial class MockWaybillClientHandlers
   {
 
+    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
+    {
+      base.Refresh(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
+    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
+    {
+      base.Showing(e);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
     public virtual void VatAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
     {
       this._obj.State.Properties.VatAmount.HighlightColor = Sungero.Core.Colors.Empty;

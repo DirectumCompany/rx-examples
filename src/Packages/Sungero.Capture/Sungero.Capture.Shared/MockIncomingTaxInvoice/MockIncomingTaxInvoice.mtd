@@ -881,6 +881,10 @@
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
   ],
+  "HandledEvents": [
+    "ShowingClient",
+    "RefreshClient"
+  ],
   "IconName": "MockIncomingTaxInvoice.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
@@ -891,6 +895,15 @@
     "IconName"
   ],
   "Properties": [
+    {
+      "$type": "Sungero.Metadata.EnumPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "9b7cc9f8-d575-45a0-b9e3-e6c820a1fc83",
+      "Name": "VerificationState",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "IsVisibility"
+      ]
+    },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",

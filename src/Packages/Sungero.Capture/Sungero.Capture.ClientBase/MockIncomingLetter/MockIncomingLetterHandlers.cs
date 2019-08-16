@@ -10,6 +10,18 @@ namespace Sungero.Capture
   partial class MockIncomingLetterClientHandlers
   {
 
+    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
+    {
+      base.Refresh(e);
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
+    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
+    {
+      base.Showing(e);      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
     public virtual void AddresseesValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
       this._obj.State.Properties.Addressees.HighlightColor = Sungero.Core.Colors.Empty;

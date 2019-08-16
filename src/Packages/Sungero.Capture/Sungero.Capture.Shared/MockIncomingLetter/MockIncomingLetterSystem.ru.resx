@@ -210,4 +210,16 @@
   <data name="ControlGroup_2d1845ca5c9a476bb777e212c7e58e1e" xml:space="preserve">
     <value>Кому</value>
   </data>
+  <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
+    <value>Предпросмотр</value>
+  </data>
+  <data name="Resource_9ad3461d21c94da4b0898738dbfe6076" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_8f91b21ba3744bd5807bb01130dff98f" xml:space="preserve">
+    <value>Свойства</value>
+  </data>
+  <data name="ControlGroup_45f253c945ab429ca9b24146eedeae12" xml:space="preserve">
+    <value>Жизненный цикл</value>
+  </data>
 </root>
