@@ -860,10 +860,6 @@
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
   ],
-  "HandledEvents": [
-    "ShowingClient",
-    "RefreshClient"
-  ],
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
   "OpenCardByDefaultInCollection": true,

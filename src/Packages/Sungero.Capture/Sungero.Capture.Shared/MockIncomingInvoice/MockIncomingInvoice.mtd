@@ -694,10 +694,6 @@
       "Overridden": []
     }
   ],
-  "HandledEvents": [
-    "ShowingClient",
-    "RefreshClient"
-  ],
   "IconResourcesKeys": [],
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",

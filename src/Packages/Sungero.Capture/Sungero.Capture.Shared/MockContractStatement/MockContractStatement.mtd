@@ -1019,10 +1019,6 @@
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
   ],
-  "HandledEvents": [
-    "ShowingClient",
-    "RefreshClient"
-  ],
   "IconName": "MockContractStatement.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,

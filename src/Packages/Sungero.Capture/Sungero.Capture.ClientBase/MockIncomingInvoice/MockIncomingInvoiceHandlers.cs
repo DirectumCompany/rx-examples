@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -9,19 +9,6 @@ namespace Sungero.Capture
 {
   partial class MockIncomingInvoiceClientHandlers
   {
-
-    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
-    {
-      base.Refresh(e);
-      
-      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
-    }
-
-    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
-    {
-      base.Showing(e);
-      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
-    }
 
     public virtual void VatAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
     {

@@ -720,10 +720,6 @@
       "Overridden": []
     }
   ],
-  "HandledEvents": [
-    "ShowingClient",
-    "RefreshClient"
-  ],
   "IconName": "MockIncomingLetter.ico",
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
