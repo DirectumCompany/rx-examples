@@ -126,7 +126,7 @@ namespace Sungero.Capture.Server
                                                                                                               IOfficialDocument leadingDocument,
                                                                                                               IEmployee responsible,
                                                                                                               bool sendedByEmail)
-    {
+    {            
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
@@ -819,6 +819,9 @@ namespace Sungero.Capture.Server
       task.Deadline = Calendar.Now.AddWorkingHours(4);
       task.Save();
       task.Start();
+      
+      // Старт фонового процесса на смену статуса верификации.
+      Jobs.ChangeVerificationState.Enqueue();      
     }
     
     /// <summary>
