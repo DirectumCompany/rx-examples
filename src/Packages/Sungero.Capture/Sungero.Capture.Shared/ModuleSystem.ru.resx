@@ -118,9 +118,9 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="JobDisplayName_161f7d1d35924b71a998955b08437924" xml:space="preserve">
-    <value>Ввод документов. Простановка отметки о завершении верификации документов</value>
+    <value>Документооборот. Завершение процесса верификации</value>
   </data>
   <data name="JobDescription_161f7d1d35924b71a998955b08437924" xml:space="preserve">
-    <value>Поставить отметки о завершении верификации документов, задания на проверку которых были выполнены.</value>
+    <value>Изменение статуса верификации на "Завершена" у документов, задачи на проверку которых выполнены</value>
   </data>
 </root>
