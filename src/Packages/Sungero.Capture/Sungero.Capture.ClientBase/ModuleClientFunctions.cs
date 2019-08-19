@@ -553,7 +553,9 @@ namespace Sungero.Capture.Client
         if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))
           return;
         
-        if (!(document.AccessRights.CanUpdate() && document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess))
+        if (!document.AccessRights.CanUpdate() ||
+            document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess ||
+            document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
           return;
 
         var properties = document.State.Properties;
@@ -591,7 +593,7 @@ namespace Sungero.Capture.Client
         
         // В некоторых случаях Aspose не может распознать файл как html, поэтому добавляем тег html, если его нет.
         if (!mailBody.Contains("<html"))
-          mailBody = string.Format("<html>{0}</html>", mailBody);        
+          mailBody = string.Format("<html>{0}</html>", mailBody);
         File.WriteAllText(path, mailBody);
       }
       catch(Exception ex)

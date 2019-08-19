@@ -482,7 +482,7 @@ namespace Sungero.Capture.Server
       var addressee = GetFieldValue(fact, "Addressee");
       var employees = GetEmployeesByName(addressee);
       result.Employee = employees.FirstOrDefault();
-      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;              
+      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;
       return result;
     }
     
@@ -625,7 +625,7 @@ namespace Sungero.Capture.Server
       if (!filteredContacts.Any())
         return result;
       result.Contact = filteredContacts.FirstOrDefault();
-      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, "Type") : false;      
+      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, "Type") : false;
       return result;
     }
     
@@ -1463,7 +1463,7 @@ namespace Sungero.Capture.Server
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       var contractualDocuments = GetLeadingDocuments(leadingDocFact, document.Counterparty);
       document.LeadingDocument = contractualDocuments.FirstOrDefault();
-      var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, "DocumentBaseName") : false;     
+      var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, "DocumentBaseName") : false;
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
@@ -2026,23 +2026,26 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Наименование факта.</param>
     public static void FillRegistrationData(IOfficialDocument document, Structures.Module.IRecognizedDocument recognizedDocument, string factName)
     {
-      var facts = recognizedDocument.Facts;
-      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
-      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
-      Nullable<bool> isTrustedNumber = null;
-      
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-      var regNumber = GetFieldValue(regNumberFact, "Number");;
-      if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
+      if (document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable)
       {
-        regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
-        isTrustedNumber = false;
+        var facts = recognizedDocument.Facts;
+        var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
+        var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
+        Nullable<bool> isTrustedNumber = null;
+        
+        document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
+        var regNumber = GetFieldValue(regNumberFact, "Number");;
+        if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
+        {
+          regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
+          isTrustedNumber = false;
+        }
+        document.RegistrationNumber = regNumber;
+        
+        var props = document.Info.Properties;
+        LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+        LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
       }
-      document.RegistrationNumber = regNumber;
-      
-      var props = document.Info.Properties;
-      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
     }
     
     /// <summary>
@@ -2489,7 +2492,7 @@ namespace Sungero.Capture.Server
       }
       return businessUnitsByName;
     }
-           
+    
     /// <summary>
     /// Получить список НОР по ИНН/КПП.
     /// </summary>
@@ -3065,7 +3068,7 @@ namespace Sungero.Capture.Server
       // Присвоить номер, если вид документа - нумеруемый.
       var number = document.RegistrationNumber;
       var date = document.RegistrationDate;
-      if (document.DocumentKind != null)
+      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable)
       {
         var isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, number, date);
         if (isRegistered)
@@ -3075,7 +3078,7 @@ namespace Sungero.Capture.Server
       return false;
     }
     
-    #warning Нигде не используется, но может еще пригодиться. 
+    #warning Нигде не используется, но может еще пригодиться.
     /// <summary>
     /// Проверить возможность нумерации документа.
     /// </summary>
