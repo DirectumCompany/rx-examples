@@ -126,7 +126,7 @@ namespace Sungero.Capture.Server
                                                                                                               IOfficialDocument leadingDocument,
                                                                                                               IEmployee responsible,
                                                                                                               bool sendedByEmail)
-    {            
+    {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
@@ -821,7 +821,7 @@ namespace Sungero.Capture.Server
       task.Start();
       
       // Старт фонового процесса на смену статуса верификации.
-      Jobs.ChangeVerificationState.Enqueue();      
+      Jobs.ChangeVerificationState.Enqueue();
     }
     
     /// <summary>
@@ -1165,7 +1165,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
       
       // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "Document");
+      FillRegistrationData(document, recognizedDocument, "Document", false);
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -1291,8 +1291,8 @@ namespace Sungero.Capture.Server
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
       LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
       
-      // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "Document");
+      // Дата, номер и регистрация.
+      FillRegistrationData(document, recognizedDocument, "Document", true);
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
@@ -1308,9 +1308,6 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
-      // Регистрация.
-      RegisterDocument(document);
       
       return document;
     }
@@ -1390,7 +1387,7 @@ namespace Sungero.Capture.Server
       }
       
       // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument", false);
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
@@ -1456,8 +1453,8 @@ namespace Sungero.Capture.Server
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
       LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
       
-      // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+      // Дата, номер и регистрация.
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument", true);
       
       // Документ-основание.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
@@ -1472,9 +1469,6 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
-      // Регистрация.
-      RegisterDocument(document);
       
       return document;
     }
@@ -1546,7 +1540,7 @@ namespace Sungero.Capture.Server
       }
       
       // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument", false);
       document.IsAdjustment = false;
       
       // Сумма и валюта.
@@ -1670,8 +1664,8 @@ namespace Sungero.Capture.Server
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
       LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
       
-      // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+      // Дата, номер и регистрация.
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument", true);
       
       // Корректировочный документ.
       if (isAdjustment)
@@ -1709,9 +1703,6 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
-      // Регистрация.
-      RegisterDocument(document);
       
       return document;
     }
@@ -1751,18 +1742,15 @@ namespace Sungero.Capture.Server
       document.Department = GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
-      // Дата и номер.
-      FillRegistrationData(document, recognizedDocument, "FinancialDocument");
+      // Дата, номер и регистрация.
+      FillRegistrationData(document, recognizedDocument, "FinancialDocument", true);
       
       // Корректировочный документ.
       FillCorrectedDocument(document, recognizedDocument, "FinancialDocument", isAdjustment);
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
-      
-      // Регистрация.
-      RegisterDocument(document);
-      
+
       return document;
     }
     
@@ -2024,26 +2012,58 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта.</param>
-    public static void FillRegistrationData(IOfficialDocument document, Structures.Module.IRecognizedDocument recognizedDocument, string factName)
+    /// <param name="fillWithoutRegistration">Заполнить дату и номер без регистрации.</param>
+    public static void FillRegistrationData(IOfficialDocument document,
+                                            Structures.Module.IRecognizedDocument recognizedDocument,
+                                            string factName,
+                                            bool fillWithoutRegistration)
     {
-      if (document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable)
+      // Присвоить номер, если вид документа - нумеруемый и однозначно определяется журнал регистрации.
+      if (document.DocumentKind == null || document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
+        return;
+      
+      // Дата.
+      var facts = recognizedDocument.Facts;
+      var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
+      var regDate = GetFieldDateTimeValue(regDateFact, "Date");
+      Nullable<bool> isTrustedDate = null;
+      if ((regDate == null || !regDate.HasValue) && fillWithoutRegistration)
       {
-        var facts = recognizedDocument.Facts;
-        var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
-        var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
-        Nullable<bool> isTrustedNumber = null;
-        
-        document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
-        var regNumber = GetFieldValue(regNumberFact, "Number");;
-        if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
-        {
-          regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
-          isTrustedNumber = false;
-        }
+        regDate = Calendar.SqlMinValue;
+        isTrustedDate = false;
+      }
+      
+      // Номер.
+      var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
+      var regNumber = GetFieldValue(regNumberFact, "Number");
+      Nullable<bool> isTrustedNumber = null;
+      if (string.IsNullOrWhiteSpace(regNumber) && fillWithoutRegistration)
+      {
+        regNumber = "???";
+        isTrustedNumber = false;
+      }
+      else if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
+      {
+        regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
+        isTrustedNumber = false;
+      }
+      
+      var isRegistered = false;
+      if (fillWithoutRegistration)
+      {
+        isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, regNumber, regDate);
+      }
+      else
+      {
+        // Для Mock-документов заполнить номер и дату без регистрации.
+        document.RegistrationDate = regDate;
         document.RegistrationNumber = regNumber;
-        
+      }
+      
+      if (isRegistered || fillWithoutRegistration)
+      {
         var props = document.Info.Properties;
-        LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+        LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
         LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
       }
     }
