@@ -65,5 +65,7 @@ namespace Sungero.Capture.Constants
       
       public const string Mail = "mail";
     }
+    
+    public const string DocumentNumberingBySmartCaptureResultParamName = "DocumentNumberingBySmartCaptureResult";
   }
 }

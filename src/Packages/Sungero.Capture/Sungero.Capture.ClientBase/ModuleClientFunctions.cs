@@ -541,13 +541,19 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Разблокировать реквизиты для верификации после автонумерации/регистрации.
+    /// Разблокировать реквизиты для верификации после нумерации.
     /// </summary>
     /// <param name="document">Документ для верификации.</param>
     [Public]
     public void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
     {
-      if (document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
+      var smartCaptureNumerationSucceed = document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
+                                          document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+                                          document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
+                                          document.DocumentRegister != null;
+      
+      if (document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess &&
+          smartCaptureNumerationSucceed)
       {
         // Проверить возможность изменения реквизитов.
         if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))

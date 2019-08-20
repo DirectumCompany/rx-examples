@@ -2021,7 +2021,18 @@ namespace Sungero.Capture.Server
       // Присвоить номер, если вид документа - нумеруемый и однозначно определяется журнал регистрации.
       if (document.DocumentKind == null || document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
         return;
-      
+
+      // Проверить конфигурацию DirectumRX на возможность нумерации документа.
+      // Можем нумеровать только тогда, когда однозначно подобран журнал.
+      // Используется при отправке задачи на обработку документа.
+      var registers = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentRegistersByDocument(document, Sungero.Docflow.RegistrationSetting.SettingType.Numeration);
+      if (registers.Count != 1)
+      {
+        ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentNumberingBySmartCaptureResultParamName] = false;
+        return;
+      }
+      ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentNumberingBySmartCaptureResultParamName] = true;
+
       // Дата.
       var facts = recognizedDocument.Facts;
       var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
@@ -2048,10 +2059,10 @@ namespace Sungero.Capture.Server
         isTrustedNumber = false;
       }
       
-      var isRegistered = false;
       if (!fillWithoutRegistration)
       {
-        isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, regNumber, regDate);
+        // Не сохранять документ, чтобы не потерять параметр DocumentNumberingBySmartCaptureResult.
+        Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(_obj, register.First(), regDate, regNumber, false, false);
       }
       else
       {
@@ -2060,12 +2071,9 @@ namespace Sungero.Capture.Server
         document.RegistrationNumber = regNumber;
       }
       
-      if (isRegistered || fillWithoutRegistration)
-      {
-        var props = document.Info.Properties;
-        LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
-        LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
-      }
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
+      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
     }
     
     /// <summary>
