@@ -383,7 +383,8 @@
     "FailedClassifyDocumentsTaskName",
     "NeedToNumberDocument",
     "SetDocumentNumber",
-    "SetDocumentDate"
+    "SetDocumentDate",
+    "UnknownNumber"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

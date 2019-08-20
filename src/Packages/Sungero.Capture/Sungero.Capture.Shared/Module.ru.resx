@@ -191,4 +191,7 @@
   <data name="SetDocumentDate" xml:space="preserve">
     <value>Необходимо заполнить дату документа.</value>
   </data>
+  <data name="UnknownNumber" xml:space="preserve">
+    <value>???</value>
+  </data>
 </root>
