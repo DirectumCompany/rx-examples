@@ -2012,11 +2012,11 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта.</param>
-    /// <param name="fillWithoutRegistration">Заполнить дату и номер без регистрации.</param>
+    /// <param name="isMockDocument">Признак mock-документа.</param>
     public static void FillRegistrationData(IOfficialDocument document,
                                             Structures.Module.IRecognizedDocument recognizedDocument,
                                             string factName,
-                                            bool fillWithoutRegistration)
+                                            bool isMockDocument)
     {
       // Присвоить номер, если вид документа - нумеруемый и однозначно определяется журнал регистрации.
       if (document.DocumentKind == null || document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
@@ -2024,21 +2024,21 @@ namespace Sungero.Capture.Server
 
       // Проверить конфигурацию DirectumRX на возможность нумерации документа.
       // Можем нумеровать только тогда, когда однозначно подобран журнал.
-      // Используется при отправке задачи на обработку документа.
+      // Параметр используется при отправке задачи на обработку документа.
+      // Для mock-документов всегда заполняем дату и номер без регистрации.
       var registers = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentRegistersByDocument(document, Sungero.Docflow.RegistrationSetting.SettingType.Numeration);
-      if (registers.Count != 1)
+      if (registers.Count != 1 && !isMockDocument)
       {
         ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentNumberingBySmartCaptureResultParamName] = false;
         return;
       }
-      ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentNumberingBySmartCaptureResultParamName] = true;
 
       // Дата.
       var facts = recognizedDocument.Facts;
       var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
       var regDate = GetFieldDateTimeValue(regDateFact, "Date");
       Nullable<bool> isTrustedDate = null;
-      if ((regDate == null || !regDate.HasValue) && fillWithoutRegistration)
+      if ((regDate == null || !regDate.HasValue) && !isMockDocument)
       {
         regDate = Calendar.SqlMinValue;
         isTrustedDate = false;
@@ -2048,7 +2048,7 @@ namespace Sungero.Capture.Server
       var regNumberFact = GetOrderedFacts(facts, factName, "Number").FirstOrDefault();
       var regNumber = GetFieldValue(regNumberFact, "Number");
       Nullable<bool> isTrustedNumber = null;
-      if (string.IsNullOrWhiteSpace(regNumber) && fillWithoutRegistration)
+      if (string.IsNullOrWhiteSpace(regNumber) && !isMockDocument)
       {
         regNumber = Resources.UnknownNumber;
         isTrustedNumber = false;
@@ -2059,10 +2059,10 @@ namespace Sungero.Capture.Server
         isTrustedNumber = false;
       }
       
-      if (!fillWithoutRegistration)
+      if (!isMockDocument)
       {
-        // Не сохранять документ, чтобы не потерять параметр DocumentNumberingBySmartCaptureResult.
-        Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(_obj, register.First(), regDate, regNumber, false, false);
+        // Не сохранять документ при регистрации, чтобы не потерять параметр DocumentNumberingBySmartCaptureResult.
+        Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(document, registers.First(), regDate, regNumber, false, false);
       }
       else
       {
