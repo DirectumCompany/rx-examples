@@ -211,9 +211,9 @@
     <value>Условия</value>
   </data>
   <data name="ControlGroup_82c787a498d643d48236a21f05121636" xml:space="preserve">
-    <value>Исполнитель</value>
+    <value>Заказчик</value>
   </data>
   <data name="ControlGroup_9152a6a160364d25a0e29f2972b43a64" xml:space="preserve">
-    <value>Заказчик</value>
+    <value>Исполнитель</value>
   </data>
 </root>

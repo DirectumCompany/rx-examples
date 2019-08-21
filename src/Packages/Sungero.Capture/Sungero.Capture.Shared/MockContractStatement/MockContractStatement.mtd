@@ -179,7 +179,7 @@
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "9152a6a1-6036-4d25-a0e2-9f2972b43a64",
-          "Name": "Contractor",
+          "Name": "Customer",
           "ColumnDefinitions": [
             {
               "Percentage": 50.0
@@ -237,7 +237,7 @@
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "82c787a4-98d6-43d4-8236-a21f05121636",
-          "Name": "Customer",
+          "Name": "Contractor",
           "ColumnDefinitions": [
             {
               "Percentage": 50.0
