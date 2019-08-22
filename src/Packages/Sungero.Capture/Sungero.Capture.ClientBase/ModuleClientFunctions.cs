@@ -81,14 +81,11 @@ namespace Sungero.Capture.Client
       {
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, packagePath, firstPageClassifierName, typeClassifierName);
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
+        
         var originalFile = new Structures.Module.FileInfo();
         originalFile.Path = packagePath;
-        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
-                                                                                    originalFile,
-                                                                                    null,
-                                                                                    responsible,
-                                                                                    false);
-        Functions.Module.Remote.SendToResponsible(documents, responsible, false);
+        Functions.Module.Remote.ProcessScanPackageRecognitionResults(classificationAndExtractionResult.Result, originalFile, responsible);
+        
         Logger.DebugFormat("End package processing. Path: {0}", packagePath);
         Logger.Debug("End of captured package processing.");
       }
@@ -548,9 +545,9 @@ namespace Sungero.Capture.Client
     public void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
     {
       var smartCaptureNumerationSucceed = document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
-                                          document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
-                                          document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
-                                          document.DocumentRegister != null;
+        document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+        document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
+        document.DocumentRegister != null;
       
       if (document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess &&
           smartCaptureNumerationSucceed)

@@ -111,6 +111,21 @@ namespace Sungero.Capture.Server
     #region Общий процесс обработки захваченных документов
     
     /// <summary>
+    /// Обработать результаты распознавания пакета докмуентов.
+    /// </summary>
+    /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
+    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
+    /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
+    [Remote]
+    public virtual void ProcessScanPackageRecognitionResults(string recognitionResults,
+                                                             Structures.Module.IFileInfo originalFile,
+                                                             IEmployee responsible)
+    {
+      var documents = CreateDocumentsByRecognitionResults(recognitionResults, originalFile, null, responsible, false);
+      SendToResponsible(documents, responsible, false);
+    }
+    
+    /// <summary>
     /// Создать документы в RX.
     /// </summary>
     /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
@@ -871,7 +886,7 @@ namespace Sungero.Capture.Server
     /// <param name="bodyInfo">Путь до тела email.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, 
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo,
                                                                                      Structures.Module.IFileInfo bodyInfo,
                                                                                      IEmployee responsible)
     {
@@ -930,7 +945,7 @@ namespace Sungero.Capture.Server
     /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo, 
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo,
                                                                                 bool sendedByEmail,
                                                                                 IEmployee responsible)
     {
