@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -9,6 +9,12 @@ namespace Sungero.SmartCapture.Shared
 {
   partial class SimpleDocumentFunctions
   {
-
+    public override void SetRequiredProperties()
+    {
+      base.SetRequiredProperties();
+      
+      // Поле Содержание обязательно для заполнения, только если это указано в метаданных.
+      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
+    }
   }
 }

@@ -116,7 +116,7 @@ namespace Sungero.Capture.Client
       mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
       
       var mailInfo = GetMailInfo(instanceInfo);
-      var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body);
+      var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
       Logger.Debug("Captured Package Process. Document from e-mail body created.");
       
       var relatedDocumentIds = new List<int>();
@@ -129,7 +129,7 @@ namespace Sungero.Capture.Client
         if (!CanArioProcessFile(attachment.Description))
         {
           Logger.DebugFormat("Captured Package Process. Can't process file by Ario: {0}", attachment.Description);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true, responsible);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
           relatedDocumentIds.Add(document.Id);
           continue;
@@ -151,7 +151,7 @@ namespace Sungero.Capture.Client
         else
         {
           Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", attachment.Description);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true);
+          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true, responsible);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
           relatedDocumentIds.Add(document.Id);
         }

@@ -19,7 +19,13 @@ namespace Sungero.SmartCapture
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
       base.Refresh(e);
-                 
+      
+      // Поле Содержание обязательно для заполнения в зависимости от типа нумерации/регистрации.
+      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired ||
+        (_obj.DocumentKind != null &&
+         (_obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Registrable ||
+          _obj.DocumentKind.GenerateDocumentName == true));
+      
       if (_obj.VerificationState != VerificationState.InProcess)
         _obj.State.Properties.VerificationState.IsVisible = false;
       

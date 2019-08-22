@@ -339,11 +339,12 @@ namespace Sungero.Capture.Server
       
       // Все нераспознанные документы создать простыми.
       else
-        document = CreateSimpleDocument(recognizedDocument);
+        document = CreateSimpleDocument(recognizedDocument, responsible);
       
       FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       CreateVersion(document, recognizedDocument);
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
+      
       document.Save();
       return document;
     }
@@ -851,11 +852,15 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateSimpleDocument(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateSimpleDocument(Structures.Module.IRecognizedDocument recognizedDocument,
+                                                                 IEmployee responsible)
     {
       var document = SimpleDocuments.Create();
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
-      
+      document.PreparedBy = responsible;
+      document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      document.Department = GetDepartment(responsible);
       return document;
     }
     
@@ -866,15 +871,20 @@ namespace Sungero.Capture.Server
     /// <param name="bodyInfo">Путь до тела email.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, Structures.Module.IFileInfo bodyInfo)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, 
+                                                                                     Structures.Module.IFileInfo bodyInfo,
+                                                                                     IEmployee responsible)
     {
       if (!System.IO.File.Exists(bodyInfo.Path))
         throw new ApplicationException(Resources.FileNotFoundFormat(bodyInfo.Path));
       
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, true);
       document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
+      document.PreparedBy = responsible;
+      document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      document.Department = GetDepartment(responsible);
+      FillDeliveryMethod(document, true);
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
       {
         var name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
@@ -920,12 +930,17 @@ namespace Sungero.Capture.Server
     /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo, bool sendedByEmail)
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo, 
+                                                                                bool sendedByEmail,
+                                                                                IEmployee responsible)
     {
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      FillDeliveryMethod(document, sendedByEmail);
       document.Name = Path.GetFileName(fileInfo.Description);
+      document.PreparedBy = responsible;
+      document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      document.Department = GetDepartment(responsible);
+      FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
       var application = GetAssociatedApplicationByFileName(fileInfo.Path);
