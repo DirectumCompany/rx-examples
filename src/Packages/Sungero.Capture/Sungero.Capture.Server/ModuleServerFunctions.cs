@@ -46,6 +46,10 @@ namespace Sungero.Capture.Server
                                                                               Capture.Server.MockIncomingInvoice.ClassTypeGuid,
                                                                               Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
       
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(Contracts.Resources.ContractTypeName,
+                                                                              Capture.Server.MockContract.ClassTypeGuid,
+                                                                              Sungero.Docflow.DocumentType.DocumentFlow.Incoming, true);
+      
       // Создать виды документов.
       var actions = new[] { OfficialDocuments.Info.Actions.SendActionItem, OfficialDocuments.Info.Actions.SendForFreeApproval };
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(RecordManagement.Resources.IncomingLetterKindName,
@@ -82,6 +86,13 @@ namespace Sungero.Capture.Server
                                                                               Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
                                                                               Capture.Server.MockIncomingInvoice.ClassTypeGuid,
                                                                               actions, Sungero.Capture.Constants.Module.Initialize.MockIncomingInvoiceGuid);
+      
+      Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentKind(Contracts.Resources.ContractKindName,
+                                                                              Contracts.Resources.ContractKindShortName,
+                                                                              Sungero.Docflow.DocumentKind.NumberingType.Registrable,
+                                                                              Sungero.Docflow.DocumentKind.DocumentFlow.Incoming, true, false,
+                                                                              Capture.Server.MockContract.ClassTypeGuid,
+                                                                              actions, Sungero.Capture.Constants.Module.Initialize.MockContractGuid);
       
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
@@ -350,6 +361,10 @@ namespace Sungero.Capture.Server
         document = isMockMode
           ? CreateMockIncomingInvoice(recognizedDocument)
           : CreateIncomingInvoice(recognizedDocument, responsible);
+      
+      // Договор.
+      else if (recognizedClass == Constants.Module.ContractClassName && isMockMode)
+        document = CreateMockContract(recognizedDocument);
       
       // Все нераспознанные документы создать простыми.
       else
@@ -813,7 +828,7 @@ namespace Sungero.Capture.Server
       
       // Собрать ссылки на документы, которые не удалось зарегистрировать.
       var documentsWithRegistrationFailureHyperlinks = new List<string>();
-      documentsWithRegistrationFailureHyperlinks.AddRange(documentsWithRegistrationFailure.Select(x => Hyperlinks.Get(x)));      
+      documentsWithRegistrationFailureHyperlinks.AddRange(documentsWithRegistrationFailure.Select(x => Hyperlinks.Get(x)));
       
       // Текст задачи.
       task.ActiveText = Resources.CheckPackageTaskText;
@@ -1983,6 +1998,24 @@ namespace Sungero.Capture.Server
       return document;
     }
     
+    #endregion
+    
+    #region Договор
+    
+    /// <summary>
+    /// Создать договор с текстовыми полями.
+    /// </summary>
+    /// <param name="recognizedDocument">Результат обработки счета на оплату в Ario.</param>
+    /// <returns>Договор.</returns>
+    public static Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognizedDocument recognizedDocument)
+    {
+      var document = Sungero.Capture.MockContracts.Create();
+      
+      // Основные свойства.
+      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      document.Name = document.DocumentKind.ShortName;
+      return document;
+    }
     #endregion
     
     #region Заполнение свойств документа

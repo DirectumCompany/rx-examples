@@ -31,6 +31,8 @@ namespace Sungero.Capture.Constants
     
     public const string IncomingInvoiceClassName = "Входящий счет на оплату";
     
+    public const string ContractClassName = "Договор";
+    
     [Sungero.Core.Public]
     public const string PropertiesAlreadyColoredParamName = "PropertiesAlreadyColored";
 
@@ -57,6 +59,8 @@ namespace Sungero.Capture.Constants
       public static readonly Guid MockIncomingTaxInvoiceGuid = Guid.Parse("69A7B4C2-7D6C-4F36-B760-B6D048EE40A4");
       
       public static readonly Guid MockIncomingInvoiceGuid = Guid.Parse("a2f02dd2-ae5b-4659-b9d1-cfcfa1f56734");
+      
+      public static readonly Guid MockContractGuid = Guid.Parse("3803bce4-67ff-4c9c-af63-7e305ae7ed69");
     }
     
     public static class CaptureSourceType

@@ -341,6 +341,7 @@ namespace Sungero.Capture.Client
         { Constants.Module.TaxInvoiceClassName, "TaxInvoice"},
         { Constants.Module.TaxinvoiceCorrectionClassName, "TaxinvoiceCorrection"},
         { Constants.Module.IncomingInvoiceClassName, "IncomingInvoice"},
+        { Constants.Module.ContractClassName, "Contract"}
       };
     }
     
