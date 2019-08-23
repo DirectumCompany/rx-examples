@@ -16,5 +16,14 @@ namespace Sungero.SmartCapture.Shared
       // Поле Содержание обязательно для заполнения, только если это указано в метаданных.
       _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
     }
+    
+    public override void FillName()
+    {
+      base.FillName();
+      
+      // Если имя формировать не из чего, то сформировать из краткого названия вида документа.
+      if (_obj.Name == Docflow.Resources.DocumentNameAutotext)
+        _obj.Name = _obj.DocumentKind.ShortName;
+    }
   }
 }

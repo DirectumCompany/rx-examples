@@ -919,11 +919,13 @@ namespace Sungero.Capture.Server
       
       var document = Sungero.Docflow.SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       document.PreparedBy = responsible;
       document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = GetDepartment(responsible);
       FillDeliveryMethod(document, true);
+      
+      // Наименование и содержание.
+      document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
       {
         var name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
