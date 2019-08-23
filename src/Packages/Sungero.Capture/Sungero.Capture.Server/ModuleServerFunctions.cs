@@ -130,6 +130,7 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
+      var documentsWithRegistrationFailure = new List<IOfficialDocument>();
       
       foreach (var recognizedDocument in recognizedDocuments)
       {
@@ -156,6 +157,9 @@ namespace Sungero.Capture.Server
         {
           document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible);
           package.Add(document);
+          
+          if (IsDocumentRegistrationFailed(document))
+            documentsWithRegistrationFailure.Add(document);
         }
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
@@ -204,7 +208,17 @@ namespace Sungero.Capture.Server
       }
       
       result.RelatedDocumentIds = package.Select(x => x.Id).ToList();
+      result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
       return result;
+    }
+    
+    public virtual bool IsDocumentRegistrationFailed(IOfficialDocument document)
+    {
+      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
+      if (documentParams.ContainsKey(Constants.Module.DocumentNumberingBySmartCaptureResultParamName))
+        return true;
+      
+      return false;
     }
     
     public virtual List<Structures.Module.IRecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults,
@@ -871,7 +885,7 @@ namespace Sungero.Capture.Server
     /// <param name="bodyInfo">Путь до тела email.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo, 
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo,
                                                                                      Structures.Module.IFileInfo bodyInfo,
                                                                                      IEmployee responsible)
     {
@@ -930,7 +944,7 @@ namespace Sungero.Capture.Server
     /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo, 
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo,
                                                                                 bool sendedByEmail,
                                                                                 IEmployee responsible)
     {
