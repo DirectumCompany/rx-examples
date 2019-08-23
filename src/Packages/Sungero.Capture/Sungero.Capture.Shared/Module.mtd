@@ -201,6 +201,11 @@
           "ParameterTypeFullName": "System.Collections.Generic.List"
         },
         {
+          "Name": "documentsWithRegistrationFailure",
+          "ParameterType": "global::System.Collections.Generic.List<global::Sungero.Docflow.IOfficialDocument>",
+          "ParameterTypeFullName": "System.Collections.Generic.List"
+        },
+        {
           "Name": "responsible",
           "ParameterType": "global::Sungero.Company.IEmployee",
           "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"

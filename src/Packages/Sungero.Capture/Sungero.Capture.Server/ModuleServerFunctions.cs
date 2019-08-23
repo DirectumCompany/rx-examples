@@ -770,12 +770,13 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="leadingDocument">Основной документ.</param>
     /// <param name="documents">Прочие документы.</param>
+    /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <param name="isCapturedFromEmail">Признак того, что пакет пришел с эл. почты.</param>
     /// <returns>Простая задача.</returns>
     [Public, Remote]
     public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
-                                          Company.IEmployee responsible, bool isCapturedFromEmail)
+                                          List<IOfficialDocument> documentsWithRegistrationFailure, Company.IEmployee responsible, bool isCapturedFromEmail)
     {
       if (leadingDocument == null)
         return;
@@ -854,7 +855,15 @@ namespace Sungero.Capture.Server
       var relatedDocuments = OfficialDocuments.GetAll()
         .Where(x => documentsCreatedByRecognition.RelatedDocumentIds.Contains(x.Id))
         .ToList();
-      SendToResponsible(leadingDocument, relatedDocuments, responsible, isCapturedFromEmail);
+      
+      var allDocuments = new List<Docflow.IOfficialDocument>();
+      allDocuments.Add(leadingDocument);
+      allDocuments.AddRange(relatedDocuments);
+      
+      var documentsWithRegistrationFailure = allDocuments
+        .Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id))
+        .ToList();
+      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, responsible, isCapturedFromEmail);
     }
     
     #endregion
