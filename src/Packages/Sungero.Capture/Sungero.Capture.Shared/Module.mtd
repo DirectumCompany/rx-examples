@@ -389,7 +389,9 @@
     "NeedToNumberDocument",
     "SetDocumentNumber",
     "SetDocumentDate",
-    "UnknownNumber"
+    "UnknownNumber",
+    "DocumentsWithRegistrationFailureTaskText",
+    "DocumentWithRegistrationFailureTaskText"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

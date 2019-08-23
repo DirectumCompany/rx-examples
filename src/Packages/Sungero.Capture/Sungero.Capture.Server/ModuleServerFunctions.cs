@@ -811,6 +811,10 @@ namespace Sungero.Capture.Server
           notClassifiedDocumentsHyperlinks.Add(Hyperlinks.Get(document));
       }
       
+      // Собрать ссылки на документы, которые не удалось зарегистрировать.
+      var documentsWithRegistrationFailureHyperlinks = new List<string>();
+      documentsWithRegistrationFailureHyperlinks.AddRange(documentsWithRegistrationFailure.Select(x => Hyperlinks.Get(x)));      
+      
       // Текст задачи.
       task.ActiveText = Resources.CheckPackageTaskText;
       
@@ -824,6 +828,18 @@ namespace Sungero.Capture.Server
         var notClassifiedDocumentsHyperlinksLabel = string.Join("\n    ", notClassifiedDocumentsHyperlinks);
         
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedClassifyTaskText, notClassifiedDocumentsHyperlinksLabel);
+      }
+      
+      // Добавить в текст задачи список документов, которые не удалось зарегистрировать.
+      if (documentsWithRegistrationFailure.Any())
+      {
+        var documentsWithRegistrationFailureTaskText = documentsWithRegistrationFailure.Count() == 1
+          ? Resources.DocumentWithRegistrationFailureTaskText
+          : Resources.DocumentsWithRegistrationFailureTaskText;
+        
+        var documentsWithRegistrationFailureHyperlinksLabel = string.Join("\n    ", documentsWithRegistrationFailureHyperlinks);
+        
+        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText, documentsWithRegistrationFailureHyperlinksLabel);
       }
       
       // Маршрут.

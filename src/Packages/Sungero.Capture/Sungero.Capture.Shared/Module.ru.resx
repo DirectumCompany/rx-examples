@@ -194,4 +194,10 @@
   <data name="UnknownNumber" xml:space="preserve">
     <value>???</value>
   </data>
+  <data name="DocumentsWithRegistrationFailureTaskText" xml:space="preserve">
+    <value>Службе ввода не удалось зарегистрировать документы:</value>
+  </data>
+  <data name="DocumentWithRegistrationFailureTaskText" xml:space="preserve">
+    <value>Службе ввода не удалось зарегистрировать документ:</value>
+  </data>
 </root>
