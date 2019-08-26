@@ -194,10 +194,19 @@
   <data name="UnknownNumber" xml:space="preserve">
     <value>???</value>
   </data>
-  <data name="DocumentsWithRegistrationFailureTaskText" xml:space="preserve">
-    <value>Службе ввода не удалось зарегистрировать документы:</value>
+  <data name="Document" xml:space="preserve">
+    <value>документа</value>
   </data>
-  <data name="DocumentWithRegistrationFailureTaskText" xml:space="preserve">
-    <value>Службе ввода не удалось зарегистрировать документ:</value>
+  <data name="Documents" xml:space="preserve">
+    <value>документов</value>
+  </data>
+  <data name="Kind" xml:space="preserve">
+    <value>видом</value>
+  </data>
+  <data name="Kinds" xml:space="preserve">
+    <value>видами</value>
+  </data>
+  <data name="DocumentsWithRegistrationFailureTaskText" xml:space="preserve">
+    <value>Для {0} с {1} {2} не удалось подобрать настройку регистрации. Обратитесь к администратору системы.</value>
   </data>
 </root>

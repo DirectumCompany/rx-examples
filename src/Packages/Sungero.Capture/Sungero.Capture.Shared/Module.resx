@@ -189,10 +189,19 @@
   <data name="UnknownNumber" xml:space="preserve">
     <value>???</value>
   </data>
-  <data name="DocumentsWithRegistrationFailureTaskText" xml:space="preserve">
+  <data name="Document" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="DocumentWithRegistrationFailureTaskText" xml:space="preserve">
+  <data name="Documents" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Kind" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Kinds" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="DocumentsWithRegistrationFailureTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
 </root>

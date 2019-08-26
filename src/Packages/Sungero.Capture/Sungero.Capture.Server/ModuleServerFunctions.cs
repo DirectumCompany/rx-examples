@@ -848,13 +848,19 @@ namespace Sungero.Capture.Server
       // Добавить в текст задачи список документов, которые не удалось зарегистрировать.
       if (documentsWithRegistrationFailure.Any())
       {
-        var documentsWithRegistrationFailureTaskText = documentsWithRegistrationFailure.Count() == 1
-          ? Resources.DocumentWithRegistrationFailureTaskText
-          : Resources.DocumentsWithRegistrationFailureTaskText;
+        documentsWithRegistrationFailure = documentsWithRegistrationFailure.OrderBy(x => x.DocumentKind.Name).ToList();
+        var documentsText = documentsWithRegistrationFailure.Count() == 1 ? Sungero.Capture.Resources.Document : Sungero.Capture.Resources.Documents;
+        var documentKinds = documentsWithRegistrationFailure.Select(x => x.DocumentKind.Name).Distinct();
+        var documentKindsText = documentKinds.Count() == 1 ? Sungero.Capture.Resources.Kind : Sungero.Capture.Resources.Kinds;
+        var documentKindsListText = string.Join(", ", documentKinds);
+        
+        var documentsWithRegistrationFailureTaskText = string.Format(Sungero.Capture.Resources.DocumentsWithRegistrationFailureTaskText,
+                                                                     documentsText, documentKindsText, documentKindsListText);
         
         var documentsWithRegistrationFailureHyperlinksLabel = string.Join("\n    ", documentsWithRegistrationFailureHyperlinks);
         
-        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText, documentsWithRegistrationFailureHyperlinksLabel);
+        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText,
+                                        documentsWithRegistrationFailureHyperlinksLabel);
       }
       
       // Маршрут.

@@ -394,8 +394,11 @@
     "SetDocumentNumber",
     "SetDocumentDate",
     "UnknownNumber",
-    "DocumentsWithRegistrationFailureTaskText",
-    "DocumentWithRegistrationFailureTaskText"
+    "Document",
+    "Documents",
+    "Kind",
+    "Kinds",
+    "DocumentsWithRegistrationFailureTaskText"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
