@@ -126,4 +126,238 @@
   <data name="CollectionDisplayName" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="Resource_fc50c88831554ff196e8ff7064894ead" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_fc50c88831554ff196e8ff7064894ead_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_ddf41ead829a4a3f8d12d40a52b7440c" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_ddf41ead829a4a3f8d12d40a52b7440c_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_f0607051ea774af2b7966d11cd8a7374" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_f0607051ea774af2b7966d11cd8a7374_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_406e14dc17444a7f85d8f6eef8abaa3f" xml:space="preserve">
+    <value>Main</value>
+  </data>
+  <data name="ControlGroup_b8017e2288d643da8d6d8d11917b1dd6" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_01dd99f5db49480eb69928488f2653fb" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_91cff7df37834f868122f6238e9ba7c0" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_91cff7df37834f868122f6238e9ba7c0_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_670056d3a80d41c290537ace73f8c3e3" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_ec742a73eb834925a43ca0a7cf42eae0" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_ec742a73eb834925a43ca0a7cf42eae0_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_7df27ccda54245dfb05240089a659cbf" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_7df27ccda54245dfb05240089a659cbf_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_4e1d78fc6f6c4c81bf9aa1fa2031a46b" xml:space="preserve">
+    <value>Date and number</value>
+  </data>
+  <data name="Resource_dcb9c4394f4f42d287de6f225f4a2812" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_dcb9c4394f4f42d287de6f225f4a2812_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_20e94ab7b35542b7b03e10bba9c2e85c" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_696a8bb83e1244c8927a37d955cfbf0f" xml:space="preserve">
+    <value>Retention</value>
+  </data>
+  <data name="Resource_e300028a5e1f485d806917e121bb9ba9" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_e81f0c5eb58a4007aeebb672ea52875b" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_c45cfe6a44c043689482e4b0a91c3e05" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_4ebb565bb94d465295fba553ba4900b8" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_6db130988df540968fd5ffc5f9d4dfc5" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_2574d8e0ddb04af7a692711434658d6a" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_1b194ce3c44048879f0d1cdc4303c583" xml:space="preserve">
+    <value>Lifecycle</value>
+  </data>
+  <data name="ControlGroup_28a6d4a8a26a467b8fe6da426092ec4a" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_03fde41782544f08950cd543871033a8" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_42612188cf984a66a4cc5c674787d208" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="Resource_0e47ae684ffc4acb80bf3d6f715ce7c2" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_0e47ae684ffc4acb80bf3d6f715ce7c2_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_72e492251e834e65bb33ea838a458e43" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="Resource_4628212b0304439ab3fb29f0a1ea289e" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_a915c070568d4f08a7365fbdabe9e559" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_a915c070568d4f08a7365fbdabe9e559_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_174ad90c64a4439eaa4f0c7286c511df" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_a52c6e121b2c4fc8941d7846542e3105" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Property_DocumentGroup" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_IsStandard" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_17f79878c1124d278dff93306ebfd9df" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_FirstPartyName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_FirstPartyTin" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_FirstPartyTrrc" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_FirstPartySignatory" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_SecondPartyName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_SecondPartyTin" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_SecondPartyTrrc" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_SecondPartySignatory" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_51cbc8866722491fb88ef84156cea259" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_24ff8d3d22f747b78e92d4124cd92a04" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_TotalAmount" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Property_Currency" xml:space="preserve">
+    <value>Currency</value>
+  </data>
+  <data name="Property_VatAmount" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_9c0e981c710f4665bcbc2d8f5d8084d3" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
+    <value>Preview</value>
+  </data>
+  <data name="ControlGroup_8f91b21ba3744bd5807bb01130dff98f" xml:space="preserve">
+    <value>Properties</value>
+  </data>
+  <data name="Resource_9ad3461d21c94da4b0898738dbfe6076" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_812fa7c1ee734284a3458e74ae533761" xml:space="preserve">
+    <value>Main</value>
+  </data>
+  <data name="ControlGroup_be2e7b3b0c934025bd189aa01ba7f66c" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_b6b8a84b12bf4dfca14371690f1ae498" xml:space="preserve">
+    <value>Notes</value>
+  </data>
+  <data name="Resource_3653e8a6c90940d29bc4de985ef7c3ac" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_3653e8a6c90940d29bc4de985ef7c3ac_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_3b8b809f288240f88f7e7446096e1ed8" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_3b8b809f288240f88f7e7446096e1ed8_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_132ee2a30e9c4614b8a1df223dedad31" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_132ee2a30e9c4614b8a1df223dedad31_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_842a9477e5f2479eacb79fbbe56ccd2a" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_842a9477e5f2479eacb79fbbe56ccd2a_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_8b050f363a594f4ca5bd78314ab6d183" xml:space="preserve">
+    <value>Lifecycle</value>
+  </data>
+  <data name="Resource_83f2f039ecf94529be545847e6564b38" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_377d65117e1b423ebf32d80e4ab31f24" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Control_377d65117e1b423ebf32d80e4ab31f24_EmptyText" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Resource_fd7a1ef6ba2c495d962e37ceb6708032" xml:space="preserve">
+    <value />
+  </data>
+  <data name="ControlGroup_7317ade3210047ae9c890ff69313dbba" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_a799fd244fa84e3991cb7b6d17ad296d" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_ebd6cef9f78b44c4aa4c1af7c1ecc72d" xml:space="preserve">
+    <value>Note</value>
+  </data>
 </root>

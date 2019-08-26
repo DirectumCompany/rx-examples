@@ -586,18 +586,48 @@ namespace Sungero.Capture.Server
       var name = GetFieldValue(fact, "Name");
       var patronymic = GetFieldValue(fact, "Patrn");
       
+      return GetFullNameByFact(surname, name, patronymic);
+    }
+    
+    /// <summary>
+    /// Получить полное имя подписанта из факта для договоров.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
+    public static string GetFullNameByFactForContract(Sungero.Capture.Structures.Module.IFact fact)
+    {
+      if (fact == null)
+        return string.Empty;
+      
+      var surname = GetFieldValue(fact, "SignatorySurname");
+      var name = GetFieldValue(fact, "SignatoryName");
+      var patronymic = GetFieldValue(fact, "SignatoryPatrn");
+      
+      return GetFullNameByFact(surname, name, patronymic);
+    }
+    
+    /// <summary>
+    /// Сформировать полное имя из строк.
+    /// </summary>
+    /// <param name="surnameFieldValue">Фамилия.</param>
+    /// <param name="nameFieldValue">Имя.</param>
+    /// <param name="patronymicFieldValue">Отчество.</param>
+    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
+    public static string GetFullNameByFact(string surnameFieldValue, string nameFieldValue, string patronymicFieldValue)
+    {
       // Собрать ФИО из фамилии, имени и отчества.
       var parts = new List<string>();
       
-      if (!string.IsNullOrWhiteSpace(surname))
-        parts.Add(surname);
-      if (!string.IsNullOrWhiteSpace(name))
-        parts.Add(name);
-      if (!string.IsNullOrWhiteSpace(patronymic))
-        parts.Add(patronymic);
+      if (!string.IsNullOrWhiteSpace(surnameFieldValue))
+        parts.Add(surnameFieldValue);
+      if (!string.IsNullOrWhiteSpace(nameFieldValue))
+        parts.Add(nameFieldValue);
+      if (!string.IsNullOrWhiteSpace(patronymicFieldValue))
+        parts.Add(patronymicFieldValue);
       
       return string.Join(" ", parts);
     }
+    
     
     /// <summary>
     /// Получить сокращенное имя из факта.
@@ -2020,6 +2050,70 @@ namespace Sungero.Capture.Server
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.Name = document.DocumentKind.ShortName;
+      var props = document.Info.Properties;
+      var facts = recognizedDocument.Facts;
+      
+      // Дата и номер.
+      FillRegistrationData(document, recognizedDocument, "Document", true);
+      
+      // Заполнить данные сторон.
+      var partyNameFacts = GetOrderedFacts(facts, "Counterparty", "Name");
+      if (partyNameFacts.Count() > 0)
+      {
+        var fact = partyNameFacts.First();
+        document.FirstPartyName = GetCorrespondentName(fact, "Name", "LegalForm");
+        document.FirstPartySignatory = GetFullNameByFactForContract(fact);
+        LinkFactAndProperty(recognizedDocument, fact, "Name", props.FirstPartyName.Name, document.FirstPartyName);
+        LinkFactAndProperty(recognizedDocument, fact, "SignatorySurname", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognizedDocument, fact, "SignatoryName", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognizedDocument, fact, "SignatoryPatrn", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+      }
+      if (partyNameFacts.Count() > 1)
+      {
+        var fact = partyNameFacts.Last();
+        document.SecondPartyName = GetCorrespondentName(fact, "Name", "LegalForm");
+        document.SecondPartySignatory = GetFullNameByFactForContract(fact);
+        LinkFactAndProperty(recognizedDocument, fact, "Name", props.SecondPartyName.Name, document.SecondPartyName);
+        LinkFactAndProperty(recognizedDocument, fact, "SignatorySurname", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognizedDocument, fact, "SignatoryName", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognizedDocument, fact, "SignatoryPatrn", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+      }
+      
+      // Заполнить ИНН/КПП сторон.
+      var tinTrrcFacts = GetOrderedFacts(facts, "Counterparty", "TIN");
+      if (tinTrrcFacts.Count() > 0)
+      {
+        var fact = tinTrrcFacts.First();
+        document.FirstPartyTin = GetFieldValue(fact, "TIN");
+        document.FirstPartyTrrc = GetFieldValue(fact, "TRRC");
+        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.FirstPartyTin.Name, document.FirstPartyTin);
+        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
+      }
+      
+      if (tinTrrcFacts.Count() > 1)
+      {
+        var fact = tinTrrcFacts.Last();
+        document.SecondPartyTin = GetFieldValue(fact, "TIN");
+        document.SecondPartyTrrc = GetFieldValue(fact, "TRRC");
+        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.SecondPartyTin.Name, document.SecondPartyTin);
+        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
+      }
+      
+      // Сумма и валюта.
+      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
+      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      
+      var documentVatAmountFact = GetOrderedFacts(facts, "DocumentAmount", "VatAmount").FirstOrDefault();
+      document.VatAmount = GetFieldNumericalValue(documentVatAmountFact, "VatAmount");
+      LinkFactAndProperty(recognizedDocument, documentVatAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      
+      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
+      if (document.Currency != null)
+        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+      
       return document;
     }
     #endregion
@@ -2113,19 +2207,23 @@ namespace Sungero.Capture.Server
                                             string factName,
                                             bool isMockDocument)
     {
-      // Присвоить номер, если вид документа - нумеруемый и однозначно определяется журнал регистрации.
-      if (document.DocumentKind == null || document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
-        return;
-
       // Проверить конфигурацию DirectumRX на возможность нумерации документа.
       // Можем нумеровать только тогда, когда однозначно подобран журнал.
-      // Параметр используется при отправке задачи на обработку документа.
-      // Для mock-документов всегда заполняем дату и номер без регистрации.
       var registers = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentRegistersByDocument(document, Sungero.Docflow.RegistrationSetting.SettingType.Numeration);
-      if (registers.Count != 1 && !isMockDocument)
+      
+      // Для mock-документов не проверять возможность нумерации.
+      if (!isMockDocument)
       {
-        ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentNumberingBySmartCaptureResultParamName] = false;
-        return;
+        // Присвоить номер, если вид документа - нумеруемый.
+        if (document.DocumentKind == null || document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
+          return;
+
+        // Если не смогли пронумеровать, то передать параметр с результатом в задачу на обработку документа.
+        if (registers.Count != 1)
+        {
+          ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentNumberingBySmartCaptureResultParamName] = false;
+          return;
+        }
       }
 
       // Дата.
@@ -2154,16 +2252,16 @@ namespace Sungero.Capture.Server
         isTrustedNumber = false;
       }
       
-      if (!isMockDocument)
+      if (isMockDocument)
       {
-        // Не сохранять документ при регистрации, чтобы не потерять параметр DocumentNumberingBySmartCaptureResult.
-        Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(document, registers.First(), regDate, regNumber, false, false);
+        // Для Mock-документов заполнить номер и дату.
+        document.RegistrationDate = regDate;
+        document.RegistrationNumber = regNumber;
       }
       else
       {
-        // Для Mock-документов заполнить номер и дату без регистрации.
-        document.RegistrationDate = regDate;
-        document.RegistrationNumber = regNumber;
+        // Не сохранять документ при нумерации, чтобы не потерять параметр DocumentNumberingBySmartCaptureResult.
+        Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(document, registers.First(), regDate, regNumber, false, false);
       }
       
       var props = document.Info.Properties;
