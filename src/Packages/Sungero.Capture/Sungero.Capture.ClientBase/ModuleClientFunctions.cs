@@ -120,6 +120,7 @@ namespace Sungero.Capture.Client
       Logger.Debug("Captured Package Process. Document from e-mail body created.");
       
       var relatedDocumentIds = new List<int>();
+      var documentWithRegistrationFailureIds = new List<int>();
       foreach (var attachment in mailFiles.Attachments)
       {
         attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
@@ -147,6 +148,7 @@ namespace Sungero.Capture.Client
                                                                                       responsible,
                                                                                       true);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
+          documentWithRegistrationFailureIds.AddRange(documents.DocumentWithRegistrationFailureIds);
         }
         else
         {
@@ -161,6 +163,7 @@ namespace Sungero.Capture.Client
       var documentsToSend = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       documentsToSend.LeadingDocumentId = emailBodyDocument.Id;
       documentsToSend.RelatedDocumentIds = relatedDocumentIds;
+      documentsToSend.DocumentWithRegistrationFailureIds = documentWithRegistrationFailureIds;
       Functions.Module.Remote.SendToResponsible(documentsToSend, responsible, true);
       Logger.Debug("Captured Package Process. Done.");
     }
