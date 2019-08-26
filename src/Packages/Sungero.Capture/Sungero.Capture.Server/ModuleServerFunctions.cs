@@ -850,7 +850,7 @@ namespace Sungero.Capture.Server
       {
         documentsWithRegistrationFailure = documentsWithRegistrationFailure.OrderBy(x => x.DocumentKind.Name).ToList();
         var documentsText = documentsWithRegistrationFailure.Count() == 1 ? Sungero.Capture.Resources.Document : Sungero.Capture.Resources.Documents;
-        var documentKinds = documentsWithRegistrationFailure.Select(x => x.DocumentKind.Name).Distinct();
+        var documentKinds = documentsWithRegistrationFailure.Select(x => string.Format("\"{0}\"", x.DocumentKind.Name)).Distinct();
         var documentKindsText = documentKinds.Count() == 1 ? Sungero.Capture.Resources.Kind : Sungero.Capture.Resources.Kinds;
         var documentKindsListText = string.Join(", ", documentKinds);
         
