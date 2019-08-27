@@ -388,7 +388,7 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Пути до захваченных с почты файлов.</returns>
-    public static Structures.Module.CapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
+    public virtual Structures.Module.CapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
     {
       var mailFiles = Structures.Module.CapturedMailFiles.Create();
       mailFiles.Attachments = new List<Structures.Module.IFileInfo>();
@@ -414,18 +414,42 @@ namespace Sungero.Capture.Client
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
                                            !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      
+      var inlineImagesNumber = 0;
+      if (hasHtmlBody)
+      {
+        var htmlBody = File.ReadAllText(mailFiles.Body.Path);
+        inlineImagesNumber = System.Text.RegularExpressions.Regex.Matches(htmlBody, @"<img([^\>]*)>").Count;
+      }
+
       foreach (var attachment in attachments)
       {
         var fileDescription = attachment.Element("FileDescription").Value;
+        var fileName = Path.GetFileName(attachment.Element("FileName").Value);
         
-        // Отбросить изображения из тела письма (помогает только для писем из аутлука).
-        if (System.Text.RegularExpressions.Regex.IsMatch(fileDescription, @"^ATT\d+\s\d+\.\w+"))
+        // Отбросить изображения из тела письма.
+        if (inlineImagesNumber > 0 && IsImage(fileName))
+        {
+          inlineImagesNumber--;
           continue;
+        }
         
         mailFiles.Attachments.Add(CreateFileInfoFromXelement(attachment, folder));
       }
       
       return mailFiles;
+    }
+    
+    /// <summary>
+    /// Проверить, является ли файл изображением.
+    /// </summary>
+    /// <param name="fileName">Название файла с расширением.</param>
+    /// <returns>True - если файл является изображением, иначе - false;</returns>
+    public virtual bool IsImage (string fileName)
+    {
+      var imageExtensions = new List<string>() { ".png", ".jpg", ".jpeg", ".bmp", ".gif" };
+      var fileExtension = Path.GetExtension(fileName).ToLower();
+      return imageExtensions.Contains(fileExtension);
     }
     
     /// <summary>
