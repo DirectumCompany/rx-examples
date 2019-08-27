@@ -23,5 +23,17 @@ namespace Sungero.Capture.Shared
       }
       return string.Empty;
     }
+    
+    /// <summary>
+    /// Заполнить имя документа из короткого имени вида документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <remarks>Если имя документа не сформировалось автоматически, то заполнить его из короткого имени вида документа.</remarks>
+    [Public]
+    public static void FillNameFromKind(Sungero.Docflow.IOfficialDocument document)
+    {
+      if (document.Name == Docflow.Resources.DocumentNameAutotext || string.IsNullOrEmpty(document.Name))
+        document.Name = document.DocumentKind.ShortName;
+    }
   }
 }

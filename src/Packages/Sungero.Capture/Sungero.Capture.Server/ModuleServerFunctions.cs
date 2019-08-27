@@ -128,7 +128,6 @@ namespace Sungero.Capture.Server
     /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
-    /// <param name="sendedByEmail">Сотрудник, ответственного за проверку документов.</param>
     /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
@@ -223,6 +222,11 @@ namespace Sungero.Capture.Server
       return result;
     }
     
+    /// <summary>
+    /// Проверить, пронумерован ли документ.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <returns>True, если документ успешно пронумерован. Иначе False.</returns>
     public virtual bool IsDocumentRegistrationFailed(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
@@ -232,6 +236,13 @@ namespace Sungero.Capture.Server
       return false;
     }
     
+    /// <summary>
+    /// Получить результат классификации Ario.
+    /// </summary>
+    /// <param name="jsonClassificationResults">Json результаты классификации и извлечения фактов.</param>
+    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
+    /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
+    /// <returns>Результат классификации Ario.</returns>
     public virtual List<Structures.Module.IRecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults,
                                                                                       Structures.Module.IFileInfo originalFile,
                                                                                       bool sendedByEmail)
@@ -3351,13 +3362,13 @@ namespace Sungero.Capture.Server
     #region ШК
     
     /// <summary>
-    /// Поиск шк в документе и извлечение из него ид документа в системе.
+    /// Поиск ШК в документе и извлечение из него ИД документа в системе.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <returns>Ид документа или null если ид не найден.</returns>
+    /// <returns>Ид документа или null, если ИД не найден.</returns>
     /// <remarks>
-    /// Поиск шк осуществляется только на первой странице документа.
-    /// Формат шк - Code128.
+    /// Поиск ШК осуществляется только на первой странице документа.
+    /// Формат ШК - Code128.
     /// </remarks>
     public static List<int> GetDocumentIdByBarcode(System.IO.Stream document)
     {

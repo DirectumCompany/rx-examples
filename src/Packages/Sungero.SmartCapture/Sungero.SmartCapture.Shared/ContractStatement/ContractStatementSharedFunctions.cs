@@ -21,7 +21,7 @@ namespace Sungero.SmartCapture.Shared
     {
       if (_obj.Counterparty == null)
         return null;
-        
+      
       return base.GetCounterparties();
     }
     
@@ -29,10 +29,7 @@ namespace Sungero.SmartCapture.Shared
     {
       base.FillName();
       
-      // Если имя формировать не из чего, то сформировать из краткого названия вида документа.
-      if (string.IsNullOrWhiteSpace(_obj.Name) ||
-          _obj.Name == Docflow.Resources.DocumentNameAutotext)
-        _obj.Name = _obj.DocumentKind.ShortName;
+      Capture.PublicFunctions.Module.FillNameFromKind(_obj);
     }
   }
 }
