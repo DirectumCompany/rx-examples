@@ -607,7 +607,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Сформировать полное имя из строк.
+    /// Сформировать полное имя из частей имени.
     /// </summary>
     /// <param name="surnameFieldValue">Фамилия.</param>
     /// <param name="nameFieldValue">Имя.</param>
@@ -833,7 +833,6 @@ namespace Sungero.Capture.Server
       
       // Тема.
       var task = SimpleTasks.Create();
-      // Если все документы
       task.Subject = Docflow.SimpleDocuments.Is(leadingDocument)
         ? Resources.FailedClassifyDocumentsTaskName
         : package.Count() > 1
