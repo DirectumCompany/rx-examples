@@ -413,27 +413,15 @@ namespace Sungero.Capture.Client
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
-                                           !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+                                           !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase)).ToList();
       
-      var inlineImagesNumber = 0;
+      // Фильтрация картинок из тела письма.
       if (hasHtmlBody)
-      {
-        var htmlBody = File.ReadAllText(mailFiles.Body.Path);
-        inlineImagesNumber = System.Text.RegularExpressions.Regex.Matches(htmlBody, @"<img([^\>]*)>").Count;
-      }
+        attachments = FilterEmailBodyInlineImages(mailFiles.Body.Path, attachments);
 
       foreach (var attachment in attachments)
       {
         var fileDescription = attachment.Element("FileDescription").Value;
-        var fileName = Path.GetFileName(attachment.Element("FileName").Value);
-        
-        // Отбросить изображения из тела письма.
-        if (inlineImagesNumber > 0 && IsImage(fileName))
-        {
-          inlineImagesNumber--;
-          continue;
-        }
-        
         mailFiles.Attachments.Add(CreateFileInfoFromXelement(attachment, folder));
       }
       
@@ -450,6 +438,29 @@ namespace Sungero.Capture.Client
       var imageExtensions = new List<string>() { ".png", ".jpg", ".jpeg", ".bmp", ".gif" };
       var fileExtension = Path.GetExtension(fileName).ToLower();
       return imageExtensions.Contains(fileExtension);
+    }
+    
+    /// <summary>
+    /// Отфильтровать картинки, пришедшие в теле письма.
+    /// </summary>
+    /// <param name="htmlBodyPath">Путь до тела письма.</param>
+    /// <param name="attachments">Вложения.</param>
+    /// <returns>Отфильтрованный список вложений.</returns>
+    public virtual List<System.Xml.Linq.XElement> FilterEmailBodyInlineImages(string htmlBodyPath, List<System.Xml.Linq.XElement> attachments)
+    {
+      var inlineImagesNumber = AsposeExtensions.HtmlTagReader.GetInlineImagesNumber(htmlBodyPath);
+      var result = new List<System.Xml.Linq.XElement>();
+      foreach (var attachment in attachments)
+      {
+        var fileName = attachment.Element("FileName").Value;
+        if (inlineImagesNumber > 0 && IsImage(fileName))
+        {
+          inlineImagesNumber--;
+          continue;
+        }
+        result.Add(attachment);
+      }
+      return result;
     }
     
     /// <summary>
@@ -576,9 +587,9 @@ namespace Sungero.Capture.Client
     public void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
     {
       var smartCaptureNumerationSucceed = document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
-                                          document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
-                                          document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
-                                          document.DocumentRegister != null;
+        document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+        document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
+        document.DocumentRegister != null;
       
       if (document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess &&
           smartCaptureNumerationSucceed)
