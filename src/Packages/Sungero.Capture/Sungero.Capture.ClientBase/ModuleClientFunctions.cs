@@ -427,19 +427,7 @@ namespace Sungero.Capture.Client
       
       return mailFiles;
     }
-    
-    /// <summary>
-    /// Проверить, является ли файл изображением.
-    /// </summary>
-    /// <param name="fileName">Название файла с расширением.</param>
-    /// <returns>True - если файл является изображением, иначе - false;</returns>
-    public virtual bool IsImage (string fileName)
-    {
-      var imageExtensions = new List<string>() { ".png", ".jpg", ".jpeg", ".bmp", ".gif" };
-      var fileExtension = Path.GetExtension(fileName).ToLower();
-      return imageExtensions.Contains(fileExtension);
-    }
-    
+
     /// <summary>
     /// Отфильтровать картинки, пришедшие в теле письма.
     /// </summary>
@@ -448,19 +436,8 @@ namespace Sungero.Capture.Client
     /// <returns>Отфильтрованный список вложений.</returns>
     public virtual List<System.Xml.Linq.XElement> FilterEmailBodyInlineImages(string htmlBodyPath, List<System.Xml.Linq.XElement> attachments)
     {
-      var inlineImagesNumber = AsposeExtensions.HtmlTagReader.GetInlineImagesNumber(htmlBodyPath);
-      var result = new List<System.Xml.Linq.XElement>();
-      foreach (var attachment in attachments)
-      {
-        var fileName = attachment.Element("FileName").Value;
-        if (inlineImagesNumber > 0 && IsImage(fileName))
-        {
-          inlineImagesNumber--;
-          continue;
-        }
-        result.Add(attachment);
-      }
-      return result;
+      var inlineImagesCount = AsposeExtensions.HtmlTagReader.GetInlineImagesCount(htmlBodyPath);
+      return attachments.Skip(inlineImagesCount).ToList();
     }
     
     /// <summary>
