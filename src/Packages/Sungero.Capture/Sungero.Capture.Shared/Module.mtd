@@ -148,7 +148,7 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
-      "Name": "FillNameFromKind",
+      "Name": "FillNameFromKindIfEmpty",
       "Parameters": [
         {
           "Name": "document",

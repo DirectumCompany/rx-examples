@@ -385,8 +385,10 @@ namespace Sungero.Capture.Server
         document = CreateSimpleDocument(recognizedDocument, responsible);
       
       FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
-      CreateVersion(document, recognizedDocument);
+      /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
+         если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
+      CreateVersion(document, recognizedDocument);
       
       document.Save();
       return document;

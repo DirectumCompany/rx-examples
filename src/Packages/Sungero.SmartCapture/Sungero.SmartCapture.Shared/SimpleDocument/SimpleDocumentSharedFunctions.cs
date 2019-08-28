@@ -21,7 +21,7 @@ namespace Sungero.SmartCapture.Shared
     {
       base.FillName();
       
-      Capture.PublicFunctions.Module.FillNameFromKind(_obj);
+      Capture.PublicFunctions.Module.FillNameFromKindIfEmpty(_obj);
     }
   }
 }
