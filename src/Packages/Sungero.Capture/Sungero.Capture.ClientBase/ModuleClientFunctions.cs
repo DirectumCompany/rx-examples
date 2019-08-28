@@ -87,7 +87,7 @@ namespace Sungero.Capture.Client
                                                                                     originalFile,
                                                                                     null,
                                                                                     responsible,
-                                                                                    false);
+                                                                                    false, null);
         Functions.Module.Remote.SendToResponsible(documents, responsible, false);
         Logger.DebugFormat("End package processing. Path: {0}", packagePath);
         Logger.Debug("End of captured package processing.");
@@ -146,7 +146,7 @@ namespace Sungero.Capture.Client
                                                                                       attachment,
                                                                                       emailBodyDocument,
                                                                                       responsible,
-                                                                                      true);
+                                                                                      true, mailInfo);
           relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
           documentWithRegistrationFailureIds.AddRange(documents.DocumentWithRegistrationFailureIds);
         }
@@ -287,7 +287,7 @@ namespace Sungero.Capture.Client
                                                                                   originalFile,
                                                                                   null,
                                                                                   responsible,
-                                                                                  false);
+                                                                                  false, null);
       
       Functions.Module.Remote.SendToResponsible(documents, responsible, false);
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");

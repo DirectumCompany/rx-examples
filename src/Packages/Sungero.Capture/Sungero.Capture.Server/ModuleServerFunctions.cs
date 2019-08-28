@@ -129,13 +129,15 @@ namespace Sungero.Capture.Server
     /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
     /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
     /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
+    /// <param name="mailInfo">Информация о захваченном письме.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults,
                                                                                                               Structures.Module.IFileInfo originalFile,
                                                                                                               IOfficialDocument leadingDocument,
                                                                                                               IEmployee responsible,
-                                                                                                              bool sendedByEmail)
+                                                                                                              bool sendedByEmail,
+                                                                                                              Capture.Structures.Module.CapturedMailInfo mailInfo)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
@@ -165,7 +167,7 @@ namespace Sungero.Capture.Server
         // Создание нового документа по фактам.
         if (document == null)
         {
-          document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible);
+          document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible, mailInfo);
           package.Add(document);
           
           if (IsDocumentRegistrationFailed(document))
@@ -324,9 +326,10 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат классификации Ario.</param>
     /// <param name="sourceFileName">Путь до исходного файла, отправленного на распознование.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
+    /// <param name="mailInfo">Информация о захваченном письме.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
     public virtual IOfficialDocument CreateDocumentByRecognizedDocument(Structures.Module.IRecognizedDocument recognizedDocument,
-                                                                        IEmployee responsible)
+                                                                        IEmployee responsible, Capture.Structures.Module.CapturedMailInfo mailInfo)
     {
       // Входящее письмо.
       var recognizedClass = recognizedDocument.PredictedClass;
