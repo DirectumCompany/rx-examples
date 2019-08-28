@@ -33,8 +33,6 @@ namespace Sungero.Capture.Shared
     [Public]
     public static void FillNameFromKindIfEmpty(Sungero.Docflow.IOfficialDocument document)
     {
-      
-      System.Diagnostics.Debugger.Launch();
       if ((document.Name == Docflow.Resources.DocumentNameAutotext || string.IsNullOrEmpty(document.Name)) && 
           document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
         document.Name = document.DocumentKind.ShortName;
