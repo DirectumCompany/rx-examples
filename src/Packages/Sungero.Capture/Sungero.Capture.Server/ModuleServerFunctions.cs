@@ -152,6 +152,9 @@ namespace Sungero.Capture.Server
         FillNotClassifiedDocumentNames(leadingDocument, package);
       LinkDocuments(leadingDocument, package, emailBodyDocument);
       
+      if (emailBodyDocument != null)
+        package.Add(emailBodyDocument);
+      
       result.LeadingDocumentId = leadingDocument.Id;
       result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
       result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
