@@ -246,4 +246,13 @@
   <data name="Property_VatAmount" xml:space="preserve">
     <value>В т. ч. НДС</value>
   </data>
+  <data name="DisplayName" xml:space="preserve">
+    <value>Входящий счет</value>
+  </data>
+  <data name="AccusativeDisplayName" xml:space="preserve">
+    <value>Входящий счет</value>
+  </data>
+  <data name="CollectionDisplayName" xml:space="preserve">
+    <value>Входящие счета</value>
+  </data>
 </root>
