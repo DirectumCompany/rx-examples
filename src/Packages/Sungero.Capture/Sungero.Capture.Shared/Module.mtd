@@ -116,22 +116,6 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "CheckPossibilityNumberingDocument",
-      "Parameters": [
-        {
-          "Name": "document",
-          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
-          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
-        },
-        {
-          "Name": "e",
-          "ParameterType": "Sungero.Core.IValidationArgs"
-        }
-      ],
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    },
-    {
       "Name": "EnableRequisitesForVerification",
       "Parameters": [
         {

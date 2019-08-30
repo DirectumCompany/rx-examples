@@ -48,7 +48,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
     /// <returns>Тип источника захвата.</returns>
-    public static string GetSourceType(string deviceInfo)
+    public virtual string GetSourceType(string deviceInfo)
     {
       if (!File.Exists(deviceInfo))
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
@@ -163,7 +163,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="fileName">Имя или путь до файла.</param>
     /// <returns>True - может, False - иначе.</returns>
-    private static bool CanArioProcessFile(string fileName)
+    public virtual bool CanArioProcessFile(string fileName)
     {
       var ext = Path.GetExtension(fileName).TrimStart('.').ToLower();
       var allowedExtensions = new List<string>()
@@ -217,7 +217,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <returns>Информация о захваченном письме.</returns>
-    private static Structures.Module.CapturedMailInfo GetMailInfo(string instanceInfo)
+    public virtual Structures.Module.CapturedMailInfo GetMailInfo(string instanceInfo)
     {
       var result = Structures.Module.CapturedMailInfo.Create();
       
@@ -253,7 +253,7 @@ namespace Sungero.Capture.Client
     /// <param name="element">XElement.</param>
     /// <param name="attributeName">Имя атрибута.</param>
     /// <returns>Строковое значение атрибута. null, если атрибут отсутствует.</returns>
-    private static string GetAttributeStringValue(System.Xml.Linq.XElement element, string attributeName)
+    public virtual string GetAttributeStringValue(System.Xml.Linq.XElement element, string attributeName)
     {
       var attribute = element.Attribute(attributeName);
       if (attribute != null)
@@ -267,6 +267,7 @@ namespace Sungero.Capture.Client
     /// <param name="bodyFilePath">Путь до исходного файла.</param>
     /// <param name="jsonFilePath">Путь до файла json с результатом распознавания.</param>
     /// <param name="responsibleId">Id сотрудника ответственного за распознавание документов.</param>
+    /// <remarks> Функция добавлена для автотестов.</remarks>
     public static void CreateDocumentByRecognitionData(string bodyFilePath, string jsonFilePath, string responsibleId)
     {
       Logger.Debug("Start CreateDocumentByRecognitionData");
@@ -351,7 +352,7 @@ namespace Sungero.Capture.Client
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Пути к пакетам документов со сканера.</returns>
     /// <remarks>Технически возможно, что документов будет несколько, но на практике приходит один.</remarks>
-    public static List<string> GetScannedPackagesPaths(string filesInfo, string folder)
+    public virtual List<string> GetScannedPackagesPaths(string filesInfo, string folder)
     {
       if (!File.Exists(filesInfo))
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
@@ -442,36 +443,13 @@ namespace Sungero.Capture.Client
     /// <param name="xmlElement">Xml элемент.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Информация о файле.</returns>
-    private static Structures.Module.IFileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
+    public virtual Structures.Module.IFileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
     {
       var fileInfo = Structures.Module.FileInfo.Create();
       fileInfo.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element("FileName").Value));
       fileInfo.Description = xmlElement.Element("FileDescription").Value;
       
       return fileInfo;
-    }
-    
-    /// <summary>
-    /// Получить имя пакета документов со сканера.
-    /// </summary>
-    /// <param name="instanceInfos">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
-    /// <returns>Путь к пакету документов со сканера.</returns>
-    public static string GetScannedPackageName(string instanceInfos)
-    {
-      if (!File.Exists(instanceInfos))
-        throw new ApplicationException(Resources.NoFilesInfoInPackage);
-      
-      var filesXDoc = System.Xml.Linq.XDocument.Load(instanceInfos);
-      var fileElement = filesXDoc
-        .Element("CaptureInstanceInfoList")
-        .Element("FileSystemCaptureInstanceInfo")
-        .Element("Files")
-        .Elements()
-        .FirstOrDefault();
-      if (fileElement == null)
-        throw new ApplicationException(Resources.NoFilesInfoInPackage);
-      
-      return fileElement.Element("FileDescription").Value;
     }
     
     /// <summary>
@@ -557,7 +535,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="document">Документ для верификации.</param>
     [Public]
-    public void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
+    public virtual void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
     {
       var smartCaptureNumerationSucceed = document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
         document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
@@ -598,7 +576,7 @@ namespace Sungero.Capture.Client
     /// Удалить изображения из тела письма.
     /// </summary>
     /// <param name="path">Пусть к html-файлу письма.</param>
-    private static void RemoveImagesFromEmailBody(string path)
+    public virtual void RemoveImagesFromEmailBody(string path)
     {
       // Нет смысла удалять изображения в файлах, расширение которых не html.
       if (Path.GetExtension(path).ToLower() != ".html")
