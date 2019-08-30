@@ -953,17 +953,21 @@ namespace Sungero.Capture.Server
     {
       var leadingDocument = OfficialDocuments.GetAll()
         .FirstOrDefault(x => x.Id == documentsCreatedByRecognition.LeadingDocumentId);
-      var relatedDocuments = OfficialDocuments.GetAll()
-        .Where(x => documentsCreatedByRecognition.RelatedDocumentIds.Contains(x.Id))
-        .ToList();
+
+      var relatedDocuments = documentsCreatedByRecognition.RelatedDocumentIds != null
+        ? OfficialDocuments.GetAll().Where(x => documentsCreatedByRecognition.RelatedDocumentIds.Contains(x.Id)).ToList()
+        : new List<Docflow.IOfficialDocument>();
+      
+      if (leadingDocument == null && !relatedDocuments.Any())
+        return;
       
       var allDocuments = new List<Docflow.IOfficialDocument>();
       allDocuments.Add(leadingDocument);
       allDocuments.AddRange(relatedDocuments);
       
-      var documentsWithRegistrationFailure = allDocuments
-        .Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id))
-        .ToList();
+      var documentsWithRegistrationFailure = documentsCreatedByRecognition.DocumentWithRegistrationFailureIds != null
+        ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id)).ToList()
+        : new List<Docflow.IOfficialDocument>();
       SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, responsible, isCapturedFromEmail);
     }
     
