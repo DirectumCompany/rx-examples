@@ -401,17 +401,24 @@ namespace Sungero.Capture.Client
       var hasHtmlBody = htmlBodyElement != null;
       var hasTxtBody = txtBodyElement != null;
       
-      if (hasHtmlBody)
-        mailFiles.Body = CreateFileInfoFromXelement(htmlBodyElement, folder);
-      else if (hasTxtBody)
-        mailFiles.Body = CreateFileInfoFromXelement(txtBodyElement, folder);
+      // Некоторые клиенты (например, Outlook) для писем без тела генерируют фейковое тело,
+      // в котором текстовая часть представляет из себя только перевод строки. Такие тела заносить не нужно.
+      if (hasTxtBody)
+      {
+        var txtBodyInfo = CreateFileInfoFromXelement(txtBodyElement, folder);
+        var txtBodyString = File.ReadAllText(txtBodyInfo.Path);
+        if (txtBodyString != Constants.Module.OutlookEmptyTxtBody && hasHtmlBody)
+          mailFiles.Body = CreateFileInfoFromXelement(htmlBodyElement, folder);
+        else if (txtBodyString != Constants.Module.OutlookEmptyTxtBody)
+          mailFiles.Body = txtBodyInfo;
+      }
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
                                            !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase)).ToList();
       
       // Фильтрация картинок из тела письма.
-      if (hasHtmlBody)
+      if (mailFiles.Body != null && hasHtmlBody)
         attachments = FilterEmailBodyInlineImages(mailFiles.Body.Path, attachments);
 
       foreach (var attachment in attachments)
