@@ -118,13 +118,17 @@ namespace Sungero.Capture.Client
       // Для писем без тела не создавать простой документ.
       var mailInfo = GetMailInfo(instanceInfo);
       var emailBodyDocument = Docflow.SimpleDocuments.Null;
-      if (mailFiles.Body != null)
+      if (mailFiles.Body != null && !string.IsNullOrEmpty(mailFiles.Body.Path))
       {
         RemoveImagesFromEmailBody(mailFiles.Body.Path);
         mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
         
         emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
         Logger.Debug("Captured Package Process. Document from e-mail body created.");
+      }
+      else
+      {
+        Logger.Debug("Captured Package Process. E-mail body is empty, document from e-mail body was not created.");
       }
       
       var package = new List<Docflow.IOfficialDocument>();
@@ -407,16 +411,19 @@ namespace Sungero.Capture.Client
       var hasHtmlBody = htmlBodyElement != null;
       var hasTxtBody = txtBodyElement != null;
       
-      // Некоторые клиенты (например, Outlook) для писем без тела генерируют фейковое тело,
-      // в котором текстовая часть представляет из себя только перевод строки. Такие тела заносить не нужно.
+      // Не создавать документ для писем с пустым телом.
+      // Некоторые клиенты (например, Outlook) для писем с пустым телом генерируют фейковое тело,
+      // в котором текстовая часть представляет из себя только перевод строки. Такие тела заносить также не нужно.
       if (hasTxtBody)
       {
         var txtBodyInfo = CreateFileInfoFromXelement(txtBodyElement, folder);
         var txtBodyString = File.ReadAllText(txtBodyInfo.Path);
-        if (txtBodyString != Constants.Module.OutlookEmptyTxtBody && hasHtmlBody)
-          mailFiles.Body = CreateFileInfoFromXelement(htmlBodyElement, folder);
-        else if (txtBodyString != Constants.Module.OutlookEmptyTxtBody)
-          mailFiles.Body = txtBodyInfo;
+        var txtBodyIsEmpty = txtBodyString == Constants.Module.OutlookEmptyTxtBody;
+        if (!txtBodyIsEmpty)
+        {
+          var bodyElement = hasHtmlBody ? htmlBodyElement : txtBodyElement;
+          mailFiles.Body = CreateFileInfoFromXelement(bodyElement, folder);
+        }
       }
       
       // Вложения.
@@ -424,7 +431,7 @@ namespace Sungero.Capture.Client
                                            !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase)).ToList();
       
       // Фильтрация картинок из тела письма.
-      if (mailFiles.Body != null && hasHtmlBody)
+      if (mailFiles.Body != null && !string.IsNullOrEmpty(mailFiles.Body.Path) && hasHtmlBody)
         attachments = FilterEmailBodyInlineImages(mailFiles.Body.Path, attachments);
 
       foreach (var attachment in attachments)
