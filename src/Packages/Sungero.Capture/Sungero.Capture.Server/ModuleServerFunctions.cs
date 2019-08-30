@@ -180,38 +180,27 @@ namespace Sungero.Capture.Server
       if (!package.Any())
         return result;
       
-      FillPackageSimpleDocumentNames(package, originalFile.Description);
-      CreatePackageRelations(package);
+      leadingDocument = GetLeadingDocument(package);
+      FillNotClassifiedDocumentNames(leadingDocument, package, originalFile.Description);
+      LinkDocuments(leadingDocument, package);
       
-      result.LeadingDocumentId = GetLeadingDocumentId(package);
+      result.LeadingDocumentId = leadingDocument.Id;
       result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => !Equals(d, result.LeadingDocumentId)).ToList();
       result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
       return result;
     }
     
     /// <summary>
-    /// Получить Ид ведущего документа.
+    /// Заполнить имена всех неклассифицированных документов в комплекте.
     /// </summary>
-    /// <param name="package">Комплект документов.</param>
-    /// <returns>Ид ведущего документа.</returns>
-    public virtual int GetLeadingDocumentId(List<IOfficialDocument> package)
-    {
-      var leadingDocument = GetLeadingDocument(package);
-      return leadingDocument.Id;
-    }
-    
-    /// <summary>
-    /// Заполнить имена всех простых документов в комплекте.
-    /// </summary>
+    /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
     /// <remarks>
-    /// Если простых документов несколько и ведущий документ простой,
+    /// Если неклассифицированных документов несколько и ведущий документ простой,
     /// то у ведущего будет номер 1, у остальных - следующие по порядку.
     /// </remarks>
-    public virtual void FillPackageSimpleDocumentNames(List<IOfficialDocument> package, string originalFileDescription)
+    public virtual void FillNotClassifiedDocumentNames(IOfficialDocument leadingDocument, List<IOfficialDocument> package, string originalFileDescription)
     {
-      var leadingDocument = GetLeadingDocument(package);
-      
       // Если ведущий документ SimpleDocument, то переименовываем его,
       // для того чтобы в имени содержался его порядковый номер.
       int simpleDocumentNumber = 1;
@@ -240,10 +229,10 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Связать документы комплекта.
     /// </summary>
+    /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
-    public virtual void CreatePackageRelations(List<IOfficialDocument> package)
+    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package)
     {
-      var leadingDocument = GetLeadingDocument(package);
       var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
       
       var relation = leadingDocumentIsSimple
