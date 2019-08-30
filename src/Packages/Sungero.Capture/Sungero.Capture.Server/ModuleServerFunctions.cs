@@ -120,7 +120,7 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Общий процесс обработки захваченных документов
-    
+        
     /// <summary>
     /// Создать документы в RX.
     /// </summary>
@@ -132,14 +132,45 @@ namespace Sungero.Capture.Server
     /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
-    public virtual Structures.Module.DocumentsCreatedByRecognitionResults CreateDocumentsByRecognitionResults(string recognitionResults,
-                                                                                                              Structures.Module.IFileInfo originalFile,
-                                                                                                              IOfficialDocument leadingDocument,
-                                                                                                              IEmployee responsible,
-                                                                                                              bool sendedByEmail,
-                                                                                                              string fromEmail)
+    public virtual Structures.Module.DocumentsCreatedByRecognitionResults ProcessPackageAfterCreationDocuments(List<IOfficialDocument> package,
+                                                                                                               IOfficialDocument emailBodyDocument,
+                                                                                                               bool isNeedFillNotClassifiedDocumentNames)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
+      
+      if (!package.Any())
+        return result;
+      
+      // Сформировать список документов, которые не смогли пронумеровать.
+      var documentsWithRegistrationFailure = new List<IOfficialDocument>();
+      foreach(var document in package)
+        if (IsDocumentRegistrationFailed(document))
+          documentsWithRegistrationFailure.Add(document);
+      
+      var leadingDocument = GetLeadingDocument(package);
+      if (isNeedFillNotClassifiedDocumentNames)
+        FillNotClassifiedDocumentNames(leadingDocument, package);
+      LinkDocuments(leadingDocument, package, emailBodyDocument);
+      
+      result.LeadingDocumentId = leadingDocument.Id;
+      result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
+      result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
+      return result;
+    }
+    
+    /// <summary>
+    /// Создать документы в RX.
+    /// </summary>
+    /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
+    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
+    /// <param name="responsible">Сотрудник, ответственный за проверку документов.</param>
+    /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
+    /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
+    /// <returns>Ид созданных документов.</returns>
+    [Remote]
+    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.IFileInfo originalFile,
+                                                                               IEmployee responsible, bool sendedByEmail, string fromEmail)
+    {
       var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
       var documentsWithRegistrationFailure = new List<IOfficialDocument>();
@@ -159,35 +190,22 @@ namespace Sungero.Capture.Server
               CreateVersion(document, recognizedDocument, Resources.VersionCreateFromBarcode);
               document.ExternalApprovalState = Docflow.OfficialDocument.ExchangeState.Signed;
               document.Save();
-              CompleteApprovalCheckReturnAssignment(document);
             }
           }
         }
         
         // Создание нового документа по фактам.
         if (document == null)
-        {
           document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible, fromEmail);
-          package.Add(document);
-          
-          if (IsDocumentRegistrationFailed(document))
-            documentsWithRegistrationFailure.Add(document);
-        }
+        
+        // Добавить Ид документа в запись справочника с результатами обработки Ario.
         recognizedDocument.Info.DocumentId = document.Id;
         recognizedDocument.Info.Save();
+        
+        package.Add(document);
       }
       
-      if (!package.Any())
-        return result;
-      
-      leadingDocument = GetLeadingDocument(package);
-      FillNotClassifiedDocumentNames(leadingDocument, package, originalFile.Description);
-      LinkDocuments(leadingDocument, package);
-      
-      result.LeadingDocumentId = leadingDocument.Id;
-      result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => !Equals(d, result.LeadingDocumentId)).ToList();
-      result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
-      return result;
+      return package;
     }
     
     /// <summary>
@@ -199,13 +217,13 @@ namespace Sungero.Capture.Server
     /// Если неклассифицированных документов несколько и ведущий документ простой,
     /// то у ведущего будет номер 1, у остальных - следующие по порядку.
     /// </remarks>
-    public virtual void FillNotClassifiedDocumentNames(IOfficialDocument leadingDocument, List<IOfficialDocument> package, string originalFileDescription)
+    public virtual void FillNotClassifiedDocumentNames(IOfficialDocument leadingDocument, List<IOfficialDocument> package)
     {
       // Если ведущий документ SimpleDocument, то переименовываем его,
       // для того чтобы в имени содержался его порядковый номер.
       int simpleDocumentNumber = 1;
       var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
-      if (leadingDocumentIsSimple && string.IsNullOrEmpty(originalFileDescription))
+      if (leadingDocumentIsSimple)
       {
         leadingDocument.Name = Resources.DocumentNameFormat(simpleDocumentNumber);
         leadingDocument.Save();
@@ -216,7 +234,7 @@ namespace Sungero.Capture.Server
       foreach (var addendum in addendums)
       {
         // У простых документов, захваченных с почты, имя не меняется.
-        if (SimpleDocuments.Is(addendum) && string.IsNullOrEmpty(originalFileDescription))
+        if (SimpleDocuments.Is(addendum))
         {
           addendum.Name = leadingDocumentIsSimple
             ? Resources.DocumentNameFormat(simpleDocumentNumber)
@@ -231,7 +249,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
-    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package)
+    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, IOfficialDocument emailBodyDocument)
     {
       var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
       
@@ -245,6 +263,13 @@ namespace Sungero.Capture.Server
       {
         addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
+      }
+      
+      // Тело email-письма связываем с основным документом, тип связи - Прочее. 
+      if (emailBodyDocument != null)
+      {
+        emailBodyDocument.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
+        emailBodyDocument.Save();
       }
     }
     

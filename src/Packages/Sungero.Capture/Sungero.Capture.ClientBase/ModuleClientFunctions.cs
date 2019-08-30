@@ -83,14 +83,16 @@ namespace Sungero.Capture.Client
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileInfo();
         originalFile.Path = packagePath;
+        
         var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
                                                                                     originalFile,
-                                                                                    null,
                                                                                     responsible,
                                                                                     false, string.Empty);
-        Functions.Module.Remote.SendToResponsible(documents, responsible, false);
-        Logger.DebugFormat("End package processing. Path: {0}", packagePath);
-        Logger.Debug("End of captured package processing.");
+        
+        var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
+        Logger.Debug("Captured Package Process. Send documents to responsible.");
+        Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, false);
+        Logger.Debug("Captured Package Process. Done.");
       }
     }
     
@@ -119,8 +121,7 @@ namespace Sungero.Capture.Client
       var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
       Logger.Debug("Captured Package Process. Document from e-mail body created.");
       
-      var relatedDocumentIds = new List<int>();
-      var documentWithRegistrationFailureIds = new List<int>();
+      var package = new List<Docflow.IOfficialDocument>();
       foreach (var attachment in mailFiles.Attachments)
       {
         var fileName = attachment.Description;
@@ -134,27 +135,23 @@ namespace Sungero.Capture.Client
           Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", fileName);
           var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
                                                                                       attachment,
-                                                                                      emailBodyDocument,
                                                                                       responsible,
                                                                                       true, mailInfo.FromEmail);
-          relatedDocumentIds.AddRange(documents.RelatedDocumentIds);
-          documentWithRegistrationFailureIds.AddRange(documents.DocumentWithRegistrationFailureIds);
+          package.AddRange(documents);
         }
         else
         {
           Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", fileName);
           var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true, responsible);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", fileName);
-          relatedDocumentIds.Add(document.Id);
+          package.Add(document);
         }
       }
+
+      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(package, emailBodyDocument, false);
       
       Logger.Debug("Captured Package Process. Send documents to responsible.");
-      var documentsToSend = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      documentsToSend.LeadingDocumentId = emailBodyDocument.Id;
-      documentsToSend.RelatedDocumentIds = relatedDocumentIds;
-      documentsToSend.DocumentWithRegistrationFailureIds = documentWithRegistrationFailureIds;
-      Functions.Module.Remote.SendToResponsible(documentsToSend, responsible, true);
+      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, true);
       Logger.Debug("Captured Package Process. Done.");
     }
     
@@ -282,11 +279,12 @@ namespace Sungero.Capture.Client
       originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
       var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(System.IO.File.ReadAllText(jsonFilePath),
                                                                                   originalFile,
-                                                                                  null,
                                                                                   responsible,
                                                                                   false, string.Empty);
       
-      Functions.Module.Remote.SendToResponsible(documents, responsible, false);
+      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
+      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, false);
+
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }
