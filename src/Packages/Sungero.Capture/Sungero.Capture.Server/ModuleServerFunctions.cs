@@ -550,22 +550,7 @@ namespace Sungero.Capture.Server
       
       return arioUrl;
     }
-    
-    /// <summary>
-    /// Получить сотрудников по имени.
-    /// </summary>
-    /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
-    /// <returns>Список сотрудников найденных по имени.</returns>
-    public virtual IQueryable<IEmployee> GetEmployeesByName(string name)
-    {
-      var noBreakSpace = new string('\u00A0', 1);
-      var space = new string('\u0020', 1);
-      
-      return Employees.GetAll()
-        .Where(x => x.Person.ShortName.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") ==
-               name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") || x.Name.ToLower() == name.ToLower());
-    }
-    
+
     /// <summary>
     /// Поиск адресата письма.
     /// </summary>
@@ -579,7 +564,7 @@ namespace Sungero.Capture.Server
         return result;
       
       var addressee = GetFieldValue(fact, "Addressee");
-      var employees = GetEmployeesByName(addressee);
+      var employees =  Company.PublicFunctions.Employee.Remote.GetEmployeesByName(addressee);
       result.Employee = employees.FirstOrDefault();
       result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;
       return result;
