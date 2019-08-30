@@ -123,25 +123,15 @@ namespace Sungero.Capture.Client
       var documentWithRegistrationFailureIds = new List<int>();
       foreach (var attachment in mailFiles.Attachments)
       {
+        var fileName = attachment.Description;
+        Logger.DebugFormat("Captured Package Process. Attachment: {0}", fileName);
         attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
         
-        Logger.DebugFormat("Captured Package Process. Attachment: {0}", attachment.Description);
-        
-        if (!CanArioProcessFile(attachment.Description))
-        {
-          Logger.DebugFormat("Captured Package Process. Can't process file by Ario: {0}", attachment.Description);
-          var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true, responsible);
-          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
-          relatedDocumentIds.Add(document.Id);
-          continue;
-        }
-        
-        Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", attachment.Description);
+        Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", fileName);
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment.Path, firstPageClassifierName, typeClassifierName, false);
-        if (classificationAndExtractionResult.Error == null ||
-            string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
+        if (string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
-          Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", attachment.Description);
+          Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", fileName);
           var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
                                                                                       attachment,
                                                                                       emailBodyDocument,
@@ -152,9 +142,9 @@ namespace Sungero.Capture.Client
         }
         else
         {
-          Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", attachment.Description);
+          Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", fileName);
           var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true, responsible);
-          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", attachment.Description);
+          Logger.DebugFormat("Captured Package Process. Simple document created. {0}", fileName);
           relatedDocumentIds.Add(document.Id);
         }
       }
@@ -190,7 +180,7 @@ namespace Sungero.Capture.Client
     /// Выполнить классификацию и распознавание для документа.
     /// </summary>
     /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="filePath">Пусть к классифицируемому файлу.</param>
+    /// <param name="filePath">Путь к классифицируемому файлу.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
@@ -201,9 +191,16 @@ namespace Sungero.Capture.Client
                                                                                                   string typeClassifierName,
                                                                                                   bool throwOnError = true)
     {
+      var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
+      var fileName = Path.GetFileName(filePath);
+      if (!CanArioProcessFile(fileName))
+      {
+        classificationAndExtractionResult.Error = Resources.CantProcessFileByArio;
+        return classificationAndExtractionResult;
+      }
+      
       var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
-      var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
       classificationAndExtractionResult.Result = processResult;
       if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
         return classificationAndExtractionResult;

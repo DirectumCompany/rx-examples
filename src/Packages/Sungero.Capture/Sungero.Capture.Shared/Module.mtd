@@ -411,7 +411,8 @@
     "Documents",
     "Kind",
     "Kinds",
-    "DocumentsWithRegistrationFailureTaskText"
+    "DocumentsWithRegistrationFailureTaskText",
+    "CantProcessFileByArio"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

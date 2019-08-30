@@ -209,4 +209,7 @@
   <data name="DocumentsWithRegistrationFailureTaskText" xml:space="preserve">
     <value>Для {0} с {1} {2} не удалось подобрать настройку регистрации. Обратитесь к администратору системы.</value>
   </data>
+  <data name="CantProcessFileByArio" xml:space="preserve">
+    <value>Обработать документ в Ario не получилось.</value>
+  </data>
 </root>
