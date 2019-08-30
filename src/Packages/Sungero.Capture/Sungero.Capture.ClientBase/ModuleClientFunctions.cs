@@ -114,12 +114,18 @@ namespace Sungero.Capture.Client
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
       if ((mailFiles.Body == null || !File.Exists(mailFiles.Body.Path)) && !mailFiles.Attachments.Any())
         throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
-      RemoveImagesFromEmailBody(mailFiles.Body.Path);
-      mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
       
+      // Для писем без тела не создавать простой документ.
       var mailInfo = GetMailInfo(instanceInfo);
-      var emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
-      Logger.Debug("Captured Package Process. Document from e-mail body created.");
+      var emailBodyDocument = Docflow.SimpleDocuments.Null;
+      if (mailFiles.Body != null)
+      {
+        RemoveImagesFromEmailBody(mailFiles.Body.Path);
+        mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
+        
+        emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
+        Logger.Debug("Captured Package Process. Document from e-mail body created.");
+      }
       
       var package = new List<Docflow.IOfficialDocument>();
       foreach (var attachment in mailFiles.Attachments)
