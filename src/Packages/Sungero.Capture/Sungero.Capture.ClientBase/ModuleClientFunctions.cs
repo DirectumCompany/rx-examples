@@ -192,8 +192,7 @@ namespace Sungero.Capture.Client
                                                                                                   bool throwOnError = true)
     {
       var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
-      var fileName = Path.GetFileName(filePath);
-      if (!CanArioProcessFile(fileName))
+      if (!CanArioProcessFile(filePath))
       {
         classificationAndExtractionResult.Error = Resources.CantProcessFileByArio;
         return classificationAndExtractionResult;
