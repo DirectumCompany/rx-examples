@@ -2062,9 +2062,6 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
       
-      // Регистрация.
-      RegisterDocument(document);
-      
       return document;
     }
     
@@ -3313,30 +3310,6 @@ namespace Sungero.Capture.Server
       return app;
     }
     
-    #endregion
-    
-    #region Регистрация
-    
-    /// <summary>
-    /// Попытаться зарегистрировать документ.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    [Public]
-    public virtual bool RegisterDocument(IOfficialDocument document)
-    {
-      // Присвоить номер, если вид документа - нумеруемый.
-      var number = document.RegistrationNumber;
-      var date = document.RegistrationDate;
-      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.Numerable)
-      {
-        var isRegistered = Docflow.PublicFunctions.OfficialDocument.TryExternalRegister(document, number, date);
-        if (isRegistered)
-          return isRegistered;
-      }
-      
-      return false;
-    }
-
     #endregion
     
     #region ШК
