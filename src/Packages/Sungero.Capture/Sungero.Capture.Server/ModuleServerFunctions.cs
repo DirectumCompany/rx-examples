@@ -120,16 +120,13 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Общий процесс обработки захваченных документов
-        
+    
     /// <summary>
-    /// Создать документы в RX.
+    /// Обработать документы комплекта.
     /// </summary>
-    /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
-    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
-    /// <param name="leadingDocument">Ведущий документ. Если не передан будет определен автоматически.</param>
-    /// <param name="responsible">Сотрудник, ответственного за проверку документов.</param>
-    /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
-    /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
+    /// <param name="recognitionResults">Комплект документов.</param>
+    /// <param name="emailBodyDocument">Тело электронного письма.</param>
+    /// <param name="isNeedFillNotClassifiedDocumentNames">Признак необходимости заполнять имена всех неклассифицированных документов в комплекте .</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults ProcessPackageAfterCreationDocuments(List<IOfficialDocument> package,
@@ -139,7 +136,11 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
       if (!package.Any())
+      {
+        if (emailBodyDocument != null)
+          result.LeadingDocumentId = emailBodyDocument.Id;
         return result;
+      }
       
       // Сформировать список документов, которые не смогли пронумеровать.
       var documentsWithRegistrationFailure = new List<IOfficialDocument>();
@@ -268,7 +269,7 @@ namespace Sungero.Capture.Server
         addendum.Save();
       }
       
-      // Тело email-письма связываем с основным документом, тип связи - Прочее. 
+      // Тело email-письма связываем с основным документом, тип связи - Прочее.
       if (emailBodyDocument != null)
       {
         emailBodyDocument.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
