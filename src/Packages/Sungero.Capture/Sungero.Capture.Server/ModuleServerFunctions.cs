@@ -99,7 +99,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Задать основные параметры захвата.
+    /// Установить основные параметры захвата.
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
@@ -211,7 +211,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить имена всех неклассифицированных документов в комплекте.
+    /// Сформировать имена для всех неклассифицированных документов в комплекте.
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
@@ -300,12 +300,12 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить результат классификации Ario.
+    /// Десериализовать результат классификации комплекта или отдельного документа в Ario.
     /// </summary>
-    /// <param name="jsonClassificationResults">Json результаты классификации и извлечения фактов.</param>
-    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
-    /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
-    /// <returns>Результат классификации Ario.</returns>
+    /// <param name="jsonClassificationResults">Json с результатами классификации и извлечения фактов.</param>
+    /// <param name="originalFile">Исходный файл.</param>
+    /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
+    /// <returns>Десериализованный результат классификации в Ario.</returns>
     public virtual List<Structures.Module.IRecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults,
                                                                                       Structures.Module.IFileInfo originalFile,
                                                                                       bool sendedByEmail)
@@ -382,10 +382,9 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Создать документ DirectumRX на основе классификации Ario.
+    /// Создать документ DirectumRX из результата классификации в Ario.
     /// </summary>
-    /// <param name="recognizedDocument">Результат классификации Ario.</param>
-    /// <param name="sourceFileName">Путь до исходного файла, отправленного на распознование.</param>
+    /// <param name="recognizedDocument">Результат классификации в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
@@ -520,7 +519,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Выполнить задания на контроль возврата пришедшего документа или отправить уведомление ответственному за документ.
+    /// Выполнить задания на контроль возврата пришедшего документа. Если их нет - отправить уведомление ответственному за документ.
     /// </summary>
     /// <param name="document">Захваченный документ.</param>
     public virtual void CompleteApprovalCheckReturnAssignment(IOfficialDocument document)
@@ -614,7 +613,7 @@ namespace Sungero.Capture.Server
     }
 
     /// <summary>
-    /// Получить полное имя из факта.
+    /// Получить полное ФИО из частей имени содержащихся в факте.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
@@ -631,7 +630,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить полное имя подписанта из факта для договоров.
+    /// Получить полное ФИО из частей имени содержащихся в факте для договоров.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
@@ -648,7 +647,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Сформировать полное имя из частей имени.
+    /// Сформировать полное ФИО из частей имени.
     /// </summary>
     /// <param name="surnameFieldValue">Фамилия.</param>
     /// <param name="nameFieldValue">Имя.</param>
@@ -670,7 +669,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить сокращенное имя из факта.
+    /// Получить сокращенное ФИО из факта.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Имя в формате "Фамилия И.О.".</returns>
@@ -686,7 +685,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить контактные лица по извлечённому факту.
+    /// Получить контактные лица по данным из факта.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <param name="counterparty">Контрагент - владелец контактного лица.</param>
@@ -702,7 +701,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить контактное лицо по извлечённому факту.
+    /// Получить контактное лицо по данным из факта.
     /// </summary>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
@@ -730,7 +729,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Поиск контактного лица контрагента.
+    /// Поиск контактного лица контрагента в верифицированных данных.
     /// </summary>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
@@ -760,6 +759,7 @@ namespace Sungero.Capture.Server
     /// Получить ведущие документы по номеру и дате из факта.
     /// </summary>
     /// <param name="fact">Факт.</param>
+    /// <param name="counterparty">Контрагент.</param>
     /// <returns>Список документов с подходящими номером и датой.</returns>
     public virtual IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Structures.Module.IFact fact, ICounterparty counterparty)
     {
@@ -804,7 +804,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить ведущий документ по результатам верификации пользователя.
+    /// Поиск ведущего документ в верифицированных данных.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
@@ -834,8 +834,8 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Отправить задачу на проверку документов.
     /// </summary>
-    /// <param name="leadingDocument">Основной документ.</param>
-    /// <param name="documents">Прочие документы.</param>
+    /// <param name="leadingDocument">Ведущий документ.</param>
+    /// <param name="documents">Прочие документы из комплекта.</param>
     /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <param name="emailBody">Тело электронного письма.</param>
@@ -931,7 +931,7 @@ namespace Sungero.Capture.Server
     /// Отправить документы ответственному.
     /// </summary>
     /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
-    /// <param name="responsible">Сотрудник, ответственный за одработку распознанных документов.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <param name="emailBody">Тело электронного письма.</param>
     [Remote]
     public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
@@ -962,10 +962,12 @@ namespace Sungero.Capture.Server
     #region Простой документ
     
     /// <summary>
-    /// Создать документ из тела email.
+    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
+    /// Создать документ из тела эл. письма.
     /// </summary>
     /// <param name="mailInfo">Информация о захваченном письме.</param>
-    /// <param name="bodyInfo">Путь до тела email.</param>
+    /// <param name="bodyInfo">Путь до тела пиьсма.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
     public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo,
@@ -1027,6 +1029,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="File">Файл.</param>
     /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
     public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo,
@@ -1143,7 +1146,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Создать входящее письмо с текстовыми полями.
+    /// Создать входящее письмо (демо режим).
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
@@ -1427,7 +1430,7 @@ namespace Sungero.Capture.Server
     #region Накладная
     
     /// <summary>
-    /// Создать накладную с текстовыми полями.
+    /// Создать накладную (демо режим).
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки накладной в Ario.</param>
     /// <returns>Накладная.</returns>
@@ -1588,7 +1591,7 @@ namespace Sungero.Capture.Server
     #region Счет-фактура
     
     /// <summary>
-    /// Создать счет-фактуру с текстовыми полями.
+    /// Создать счет-фактуру (демо режим).
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Счет-фактура.</returns>
@@ -1694,6 +1697,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
+    /// <param name="isAdjustment">Корректировочная.</param>
     /// <returns>Счет-фактура.</returns>
     public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
@@ -1826,6 +1830,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки УПД в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
+    /// <param name="isAdjustment">Корректировочная.</param>
     /// <returns>УПД.</returns>
     public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
     {
@@ -1856,7 +1861,7 @@ namespace Sungero.Capture.Server
       NumberDocument(document, recognizedDocument, "FinancialDocument");
       
       // Корректировочный документ.
-      FillCorrectedDocument(document, recognizedDocument, "FinancialDocument", isAdjustment);
+      FillCorrectedDocument(document, recognizedDocument, isAdjustment);
       
       // Сумма и валюта.
       FillAmount(document, recognizedDocument);
@@ -1869,7 +1874,7 @@ namespace Sungero.Capture.Server
     #region Счет на оплату
     
     /// <summary>
-    /// Создать счет на оплату с текстовыми полями.
+    /// Создать счет на оплату (демо режим).
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Счет на оплату.</returns>
@@ -2039,7 +2044,7 @@ namespace Sungero.Capture.Server
     #region Договор
     
     /// <summary>
-    /// Создать договор с текстовыми полями.
+    /// Создать договор (демо режим).
     /// </summary>
     /// <param name="recognizedDocument">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Договор.</returns>
@@ -2200,7 +2205,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
-    /// <param name="factName">Наименование факта.</param>
+    /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public virtual void NumberDocument(IOfficialDocument document,
                                        Structures.Module.IRecognizedDocument recognizedDocument,
                                        string factName)
@@ -2259,7 +2264,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
-    /// <param name="factName">Наименование факта.</param>
+    /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public static void FillMockRegistrationData(IOfficialDocument document,
                                                 Structures.Module.IRecognizedDocument recognizedDocument,
                                                 string factName)
@@ -2290,11 +2295,9 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
-    /// <param name="factName">Наименование факта.</param>
     /// <param name="factName">Корректировочный.</param>
     public virtual void FillCorrectedDocument(IAccountingDocumentBase document,
                                               Structures.Module.IRecognizedDocument recognizedDocument,
-                                              string factName,
                                               bool isAdjustment)
     {
       if (isAdjustment)
@@ -2333,6 +2336,12 @@ namespace Sungero.Capture.Server
     
     #region Поиск контрагента/НОР
     
+    /// <summary>
+    /// Получить факты с контрагентом указанного типа из общего списка фактов.
+    /// </summary>
+    /// <param name="facts">Список фактов.</param>
+    /// <param name="counterpartyType">Тип контрагента.</param>
+    /// <returns></returns>
     public virtual List<IFact> GetCounterpartyFacts(List<Structures.Module.IFact> facts, string counterpartyType)
     {
       var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
