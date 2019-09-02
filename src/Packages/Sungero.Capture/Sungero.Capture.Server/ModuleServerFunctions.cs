@@ -445,7 +445,7 @@ namespace Sungero.Capture.Server
       else
         document = CreateSimpleDocument(recognizedDocument, responsible);
       
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
+      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
          если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
@@ -976,7 +976,7 @@ namespace Sungero.Capture.Server
       document.PreparedBy = responsible;
       document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, true);
+      FillDeliveryMethod(document, true);
       
       // Наименование и содержание.
       document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
@@ -1035,7 +1035,7 @@ namespace Sungero.Capture.Server
       document.PreparedBy = responsible;
       document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, sendedByEmail);
+      FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
       var application = GetAssociatedApplicationByFileName(fileInfo.Path);
@@ -2311,6 +2311,22 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
         LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
       }
+    }
+    
+    /// <summary>
+    /// Заполнить способ доставки
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
+    public virtual void FillDeliveryMethod(IOfficialDocument document, bool sendedByEmail)
+    {
+      var methodName = sendedByEmail
+        ? MailDeliveryMethods.Resources.EmailMethod
+        : MailDeliveryMethods.Resources.MailMethod;
+      
+      document.DeliveryMethod = MailDeliveryMethods.GetAll()
+        .Where(m => m.Name.Equals(methodName, StringComparison.InvariantCultureIgnoreCase))
+        .FirstOrDefault();
     }
     
     #endregion
