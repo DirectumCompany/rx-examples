@@ -117,13 +117,13 @@ namespace Sungero.Capture.Client
       
       // Для писем без тела не создавать простой документ.
       var mailInfo = GetMailInfo(instanceInfo);
-      var emailBodyDocument = Docflow.SimpleDocuments.Null;
+      var emailBody = Docflow.SimpleDocuments.Null;
       if (mailFiles.Body != null && !string.IsNullOrEmpty(mailFiles.Body.Path))
       {
         RemoveImagesFromEmailBody(mailFiles.Body.Path);
         mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
         
-        emailBodyDocument = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
+        emailBody = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
         Logger.Debug("Captured Package Process. Document from e-mail body created.");
       }
       else
@@ -158,11 +158,11 @@ namespace Sungero.Capture.Client
         }
       }
 
-      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(package, emailBodyDocument, false);
+      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(package, emailBody, false);
       
-      // Если не было вложений, тело письма - ведущий документ.
-      if (!package.Any() && emailBodyDocument != null)
-        documentsCreatedByRecognitionResults.LeadingDocumentId = emailBodyDocument.Id;
+      // Если не было вложений, то тело письма - ведущий документ.
+      if (!package.Any() && emailBody != null)
+        documentsCreatedByRecognitionResults.LeadingDocumentId = emailBody.Id;
       
       Logger.Debug("Captured Package Process. Send documents to responsible.");
       Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, true);

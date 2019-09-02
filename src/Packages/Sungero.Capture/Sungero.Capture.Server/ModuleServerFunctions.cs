@@ -125,12 +125,12 @@ namespace Sungero.Capture.Server
     /// Обработать документы комплекта.
     /// </summary>
     /// <param name="recognitionResults">Комплект документов.</param>
-    /// <param name="emailBodyDocument">Тело электронного письма.</param>
+    /// <param name="emailBody">Тело электронного письма.</param>
     /// <param name="isNeedFillNotClassifiedDocumentNames">Признак необходимости заполнять имена всех неклассифицированных документов в комплекте .</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults ProcessPackageAfterCreationDocuments(List<IOfficialDocument> package,
-                                                                                                               IOfficialDocument emailBodyDocument,
+                                                                                                               IOfficialDocument emailBody,
                                                                                                                bool isNeedFillNotClassifiedDocumentNames)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
@@ -142,17 +142,17 @@ namespace Sungero.Capture.Server
       var documentsWithRegistrationFailure = package.Where(d => IsDocumentRegistrationFailed(d)).ToList();
       
       var leadingDocument = GetLeadingDocument(package);
+      LinkDocuments(leadingDocument, package, emailBody);
       
-      // Для документов, нераспознанных Ario: 
+      // Для документов, нераспознанных Ario:
       // со сканера - заполнить имена,
       // с электронной почты - заполнять имена не надо, они будут как у исходного вложения.
       if (isNeedFillNotClassifiedDocumentNames)
         FillNotClassifiedDocumentNames(leadingDocument, package);
       
-      LinkDocuments(leadingDocument, package, emailBodyDocument);
-      
-      if (emailBodyDocument != null)
-        package.Add(emailBodyDocument);
+      // Добавить тело письма к документам комплекта, чтобы вложить в задачу на обработку.
+      if (emailBody != null)
+        package.Add(emailBody);
       
       result.LeadingDocumentId = leadingDocument.Id;
       result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
@@ -241,6 +241,7 @@ namespace Sungero.Capture.Server
           addendum.Name = leadingDocumentIsSimple
             ? Resources.DocumentNameFormat(simpleDocumentNumber)
             : Resources.AttachmentNameFormat(simpleDocumentNumber);
+          addendum.Save();
           simpleDocumentNumber++;
         }
       }
@@ -251,8 +252,8 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
-    /// <param name="emailBodyDocument">Тело электронного письма.</param>
-    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, IOfficialDocument emailBodyDocument)
+    /// <param name="emailBody">Тело электронного письма.</param>
+    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, IOfficialDocument emailBody)
     {
       var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
       
@@ -269,10 +270,10 @@ namespace Sungero.Capture.Server
       }
       
       // Тело email-письма связываем с основным документом, тип связи - Прочее.
-      if (emailBodyDocument != null)
+      if (emailBody != null)
       {
-        emailBodyDocument.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
-        emailBodyDocument.Save();
+        emailBody.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
+        emailBody.Save();
       }
     }
     
