@@ -569,31 +569,7 @@ namespace Sungero.Capture.Server
       result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;
       return result;
     }
-    
-    /// <summary>
-    /// Получить контактные лица по имени.
-    /// </summary>
-    /// <param name="name">Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</param>
-    /// <param name="shortName">Имя в формате "Фамилия И.О.".</param>
-    /// <param name="counterparty">Контрагент, владелец контакта.</param>
-    /// <returns>Коллекция контактных лиц.</returns>
-    public virtual IQueryable<IContact> GetContactsByName(string name, string personShortName, ICounterparty counterparty)
-    {
-      var noBreakSpace = new string('\u00A0', 1);
-      var space = new string('\u0020', 1);
-      
-      name = name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".");
-      
-      var contacts =  Contacts.GetAll()
-        .Where(x => (x.Name.ToLower().Replace(noBreakSpace, space).Replace(". ", ".") == name) ||
-               (x.Person != null && string.Equals(x.Person.ShortName, personShortName, StringComparison.InvariantCultureIgnoreCase)));
-      
-      if (counterparty != null)
-        return contacts.Where(c => c.Company.Equals(counterparty));
-      
-      return contacts;
-    }
-    
+
     /// <summary>
     /// Получить полное имя из факта.
     /// </summary>
@@ -679,7 +655,7 @@ namespace Sungero.Capture.Server
       
       var fullName = GetFullNameByFact(fact);
       var shortName = GetShortNameByFact(fact);
-      return GetContactsByName(fullName, shortName, counterparty);
+      return Parties.PublicFunctions.Contact.GetContactsByName(fullName, shortName, counterparty);
     }
     
     /// <summary>
