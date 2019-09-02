@@ -1033,12 +1033,8 @@ namespace Sungero.Capture.Server
                                                                                 bool sendedByEmail,
                                                                                 IEmployee responsible)
     {
-      var document = Sungero.Docflow.SimpleDocuments.Create();
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.Name = Path.GetFileName(fileInfo.Description);
-      document.PreparedBy = responsible;
-      document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      var name = Path.GetFileName(fileInfo.Description);
+      var document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
       FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
