@@ -2371,7 +2371,7 @@ namespace Sungero.Capture.Server
         var trrc = GetFieldValue(fact, "TRRC");
         if (businessUnit == null)
         {
-          var businessUnits = GetBusinessUnits(tin, trrc);
+          var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
           if (businessUnits.Count > 1)
             isTrusted = false;
           businessUnit = businessUnits.FirstOrDefault();
@@ -2695,7 +2695,7 @@ namespace Sungero.Capture.Server
         {
           var tin = GetFieldValue(fact, "TIN");
           var trrc = GetFieldValue(fact, "TRRC");
-          var businessUnits = GetBusinessUnits(tin, trrc);
+          var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
           var isTrusted = businessUnits.Count == 1;
           foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact, isTrusted)));
         }
@@ -2709,45 +2709,6 @@ namespace Sungero.Capture.Server
           return businessUnitsByName.Where(x => string.IsNullOrEmpty(x.BusinessUnit.TIN) && string.IsNullOrEmpty(x.BusinessUnit.TRRC)).ToList();
       }
       return businessUnitsByName;
-    }
-    
-    /// <summary>
-    /// Получить список НОР по ИНН/КПП.
-    /// </summary>
-    /// <param name="tin">ИНН.</param>
-    /// <param name="trrc">КПП.</param>
-    /// <returns>Список НОР.</returns>
-    public virtual List<IBusinessUnit> GetBusinessUnits(string tin, string trrc)
-    {
-      var searchByTin = !string.IsNullOrWhiteSpace(tin);
-      var searchByTrrc = !string.IsNullOrWhiteSpace(trrc);
-      
-      if (!searchByTin && !searchByTrrc)
-        return new List<IBusinessUnit>();
-
-      // Отфильтровать закрытые НОР.
-      var businessUnits = BusinessUnits.GetAll().Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
-      
-      // Поиск по ИНН, если ИНН передан.
-      if (searchByTin)
-      {
-        var strongTinBusinessUnits = businessUnits.Where(x => x.TIN == tin).ToList();
-        
-        // Поиск по КПП, если КПП передан.
-        if (searchByTrrc)
-        {
-          var strongTrrcBusinessUnits = strongTinBusinessUnits
-            .Where(c => !string.IsNullOrWhiteSpace(c.TRRC) && c.TRRC == trrc)
-            .ToList();
-          
-          if (strongTrrcBusinessUnits.Count > 0)
-            return strongTrrcBusinessUnits;
-          
-          return strongTinBusinessUnits.Where(c => string.IsNullOrWhiteSpace(c.TRRC)).ToList();
-        }
-        return strongTinBusinessUnits;
-      }
-      return new List<IBusinessUnit>();
     }
     
     #endregion
