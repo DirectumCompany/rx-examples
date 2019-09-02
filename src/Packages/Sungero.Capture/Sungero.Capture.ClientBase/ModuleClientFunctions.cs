@@ -9,6 +9,8 @@ namespace Sungero.Capture.Client
 {
   public class ModuleFunctions
   {
+    #region Захват
+    
     /// <summary>
     /// Создать документ на основе пакета документов со сканера.
     /// </summary>
@@ -61,40 +63,19 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Обработать пакет пришедший со сканера.
+    /// Задать основные настройки захвата.
     /// </summary>
-    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
-    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    public virtual void ProcessScanPackage(string filesInfo, string folder,
-                                           string arioUrl, string firstPageClassifierName, string typeClassifierName,
-                                           Sungero.Company.IEmployee responsible)
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
+    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>
+    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
     {
-      var packagesPaths = GetScannedPackagesPaths(filesInfo, folder);
-      if (!packagesPaths.Any())
-        throw new ApplicationException("Package not found");
-      
-      foreach (var packagePath in packagesPaths)
-      {
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, packagePath, firstPageClassifierName, typeClassifierName);
-        Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
-        var originalFile = new Structures.Module.FileInfo();
-        originalFile.Path = packagePath;
-        
-        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
-                                                                                    originalFile,
-                                                                                    responsible,
-                                                                                    false, string.Empty);
-        
-        var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
-        Logger.Debug("Captured Package Process. Send documents to responsible.");
-        Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, null);
-        Logger.Debug("Captured Package Process. Done.");
-      }
+      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, minFactProbability, trustedFactProbability);
     }
+    
+    #endregion
+    
+    #region Обработка пакета с эл. почты
     
     /// <summary>
     /// Обработать пакет пришедший с эл.почты.
@@ -168,228 +149,6 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Определить может ли Ario обработать файл.
-    /// </summary>
-    /// <param name="fileName">Имя или путь до файла.</param>
-    /// <returns>True - может, False - иначе.</returns>
-    public virtual bool CanArioProcessFile(string fileName)
-    {
-      var ext = Path.GetExtension(fileName).TrimStart('.').ToLower();
-      var allowedExtensions = new List<string>()
-      {
-        "jpg", "jpeg", "png", "bmp", "gif",
-        "tif", "tiff", "pdf", "doc", "docx",
-        "dot", "dotx", "rtf", "odt", "ott",
-        "txt", "xls", "xlsx", "ods", "pdf"
-      };
-      return allowedExtensions.Contains(ext);
-    }
-    
-    /// <summary>
-    /// Выполнить классификацию и распознавание для документа.
-    /// </summary>
-    /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="filePath">Путь к классифицируемому файлу.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
-    /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
-                                                                                                  string filePath,
-                                                                                                  string firstPageClassifierName,
-                                                                                                  string typeClassifierName,
-                                                                                                  bool throwOnError = true)
-    {
-      var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
-      if (!CanArioProcessFile(filePath))
-      {
-        classificationAndExtractionResult.Error = Resources.CantProcessFileByArio;
-        return classificationAndExtractionResult;
-      }
-      
-      var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
-      var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
-      classificationAndExtractionResult.Result = processResult;
-      if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
-        return classificationAndExtractionResult;
-      
-      if (throwOnError)
-        throw new ApplicationException(nativeError.Message);
-      
-      Logger.Error(nativeError.Message);
-      classificationAndExtractionResult.Error = nativeError.Message;
-      return classificationAndExtractionResult;
-    }
-    
-    /// <summary>
-    /// Получить информацию о захваченном письме.
-    /// </summary>
-    /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
-    /// <returns>Информация о захваченном письме.</returns>
-    public virtual Structures.Module.CapturedMailInfo GetMailInfo(string instanceInfo)
-    {
-      var result = Structures.Module.CapturedMailInfo.Create();
-      
-      if (!File.Exists(instanceInfo))
-        throw new ApplicationException(Resources.FileNotFoundFormat(instanceInfo));
-      
-      var infoXDoc = System.Xml.Linq.XDocument.Load(instanceInfo);
-      if (infoXDoc == null)
-        return result;
-      
-      var mailCaptureInstanceInfoElement = infoXDoc
-        .Element("CaptureInstanceInfoList")
-        .Element("MailCaptureInstanceInfo");
-      
-      if (mailCaptureInstanceInfoElement == null)
-        return result;
-      
-      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, "Subject");
-      
-      var fromElement = mailCaptureInstanceInfoElement.Element("From");
-      if (fromElement == null)
-        return result;
-      
-      result.FromEmail = GetAttributeStringValue(fromElement, "Address");
-      result.Name = GetAttributeStringValue(fromElement, "Name");
-      
-      return result;
-    }
-    
-    /// <summary>
-    /// Получить значение атрибута XElement.
-    /// </summary>
-    /// <param name="element">XElement.</param>
-    /// <param name="attributeName">Имя атрибута.</param>
-    /// <returns>Строковое значение атрибута. null, если атрибут отсутствует.</returns>
-    public virtual string GetAttributeStringValue(System.Xml.Linq.XElement element, string attributeName)
-    {
-      var attribute = element.Attribute(attributeName);
-      if (attribute != null)
-        return attribute.Value;
-      return null;
-    }
-    
-    /// <summary>
-    /// Создать документ в DirectumRX на основе данных распознования.
-    /// </summary>
-    /// <param name="bodyFilePath">Путь до исходного файла.</param>
-    /// <param name="jsonFilePath">Путь до файла json с результатом распознавания.</param>
-    /// <param name="responsibleId">Id сотрудника ответственного за распознавание документов.</param>
-    /// <remarks> Функция добавлена для автотестов.</remarks>
-    public static void CreateDocumentByRecognitionData(string bodyFilePath, string jsonFilePath, string responsibleId)
-    {
-      Logger.Debug("Start CreateDocumentByRecognitionData");
-      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
-      if (responsible == null)
-        throw new ApplicationException(Resources.InvalidResponsibleId);
-      Logger.DebugFormat(Calendar.Now.ToString() + " Responsible: {0}", responsible.Person.ShortName);
-
-      // Обработать пакет.
-      Logger.Debug(Calendar.Now.ToString() + " Start ProcessSplitedPackage");
-      var originalFile = new Structures.Module.FileInfo();
-      originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
-      var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(System.IO.File.ReadAllText(jsonFilePath),
-                                                                                  originalFile,
-                                                                                  responsible,
-                                                                                  false, string.Empty);
-      
-      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
-      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, null);
-
-      Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
-      Logger.Debug("End CreateDocumentByRecognitionData");
-    }
-    
-    /// <summary>
-    /// Разделить пакет на документы, классифицировать и извлечь из документов факты с помощью сервиса Ario.
-    /// </summary>
-    /// <param name="filePath">Путь к пакету.</param>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    /// <returns>Json с результатом классификации и извлечения фактов.</returns>
-    public virtual string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
-    {
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
-      if (fpClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
-      
-      var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
-      if (typeClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
-
-      var fpClassifierId = fpClassifier.Id.ToString();
-      var typeClassifierId = typeClassifier.Id.ToString();
-      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
-      Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
-      
-      var fileName = System.IO.Path.GetFileName(filePath);
-      var ruleMapping = GetClassRuleMapping();
-      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", fileName);
-      var result = arioConnector.ClassifyAndExtractFacts(File.ReadAllBytes(filePath), fileName, typeClassifierId, fpClassifierId, ruleMapping);
-      Logger.DebugFormat("End classification and facts extraction. File: {0}", fileName);
-      return result;
-    }
-    
-    /// <summary>
-    /// Получить соответствие класса и имени правила его обработки.
-    /// </summary>
-    /// <returns></returns>
-    [Public]
-    public virtual System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
-    {
-      return new Dictionary<string, string>()
-      {
-        { "Входящее письмо", "Letter"},
-        { Constants.Module.LetterClassName, "Letter"},
-        { Constants.Module.ContractStatementClassName, "ContractStatement"},
-        { Constants.Module.WaybillClassName, "Waybill"},
-        { Constants.Module.UniversalTransferDocumentClassName, "GeneralTransferDocument"},
-        { Constants.Module.GeneralCorrectionDocumentClassName, "GeneralCorrectionDocument"},
-        { Constants.Module.TaxInvoiceClassName, "TaxInvoice"},
-        { Constants.Module.TaxinvoiceCorrectionClassName, "TaxinvoiceCorrection"},
-        { Constants.Module.IncomingInvoiceClassName, "IncomingInvoice"},
-        { Constants.Module.ContractClassName, "Contract"}
-      };
-    }
-    
-    /// <summary>
-    /// Получить пути к пакетам документов со сканера.
-    /// </summary>
-    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
-    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    /// <returns>Пути к пакетам документов со сканера.</returns>
-    /// <remarks>Технически возможно, что документов будет несколько, но на практике приходит один.</remarks>
-    public virtual List<string> GetScannedPackagesPaths(string filesInfo, string folder)
-    {
-      if (!File.Exists(filesInfo))
-        throw new ApplicationException(Resources.NoFilesInfoInPackage);
-      
-      var filePaths = new List<string>();
-      var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
-      var fileElements = filesXDoc
-        .Element("InputFilesSection")
-        .Element("Files")
-        .Elements();
-      
-      if (!fileElements.Any())
-        throw new ApplicationException(Resources.NoFilesInfoInPackage);
-      
-      foreach (var fileElement in fileElements)
-      {
-        var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
-        if (File.Exists(filePath))
-          filePaths.Add(filePath);
-        else
-          Logger.Error(Resources.FileNotFoundFormat(filePath));
-      }
-      
-      return filePaths;
-    }
-    
-    /// <summary>
     /// Получить пути до захваченных с почты файлов.
     /// </summary>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
@@ -452,9 +211,44 @@ namespace Sungero.Capture.Client
       
       return mailFiles;
     }
-
+    
     /// <summary>
-    /// Отфильтровать картинки, пришедшие в теле письма.
+    /// Получить информацию о захваченном письме.
+    /// </summary>
+    /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
+    /// <returns>Информация о захваченном письме.</returns>
+    public virtual Structures.Module.CapturedMailInfo GetMailInfo(string instanceInfo)
+    {
+      var result = Structures.Module.CapturedMailInfo.Create();
+      
+      if (!File.Exists(instanceInfo))
+        throw new ApplicationException(Resources.FileNotFoundFormat(instanceInfo));
+      
+      var infoXDoc = System.Xml.Linq.XDocument.Load(instanceInfo);
+      if (infoXDoc == null)
+        return result;
+      
+      var mailCaptureInstanceInfoElement = infoXDoc
+        .Element("CaptureInstanceInfoList")
+        .Element("MailCaptureInstanceInfo");
+      
+      if (mailCaptureInstanceInfoElement == null)
+        return result;
+      
+      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, "Subject");
+      
+      var fromElement = mailCaptureInstanceInfoElement.Element("From");
+      if (fromElement == null)
+        return result;
+      
+      result.FromEmail = GetAttributeStringValue(fromElement, "Address");
+      result.Name = GetAttributeStringValue(fromElement, "Name");
+      
+      return result;
+    }
+    
+    /// <summary>
+    /// Отфильтровать изображения, пришедшие в теле письма.
     /// </summary>
     /// <param name="htmlBodyPath">Путь до тела письма.</param>
     /// <param name="attachments">Вложения.</param>
@@ -463,6 +257,46 @@ namespace Sungero.Capture.Client
     {
       var inlineImagesCount = AsposeExtensions.HtmlTagReader.GetInlineImagesCount(htmlBodyPath);
       return attachments.Skip(inlineImagesCount).ToList();
+    }
+    
+    /// <summary>
+    /// Удалить изображения из тела письма.
+    /// </summary>
+    /// <param name="path">Пусть к html-файлу письма.</param>
+    public virtual void RemoveImagesFromEmailBody(string path)
+    {
+      // Нет смысла удалять изображения в файлах, расширение которых не html.
+      if (Path.GetExtension(path).ToLower() != ".html")
+        return;
+
+      try
+      {
+        var mailBody = File.ReadAllText(path);
+        mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
+        
+        // В некоторых случаях Aspose не может распознать файл как html, поэтому добавляем тег html, если его нет.
+        if (!mailBody.Contains("<html"))
+          mailBody = string.Format("<html>{0}</html>", mailBody);
+        File.WriteAllText(path, mailBody);
+      }
+      catch(Exception ex)
+      {
+        Logger.ErrorFormat("RemoveImagesFromEmailBody: Cannot remove images from email body.", ex);
+      }
+    }
+    
+    /// <summary>
+    /// Получить значение атрибута XElement.
+    /// </summary>
+    /// <param name="element">XElement.</param>
+    /// <param name="attributeName">Имя атрибута.</param>
+    /// <returns>Строковое значение атрибута. null, если атрибут отсутствует.</returns>
+    public virtual string GetAttributeStringValue(System.Xml.Linq.XElement element, string attributeName)
+    {
+      var attribute = element.Attribute(attributeName);
+      if (attribute != null)
+        return attribute.Value;
+      return null;
     }
     
     /// <summary>
@@ -479,6 +313,196 @@ namespace Sungero.Capture.Client
       
       return fileInfo;
     }
+    
+    #endregion
+    
+    #region Обработка пакета со сканера
+    
+    /// <summary>
+    /// Обработать пакет пришедший со сканера.
+    /// </summary>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <param name="arioUrl">Host Ario.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
+    public virtual void ProcessScanPackage(string filesInfo, string folder,
+                                           string arioUrl, string firstPageClassifierName, string typeClassifierName,
+                                           Sungero.Company.IEmployee responsible)
+    {
+      var packagesPaths = GetScannedPackagesPaths(filesInfo, folder);
+      if (!packagesPaths.Any())
+        throw new ApplicationException("Package not found");
+      
+      foreach (var packagePath in packagesPaths)
+      {
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, packagePath, firstPageClassifierName, typeClassifierName);
+        Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
+        var originalFile = new Structures.Module.FileInfo();
+        originalFile.Path = packagePath;
+        
+        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
+                                                                                    originalFile,
+                                                                                    responsible,
+                                                                                    false, string.Empty);
+        
+        var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
+        Logger.Debug("Captured Package Process. Send documents to responsible.");
+        Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, null);
+        Logger.Debug("Captured Package Process. Done.");
+      }
+    }
+    
+    /// <summary>
+    /// Получить пути к пакетам документов со сканера.
+    /// </summary>
+    /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
+    /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
+    /// <returns>Пути к пакетам документов со сканера.</returns>
+    /// <remarks>Технически возможно, что документов будет несколько, но на практике приходит один.</remarks>
+    public virtual List<string> GetScannedPackagesPaths(string filesInfo, string folder)
+    {
+      if (!File.Exists(filesInfo))
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
+      
+      var filePaths = new List<string>();
+      var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
+      var fileElements = filesXDoc
+        .Element("InputFilesSection")
+        .Element("Files")
+        .Elements();
+      
+      if (!fileElements.Any())
+        throw new ApplicationException(Resources.NoFilesInfoInPackage);
+      
+      foreach (var fileElement in fileElements)
+      {
+        var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
+        if (File.Exists(filePath))
+          filePaths.Add(filePath);
+        else
+          Logger.Error(Resources.FileNotFoundFormat(filePath));
+      }
+      
+      return filePaths;
+    }
+    
+    #endregion
+    
+    #region Классификация и распознавание
+    
+    /// <summary>
+    /// Выполнить классификацию и распознавание для документа.
+    /// </summary>
+    /// <param name="arioUrl">Host Ario.</param>
+    /// <param name="filePath">Путь к классифицируемому файлу.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
+    /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
+    public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
+                                                                                                  string filePath,
+                                                                                                  string firstPageClassifierName,
+                                                                                                  string typeClassifierName,
+                                                                                                  bool throwOnError = true)
+    {
+      var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
+      if (!CanArioProcessFile(filePath))
+      {
+        classificationAndExtractionResult.Error = Resources.CantProcessFileByArio;
+        return classificationAndExtractionResult;
+      }
+      
+      var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
+      classificationAndExtractionResult.Result = processResult;
+      if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
+        return classificationAndExtractionResult;
+      
+      if (throwOnError)
+        throw new ApplicationException(nativeError.Message);
+      
+      Logger.Error(nativeError.Message);
+      classificationAndExtractionResult.Error = nativeError.Message;
+      return classificationAndExtractionResult;
+    }
+    
+    /// <summary>
+    /// Разделить пакет на документы, классифицировать и извлечь из документов факты с помощью сервиса Ario.
+    /// </summary>
+    /// <param name="filePath">Путь к пакету.</param>
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
+    /// <returns>Json с результатом классификации и извлечения фактов.</returns>
+    public virtual string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
+    {
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
+      if (fpClassifier == null)
+        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      
+      var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
+      if (typeClassifier == null)
+        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+
+      var fpClassifierId = fpClassifier.Id.ToString();
+      var typeClassifierId = typeClassifier.Id.ToString();
+      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
+      Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
+      
+      var fileName = System.IO.Path.GetFileName(filePath);
+      var ruleMapping = GetClassRuleMapping();
+      Logger.DebugFormat("Begin classification and facts extraction. File: {0}", fileName);
+      var result = arioConnector.ClassifyAndExtractFacts(File.ReadAllBytes(filePath), fileName, typeClassifierId, fpClassifierId, ruleMapping);
+      Logger.DebugFormat("End classification and facts extraction. File: {0}", fileName);
+      return result;
+    }
+    
+    /// <summary>
+    /// Определить может ли Ario обработать файл.
+    /// </summary>
+    /// <param name="fileName">Имя или путь до файла.</param>
+    /// <returns>True - может, False - иначе.</returns>
+    public virtual bool CanArioProcessFile(string fileName)
+    {
+      var ext = Path.GetExtension(fileName).TrimStart('.').ToLower();
+      var allowedExtensions = new List<string>()
+      {
+        "jpg", "jpeg", "png", "bmp", "gif",
+        "tif", "tiff", "pdf", "doc", "docx",
+        "dot", "dotx", "rtf", "odt", "ott",
+        "txt", "xls", "xlsx", "ods", "pdf"
+      };
+      return allowedExtensions.Contains(ext);
+    }
+    
+    /// <summary>
+    /// Получить соответствие класса и имени правила его обработки.
+    /// </summary>
+    /// <returns></returns>
+    [Public]
+    public virtual System.Collections.Generic.Dictionary<string, string> GetClassRuleMapping()
+    {
+      return new Dictionary<string, string>()
+      {
+        { "Входящее письмо", "Letter"},
+        { Constants.Module.LetterClassName, "Letter"},
+        { Constants.Module.ContractStatementClassName, "ContractStatement"},
+        { Constants.Module.WaybillClassName, "Waybill"},
+        { Constants.Module.UniversalTransferDocumentClassName, "GeneralTransferDocument"},
+        { Constants.Module.GeneralCorrectionDocumentClassName, "GeneralCorrectionDocument"},
+        { Constants.Module.TaxInvoiceClassName, "TaxInvoice"},
+        { Constants.Module.TaxinvoiceCorrectionClassName, "TaxinvoiceCorrection"},
+        { Constants.Module.IncomingInvoiceClassName, "IncomingInvoice"},
+        { Constants.Module.ContractClassName, "Contract"}
+      };
+    }
+    
+    #endregion
+    
+    #region Верификация
     
     /// <summary>
     /// Активировать режим верификации.
@@ -600,31 +624,7 @@ namespace Sungero.Capture.Client
       }
     }
     
-    /// <summary>
-    /// Удалить изображения из тела письма.
-    /// </summary>
-    /// <param name="path">Пусть к html-файлу письма.</param>
-    public virtual void RemoveImagesFromEmailBody(string path)
-    {
-      // Нет смысла удалять изображения в файлах, расширение которых не html.
-      if (Path.GetExtension(path).ToLower() != ".html")
-        return;
-
-      try
-      {
-        var mailBody = File.ReadAllText(path);
-        mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
-        
-        // В некоторых случаях Aspose не может распознать файл как html, поэтому добавляем тег html, если его нет.
-        if (!mailBody.Contains("<html"))
-          mailBody = string.Format("<html>{0}</html>", mailBody);
-        File.WriteAllText(path, mailBody);
-      }
-      catch(Exception ex)
-      {
-        Logger.ErrorFormat("RemoveImagesFromEmailBody: Cannot remove images from email body.", ex);
-      }
-    }
+    #endregion
     
     /// <summary>
     /// Включить демо-режим.
@@ -635,14 +635,34 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Задать основные настройки захвата.
+    /// Создать документ в DirectumRX на основе данных распознования.
     /// </summary>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
-    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
+    /// <param name="bodyFilePath">Путь до исходного файла.</param>
+    /// <param name="jsonFilePath">Путь до файла json с результатом распознавания.</param>
+    /// <param name="responsibleId">Id сотрудника ответственного за распознавание документов.</param>
+    /// <remarks> Функция добавлена для автотестов.</remarks>
+    public static void CreateDocumentByRecognitionData(string bodyFilePath, string jsonFilePath, string responsibleId)
     {
-      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, minFactProbability, trustedFactProbability);
+      Logger.Debug("Start CreateDocumentByRecognitionData");
+      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
+      if (responsible == null)
+        throw new ApplicationException(Resources.InvalidResponsibleId);
+      Logger.DebugFormat(Calendar.Now.ToString() + " Responsible: {0}", responsible.Person.ShortName);
+
+      // Обработать пакет.
+      Logger.Debug(Calendar.Now.ToString() + " Start ProcessSplitedPackage");
+      var originalFile = new Structures.Module.FileInfo();
+      originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
+      var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(System.IO.File.ReadAllText(jsonFilePath),
+                                                                                  originalFile,
+                                                                                  responsible,
+                                                                                  false, string.Empty);
+      
+      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
+      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, null);
+
+      Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
+      Logger.Debug("End CreateDocumentByRecognitionData");
     }
   }
 }
