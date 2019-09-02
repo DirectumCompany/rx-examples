@@ -136,21 +136,19 @@ namespace Sungero.Capture.Server
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       
       if (!package.Any())
-      {
-        if (emailBodyDocument != null)
-          result.LeadingDocumentId = emailBodyDocument.Id;
         return result;
-      }
       
       // Сформировать список документов, которые не смогли пронумеровать.
-      var documentsWithRegistrationFailure = new List<IOfficialDocument>();
-      foreach(var document in package)
-        if (IsDocumentRegistrationFailed(document))
-          documentsWithRegistrationFailure.Add(document);
+      var documentsWithRegistrationFailure = package.Where(d => IsDocumentRegistrationFailed(d)).ToList();
       
       var leadingDocument = GetLeadingDocument(package);
+      
+      // Для документов, нераспознанных Ario: 
+      // со сканера - заполнить имена,
+      // с электронной почты - заполнять имена не надо, они будут как у исходного вложения.
       if (isNeedFillNotClassifiedDocumentNames)
         FillNotClassifiedDocumentNames(leadingDocument, package);
+      
       LinkDocuments(leadingDocument, package, emailBodyDocument);
       
       if (emailBodyDocument != null)
@@ -253,6 +251,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
+    /// <param name="emailBodyDocument">Тело электронного письма.</param>
     public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, IOfficialDocument emailBodyDocument)
     {
       var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
@@ -967,7 +966,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
     public virtual Docflow.IOfficialDocument CreateSimpleDocument(Structures.Module.IRecognizedDocument recognizedDocument,
-                                                                 IEmployee responsible)
+                                                                  IEmployee responsible)
     {
       var document = SimpleDocuments.Create();
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -2314,9 +2313,9 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Наименование факта.</param>
     /// <param name="factName">Корректировочный.</param>
     public virtual void FillCorrectedDocument(IAccountingDocumentBase document,
-                                             Structures.Module.IRecognizedDocument recognizedDocument,
-                                             string factName,
-                                             bool isAdjustment)
+                                              Structures.Module.IRecognizedDocument recognizedDocument,
+                                              string factName,
+                                              bool isAdjustment)
     {
       if (isAdjustment)
       {
@@ -2373,7 +2372,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
     public virtual List<Structures.Module.BusinessUnitAndCounterpartyWithFact> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> allFacts,
-                                                                                                                           List<string> counterpartyTypes)
+                                                                                                                            List<string> counterpartyTypes)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
       var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
@@ -2448,9 +2447,9 @@ namespace Sungero.Capture.Server
     }
     
     public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
-                                                                                                         Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
-                                                                                                         List<Structures.Module.BusinessUnitAndCounterpartyWithFact> nonTypeFacts,
-                                                                                                         IEmployee responsibleEmployee)
+                                                                                                          Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
+                                                                                                          List<Structures.Module.BusinessUnitAndCounterpartyWithFact> nonTypeFacts,
+                                                                                                          IEmployee responsibleEmployee)
     {
       Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
       Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;
@@ -2509,8 +2508,8 @@ namespace Sungero.Capture.Server
     }
     
     public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
-                                                                                                         Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
-                                                                                                         IEmployee responsibleEmployee)
+                                                                                                          Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
+                                                                                                          IEmployee responsibleEmployee)
     {
       Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
       Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;

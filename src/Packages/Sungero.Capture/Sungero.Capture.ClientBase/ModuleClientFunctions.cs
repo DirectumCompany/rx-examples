@@ -160,6 +160,10 @@ namespace Sungero.Capture.Client
 
       var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(package, emailBodyDocument, false);
       
+      // Если не было вложений, тело письма - ведущий документ.
+      if (!package.Any() && emailBodyDocument != null)
+        documentsCreatedByRecognitionResults.LeadingDocumentId = emailBodyDocument.Id;
+      
       Logger.Debug("Captured Package Process. Send documents to responsible.");
       Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, true);
       Logger.Debug("Captured Package Process. Done.");
