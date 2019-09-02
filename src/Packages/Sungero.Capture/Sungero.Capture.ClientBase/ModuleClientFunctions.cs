@@ -91,7 +91,7 @@ namespace Sungero.Capture.Client
         
         var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
         Logger.Debug("Captured Package Process. Send documents to responsible.");
-        Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, false);
+        Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, null);
         Logger.Debug("Captured Package Process. Done.");
       }
     }
@@ -132,6 +132,8 @@ namespace Sungero.Capture.Client
       }
       
       var package = new List<Docflow.IOfficialDocument>();
+      var notRecognizedDocuments = new List<Docflow.IOfficialDocument>();
+      notRecognizedDocuments.Add(emailBody);
       foreach (var attachment in mailFiles.Attachments)
       {
         var fileName = attachment.Description;
@@ -154,18 +156,14 @@ namespace Sungero.Capture.Client
           Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", fileName);
           var document = Functions.Module.Remote.CreateSimpleDocumentFromFile(attachment, true, responsible);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", fileName);
-          package.Add(document);
+          notRecognizedDocuments.Add(document);
         }
       }
-
-      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(package, emailBody, false);
       
-      // Если не было вложений, то тело письма - ведущий документ.
-      if (!package.Any() && emailBody != null)
-        documentsCreatedByRecognitionResults.LeadingDocumentId = emailBody.Id;
-      
+      var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(package, notRecognizedDocuments, false);
       Logger.Debug("Captured Package Process. Send documents to responsible.");
-      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, true);
+
+      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, emailBody);
       Logger.Debug("Captured Package Process. Done.");
     }
     
@@ -297,7 +295,7 @@ namespace Sungero.Capture.Client
                                                                                   false, string.Empty);
       
       var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
-      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, false);
+      Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults, responsible, null);
 
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");

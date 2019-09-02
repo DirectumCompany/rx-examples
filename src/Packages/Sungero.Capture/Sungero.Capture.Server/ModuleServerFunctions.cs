@@ -124,25 +124,25 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Обработать документы комплекта.
     /// </summary>
-    /// <param name="recognitionResults">Комплект документов.</param>
-    /// <param name="emailBody">Тело электронного письма.</param>
+    /// <param name="package">Распознанные документы комплекта.</param>
+    /// <param name="notRecognizedDocuments">Нераспознанные документы комплекта.</param>
     /// <param name="isNeedFillNotClassifiedDocumentNames">Признак необходимости заполнять имена всех неклассифицированных документов в комплекте .</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults ProcessPackageAfterCreationDocuments(List<IOfficialDocument> package,
-                                                                                                               IOfficialDocument emailBody,
+                                                                                                               List<IOfficialDocument> notRecognizedDocuments,
                                                                                                                bool isNeedFillNotClassifiedDocumentNames)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      
-      if (!package.Any())
+      if (!package.Any() && (notRecognizedDocuments == null || !notRecognizedDocuments.Any()))
         return result;
       
       // Сформировать список документов, которые не смогли пронумеровать.
       var documentsWithRegistrationFailure = package.Where(d => IsDocumentRegistrationFailed(d)).ToList();
       
-      var leadingDocument = GetLeadingDocument(package);
-      LinkDocuments(leadingDocument, package, emailBody);
+      // Получить ведущий документ из распознанных документов комплекта. Если список пуст, то из нераспознанных.
+      var leadingDocument = package.Any() ? GetLeadingDocument(package) : GetLeadingDocument(notRecognizedDocuments);
+      LinkDocuments(leadingDocument, package, notRecognizedDocuments);
       
       // Для документов, нераспознанных Ario:
       // со сканера - заполнить имена,
@@ -150,9 +150,9 @@ namespace Sungero.Capture.Server
       if (isNeedFillNotClassifiedDocumentNames)
         FillNotClassifiedDocumentNames(leadingDocument, package);
       
-      // Добавить тело письма к документам комплекта, чтобы вложить в задачу на обработку.
-      if (emailBody != null)
-        package.Add(emailBody);
+      // Добавить документы, не распознанные Ario, к документам комплекта, чтобы вложить в задачу на обработку.
+      if (notRecognizedDocuments != null && notRecognizedDocuments.Any())
+        package.AddRange(notRecognizedDocuments);
       
       result.LeadingDocumentId = leadingDocument.Id;
       result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
@@ -251,9 +251,13 @@ namespace Sungero.Capture.Server
     /// Связать документы комплекта.
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
-    /// <param name="package">Комплект документов.</param>
-    /// <param name="emailBody">Тело электронного письма.</param>
-    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, IOfficialDocument emailBody)
+    /// <param name="package">Распознанные документы комплекта.</param>
+    /// <param name="notRecognizedDocuments">Нераспознанные документы комплекта.</param>
+    /// <remarks>
+    /// Для распознанных документов комплекта, если ведущий документ - простой, то тип связи - "Прочие". Иначе "Приложение".
+    /// Для нераспознанных документов комплекта - тип связи "Прочие".
+    /// </remarks>
+    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, List<IOfficialDocument> notRecognizedDocuments)
     {
       var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
       
@@ -261,19 +265,23 @@ namespace Sungero.Capture.Server
         ? Constants.Module.SimpleRelationRelationName
         : Docflow.PublicConstants.Module.AddendumRelationName;
       
-      var addendums = package.Where(x => !Equals(x, leadingDocument));
       // Связать приложения с ведущим документом.
+      var addendums = package.Where(x => !Equals(x, leadingDocument));
       foreach (var addendum in addendums)
       {
         addendum.Relations.AddFrom(relation, leadingDocument);
         addendum.Save();
       }
       
-      // Тело email-письма связываем с основным документом, тип связи - Прочее.
-      if (emailBody != null)
+      // Связать нераспознанные документы с ведущим документом, тип связи - "Прочие".
+      if (notRecognizedDocuments != null)
       {
-        emailBody.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
-        emailBody.Save();
+        notRecognizedDocuments = notRecognizedDocuments.Where(x => !Equals(x, leadingDocument)).ToList();
+        foreach (var notRecognizedDocument in notRecognizedDocuments)
+        {
+          notRecognizedDocument.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
+          notRecognizedDocument.Save();
+        }
       }
     }
     
@@ -455,21 +463,35 @@ namespace Sungero.Capture.Server
     public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
     {
       var leadingDocument = package.FirstOrDefault();
-      var incLetter = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null
+      var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+      
+      var incLetter = isMockMode
         ? package.Where(d => MockIncomingLetters.Is(d)).FirstOrDefault()
         : package.Where(d => IncomingLetters.Is(d)).FirstOrDefault();
       if (incLetter != null)
         return incLetter;
       
-      var contractStatement = package.Where(d => MockContractStatements.Is(d)).FirstOrDefault();
+      var contract = isMockMode
+        ? package.Where(d => MockContracts.Is(d)).FirstOrDefault()
+        : null;
+      if (contract != null)
+        return contract;
+      
+      var contractStatement = isMockMode
+        ? package.Where(d => MockContractStatements.Is(d)).FirstOrDefault()
+        : package.Where(d => FinancialArchive.ContractStatements.Is(d)).FirstOrDefault();
       if (contractStatement != null)
         return contractStatement;
       
-      var waybill = package.Where(d => MockWaybills.Is(d)).FirstOrDefault();
+      var waybill = isMockMode
+        ? package.Where(d => MockWaybills.Is(d)).FirstOrDefault()
+        : package.Where(d => FinancialArchive.Waybills.Is(d)).FirstOrDefault();
       if (waybill != null)
         return waybill;
       
-      var incTaxInvoice = package.Where(d => MockIncomingTaxInvoices.Is(d)).FirstOrDefault();
+      var incTaxInvoice = isMockMode
+        ? package.Where(d => MockIncomingTaxInvoices.Is(d)).FirstOrDefault()
+        : package.Where(d => FinancialArchive.IncomingTaxInvoices.Is(d)).FirstOrDefault();
       if (incTaxInvoice != null)
         return incTaxInvoice;
       
@@ -795,11 +817,11 @@ namespace Sungero.Capture.Server
     /// <param name="documents">Прочие документы.</param>
     /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
     /// <param name="responsible">Ответственный.</param>
-    /// <param name="isCapturedFromEmail">Признак того, что пакет пришел с эл. почты.</param>
+    /// <param name="emailBody">Тело электронного письма.</param>
     /// <returns>Простая задача.</returns>
     [Public, Remote]
     public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
-                                          List<IOfficialDocument> documentsWithRegistrationFailure, Company.IEmployee responsible, bool isCapturedFromEmail)
+                                          List<IOfficialDocument> documentsWithRegistrationFailure, Company.IEmployee responsible, Docflow.IOfficialDocument emailBody)
     {
       if (leadingDocument == null)
         return;
@@ -829,7 +851,7 @@ namespace Sungero.Capture.Server
         
         // Собрать ссылки на неклассифицированные документы.
         // Не нужно считать тело письма неклассифицированным документом и писать об этом.
-        if (Docflow.SimpleDocuments.Is(document) && (!isCapturedFromEmail || document.Id != leadingDocument.Id))
+        if (Docflow.SimpleDocuments.Is(document) && (emailBody == null || document.Id != emailBody.Id))
           notClassifiedDocumentsHyperlinks.Add(Hyperlinks.Get(document));
       }
       
@@ -889,10 +911,10 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
     /// <param name="responsible">Сотрудник, ответственный за одработку распознанных документов.</param>
-    /// <param name="isCapturedFromEmail">Признак того, что пакет пришел с эл. почты.</param>
+    /// <param name="emailBody">Тело электронного письма.</param>
     [Remote]
     public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
-                                          Sungero.Company.IEmployee responsible, bool isCapturedFromEmail)
+                                          Sungero.Company.IEmployee responsible, Docflow.IOfficialDocument emailBody)
     {
       var leadingDocument = OfficialDocuments.GetAll()
         .FirstOrDefault(x => x.Id == documentsCreatedByRecognition.LeadingDocumentId);
@@ -911,7 +933,7 @@ namespace Sungero.Capture.Server
       var documentsWithRegistrationFailure = documentsCreatedByRecognition.DocumentWithRegistrationFailureIds != null
         ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id)).ToList()
         : new List<Docflow.IOfficialDocument>();
-      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, responsible, isCapturedFromEmail);
+      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, responsible, emailBody);
     }
     
     #endregion

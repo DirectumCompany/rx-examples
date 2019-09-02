@@ -197,9 +197,9 @@
           "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
         },
         {
-          "Name": "isCapturedFromEmail",
-          "ParameterType": "global::System.Boolean",
-          "ParameterTypeFullName": "System.Boolean"
+          "Name": "emailBody",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
         }
       ],
       "Placement": "Shared",
