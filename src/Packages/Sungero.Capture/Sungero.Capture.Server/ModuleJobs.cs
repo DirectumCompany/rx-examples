@@ -17,18 +17,20 @@ namespace Sungero.Capture.Server
     public virtual void ChangeVerificationState()
     {
       var documentIds = Docflow.OfficialDocuments.GetAll()
-        .Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess && 
-               d.RegistrationState == Docflow.OfficialDocument.RegistrationState.Registered)
+        .Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
+        .Where(d => d.RegistrationState == Docflow.OfficialDocument.RegistrationState.Registered ||
+               d.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered &&
+               d.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.NotNumerable)
         .Select(d => d.Id).ToList();
       
       // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов,
       // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.
       var processedIds = new List<int?>();
       var verificationTasks = SimpleTasks.GetAll()
-        .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id && 
+        .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id &&
                t.Status == Workflow.Task.Status.Completed &&
-               (t.Subject.Contains(Resources.CheckPackage) || 
-                t.Subject.Contains(Resources.CheckDocument) || 
+               (t.Subject.Contains(Resources.CheckPackage) ||
+                t.Subject.Contains(Resources.CheckDocument) ||
                 t.Subject.Contains(Resources.FailedClassifyDocumentsTaskName)));
       
       foreach(var documentId in documentIds)
@@ -48,11 +50,12 @@ namespace Sungero.Capture.Server
         var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
         processedIds.AddRange(attachmentIds);
         var subTasks = Tasks.GetAll()
-          .Where(t => t.MainTaskId.HasValue && 
+          .Where(t => t.MainTaskId.HasValue &&
                  t.MainTaskId.Value == task.Id &&
-                 t.Status != Workflow.Task.Status.Completed && 
+                 t.Status != Workflow.Task.Status.Completed &&
                  t.Status != Workflow.Task.Status.Aborted);
         if (!subTasks.Any())
+        {
           foreach (var id in attachmentIds)
           {
             if (id == null)
@@ -61,6 +64,7 @@ namespace Sungero.Capture.Server
             var document = OfficialDocuments.Get((int)id);
             document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
             document.Save();
+          }
         }
       }
     }
