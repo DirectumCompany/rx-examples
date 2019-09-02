@@ -714,25 +714,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить подразделение из настроек сотрудника.
-    /// </summary>
-    /// <param name="employee">Сотрудник.</param>
-    /// <returns>Подразделение.</returns>
-    public virtual Company.IDepartment GetDepartment(Company.IEmployee employee)
-    {
-      if (employee == null)
-        return null;
-      
-      var department = Company.Departments.Null;
-      var settings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(employee);
-      if (settings != null)
-        department = settings.Department;
-      if (department == null)
-        department = employee.Department;
-      return department;
-    }
-    
-    /// <summary>
     /// Получить ведущие документы по номеру и дате из факта.
     /// </summary>
     /// <param name="fact">Факт.</param>
@@ -950,7 +931,7 @@ namespace Sungero.Capture.Server
       document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
       document.PreparedBy = responsible;
       document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       return document;
     }
     
@@ -972,7 +953,7 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.PreparedBy = responsible;
       document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, true);
       
       // Наименование и содержание.
@@ -1031,7 +1012,7 @@ namespace Sungero.Capture.Server
       document.Name = Path.GetFileName(fileInfo.Description);
       document.PreparedBy = responsible;
       document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
@@ -1107,8 +1088,8 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       document.Department = document.Addressee != null
-        ? GetDepartment(document.Addressee)
-        : GetDepartment(responsible);
+        ? Company.PublicFunctions.Department.GetDepartment(document.Addressee)
+        : Company.PublicFunctions.Department.GetDepartment(responsible);
       
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
@@ -1410,7 +1391,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
       
       // Подразделение и ответственный.
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
@@ -1571,7 +1552,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
@@ -1805,7 +1786,7 @@ namespace Sungero.Capture.Server
       }
       
       // Подразделение и ответственный.
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
@@ -1846,7 +1827,7 @@ namespace Sungero.Capture.Server
       LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
       
       // Подразделение и ответственный.
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Дата, номер и регистрация.
@@ -2022,7 +2003,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number, isTrustedNumber);
       
       // Подразделение и ответственный.
-      document.Department = GetDepartment(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
