@@ -397,53 +397,74 @@ namespace Sungero.Capture.Server
       var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
       if (recognizedClass == Constants.Module.LetterClassName)
+      {
         document = isMockMode
           ? CreateMockIncomingLetter(recognizedDocument)
           : CreateIncomingLetter(recognizedDocument, responsible);
+      }
       
       // Акт выполненных работ.
       else if (recognizedClass == Constants.Module.ContractStatementClassName)
+      {
         document = isMockMode
           ? CreateMockContractStatement(recognizedDocument)
           : CreateContractStatement(recognizedDocument, responsible);
+      }
       
       // Товарная накладная.
       else if (recognizedClass == Constants.Module.WaybillClassName)
+      {
         document = isMockMode
           ? CreateMockWaybill(recognizedDocument)
           : CreateWaybill(recognizedDocument, responsible);
+      }
       
       // Счет-фактура.
       else if (recognizedClass == Constants.Module.TaxInvoiceClassName)
+      {
         document = isMockMode
           ? CreateMockIncomingTaxInvoice(recognizedDocument)
           : CreateTaxInvoice(recognizedDocument, responsible, false);
+      }
       
       // Корректировочный счет-фактура.
       else if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
+      {
         document = CreateTaxInvoice(recognizedDocument, responsible, true);
+      }
       
       // УПД.
       else if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
+      {
         document = CreateUniversalTransferDocument(recognizedDocument, responsible, false);
+      }
       
       // УКД.
       else if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
+      {
         document = CreateUniversalTransferDocument(recognizedDocument, responsible, true);
+      }
       
       // Счет на оплату.
       else if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
+      {
         document = isMockMode
           ? CreateMockIncomingInvoice(recognizedDocument)
           : CreateIncomingInvoice(recognizedDocument, responsible);
+      }
       
       // Договор.
       else if (recognizedClass == Constants.Module.ContractClassName && isMockMode)
+      {
         document = CreateMockContract(recognizedDocument);
+      }
       
       // Все нераспознанные документы создать простыми.
       else
-        document = CreateSimpleDocument(recognizedDocument, responsible);
+      {
+        var name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
+        document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
+      }
       
       FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
       /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
@@ -939,23 +960,6 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Простой документ
-    
-    /// <summary>
-    /// Создать документ в Rx, тело документа загружается из Арио.
-    /// </summary>
-    /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
-    /// <returns>Документ.</returns>
-    public virtual Docflow.IOfficialDocument CreateSimpleDocument(Structures.Module.IRecognizedDocument recognizedDocument,
-                                                                  IEmployee responsible)
-    {
-      var document = SimpleDocuments.Create();
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.Name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
-      document.PreparedBy = responsible;
-      document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      return document;
-    }
     
     /// <summary>
     /// Создать документ из тела email.
