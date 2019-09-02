@@ -416,19 +416,27 @@ namespace Sungero.Capture.Client
       var hasTxtBody = txtBodyElement != null;
       
       // Не создавать документ для писем с пустым телом.
-      // Некоторые клиенты (например, Outlook) для писем с пустым телом генерируют фейковое тело,
-      // в котором текстовая часть представляет из себя только перевод строки. Такие тела заносить также не нужно.
+      // В некоторых случаях (например, при отправке из Outlook в Яндекс) для писем с пустым телом генерируется фейковое тело,
+      // в котором текстовая часть представляет из себя только перевод строки, а html часть анализировать слишком сложно, она зависит от клиента.
+      // Такие тела заносить также не нужно (ни текстовую, ни html часть).
+      // В других случаях (например, при отправке из Outlook в Outlook) для писем с любым телом txtBodyElement может
+      // не создаваться вообще, то есть, проверить, пусто ли тело, нельзя. В таких случаях заносить html часть тела.
+      System.Xml.Linq.XElement bodyElement = null;
       if (hasTxtBody)
       {
         var txtBodyInfo = CreateFileInfoFromXelement(txtBodyElement, folder);
         var txtBodyString = File.ReadAllText(txtBodyInfo.Path);
         var txtBodyIsEmpty = txtBodyString == Constants.Module.OutlookEmptyTxtBody;
         if (!txtBodyIsEmpty)
-        {
-          var bodyElement = hasHtmlBody ? htmlBodyElement : txtBodyElement;
-          mailFiles.Body = CreateFileInfoFromXelement(bodyElement, folder);
-        }
+          bodyElement = hasHtmlBody ? htmlBodyElement : txtBodyElement;
       }
+      else if (hasHtmlBody)
+      {
+        bodyElement = htmlBodyElement;
+      }
+      
+      if (bodyElement != null)
+        mailFiles.Body = CreateFileInfoFromXelement(bodyElement, folder);
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
