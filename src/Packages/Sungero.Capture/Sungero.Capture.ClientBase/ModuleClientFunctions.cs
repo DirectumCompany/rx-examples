@@ -12,7 +12,7 @@ namespace Sungero.Capture.Client
     #region Захват
     
     /// <summary>
-    /// Создать документы в RX на основе пакета документов со сканера или почты.
+    /// Обработать пакет документов со сканера или почты.
     /// </summary>
     /// <param name="senderLine">Наименование линии.</param>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
@@ -479,7 +479,7 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Получить соответствие класса и имени правила его обработки.
+    /// Получить соответствие класса и наименования правила извлечения фактов.
     /// </summary>
     /// <returns></returns>
     [Public]
@@ -505,7 +505,7 @@ namespace Sungero.Capture.Client
     #region Верификация
     
     /// <summary>
-    /// Активировать режим верификации.
+    /// Включить режим верификации.
     /// </summary>
     /// <param name="document">Документ.</param>
     [Public]

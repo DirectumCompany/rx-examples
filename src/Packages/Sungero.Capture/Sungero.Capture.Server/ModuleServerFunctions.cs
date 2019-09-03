@@ -148,7 +148,7 @@ namespace Sungero.Capture.Server
       // со сканера - заполнить имена,
       // с электронной почты - заполнять имена не надо, они будут как у исходного вложения.
       if (isNeedFillNotClassifiedDocumentNames)
-        FillNotClassifiedDocumentNames(leadingDocument, package);
+        RenameNotClassifiedDocuments(leadingDocument, package);
       
       // Добавить документы, не распознанные Ario, к документам комплекта, чтобы вложить в задачу на обработку.
       if (notRecognizedDocuments != null && notRecognizedDocuments.Any())
@@ -210,7 +210,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Сформировать имена для всех неклассифицированных документов в комплекте.
+    /// Переименовать неклассифицированные документы в комплекте.
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="package">Комплект документов.</param>
@@ -218,7 +218,7 @@ namespace Sungero.Capture.Server
     /// Если неклассифицированных документов несколько и ведущий документ простой,
     /// то у ведущего будет номер 1, у остальных - следующие по порядку.
     /// </remarks>
-    public virtual void FillNotClassifiedDocumentNames(IOfficialDocument leadingDocument, List<IOfficialDocument> package)
+    public virtual void RenameNotClassifiedDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package)
     {
       // Если ведущий документ SimpleDocument, то переименовываем его,
       // для того чтобы в имени содержался его порядковый номер.
@@ -670,7 +670,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Поиск контактного лица контрагента в верифицированных данных.
+    /// Получить контактное лицо контрагента из верифицированных данных.
     /// </summary>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
@@ -746,7 +746,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Поиск ведущего документ в верифицированных данных.
+    /// Получить ведущий документ из верифицированных данных.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
