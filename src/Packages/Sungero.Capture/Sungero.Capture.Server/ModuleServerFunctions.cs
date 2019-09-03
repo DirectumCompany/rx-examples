@@ -2613,7 +2613,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <returns>Связку контрагент + факт.</returns>
+    /// <returns>Связка контрагент + факт.</returns>
     public virtual Structures.Module.CounterpartyWithFact GetCounterpartyByVerifiedData(Structures.Module.IFact fact, string propertyName)
     {
       var counterpartyUnitField = GetFieldByVerifiedData(fact, propertyName);
@@ -2659,7 +2659,9 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <param name="addressee">Адресат.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
-    public virtual Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts, IEmployee responsible, IEmployee addressee, string businessUnitPropertyName)
+    public virtual Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts, 
+                                                                                          IEmployee responsible, IEmployee addressee, 
+                                                                                          string businessUnitPropertyName)
     {
       
       // Сначала поиск по хэшам фактов.
@@ -2757,7 +2759,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить значение поля из фактов.
+    /// Получить значение поля из факта.
     /// </summary>
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
@@ -2775,11 +2777,12 @@ namespace Sungero.Capture.Server
     }
 
     /// <summary>
-    /// Получить поле из фактов.
+    /// Получить значение поля из фактов.
     /// </summary>
     /// <param name="facts"> Список фактов.</param>
     /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
-    /// <returns>Поле, полученное из Ario с наибольшей вероятностью.</returns>
+    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param> 
+    /// <returns>Значение поля, полученное из Ario с наибольшей вероятностью.</returns>
     public static string GetFieldValue(List<Structures.Module.IFact> facts, string factName, string fieldName)
     {
       IEnumerable<IFactField> fields = facts
@@ -2847,7 +2850,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить запись, которая уже сопоставлялась с переданным фактом, с дополнительной фильрацией по контрагенту.
+    /// Получить запись, которая уже сопоставлялась с переданным фактом, с дополнительной фильтжрацией по контрагенту.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <param name="propertyName">Имя свойства документа связанное с фактом.</param>
@@ -2875,7 +2878,7 @@ namespace Sungero.Capture.Server
     /// <param name="facts">Список фактов.</param>
     /// <param name="factName">Имя факта.</param>
     /// <param name="fieldName">Имя поля.</param>
-    /// <returns>Список фактов с наибольшей вероятностью.</returns>
+    /// <returns>Список фактов.</returns>
     /// <remarks>С учетом вероятности факта.</remarks>
     public static List<Structures.Module.IFact> GetFacts(List<Structures.Module.IFact> facts, string factName, string fieldName)
     {
@@ -2886,12 +2889,12 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить сортированный список фактов.
+    /// Получить список фактов отфильтрованный по имени факта и отсортированный по вероятности поля.
     /// </summary>
     /// <param name="facts">Список фактов.</param>
     /// <param name="factName">Имя факта.</param>
     /// <param name="orderFieldName">Имя поля по вероятности которого будет произведена сортировка.</param>
-    /// <returns>Список фактов с наибольшей вероятностью.</returns>
+    /// <returns>Отсортированный список фактов.</returns>
     /// <remarks>С учетом вероятности факта.</remarks>
     public static List<Structures.Module.IFact> GetOrderedFacts(List<Structures.Module.IFact> facts, string factName, string orderFieldName)
     {
@@ -3183,6 +3186,7 @@ namespace Sungero.Capture.Server
     /// Создать тело документа.
     /// </summary>
     /// <param name="document">Документ Rx.</param>
+    /// <param name="versionNote">Примечание к версии.</param>    
     /// <param name="recognizedDocument">Результат обработки входящего документа в Арио.</param>
     public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognizedDocument recognizedDocument, string versionNote = "")
     {
