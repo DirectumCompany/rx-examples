@@ -190,7 +190,6 @@ namespace Sungero.Capture.Server
             if (document != null)
             {
               CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
-              document.ExternalApprovalState = Docflow.OfficialDocument.ExchangeState.Signed;
               document.Save();
             }
           }
@@ -200,7 +199,7 @@ namespace Sungero.Capture.Server
         if (document == null)
           document = CreateDocumentByRecognitionResult(recognitionResult, responsible);
         
-        // Добавить Ид документа в запись справочника с результатами обработки Ario.
+        // Добавить ИД документа в запись справочника с результатами обработки Ario.
         recognitionResult.Info.DocumentId = document.Id;
         recognitionResult.Info.Save();
         
@@ -516,45 +515,7 @@ namespace Sungero.Capture.Server
       
       return leadingDocument;
     }
-    
-    /// <summary>
-    /// Выполнить задания на контроль возврата пришедшего документа. Если их нет - отправить уведомление ответственному за документ.
-    /// </summary>
-    /// <param name="document">Захваченный документ.</param>
-    public virtual void CompleteApprovalCheckReturnAssignment(IOfficialDocument document)
-    {
-      // Выполнить задания на контроль возврата.
-      var documentsGroupGuid = Docflow.PublicConstants.Module.TaskMainGroup.ApprovalTask;
-      var approvalRegulationsAssignments = Assignments.GetAll()
-        .Where(a => Sungero.Docflow.ApprovalCheckReturnAssignments.Is(a))
-        .Where(a => !a.Completed.HasValue)
-        .Where(a => a.AttachmentDetails.Any(g => g.GroupId == documentsGroupGuid && g.AttachmentId == document.Id))
-        .GroupBy(a => a.MainTask.Id);
-      
-      foreach (var assignmentGroup in approvalRegulationsAssignments)
-        assignmentGroup.FirstOrDefault().Complete(Sungero.Docflow.ApprovalCheckReturnAssignment.Result.Signed);
-      
-      // Если нет заданий на контроль возврата, то отправить уведомление ответственному за документ.
-      if (approvalRegulationsAssignments.ToList().Count == 0)
-      {
-        var responsibleEmployee = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentResponsibleEmployee(document);
-        if (responsibleEmployee != null && responsibleEmployee.IsSystem != true)
-        {
-          var notice = SimpleTasks.Create();
-          notice.Subject = Resources.NoticeToAuthorSubjectFormat(document);
-          notice.Attachments.Add(document);
-          
-          if (notice.Subject.Length > notice.Info.Properties.Subject.Length)
-            notice.Subject = notice.Subject.Substring(0, notice.Info.Properties.Subject.Length);
 
-          var routeStep = notice.RouteSteps.AddNew();
-          routeStep.AssignmentType = Workflow.SimpleTaskRouteSteps.AssignmentType.Notice;
-          routeStep.Performer = responsibleEmployee;
-          routeStep.Deadline = null;
-          notice.Start();
-        }
-      }
-    }
     #endregion
     
     #region Фасад DirectumRX
