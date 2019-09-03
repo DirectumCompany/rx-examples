@@ -461,7 +461,7 @@ namespace Sungero.Capture.Server
       // Все нераспознанные документы создать простыми.
       else
       {
-        var name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
+        var name = !string.IsNullOrWhiteSpace(recognizedResult.OriginalFile.Description) ? recognizedResult.OriginalFile.Description : Resources.SimpleDocumentName;
         document = CreateSimpleDocument(name, responsible);
       }
       
