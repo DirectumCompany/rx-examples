@@ -422,25 +422,25 @@ namespace Sungero.Capture.Server
       {
         document = isMockMode
           ? CreateMockIncomingTaxInvoice(recognitionResult)
-          : CreateTaxInvoice(recognitionResult, responsible, false);
+          : CreateTaxInvoice(recognitionResult, false, responsible);
       }
       
       // Корректировочный счет-фактура.
       else if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
       {
-        document = CreateTaxInvoice(recognitionResult, responsible, true);
+        document = CreateTaxInvoice(recognitionResult, true, responsible);
       }
       
       // УПД.
       else if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
       {
-        document = CreateUniversalTransferDocument(recognitionResult, responsible, false);
+        document = CreateUniversalTransferDocument(recognitionResult, false, responsible);
       }
       
       // УКД.
       else if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
       {
-        document = CreateUniversalTransferDocument(recognitionResult, responsible, true);
+        document = CreateUniversalTransferDocument(recognitionResult, true, responsible);
       }
       
       // Счет на оплату.
@@ -1706,10 +1706,10 @@ namespace Sungero.Capture.Server
     /// Создать счет-фактуру.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
-    /// <param name="responsible">Ответственный.</param>
     /// <param name="isAdjustment">Корректировочная.</param>
+    /// <param name="responsible">Ответственный.</param>    
     /// <returns>Счет-фактура.</returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible, bool isAdjustment)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
@@ -1839,10 +1839,10 @@ namespace Sungero.Capture.Server
     /// Создать УПД.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки УПД в Ario.</param>
-    /// <param name="responsible">Ответственный.</param>
     /// <param name="isAdjustment">Корректировочная.</param>
+    /// <param name="responsible">Ответственный.</param>    
     /// <returns>УПД.</returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible, bool isAdjustment)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
