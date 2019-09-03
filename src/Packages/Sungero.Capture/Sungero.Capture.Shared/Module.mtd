@@ -164,13 +164,6 @@
       "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
     },
     {
-      "Name": "GetCurrentTenant",
-      "IsRemote": true,
-      "Placement": "Shared",
-      "ReturnType": "global::System.String",
-      "ReturnTypeFullName": "System.String"
-    },
-    {
       "Name": "GetRecognitionResultProperties",
       "IsRemote": true,
       "Parameters": [

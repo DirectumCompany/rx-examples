@@ -520,13 +520,6 @@ namespace Sungero.Capture.Server
     
     #region Фасад DirectumRX
     
-    [Public, Remote]
-    public static string GetCurrentTenant()
-    {
-      var currentTenant = Sungero.Domain.TenantRegistry.Instance.CurrentTenant;
-      return currentTenant != null ? currentTenant.Id : string.Empty;
-    }
-    
     /// <summary>
     /// Получить значение параметра из docflow_params.
     /// </summary>
@@ -3269,7 +3262,7 @@ namespace Sungero.Capture.Server
         if (!barcodeList.Any())
           return result;
         
-        var tenantId = GetCurrentTenant();
+        var tenantId = Docflow.PublicFunctions.Module.Remote.GetCurrentTenantId();
         var formattedTenantId = Docflow.PublicFunctions.Module.FormatTenantIdForBarcode(tenantId).Trim();
         var ourBarcodes = barcodeList.Where(b => b.Contains(formattedTenantId));
         foreach (var barcode in ourBarcodes)
