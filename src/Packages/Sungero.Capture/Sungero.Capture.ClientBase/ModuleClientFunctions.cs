@@ -12,7 +12,7 @@ namespace Sungero.Capture.Client
     #region Захват
     
     /// <summary>
-    /// Создать документ на основе пакета документов со сканера.
+    /// Создать документы в RX на основе пакета документов со сканера или почты.
     /// </summary>
     /// <param name="senderLine">Наименование линии.</param>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
@@ -122,7 +122,7 @@ namespace Sungero.Capture.Client
         attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
         
         Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", fileName);
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, attachment.Path, firstPageClassifierName, typeClassifierName, false);
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(attachment.Path, arioUrl, firstPageClassifierName, typeClassifierName, false);
         if (string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
         {
           Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", fileName);
@@ -337,7 +337,7 @@ namespace Sungero.Capture.Client
       
       foreach (var packagePath in packagesPaths)
       {
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(arioUrl, packagePath, firstPageClassifierName, typeClassifierName);
+        var classificationAndExtractionResult = TryClassifyAndExtractFacts(packagePath, arioUrl, firstPageClassifierName, typeClassifierName);
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileInfo();
         originalFile.Path = packagePath;
@@ -395,14 +395,14 @@ namespace Sungero.Capture.Client
     /// <summary>
     /// Выполнить классификацию и распознавание для документа.
     /// </summary>
-    /// <param name="arioUrl">Host Ario.</param>
     /// <param name="filePath">Путь к классифицируемому файлу.</param>
+    /// <param name="arioUrl">Host Ario.</param>    
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string arioUrl,
-                                                                                                  string filePath,
+    public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string filePath,
+                                                                                                  string arioUrl,
                                                                                                   string firstPageClassifierName,
                                                                                                   string typeClassifierName,
                                                                                                   bool throwOnError = true)
@@ -507,6 +507,7 @@ namespace Sungero.Capture.Client
     /// <summary>
     /// Активировать режим верификации.
     /// </summary>
+    /// <param name="document">Документ.</param>
     [Public]
     public virtual void SwitchVerificationMode(Sungero.Docflow.IOfficialDocument document)
     {
