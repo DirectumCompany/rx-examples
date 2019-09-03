@@ -116,6 +116,23 @@
   ],
   "PublicFunctions": [
     {
+      "Name": "CreateSimpleDocument",
+      "Parameters": [
+        {
+          "Name": "name",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        },
+        {
+          "Name": "responsible",
+          "ParameterType": "global::Sungero.Company.IEmployee",
+          "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "global::Sungero.Docflow.ISimpleDocument",
+      "ReturnTypeFullName": "Sungero.Docflow.ISimpleDocument, Sungero.Domain.Interfaces"
+    },
+    {
       "Name": "EnableRequisitesForVerification",
       "Parameters": [
         {

@@ -461,8 +461,8 @@ namespace Sungero.Capture.Server
       // Все нераспознанные документы создать простыми.
       else
       {
-        var name = !string.IsNullOrWhiteSpace(recognizedResult.OriginalFile.Description) ? recognizedResult.OriginalFile.Description : Resources.SimpleDocumentName;
-        document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
+        var name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
+        document = CreateSimpleDocument(name, responsible);
       }
       
       FillDeliveryMethod(document, recognizedResult.SendedByEmail);
@@ -963,6 +963,20 @@ namespace Sungero.Capture.Server
     #region Простой документ
     
     /// <summary>
+    /// Создать простой документ.
+    /// </summary>
+    /// <param name="name">Наименование документа.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns></returns>
+    [Public]
+    public static ISimpleDocument CreateSimpleDocument(string name, Company.IEmployee responsible)
+    {
+      var document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
+      document.VerificationState = Docflow.SimpleDocument.VerificationState.InProcess;
+      return document;
+    }
+    
+    /// <summary>
     /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// Создать документ из тела эл. письма.
     /// </summary>
@@ -979,7 +993,7 @@ namespace Sungero.Capture.Server
         throw new ApplicationException(Resources.FileNotFoundFormat(bodyInfo.Path));
       
       var documentName = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
-      var document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(documentName, responsible);      
+      var document = CreateSimpleDocument(documentName, responsible);
       FillDeliveryMethod(document, true);
       
       // Наименование и содержание.
@@ -1034,7 +1048,7 @@ namespace Sungero.Capture.Server
                                                                                 IEmployee responsible)
     {
       var name = Path.GetFileName(fileInfo.Description);
-      var document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
+      var document = CreateSimpleDocument(name, responsible);
       FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
@@ -2656,8 +2670,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <param name="addressee">Адресат.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
-    public virtual Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts, 
-                                                                                          IEmployee responsible, IEmployee addressee, 
+    public virtual Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts,
+                                                                                          IEmployee responsible, IEmployee addressee,
                                                                                           string businessUnitPropertyName)
     {
       
@@ -2778,7 +2792,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts"> Список фактов.</param>
     /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
-    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param> 
+    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Значение поля, полученное из Ario с наибольшей вероятностью.</returns>
     public static string GetFieldValue(List<Structures.Module.IFact> facts, string factName, string fieldName)
     {
