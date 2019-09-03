@@ -936,7 +936,7 @@ namespace Sungero.Capture.Server
     /// <param name="emailBody">Тело электронного письма.</param>
     [Remote]
     public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
-                                          Sungero.Company.IEmployee responsible, Docflow.IOfficialDocument emailBody)
+                                          Docflow.IOfficialDocument emailBody, Sungero.Company.IEmployee responsible)
     {
       var leadingDocument = OfficialDocuments.GetAll()
         .FirstOrDefault(x => x.Id == documentsCreatedByRecognition.LeadingDocumentId);
