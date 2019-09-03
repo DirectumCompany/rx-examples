@@ -2444,6 +2444,14 @@ namespace Sungero.Capture.Server
       return businessUnitsAndCounterparties;
     }
     
+    /// <summary>
+    /// Подобрать НОР и контрагента.
+    /// </summary>
+    /// <param name="buyerFact">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
+    /// <param name="sellerFact">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
+    /// <param name="nonTypeFacts">Список фактов с данными о контрагенте. Тип контрагента не заполнен.</param>
+    /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
+    /// <returns>НОР и контрагента.</returns>
     public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
                                                                                                           Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
                                                                                                           List<Structures.Module.BusinessUnitAndCounterpartyWithFact> nonTypeFacts,
@@ -2505,6 +2513,14 @@ namespace Sungero.Capture.Server
       return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnitFact, counterpartyFact, responsibleEmployeeBusinessUnit);
     }
     
+    
+    /// <summary>
+    /// Подобрать НОР и контрагента.
+    /// </summary>
+    /// <param name="buyerFact">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
+    /// <param name="sellerFact">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
+    /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
+    /// <returns>НОР и контрагента.</returns>
     public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
                                                                                                           Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
                                                                                                           IEmployee responsibleEmployee)
@@ -2525,6 +2541,12 @@ namespace Sungero.Capture.Server
       return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnitFact, counterpartyFact, responsibleEmployeeBusinessUnit);
     }
     
+    /// <summary>
+    /// Поиск контрагента для документов в демо режиме.
+    /// </summary>
+    /// <param name="facts">Факты для поиска факта с контрагентом.</param>
+    /// <param name="counterpartyType">Тип контрагента.</param>
+    /// <returns>Контрагент.</returns>
     public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.IFact> facts, string counterpartyType)
     {
       var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name");
