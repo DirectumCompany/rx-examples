@@ -167,7 +167,7 @@ namespace Sungero.Capture.Server
     /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <param name="responsible">Сотрудник, ответственный за проверку документов.</param>
     /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
-    /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
+    /// <param name="fromEmail">Адрес эл.почты отправителя.(Не используется, добавлен для перекрытия)</param>
     /// <returns>Ид созданных документов.</returns>
     [Remote]
     public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Structures.Module.IFileInfo originalFile,
