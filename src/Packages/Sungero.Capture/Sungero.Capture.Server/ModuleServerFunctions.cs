@@ -198,7 +198,7 @@ namespace Sungero.Capture.Server
         
         // Создание нового документа по фактам.
         if (document == null)
-          document = CreateDocumentByRecognitionResult(recognitionResult, responsible, fromEmail);
+          document = CreateDocumentByRecognitionResult(recognitionResult, responsible);
         
         // Добавить Ид документа в запись справочника с результатами обработки Ario.
         recognitionResult.Info.DocumentId = document.Id;
@@ -389,7 +389,7 @@ namespace Sungero.Capture.Server
     /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
     public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognizedResult,
-                                                                        IEmployee responsible, string fromEmail)
+                                                                        IEmployee responsible)
     {
       // Входящее письмо.
       var recognizedClass = recognizedResult.PredictedClass;
