@@ -627,6 +627,8 @@ namespace Sungero.Capture.Client
     
     #endregion
     
+    #region Настройка и тесты
+    
     /// <summary>
     /// Включить демо-режим.
     /// </summary>
@@ -665,5 +667,7 @@ namespace Sungero.Capture.Client
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
     }
+    
+    #endregion
   }
 }
