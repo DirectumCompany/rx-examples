@@ -977,15 +977,11 @@ namespace Sungero.Capture.Server
       if (!System.IO.File.Exists(bodyInfo.Path))
         throw new ApplicationException(Resources.FileNotFoundFormat(bodyInfo.Path));
       
-      var document = Sungero.Docflow.SimpleDocuments.Create();
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      document.PreparedBy = responsible;
-      document.BusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      var documentName = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
+      var document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(documentName, responsible);      
       FillDeliveryMethod(document, true);
       
       // Наименование и содержание.
-      document.Name = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
       {
         var name = string.Format("{0} \"{1}\"", document.Name, mailInfo.Subject);
