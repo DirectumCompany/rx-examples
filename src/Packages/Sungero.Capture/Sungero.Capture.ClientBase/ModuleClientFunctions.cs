@@ -114,7 +114,9 @@ namespace Sungero.Capture.Client
       
       var package = new List<Docflow.IOfficialDocument>();
       var notRecognizedDocuments = new List<Docflow.IOfficialDocument>();
-      notRecognizedDocuments.Add(emailBody);
+      if (emailBody != null)
+        notRecognizedDocuments.Add(emailBody);
+      
       foreach (var attachment in mailFiles.Attachments)
       {
         var fileName = attachment.Description;
@@ -174,26 +176,28 @@ namespace Sungero.Capture.Client
       
       // Не создавать документ для писем с пустым телом.
       // В некоторых случаях (например, при отправке из Outlook в Яндекс) для писем с пустым телом генерируется фейковое тело,
-      // в котором текстовая часть представляет из себя только перевод строки, а html часть анализировать слишком сложно, она зависит от клиента.
-      // Такие тела заносить также не нужно (ни текстовую, ни html часть).
-      // В других случаях (например, при отправке из Outlook в Outlook) для писем с любым телом txtBodyElement может
-      // не создаваться вообще, то есть, проверить, пусто ли тело, нельзя. В таких случаях заносить html часть тела.
-      System.Xml.Linq.XElement bodyElement = null;
-      if (hasTxtBody)
+      // представляющее из себя только перевод строки. Такие тела заносить также не нужно.
+      
+      // Получить текст из тела письма.
+      var bodyText = string.Empty;
+      if (hasHtmlBody)
+      {
+        var htmlBodyInfo = CreateFileInfoFromXelement(htmlBodyElement, folder);
+        bodyText = AsposeExtensions.HtmlTagReader.GetTextFromHtml(htmlBodyInfo.Path);
+      }
+      else if (hasTxtBody)
       {
         var txtBodyInfo = CreateFileInfoFromXelement(txtBodyElement, folder);
-        var txtBodyString = File.ReadAllText(txtBodyInfo.Path);
-        var txtBodyIsEmpty = txtBodyString == Constants.Module.OutlookEmptyTxtBody;
-        if (!txtBodyIsEmpty)
-          bodyElement = hasHtmlBody ? htmlBodyElement : txtBodyElement;
-      }
-      else if (hasHtmlBody)
-      {
-        bodyElement = htmlBodyElement;
+        bodyText = File.ReadAllText(txtBodyInfo.Path);
       }
       
-      if (bodyElement != null)
+      // Очистить текст из тела письма от спецсимволов, чтобы определить, пуст ли он.
+      var clearBodyText = bodyText.Trim(new[] {' ', '\r', '\n', '\0'});
+      if (!string.IsNullOrWhiteSpace(clearBodyText))
+      {
+        var bodyElement = hasHtmlBody ? htmlBodyElement : txtBodyElement;
         mailFiles.Body = CreateFileInfoFromXelement(bodyElement, folder);
+      }
       
       // Вложения.
       var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
@@ -396,7 +400,7 @@ namespace Sungero.Capture.Client
     /// Выполнить классификацию и распознавание для документа.
     /// </summary>
     /// <param name="filePath">Путь к классифицируемому файлу.</param>
-    /// <param name="arioUrl">Host Ario.</param>    
+    /// <param name="arioUrl">Host Ario.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>

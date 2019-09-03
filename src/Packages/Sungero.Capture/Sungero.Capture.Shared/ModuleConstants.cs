@@ -71,7 +71,5 @@ namespace Sungero.Capture.Constants
     }
     
     public const string DocumentNumberingBySmartCaptureResultParamName = "DocumentNumberingBySmartCaptureResult";
-    
-    public const string OutlookEmptyTxtBody = "\r\0\n\0";
   }
 }
