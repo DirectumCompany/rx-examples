@@ -386,7 +386,6 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат классификации в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
-    /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
     public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognitionResult,
                                                                         IEmployee responsible)
@@ -837,9 +836,9 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="documents">Прочие документы из комплекта.</param>
-    /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
-    /// <param name="responsible">Ответственный.</param>
+    /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>    
     /// <param name="emailBody">Тело электронного письма.</param>
+    /// <param name="responsible">Ответственный.</param>
     /// <returns>Простая задача.</returns>
     [Public, Remote]
     public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
@@ -932,8 +931,8 @@ namespace Sungero.Capture.Server
     /// Отправить документы ответственному.
     /// </summary>
     /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
-    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <param name="emailBody">Тело электронного письма.</param>
+    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>    
     [Remote]
     public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
                                           Docflow.IOfficialDocument emailBody, Sungero.Company.IEmployee responsible)
