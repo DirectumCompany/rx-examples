@@ -1118,7 +1118,7 @@ namespace Sungero.Capture.Server
         facts.Remove(correspondent.Fact);
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(facts);
       
-      var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee, document.Info.Properties.BusinessUnit.Name);
+      var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, document.Info.Properties.BusinessUnit.Name, document.Addressee, responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
       LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
@@ -2305,7 +2305,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    /// <param name="factName">Корректировочный.</param>
+    /// <param name="isAdjustment">Корректировочный.</param>
     public virtual void FillCorrectedDocument(IAccountingDocumentBase document,
                                               Structures.Module.IRecognitionResult recognitionResult,
                                               bool isAdjustment)
@@ -2661,17 +2661,18 @@ namespace Sungero.Capture.Server
       
       return Structures.Module.BusinessUnitWithFact.Create(filteredBusinessUnit, fact, businessUnitField.IsTrusted == true);
     }
-    
+
     /// <summary>
     /// Поиск НОР, наиболее подходящей для ответственного и адресата.
     /// </summary>
-    /// <param name="businessUnits">НОР, найденные по фактам.</param>
-    /// <param name="responsible">Ответственный.</param>
+    /// <param name="businessUnitsWithFacts">НОР, найденные по фактам.</param>
+    /// <param name="businessUnitPropertyName">Имя связанного свойства.</param>
     /// <param name="addressee">Адресат.</param>
+    /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
-    public virtual Capture.Structures.Module.BusinessUnitWithFact GetBusinessUnitWithFact(List<Capture.Structures.Module.BusinessUnitWithFact> businessUnitsWithFacts,
-                                                                                          IEmployee responsible, IEmployee addressee,
-                                                                                          string businessUnitPropertyName)
+    public virtual BusinessUnitWithFact GetBusinessUnitWithFact(List<BusinessUnitWithFact> businessUnitsWithFacts,
+      string businessUnitPropertyName, IEmployee addressee,
+      IEmployee responsible)
     {
       
       // Сначала поиск по хэшам фактов.
