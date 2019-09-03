@@ -596,9 +596,8 @@ namespace Sungero.Capture.Server
     /// Поиск адресата письма.
     /// </summary>
     /// <param name="fact">Факт.</param>
-    /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Адресат.</returns>
-    public virtual Structures.Module.EmployeeWithFact GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact, string propertyName)
+    public virtual Structures.Module.EmployeeWithFact GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
     {
       var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
       if (fact == null)
@@ -1092,7 +1091,7 @@ namespace Sungero.Capture.Server
       
       // Адресат.
       var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
-      var addressee = GetAdresseeByFact(addresseeFact, document.Info.Properties.Addressee.Name);
+      var addressee = GetAdresseeByFact(addresseeFact);
       document.Addressee = addressee.Employee;
       LinkFactAndProperty(recognitionResult, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee, addressee.IsTrusted);
       
