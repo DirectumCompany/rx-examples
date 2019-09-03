@@ -154,7 +154,7 @@
       "ReturnTypeFullName": "System.String"
     },
     {
-      "Name": "GetRecognizedDocumentProperties",
+      "Name": "GetRecognitionResultProperties",
       "IsRemote": true,
       "Parameters": [
         {
@@ -302,7 +302,7 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "RecognizedDocument",
+      "Name": "RecognitionResult",
       "IsPublic": true,
       "Properties": [
         {

@@ -163,25 +163,25 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать документы в RX.
     /// </summary>
-    /// <param name="recognitionResults">Json результаты классификации и извлечения фактов.</param>
+    /// <param name="recognitionResultsJson">Json результаты классификации и извлечения фактов.</param>
     /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
     /// <param name="responsible">Сотрудник, ответственный за проверку документов.</param>
     /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
     /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Ид созданных документов.</returns>
     [Remote]
-    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResults, Structures.Module.IFileInfo originalFile,
+    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Structures.Module.IFileInfo originalFile,
                                                                                IEmployee responsible, bool sendedByEmail, string fromEmail)
     {
-      var recognizedDocuments = GetRecognizedDocuments(recognitionResults, originalFile, sendedByEmail);
+      var recognitionResults = GetRecognitionResults(recognitionResultsJson, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();
       var documentsWithRegistrationFailure = new List<IOfficialDocument>();
       
-      foreach (var recognizedDocument in recognizedDocuments)
+      foreach (var recognitionResult in recognitionResults)
       {
         // Поиск документа по ШК.
         var document = OfficialDocuments.Null;
-        using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
+        using (var body = GetDocumentBody(recognitionResult.BodyGuid))
         {
           var docIds = GetDocumentIdByBarcode(body);
           if (docIds != null && docIds.Any())
@@ -189,7 +189,7 @@ namespace Sungero.Capture.Server
             document = OfficialDocuments.GetAll().Where(x => x.Id == docIds.FirstOrDefault()).FirstOrDefault();
             if (document != null)
             {
-              CreateVersion(document, recognizedDocument, Resources.VersionCreateFromBarcode);
+              CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
               document.ExternalApprovalState = Docflow.OfficialDocument.ExchangeState.Signed;
               document.Save();
             }
@@ -198,11 +198,11 @@ namespace Sungero.Capture.Server
         
         // Создание нового документа по фактам.
         if (document == null)
-          document = CreateDocumentByRecognizedDocument(recognizedDocument, responsible, fromEmail);
+          document = CreateDocumentByRecognitionResult(recognitionResult, responsible, fromEmail);
         
         // Добавить Ид документа в запись справочника с результатами обработки Ario.
-        recognizedDocument.Info.DocumentId = document.Id;
-        recognizedDocument.Info.Save();
+        recognitionResult.Info.DocumentId = document.Id;
+        recognitionResult.Info.Save();
         
         package.Add(document);
       }
@@ -306,34 +306,34 @@ namespace Sungero.Capture.Server
     /// <param name="originalFile">Исходный файл.</param>
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
-    public virtual List<Structures.Module.IRecognizedDocument> GetRecognizedDocuments(string jsonClassificationResults,
+    public virtual List<Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
                                                                                       Structures.Module.IFileInfo originalFile,
                                                                                       bool sendedByEmail)
     {
-      var recognizedDocuments = new List<IRecognizedDocument>();
+      var recognitionResults = new List<IRecognitionResult>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
-        return recognizedDocuments;
+        return recognitionResults;
       
       var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
       foreach (var packageProcessResult in packageProcessResults)
       {
         // Класс и гуид тела документа.
-        var recognizedDocument = RecognizedDocument.Create();
+        var recognitionResult = RecognitionResult.Create();
         var clsResult = packageProcessResult.ClassificationResult;
-        recognizedDocument.ClassificationResultId = clsResult.Id;
-        recognizedDocument.BodyGuid = packageProcessResult.Guid;
-        recognizedDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
-        recognizedDocument.Message = packageProcessResult.Message;
-        recognizedDocument.OriginalFile = originalFile;
-        recognizedDocument.SendedByEmail = sendedByEmail;
+        recognitionResult.ClassificationResultId = clsResult.Id;
+        recognitionResult.BodyGuid = packageProcessResult.Guid;
+        recognitionResult.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
+        recognitionResult.Message = packageProcessResult.Message;
+        recognitionResult.OriginalFile = originalFile;
+        recognitionResult.SendedByEmail = sendedByEmail;
         var docInfo = DocumentRecognitionInfos.Create();
-        docInfo.Name = recognizedDocument.PredictedClass;
-        docInfo.RecognizedClass = recognizedDocument.PredictedClass;
+        docInfo.Name = recognitionResult.PredictedClass;
+        docInfo.RecognizedClass = recognitionResult.PredictedClass;
         if (clsResult.PredictedProbability != null)
           docInfo.ClassProbability = (double)(clsResult.PredictedProbability);
         
         // Факты и поля фактов.
-        recognizedDocument.Facts = new List<IFact>();
+        recognitionResult.Facts = new List<IFact>();
         var minFactProbability = GetDocflowParamsNumbericValue(Constants.Module.MinFactProbabilityKey);
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
@@ -347,7 +347,7 @@ namespace Sungero.Capture.Server
             var fields = fact.Fields.Where(f => f != null)
               .Where(f => f.Probability >= minFactProbability)
               .Select(f => FactField.Create(f.Id, f.Name, f.Value, f.Probability));
-            recognizedDocument.Facts.Add(Fact.Create(fact.Id, fact.Name, fields.ToList()));
+            recognitionResult.Facts.Add(Fact.Create(fact.Id, fact.Name, fields.ToList()));
             
             foreach (var factField in fact.Fields)
             {
@@ -375,101 +375,101 @@ namespace Sungero.Capture.Server
           }
         }
         docInfo.Save();
-        recognizedDocument.Info = docInfo;
-        recognizedDocuments.Add(recognizedDocument);
+        recognitionResult.Info = docInfo;
+        recognitionResults.Add(recognitionResult);
       }
-      return recognizedDocuments;
+      return recognitionResults;
     }
     
     /// <summary>
     /// Создать документ DirectumRX из результата классификации в Ario.
     /// </summary>
-    /// <param name="recognizedDocument">Результат классификации в Ario.</param>
+    /// <param name="recognitionResult">Результат классификации в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
-    public virtual IOfficialDocument CreateDocumentByRecognizedDocument(Structures.Module.IRecognizedDocument recognizedDocument,
+    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognizedResult,
                                                                         IEmployee responsible, string fromEmail)
     {
       // Входящее письмо.
-      var recognizedClass = recognizedDocument.PredictedClass;
+      var recognizedClass = recognizedResult.PredictedClass;
       var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
       if (recognizedClass == Constants.Module.LetterClassName)
       {
         document = isMockMode
-          ? CreateMockIncomingLetter(recognizedDocument)
-          : CreateIncomingLetter(recognizedDocument, responsible);
+          ? CreateMockIncomingLetter(recognizedResult)
+          : CreateIncomingLetter(recognizedResult, responsible);
       }
       
       // Акт выполненных работ.
       else if (recognizedClass == Constants.Module.ContractStatementClassName)
       {
         document = isMockMode
-          ? CreateMockContractStatement(recognizedDocument)
-          : CreateContractStatement(recognizedDocument, responsible);
+          ? CreateMockContractStatement(recognizedResult)
+          : CreateContractStatement(recognizedResult, responsible);
       }
       
       // Товарная накладная.
       else if (recognizedClass == Constants.Module.WaybillClassName)
       {
         document = isMockMode
-          ? CreateMockWaybill(recognizedDocument)
-          : CreateWaybill(recognizedDocument, responsible);
+          ? CreateMockWaybill(recognizedResult)
+          : CreateWaybill(recognizedResult, responsible);
       }
       
       // Счет-фактура.
       else if (recognizedClass == Constants.Module.TaxInvoiceClassName)
       {
         document = isMockMode
-          ? CreateMockIncomingTaxInvoice(recognizedDocument)
-          : CreateTaxInvoice(recognizedDocument, responsible, false);
+          ? CreateMockIncomingTaxInvoice(recognizedResult)
+          : CreateTaxInvoice(recognizedResult, responsible, false);
       }
       
       // Корректировочный счет-фактура.
       else if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
       {
-        document = CreateTaxInvoice(recognizedDocument, responsible, true);
+        document = CreateTaxInvoice(recognizedResult, responsible, true);
       }
       
       // УПД.
       else if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
       {
-        document = CreateUniversalTransferDocument(recognizedDocument, responsible, false);
+        document = CreateUniversalTransferDocument(recognizedResult, responsible, false);
       }
       
       // УКД.
       else if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
       {
-        document = CreateUniversalTransferDocument(recognizedDocument, responsible, true);
+        document = CreateUniversalTransferDocument(recognizedResult, responsible, true);
       }
       
       // Счет на оплату.
       else if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
       {
         document = isMockMode
-          ? CreateMockIncomingInvoice(recognizedDocument)
-          : CreateIncomingInvoice(recognizedDocument, responsible);
+          ? CreateMockIncomingInvoice(recognizedResult)
+          : CreateIncomingInvoice(recognizedResult, responsible);
       }
       
       // Договор.
       else if (recognizedClass == Constants.Module.ContractClassName && isMockMode)
       {
-        document = CreateMockContract(recognizedDocument);
+        document = CreateMockContract(recognizedResult);
       }
       
       // Все нераспознанные документы создать простыми.
       else
       {
-        var name = !string.IsNullOrWhiteSpace(recognizedDocument.OriginalFile.Description) ? recognizedDocument.OriginalFile.Description : Resources.SimpleDocumentName;
+        var name = !string.IsNullOrWhiteSpace(recognizedResult.OriginalFile.Description) ? recognizedResult.OriginalFile.Description : Resources.SimpleDocumentName;
         document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
       }
       
-      FillDeliveryMethod(document, recognizedDocument.SendedByEmail);
+      FillDeliveryMethod(document, recognizedResult.SendedByEmail);
       /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
          если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      CreateVersion(document, recognizedDocument);
+      CreateVersion(document, recognizedResult);
       
       document.Save();
       return document;
@@ -1057,37 +1057,37 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать входящее письмо в RX.
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
       var subject = GetFieldValue(subjectFact, "Subject");
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
+        LinkFactAndProperty(recognitionResult, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
       
       // Адресат.
       var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
       var addressee = GetAdresseeByFact(addresseeFact, document.Info.Properties.Addressee.Name);
       document.Addressee = addressee.Employee;
-      LinkFactAndProperty(recognizedDocument, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee, addressee.IsTrusted);
+      LinkFactAndProperty(recognitionResult, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee, addressee.IsTrusted);
       
       // Заполнить данные корреспондента.
       var correspondent = GetCounterparty(facts, props.Correspondent.Name);
       if (correspondent != null)
       {
         document.Correspondent = correspondent.Counterparty;
-        LinkFactAndProperty(recognizedDocument, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
+        LinkFactAndProperty(recognitionResult, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
       }
       
       // Дата номер.
@@ -1095,8 +1095,8 @@ namespace Sungero.Capture.Server
       var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
       document.Dated = GetFieldDateTimeValue(dateFact, "Date");
       document.InNumber = GetFieldValue(numberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Dated.Name, document.Dated);
-      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.InNumber.Name, document.InNumber);
+      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Dated.Name, document.Dated);
+      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные нашей стороны.
       // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
@@ -1106,7 +1106,7 @@ namespace Sungero.Capture.Server
       
       var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, responsible, document.Addressee, document.Info.Properties.BusinessUnit.Name);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognizedDocument, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsTrusted);
+      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       document.Department = document.Addressee != null
         ? Company.PublicFunctions.Department.GetDepartment(document.Addressee)
@@ -1120,11 +1120,11 @@ namespace Sungero.Capture.Server
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
       if (document.Correspondent == null && signedBy.Contact != null)
       {
-        LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, signedBy.Contact.Company, signedBy.IsTrusted);
+        LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, signedBy.Contact.Company, signedBy.IsTrusted);
       }
       document.SignedBy = signedBy.Contact;
       var isTrustedSignatory = IsTrustedField(signatoryFact, "Type");
-      LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
+      LinkFactAndProperty(recognitionResult, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
       
       // Заполнить контакт.
       var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
@@ -1132,11 +1132,11 @@ namespace Sungero.Capture.Server
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
       if (document.Correspondent == null && contact.Contact != null)
       {
-        LinkFactAndProperty(recognizedDocument, null, null, props.Correspondent.Name, contact.Contact.Company, contact.IsTrusted);
+        LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, contact.Contact.Company, contact.IsTrusted);
       }
       document.Contact = contact.Contact;
       var isTrustedContact = IsTrustedField(responsibleFact, "Type");
-      LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
+      LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
       return document;
     }
@@ -1144,13 +1144,13 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать входящее письмо (демо режим).
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки письма в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
       var props = document.Info.Properties;
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1160,8 +1160,8 @@ namespace Sungero.Capture.Server
       var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
       document.InNumber = GetFieldValue(numberFact, "Number");
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(dateFact, "Date"));
-      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Dated.Name, document.Dated);
-      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.InNumber.Name, document.InNumber);
+      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Dated.Name, document.Dated);
+      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
       var correspondentNameFacts = GetOrderedFacts(facts, "Letter", "CorrespondentName");
@@ -1169,13 +1169,13 @@ namespace Sungero.Capture.Server
       {
         var fact = correspondentNameFacts.First();
         document.Correspondent = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(recognizedDocument, fact, "CorrespondentName", props.Correspondent.Name, document.Correspondent);
+        LinkFactAndProperty(recognitionResult, fact, "CorrespondentName", props.Correspondent.Name, document.Correspondent);
       }
       if (correspondentNameFacts.Count() > 1)
       {
         var fact = correspondentNameFacts.Last();
         document.Recipient = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(recognizedDocument, fact, "CorrespondentName", props.Recipient.Name, document.Recipient);
+        LinkFactAndProperty(recognitionResult, fact, "CorrespondentName", props.Recipient.Name, document.Recipient);
       }
       
       // Заполнить ИНН/КПП для КА и НОР.
@@ -1185,8 +1185,8 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.First();
         document.CorrespondentTin = GetFieldValue(fact, "TIN");
         document.CorrespondentTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
-        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
+        LinkFactAndProperty(recognitionResult, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
+        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
       }
       
       if (tinTrrcFacts.Count() > 1)
@@ -1194,8 +1194,8 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.Last();
         document.RecipientTin = GetFieldValue(fact, "TIN");
         document.RecipientTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.RecipientTin.Name, document.RecipientTin);
-        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.RecipientTrrc.Name, document.RecipientTrrc);
+        LinkFactAndProperty(recognitionResult, fact, "TIN", props.RecipientTin.Name, document.RecipientTin);
+        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.RecipientTrrc.Name, document.RecipientTrrc);
       }
       
       // В ответ на.
@@ -1206,8 +1206,8 @@ namespace Sungero.Capture.Server
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? responseToNumber
         : string.Format("{0} {1} {2}", responseToNumber, Sungero.Docflow.Resources.From, responseToDate);
-      LinkFactAndProperty(recognizedDocument, responseToNumberFact, "ResponseToNumber", props.InResponseTo.Name, document.InResponseTo);
-      LinkFactAndProperty(recognizedDocument, responseToDateFact, "ResponseToDate", props.InResponseTo.Name, document.InResponseTo);
+      LinkFactAndProperty(recognitionResult, responseToNumberFact, "ResponseToNumber", props.InResponseTo.Name, document.InResponseTo);
+      LinkFactAndProperty(recognitionResult, responseToDateFact, "ResponseToDate", props.InResponseTo.Name, document.InResponseTo);
       
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
@@ -1216,7 +1216,7 @@ namespace Sungero.Capture.Server
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
         document.Signatory = GetFullNameByFact(signatoryFact);
         var isTrusted = IsTrustedField(signatoryFact, "Type");
-        LinkFactAndProperty(recognizedDocument, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
+        LinkFactAndProperty(recognitionResult, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
       }
       
       // Заполнить контакт.
@@ -1225,7 +1225,7 @@ namespace Sungero.Capture.Server
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
         document.Contact = GetFullNameByFact(responsibleFact);
         var isTrusted = IsTrustedField(responsibleFact, "Type");
-        LinkFactAndProperty(recognizedDocument, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
+        LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
       }
       
       // Заполнить данные нашей стороны.
@@ -1236,7 +1236,7 @@ namespace Sungero.Capture.Server
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
       }
       foreach (var fact in addresseeFacts)
-        LinkFactAndProperty(recognizedDocument, fact, null, props.Addressees.Name, document.Addressees, true);
+        LinkFactAndProperty(recognitionResult, fact, null, props.Addressees.Name, document.Addressees, true);
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
       var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
@@ -1244,7 +1244,7 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognizedDocument, subjectFact, "Subject", props.Subject.Name, document.Subject);
+        LinkFactAndProperty(recognitionResult, subjectFact, "Subject", props.Subject.Name, document.Subject);
       }
       
       return document;
@@ -1259,22 +1259,22 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.LeadDoc = GetLeadingDocumentName(leadingDocFact);
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
+      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
       
       // Дата и номер.
-      FillMockRegistrationData(document, recognizedDocument, "Document");
+      FillMockRegistrationData(document, recognitionResult, "Document");
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -1283,10 +1283,10 @@ namespace Sungero.Capture.Server
         document.CounterpartyName = seller.Name;
         document.CounterpartyTin = seller.Tin;
         document.CounterpartyTrrc = seller.Trrc;
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.CounterpartyName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.CounterpartyName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.CounterpartyTin.Name, seller.Tin);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.CounterpartyTrrc.Name, seller.Trrc);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "Name", props.CounterpartyName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "LegalForm", props.CounterpartyName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "TIN", props.CounterpartyTin.Name, seller.Tin);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "TRRC", props.CounterpartyTrrc.Name, seller.Trrc);
       }
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
       if (buyer != null)
@@ -1294,10 +1294,10 @@ namespace Sungero.Capture.Server
         document.BusinessUnitName = buyer.Name;
         document.BusinessUnitTin = buyer.Tin;
         document.BusinessUnitTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "Name", props.BusinessUnitName.Name, buyer.Name);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "LegalForm", props.BusinessUnitName.Name, buyer.Name);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TIN", props.BusinessUnitTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BusinessUnitTrrc.Name, buyer.Trrc);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "Name", props.BusinessUnitName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "LegalForm", props.BusinessUnitName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "TIN", props.BusinessUnitTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "TRRC", props.BusinessUnitTrrc.Name, buyer.Trrc);
       }
       
       // В актах могут прийти контрагенты без типа. Заполнить контрагентами без типа.
@@ -1319,10 +1319,10 @@ namespace Sungero.Capture.Server
             document.CounterpartyName = name;
             document.CounterpartyTin = tin;
             document.CounterpartyTrrc = trrc;
-            LinkFactAndProperty(recognizedDocument, fact, "Name", props.CounterpartyName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.CounterpartyName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.CounterpartyTin.Name, tin);
-            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.CounterpartyTrrc.Name, trrc);
+            LinkFactAndProperty(recognitionResult, fact, "Name", props.CounterpartyName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "LegalForm", props.CounterpartyName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "TIN", props.CounterpartyTin.Name, tin);
+            LinkFactAndProperty(recognitionResult, fact, "TRRC", props.CounterpartyTrrc.Name, trrc);
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
           else if (string.IsNullOrWhiteSpace(document.BusinessUnitName))
@@ -1330,10 +1330,10 @@ namespace Sungero.Capture.Server
             document.BusinessUnitName = name;
             document.BusinessUnitTin = tin;
             document.BusinessUnitTrrc = trrc;
-            LinkFactAndProperty(recognizedDocument, fact, "Name", props.BusinessUnitName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.BusinessUnitName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.BusinessUnitTin.Name, tin);
-            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.BusinessUnitTrrc.Name, trrc);
+            LinkFactAndProperty(recognitionResult, fact, "Name", props.BusinessUnitName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "LegalForm", props.BusinessUnitName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "TIN", props.BusinessUnitTin.Name, tin);
+            LinkFactAndProperty(recognitionResult, fact, "TRRC", props.BusinessUnitTrrc.Name, trrc);
           }
         }
       }
@@ -1342,14 +1342,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -1363,12 +1363,12 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognizedDocument, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
-        LinkFactAndProperty(recognizedDocument, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
-        LinkFactAndProperty(recognizedDocument, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
-        LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
-        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
-        LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
+        LinkFactAndProperty(recognitionResult, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
+        LinkFactAndProperty(recognitionResult, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
+        LinkFactAndProperty(recognitionResult, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
+        LinkFactAndProperty(recognitionResult, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
+        LinkFactAndProperty(recognitionResult, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
+        LinkFactAndProperty(recognitionResult, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       return document;
     }
@@ -1379,9 +1379,9 @@ namespace Sungero.Capture.Server
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var document = FinancialArchive.ContractStatements.Create();
       var props = AccountingDocumentBases.Info.Properties;
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1398,10 +1398,10 @@ namespace Sungero.Capture.Server
       var nonTypeFacts = factMatches.Where(m => m.Type == string.Empty).ToList();
       var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, nonTypeFacts, responsible);
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
       
       // Дата, номер и регистрация.
-      NumberDocument(document, recognizedDocument, "Document");
+      NumberDocument(document, recognitionResult, "Document");
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
@@ -1409,14 +1409,14 @@ namespace Sungero.Capture.Server
                                                document.Info.Properties.LeadingDocument.Name,
                                                document.Info.Properties.Counterparty.Name);
       document.LeadingDocument = leadingDocument.Contract;
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
+      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognizedDocument);
+      FillAmount(document, recognitionResult);
       
       return document;
     }
@@ -1428,22 +1428,22 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать накладную (демо режим).
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки накладной в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки накладной в Ario.</param>
     /// <returns>Накладная.</returns>
-    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockWaybills.Create();
       var props = document.Info.Properties;
       
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
       var isTrusted = IsTrustedField(leadingDocFact, "Type");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -1453,10 +1453,10 @@ namespace Sungero.Capture.Server
         document.Shipper = shipper.Name;
         document.ShipperTin = shipper.Tin;
         document.ShipperTrrc = shipper.Trrc;
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "Name", props.Shipper.Name, shipper.Name);
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "LegalForm", props.Shipper.Name, shipper.Name);
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TIN", props.ShipperTin.Name, shipper.Tin);
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TRRC", props.ShipperTrrc.Name, shipper.Trrc);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "Name", props.Shipper.Name, shipper.Name);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "LegalForm", props.Shipper.Name, shipper.Name);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "TIN", props.ShipperTin.Name, shipper.Tin);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "TRRC", props.ShipperTrrc.Name, shipper.Trrc);
       }
       
       var consignee = GetMostProbableMockCounterparty(facts, "CONSIGNEE");
@@ -1465,10 +1465,10 @@ namespace Sungero.Capture.Server
         document.Consignee = consignee.Name;
         document.ConsigneeTin = consignee.Tin;
         document.ConsigneeTrrc = consignee.Trrc;
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "Name", props.Consignee.Name, consignee.Name);
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "LegalForm", props.Consignee.Name, consignee.Name);
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TIN", props.ConsigneeTin.Name, consignee.Tin);
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TRRC", props.ConsigneeTrrc.Name, consignee.Trrc);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "Name", props.Consignee.Name, consignee.Name);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "LegalForm", props.Consignee.Name, consignee.Name);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "TIN", props.ConsigneeTin.Name, consignee.Tin);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "TRRC", props.ConsigneeTrrc.Name, consignee.Trrc);
       }
       
       var supplier = GetMostProbableMockCounterparty(facts, "SUPPLIER");
@@ -1477,10 +1477,10 @@ namespace Sungero.Capture.Server
         document.Supplier = supplier.Name;
         document.SupplierTin = supplier.Tin;
         document.SupplierTrrc = supplier.Trrc;
-        LinkFactAndProperty(recognizedDocument, supplier.Fact, "Name", props.Supplier.Name, supplier.Name);
-        LinkFactAndProperty(recognizedDocument, supplier.Fact, "LegalForm", props.Supplier.Name, supplier.Name);
-        LinkFactAndProperty(recognizedDocument, supplier.Fact, "TIN", props.SupplierTin.Name, supplier.Tin);
-        LinkFactAndProperty(recognizedDocument, supplier.Fact, "TRRC", props.SupplierTrrc.Name, supplier.Trrc);
+        LinkFactAndProperty(recognitionResult, supplier.Fact, "Name", props.Supplier.Name, supplier.Name);
+        LinkFactAndProperty(recognitionResult, supplier.Fact, "LegalForm", props.Supplier.Name, supplier.Name);
+        LinkFactAndProperty(recognitionResult, supplier.Fact, "TIN", props.SupplierTin.Name, supplier.Tin);
+        LinkFactAndProperty(recognitionResult, supplier.Fact, "TRRC", props.SupplierTrrc.Name, supplier.Trrc);
       }
       
       var payer = GetMostProbableMockCounterparty(facts, "PAYER");
@@ -1489,27 +1489,27 @@ namespace Sungero.Capture.Server
         document.Payer = payer.Name;
         document.PayerTin = payer.Tin;
         document.PayerTrrc = payer.Trrc;
-        LinkFactAndProperty(recognizedDocument, payer.Fact, "Name", props.Payer.Name, payer.Name);
-        LinkFactAndProperty(recognizedDocument, payer.Fact, "LegalForm", props.Payer.Name, payer.Name);
-        LinkFactAndProperty(recognizedDocument, payer.Fact, "TIN", props.PayerTin.Name, payer.Tin);
-        LinkFactAndProperty(recognizedDocument, payer.Fact, "TRRC", props.PayerTrrc.Name, payer.Trrc);
+        LinkFactAndProperty(recognitionResult, payer.Fact, "Name", props.Payer.Name, payer.Name);
+        LinkFactAndProperty(recognitionResult, payer.Fact, "LegalForm", props.Payer.Name, payer.Name);
+        LinkFactAndProperty(recognitionResult, payer.Fact, "TIN", props.PayerTin.Name, payer.Tin);
+        LinkFactAndProperty(recognitionResult, payer.Fact, "TRRC", props.PayerTrrc.Name, payer.Trrc);
       }
       
       // Дата и номер.
-      FillMockRegistrationData(document, recognizedDocument, "FinancialDocument");
+      FillMockRegistrationData(document, recognitionResult, "FinancialDocument");
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -1523,12 +1523,12 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognizedDocument, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
-        LinkFactAndProperty(recognizedDocument, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
-        LinkFactAndProperty(recognizedDocument, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
-        LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
-        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
-        LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
+        LinkFactAndProperty(recognitionResult, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
+        LinkFactAndProperty(recognitionResult, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
+        LinkFactAndProperty(recognitionResult, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
+        LinkFactAndProperty(recognitionResult, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
+        LinkFactAndProperty(recognitionResult, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
+        LinkFactAndProperty(recognitionResult, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       
       return document;
@@ -1537,12 +1537,12 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать накладную.
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки накладной в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки накладной в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Накладная.</returns>
-    public virtual Docflow.IOfficialDocument CreateWaybill(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateWaybill(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var document = FinancialArchive.Waybills.Create();
       var props = document.Info.Properties;
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1560,24 +1560,24 @@ namespace Sungero.Capture.Server
       var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, responsible);
       
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
       
       // Дата, номер и регистрация.
-      NumberDocument(document, recognizedDocument, "FinancialDocument");
+      NumberDocument(document, recognitionResult, "FinancialDocument");
       
       // Документ-основание.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       var contractualDocuments = GetLeadingDocuments(leadingDocFact, document.Counterparty);
       document.LeadingDocument = contractualDocuments.FirstOrDefault();
       var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, "DocumentBaseName") : false;
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
+      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognizedDocument);
+      FillAmount(document, recognitionResult);
       
       return document;
     }
@@ -1589,11 +1589,11 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать счет-фактуру (демо режим).
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки счет-фактуры в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Счет-фактура.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.IRecognitionResult recognitionResult)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
       var props = document.Info.Properties;
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1606,10 +1606,10 @@ namespace Sungero.Capture.Server
         document.ShipperName = shipper.Name;
         document.ShipperTin = shipper.Tin;
         document.ShipperTrrc = shipper.Trrc;
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "Name", props.ShipperName.Name, shipper.Name);
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "LegalForm", props.ShipperName.Name, shipper.Name);
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TIN", props.ShipperTin.Name, shipper.Tin);
-        LinkFactAndProperty(recognizedDocument, shipper.Fact, "TRRC", props.ShipperTrrc.Name, shipper.Trrc);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "Name", props.ShipperName.Name, shipper.Name);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "LegalForm", props.ShipperName.Name, shipper.Name);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "TIN", props.ShipperTin.Name, shipper.Tin);
+        LinkFactAndProperty(recognitionResult, shipper.Fact, "TRRC", props.ShipperTrrc.Name, shipper.Trrc);
       }
       
       var consignee = GetMostProbableMockCounterparty(facts, "CONSIGNEE");
@@ -1618,10 +1618,10 @@ namespace Sungero.Capture.Server
         document.ConsigneeName = consignee.Name;
         document.ConsigneeTin = consignee.Tin;
         document.ConsigneeTrrc = consignee.Trrc;
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "Name", props.ConsigneeName.Name, consignee.Name);
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "LegalForm", props.ConsigneeName.Name, consignee.Name);
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TIN", props.ConsigneeTin.Name, consignee.Tin);
-        LinkFactAndProperty(recognizedDocument, consignee.Fact, "TRRC", props.ConsigneeTrrc.Name, consignee.Trrc);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "Name", props.ConsigneeName.Name, consignee.Name);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "LegalForm", props.ConsigneeName.Name, consignee.Name);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "TIN", props.ConsigneeTin.Name, consignee.Tin);
+        LinkFactAndProperty(recognitionResult, consignee.Fact, "TRRC", props.ConsigneeTrrc.Name, consignee.Trrc);
       }
       
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -1630,10 +1630,10 @@ namespace Sungero.Capture.Server
         document.SellerName = seller.Name;
         document.SellerTin = seller.Tin;
         document.SellerTrrc = seller.Trrc;
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "Name", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
       }
       
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
@@ -1642,28 +1642,28 @@ namespace Sungero.Capture.Server
         document.BuyerName = buyer.Name;
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
       }
       
       // Дата и номер.
-      FillMockRegistrationData(document, recognizedDocument, "FinancialDocument");
+      FillMockRegistrationData(document, recognitionResult, "FinancialDocument");
       document.IsAdjustment = false;
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, "Goods", "Name"))
@@ -1677,12 +1677,12 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, "Amount");
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognizedDocument, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
-        LinkFactAndProperty(recognizedDocument, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
-        LinkFactAndProperty(recognizedDocument, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
-        LinkFactAndProperty(recognizedDocument, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
-        LinkFactAndProperty(recognizedDocument, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
-        LinkFactAndProperty(recognizedDocument, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
+        LinkFactAndProperty(recognitionResult, fact, "Name", string.Format(formatter, props.Goods.Properties.Name.Name), good.Name);
+        LinkFactAndProperty(recognitionResult, fact, "UnitName", string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName);
+        LinkFactAndProperty(recognitionResult, fact, "Count", string.Format(formatter, props.Goods.Properties.Count.Name), good.Count);
+        LinkFactAndProperty(recognitionResult, fact, "Price", string.Format(formatter, props.Goods.Properties.Price.Name), good.Price);
+        LinkFactAndProperty(recognitionResult, fact, "VatAmount", string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount);
+        LinkFactAndProperty(recognitionResult, fact, "Amount", string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount);
       }
       
       return document;
@@ -1691,13 +1691,13 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать счет-фактуру.
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <param name="isAdjustment">Корректировочная.</param>
     /// <returns>Счет-фактура.</returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible, bool isAdjustment)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       var document = AccountingDocumentBases.Null;
       var props = AccountingDocumentBases.Info.Properties;
@@ -1772,10 +1772,10 @@ namespace Sungero.Capture.Server
       
       // НОР и КА.
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
       
       // Дата, номер и регистрация.
-      NumberDocument(document, recognizedDocument, "FinancialDocument");
+      NumberDocument(document, recognitionResult, "FinancialDocument");
       
       // Корректировочный документ.
       if (isAdjustment)
@@ -1802,8 +1802,8 @@ namespace Sungero.Capture.Server
             document.Corrected = documents.FirstOrDefault();
             isTrusted = documents.Count() == 1;
           }
-          LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, isTrusted);
-          LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, isTrusted);
+          LinkFactAndProperty(recognitionResult, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, isTrusted);
+          LinkFactAndProperty(recognitionResult, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, isTrusted);
         }
       }
       
@@ -1812,7 +1812,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognizedDocument);
+      FillAmount(document, recognitionResult);
       
       return document;
     }
@@ -1824,13 +1824,13 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать УПД.
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки УПД в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки УПД в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <param name="isAdjustment">Корректировочная.</param>
     /// <returns>УПД.</returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible, bool isAdjustment)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible, bool isAdjustment)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       var props = document.Info.Properties;
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1847,20 +1847,20 @@ namespace Sungero.Capture.Server
       var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "CONSIGNEE").FirstOrDefault();
       var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, responsible);
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Дата, номер и регистрация.
-      NumberDocument(document, recognizedDocument, "FinancialDocument");
+      NumberDocument(document, recognitionResult, "FinancialDocument");
       
       // Корректировочный документ.
-      FillCorrectedDocument(document, recognizedDocument, isAdjustment);
+      FillCorrectedDocument(document, recognitionResult, isAdjustment);
       
       // Сумма и валюта.
-      FillAmount(document, recognizedDocument);
+      FillAmount(document, recognitionResult);
 
       return document;
     }
@@ -1872,22 +1872,22 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать счет на оплату (демо режим).
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки счета на оплату в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Счет на оплату.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockIncomingInvoices.Create();
       var props = document.Info.Properties;
       
       // Основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
       var isTrusted = IsTrustedField(leadingDocFact, "DocumentBaseName");
-      LinkFactAndProperty(recognizedDocument, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, "SELLER");
@@ -1896,10 +1896,10 @@ namespace Sungero.Capture.Server
         document.SellerName = seller.Name;
         document.SellerTin = seller.Tin;
         document.SellerTrrc = seller.Trrc;
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "Name", props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
-        LinkFactAndProperty(recognizedDocument, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "Name", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
+        LinkFactAndProperty(recognitionResult, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
       }
       
       var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
@@ -1908,10 +1908,10 @@ namespace Sungero.Capture.Server
         document.BuyerName = buyer.Name;
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognizedDocument, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
       }
       
       // Могут прийти контрагенты без типа. Заполнить контрагентами без типа.
@@ -1933,10 +1933,10 @@ namespace Sungero.Capture.Server
             document.SellerName = name;
             document.SellerTin = tin;
             document.SellerTrrc = trrc;
-            LinkFactAndProperty(recognizedDocument, fact, "Name", props.SellerName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.SellerName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.SellerTin.Name, tin);
-            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.SellerTrrc.Name, trrc);
+            LinkFactAndProperty(recognitionResult, fact, "Name", props.SellerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "LegalForm", props.SellerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "TIN", props.SellerTin.Name, tin);
+            LinkFactAndProperty(recognitionResult, fact, "TRRC", props.SellerTrrc.Name, trrc);
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
           else if (string.IsNullOrWhiteSpace(document.BuyerName))
@@ -1944,10 +1944,10 @@ namespace Sungero.Capture.Server
             document.BuyerName = name;
             document.BuyerTin = tin;
             document.BuyerTrrc = trrc;
-            LinkFactAndProperty(recognizedDocument, fact, "Name", props.BuyerName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "LegalForm", props.BuyerName.Name, name);
-            LinkFactAndProperty(recognizedDocument, fact, "TIN", props.BuyerTin.Name, tin);
-            LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.BuyerTrrc.Name, trrc);
+            LinkFactAndProperty(recognitionResult, fact, "Name", props.BuyerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "LegalForm", props.BuyerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, "TIN", props.BuyerTin.Name, tin);
+            LinkFactAndProperty(recognitionResult, fact, "TRRC", props.BuyerTrrc.Name, trrc);
           }
         }
       }
@@ -1957,21 +1957,21 @@ namespace Sungero.Capture.Server
       var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.Date = GetFieldDateTimeValue(dateFact, "Date");
       document.Number = GetFieldValue(numberFact, "Number");
-      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
-      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number);
+      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Date.Name, document.Date);
+      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.Number.Name, document.Number);
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       return document;
     }
@@ -1979,12 +1979,12 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать счет на оплату.
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Счет на оплату.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Structures.Module.IRecognizedDocument recognizedDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var document = Contracts.IncomingInvoices.Create();
       var props = document.Info.Properties;
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -2000,19 +2000,19 @@ namespace Sungero.Capture.Server
       var nonTypeFacts = factMatches.Where(m => m.Type == string.Empty).ToList();
       var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, nonTypeFacts, responsible);
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognizedDocument, counterpartyAndBusinessUnitFacts);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
       
       // Договор.
       var contractFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
       var contract = GetLeadingDocument(contractFact, document.Counterparty, document.Info.Properties.Contract.Name, document.Info.Properties.Counterparty.Name);
       document.Contract = contract.Contract;
-      LinkFactAndProperty(recognizedDocument, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
+      LinkFactAndProperty(recognitionResult, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
       
       // Дата.
       var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
       var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
       document.Date = GetFieldDateTimeValue(dateFact, "Date");
-      LinkFactAndProperty(recognizedDocument, dateFact, "Date", props.Date.Name, document.Date);
+      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Date.Name, document.Date);
       
       // Номер.
       var number = GetFieldValue(numberFact, "Number");
@@ -2023,14 +2023,14 @@ namespace Sungero.Capture.Server
         isTrustedNumber = false;
       }
       document.Number = number;
-      LinkFactAndProperty(recognizedDocument, numberFact, "Number", props.Number.Name, document.Number, isTrustedNumber);
+      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.Number.Name, document.Number, isTrustedNumber);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognizedDocument);
+      FillAmount(document, recognitionResult);
       
       return document;
     }
@@ -2042,9 +2042,9 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать договор (демо режим).
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки счета на оплату в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Договор.</returns>
-    public static Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognizedDocument recognizedDocument)
+    public static Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockContracts.Create();
       
@@ -2052,10 +2052,10 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       document.Name = document.DocumentKind.ShortName;
       var props = document.Info.Properties;
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       
       // Дата и номер.
-      FillMockRegistrationData(document, recognizedDocument, "Document");
+      FillMockRegistrationData(document, recognitionResult, "Document");
       
       // Заполнить данные сторон.
       var partyNameFacts = GetOrderedFacts(facts, "Counterparty", "Name");
@@ -2064,20 +2064,20 @@ namespace Sungero.Capture.Server
         var fact = partyNameFacts.First();
         document.FirstPartyName = GetCorrespondentName(fact, "Name", "LegalForm");
         document.FirstPartySignatory = GetFullNameByFactForContract(fact);
-        LinkFactAndProperty(recognizedDocument, fact, "Name", props.FirstPartyName.Name, document.FirstPartyName);
-        LinkFactAndProperty(recognizedDocument, fact, "SignatorySurname", props.FirstPartySignatory.Name, document.FirstPartySignatory);
-        LinkFactAndProperty(recognizedDocument, fact, "SignatoryName", props.FirstPartySignatory.Name, document.FirstPartySignatory);
-        LinkFactAndProperty(recognizedDocument, fact, "SignatoryPatrn", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, "Name", props.FirstPartyName.Name, document.FirstPartyName);
+        LinkFactAndProperty(recognitionResult, fact, "SignatorySurname", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, "SignatoryName", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, "SignatoryPatrn", props.FirstPartySignatory.Name, document.FirstPartySignatory);
       }
       if (partyNameFacts.Count() > 1)
       {
         var fact = partyNameFacts.Last();
         document.SecondPartyName = GetCorrespondentName(fact, "Name", "LegalForm");
         document.SecondPartySignatory = GetFullNameByFactForContract(fact);
-        LinkFactAndProperty(recognizedDocument, fact, "Name", props.SecondPartyName.Name, document.SecondPartyName);
-        LinkFactAndProperty(recognizedDocument, fact, "SignatorySurname", props.SecondPartySignatory.Name, document.SecondPartySignatory);
-        LinkFactAndProperty(recognizedDocument, fact, "SignatoryName", props.SecondPartySignatory.Name, document.SecondPartySignatory);
-        LinkFactAndProperty(recognizedDocument, fact, "SignatoryPatrn", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, "Name", props.SecondPartyName.Name, document.SecondPartyName);
+        LinkFactAndProperty(recognitionResult, fact, "SignatorySurname", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, "SignatoryName", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, "SignatoryPatrn", props.SecondPartySignatory.Name, document.SecondPartySignatory);
       }
       
       // Заполнить ИНН/КПП сторон.
@@ -2087,8 +2087,8 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.First();
         document.FirstPartyTin = GetFieldValue(fact, "TIN");
         document.FirstPartyTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.FirstPartyTin.Name, document.FirstPartyTin);
-        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
+        LinkFactAndProperty(recognitionResult, fact, "TIN", props.FirstPartyTin.Name, document.FirstPartyTin);
+        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
       }
       
       if (tinTrrcFacts.Count() > 1)
@@ -2096,24 +2096,24 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.Last();
         document.SecondPartyTin = GetFieldValue(fact, "TIN");
         document.SecondPartyTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognizedDocument, fact, "TIN", props.SecondPartyTin.Name, document.SecondPartyTin);
-        LinkFactAndProperty(recognizedDocument, fact, "TRRC", props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
+        LinkFactAndProperty(recognitionResult, fact, "TIN", props.SecondPartyTin.Name, document.SecondPartyTin);
+        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
       }
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
-      LinkFactAndProperty(recognizedDocument, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       
       var documentVatAmountFact = GetOrderedFacts(facts, "DocumentAmount", "VatAmount").FirstOrDefault();
       document.VatAmount = GetFieldNumericalValue(documentVatAmountFact, "VatAmount");
-      LinkFactAndProperty(recognizedDocument, documentVatAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentVatAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognizedDocument, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
       
       return document;
     }
@@ -2140,9 +2140,9 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Связать факты для НОР и контрагента с подобранными значениями.
     /// </summary>
-    /// <param name="recognizedDocument">Результаты обработки бухгалтерского документа в Ario.</param>
+    /// <param name="recognitionResult">Результаты обработки бухгалтерского документа в Ario.</param>
     /// <param name="facts">Факты для документа с подбором НОР и контрагента.</param>
-    public virtual void LinkAccountingDocumentCounterpartyAndBusinessUnit(Structures.Module.IRecognizedDocument recognizedDocument,
+    public virtual void LinkAccountingDocumentCounterpartyAndBusinessUnit(Structures.Module.IRecognitionResult recognitionResult,
                                                                           Structures.Module.BusinessUnitAndCounterpartyFacts facts)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
@@ -2153,14 +2153,14 @@ namespace Sungero.Capture.Server
         facts.BusinessUnitFact.BusinessUnit != null;
       
       if (counterpartyMatched)
-        LinkFactAndProperty(recognizedDocument, facts.CounterpartyFact.Fact, null,
+        LinkFactAndProperty(recognitionResult, facts.CounterpartyFact.Fact, null,
                             counterpartyPropertyName, facts.CounterpartyFact.Counterparty, facts.CounterpartyFact.IsTrusted);
 
       if (businessUnitMatched)
-        LinkFactAndProperty(recognizedDocument, facts.BusinessUnitFact.Fact, null,
+        LinkFactAndProperty(recognitionResult, facts.BusinessUnitFact.Fact, null,
                             businessUnitPropertyName, facts.BusinessUnitFact.BusinessUnit, facts.BusinessUnitFact.IsTrusted);
       else
-        LinkFactAndProperty(recognizedDocument, null, null,
+        LinkFactAndProperty(recognitionResult, null, null,
                             businessUnitPropertyName, facts.ResponsibleEmployeeBusinessUnit, false);
       
     }
@@ -2169,10 +2169,10 @@ namespace Sungero.Capture.Server
     /// Заполнить сумму и валюту.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
-    public virtual void FillAmount(IAccountingDocumentBase document, Structures.Module.IRecognizedDocument recognizedDocument)
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    public virtual void FillAmount(IAccountingDocumentBase document, Structures.Module.IRecognitionResult recognitionResult)
     {
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var props = document.Info.Properties;
       var amountFacts = GetOrderedFacts(facts, "DocumentAmount", "Amount");
       
@@ -2180,7 +2180,7 @@ namespace Sungero.Capture.Server
       if (amountFact != null)
       {
         document.TotalAmount = GetFieldNumericalValue(amountFact, "Amount");
-        LinkFactAndProperty(recognizedDocument, amountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+        LinkFactAndProperty(recognitionResult, amountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
       }
       
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
@@ -2192,7 +2192,7 @@ namespace Sungero.Capture.Server
       {
         var currencyCode = GetFieldValue(currencyFact, "Currency");
         document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-        LinkFactAndProperty(recognizedDocument, currencyFact, "Currency", props.Currency.Name, document.Currency);
+        LinkFactAndProperty(recognitionResult, currencyFact, "Currency", props.Currency.Name, document.Currency);
       }
     }
     
@@ -2200,10 +2200,10 @@ namespace Sungero.Capture.Server
     /// Пронумеровать документ.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public virtual void NumberDocument(IOfficialDocument document,
-                                       Structures.Module.IRecognizedDocument recognizedDocument,
+                                       Structures.Module.IRecognitionResult recognitionResult,
                                        string factName)
     {
       // Проверить конфигурацию DirectumRX на возможность нумерации документа.
@@ -2222,7 +2222,7 @@ namespace Sungero.Capture.Server
       }
 
       // Дата.
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
       var regDate = GetFieldDateTimeValue(regDateFact, "Date");
       Nullable<bool> isTrustedDate = null;
@@ -2251,22 +2251,22 @@ namespace Sungero.Capture.Server
       Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(document, registers.First(), regDate, regNumber, false, false);
       
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
+      LinkFactAndProperty(recognitionResult, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
+      LinkFactAndProperty(recognitionResult, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
     }
     
     /// <summary>
     /// Заполнить номер и дату для Mock-документов.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public static void FillMockRegistrationData(IOfficialDocument document,
-                                                Structures.Module.IRecognizedDocument recognizedDocument,
+                                                Structures.Module.IRecognitionResult recognitionResult,
                                                 string factName)
     {
       // Дата.
-      var facts = recognizedDocument.Facts;
+      var facts = recognitionResult.Facts;
       var regDateFact = GetOrderedFacts(facts, factName, "Date").FirstOrDefault();
       document.RegistrationDate = GetFieldDateTimeValue(regDateFact, "Date");
 
@@ -2282,33 +2282,33 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = regNumber;
       
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognizedDocument, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
-      LinkFactAndProperty(recognizedDocument, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
+      LinkFactAndProperty(recognitionResult, regDateFact, "Date", props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognitionResult, regNumberFact, "Number", props.RegistrationNumber.Name, document.RegistrationNumber, isTrustedNumber);
     }
     
     /// <summary>
     /// Заполнить корректируемый документ.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="recognizedDocument">Результат обработки документа в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Корректировочный.</param>
     public virtual void FillCorrectedDocument(IAccountingDocumentBase document,
-                                              Structures.Module.IRecognizedDocument recognizedDocument,
+                                              Structures.Module.IRecognitionResult recognitionResult,
                                               bool isAdjustment)
     {
       if (isAdjustment)
       {
         document.IsAdjustment = true;
-        var correctionDateFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
-        var correctionNumberFact = GetOrderedFacts(recognizedDocument.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
+        var correctionDateFact = GetOrderedFacts(recognitionResult.Facts, "FinancialDocument", "CorrectionDate").FirstOrDefault();
+        var correctionNumberFact = GetOrderedFacts(recognitionResult.Facts, "FinancialDocument", "CorrectionNumber").FirstOrDefault();
         var correctionDate = GetFieldDateTimeValue(correctionDateFact, "CorrectionDate");
         var correctionNumber = GetFieldValue(correctionNumberFact, "CorrectionNumber");
         
         document.Corrected = FinancialArchive.UniversalTransferDocuments.GetAll()
           .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
         var props = document.Info.Properties;
-        LinkFactAndProperty(recognizedDocument, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
-        LinkFactAndProperty(recognizedDocument, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
+        LinkFactAndProperty(recognitionResult, correctionDateFact, "CorrectionDate", props.Corrected.Name, document.Corrected, true);
+        LinkFactAndProperty(recognitionResult, correctionNumberFact, "CorrectionNumber", props.Corrected.Name, document.Corrected, true);
       }
     }
     
@@ -2988,13 +2988,13 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Проложить связь между фактом и свойством документа.
     /// </summary>
-    /// <param name="recognizedDocument">Результат обработки документа в Арио.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
     /// <param name="fact">Факт, который будет связан со свойством документа.</param>
     /// <param name="fieldName">Поле, которое будет связано со свойством документа. Если не указано, то будут связаны все поля факта.</param>
     /// <param name="propertyName">Имя свойства документа.</param>
     /// <param name="propertyValue">Значение свойства.</param>
     /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
-    public static void LinkFactAndProperty(Structures.Module.IRecognizedDocument recognizedDocument,
+    public static void LinkFactAndProperty(Structures.Module.IRecognitionResult recognitionResult,
                                            Structures.Module.IFact fact,
                                            string fieldName,
                                            string propertyName,
@@ -3009,7 +3009,7 @@ namespace Sungero.Capture.Server
       // для подсветки заносим это свойство и результату не доверяем.
       if (fact == null)
       {
-        var calculatedFact = recognizedDocument.Info.Facts.AddNew();
+        var calculatedFact = recognitionResult.Info.Facts.AddNew();
         calculatedFact.PropertyName = propertyName;
         calculatedFact.PropertyValue = propertyStringValue;
         calculatedFact.IsTrusted = false;
@@ -3019,7 +3019,7 @@ namespace Sungero.Capture.Server
         if (isTrusted == null)
           isTrusted = IsTrustedField(fact, fieldName);
         
-        var facts = recognizedDocument.Info.Facts
+        var facts = recognitionResult.Info.Facts
           .Where(f => f.FactId == fact.Id)
           .Where(f => string.IsNullOrWhiteSpace(fieldName) || f.FieldName == fieldName);
         var factLabel = GetFactLabel(fact, propertyName);
@@ -3063,7 +3063,7 @@ namespace Sungero.Capture.Server
     /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
     /// <returns>Список распознанных свойств документа.</returns>
     [Remote(IsPure = true), Public]
-    public virtual List<string> GetRecognizedDocumentProperties(Docflow.IOfficialDocument document, bool isTrusted)
+    public virtual List<string> GetRecognitionResultProperties(Docflow.IOfficialDocument document, bool isTrusted)
     {
       var result = new List<string>();
       
@@ -3183,17 +3183,17 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Документ Rx.</param>
     /// <param name="versionNote">Примечание к версии.</param>    
-    /// <param name="recognizedDocument">Результат обработки входящего документа в Арио.</param>
-    public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognizedDocument recognizedDocument, string versionNote = "")
+    /// <param name="recognitionResult">Результат обработки входящего документа в Арио.</param>
+    public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
     {
-      var needCreatePublicBody = recognizedDocument.OriginalFile != null && recognizedDocument.OriginalFile.Data != null;
+      var needCreatePublicBody = recognitionResult.OriginalFile != null && recognitionResult.OriginalFile.Data != null;
       var pdfApp = Content.AssociatedApplications.GetByExtension("pdf");
       if (pdfApp == Content.AssociatedApplications.Null)
-        pdfApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.Path);
+        pdfApp = GetAssociatedApplicationByFileName(recognitionResult.OriginalFile.Path);
       
       var originalFileApp = Content.AssociatedApplications.Null;
       if (needCreatePublicBody)
-        originalFileApp = GetAssociatedApplicationByFileName(recognizedDocument.OriginalFile.Path);
+        originalFileApp = GetAssociatedApplicationByFileName(recognitionResult.OriginalFile.Path);
       
       // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
       var subjectIsEmpty = string.IsNullOrEmpty(document.Subject);
@@ -3205,16 +3205,16 @@ namespace Sungero.Capture.Server
       
       if (needCreatePublicBody)
       {
-        using (var publicBody = GetDocumentBody(recognizedDocument.BodyGuid))
+        using (var publicBody = GetDocumentBody(recognitionResult.BodyGuid))
           version.PublicBody.Write(publicBody);
-        using (var body = new MemoryStream(recognizedDocument.OriginalFile.Data))
+        using (var body = new MemoryStream(recognitionResult.OriginalFile.Data))
           version.Body.Write(body);
         version.AssociatedApplication = pdfApp;
         version.BodyAssociatedApplication = originalFileApp;
       }
       else
       {
-        using (var body = GetDocumentBody(recognizedDocument.BodyGuid))
+        using (var body = GetDocumentBody(recognitionResult.BodyGuid))
         {
           version.Body.Write(body);
         }

@@ -533,10 +533,10 @@ namespace Sungero.Capture.Client
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
-      var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, true);
+      var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, true);
       HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.GreenHighlightsColorCode));
       
-      var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognizedDocumentProperties(document, false);
+      var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, false);
       HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode));
     }
     
