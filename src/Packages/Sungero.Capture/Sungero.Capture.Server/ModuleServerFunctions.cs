@@ -391,7 +391,7 @@ namespace Sungero.Capture.Server
     {
       // Входящее письмо.
       var recognizedClass = recognitionResult.PredictedClass;
-      var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+      var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
       if (recognizedClass == Constants.Module.LetterClassName)
       {
@@ -481,7 +481,7 @@ namespace Sungero.Capture.Server
     public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
     {
       var leadingDocument = package.FirstOrDefault();
-      var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+      var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       
       var incLetter = isMockMode
         ? package.Where(d => MockIncomingLetters.Is(d)).FirstOrDefault()
@@ -521,24 +521,13 @@ namespace Sungero.Capture.Server
     #region Фасад DirectumRX
     
     /// <summary>
-    /// Получить значение параметра из docflow_params.
-    /// </summary>
-    /// <param name="paramName">Наименование параметра.</param>
-    /// <returns>Значение параметра.</returns>
-    public virtual object GetDocflowParamsValue(string paramName)
-    {
-      var command = string.Format(Queries.Module.SelectDocflowParamsValue, paramName);
-      return Docflow.PublicFunctions.Module.ExecuteScalarSQLCommand(command);
-    }
-    
-    /// <summary>
     /// Получить адрес сервиса Арио.
     /// </summary>
     /// <returns>Адрес Арио.</returns>
     [Remote]
     public virtual string GetArioUrl()
     {
-      var commandExecutionResult = GetDocflowParamsValue(Constants.Module.ArioUrlKey);
+      var commandExecutionResult = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey);
       var arioUrl = string.Empty;
       if (!(commandExecutionResult is DBNull) && commandExecutionResult != null)
         arioUrl = commandExecutionResult.ToString();
@@ -2911,7 +2900,7 @@ namespace Sungero.Capture.Server
     public static double GetDocflowParamsNumbericValue(string paramName)
     {
       double result = 0;
-      var paramValue = Functions.Module.GetDocflowParamsValue(paramName);
+      var paramValue = Functions.Module.Docflow.PublicFunctions.Module.GetDocflowParamsValue(paramName);
       if (!(paramValue is DBNull) && paramValue != null)
         double.TryParse(paramValue.ToString(), out result);
       return result;
