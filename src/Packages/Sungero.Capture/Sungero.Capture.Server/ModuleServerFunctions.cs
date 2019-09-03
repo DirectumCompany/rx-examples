@@ -2900,7 +2900,7 @@ namespace Sungero.Capture.Server
     public static double GetDocflowParamsNumbericValue(string paramName)
     {
       double result = 0;
-      var paramValue = Functions.Module.Docflow.PublicFunctions.Module.GetDocflowParamsValue(paramName);
+      var paramValue = Docflow.PublicFunctions.Module.GetDocflowParamsValue(paramName);
       if (!(paramValue is DBNull) && paramValue != null)
         double.TryParse(paramValue.ToString(), out result);
       return result;
