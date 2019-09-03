@@ -171,7 +171,7 @@ namespace Sungero.Capture.Server
     /// <returns>Ид созданных документов.</returns>
     [Remote]
     public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Structures.Module.IFileInfo originalFile,
-                                                                               IEmployee responsible, bool sendedByEmail)
+                                                                               IEmployee responsible, bool sendedByEmail, string fromEmail)
     {
       var recognitionResults = GetRecognitionResults(recognitionResultsJson, originalFile, sendedByEmail);
       var package = new List<IOfficialDocument>();

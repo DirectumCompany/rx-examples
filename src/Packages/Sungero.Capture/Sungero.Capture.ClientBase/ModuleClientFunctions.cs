@@ -129,7 +129,7 @@ namespace Sungero.Capture.Client
           var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
                                                                                       attachment,
                                                                                       responsible,
-                                                                                      true);
+                                                                                      true, mailInfo.FromEmail);
           package.AddRange(documents);
         }
         else
@@ -345,7 +345,7 @@ namespace Sungero.Capture.Client
         var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
                                                                                     originalFile,
                                                                                     responsible,
-                                                                                    false);
+                                                                                    false, string.Empty);
         
         var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
         Logger.Debug("Captured Package Process. Send documents to responsible.");
@@ -659,7 +659,7 @@ namespace Sungero.Capture.Client
       var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(System.IO.File.ReadAllText(jsonFilePath),
                                                                                   originalFile,
                                                                                   responsible,
-                                                                                  false);
+                                                                                  false, string.Empty);
       
       var documentsCreatedByRecognitionResults = Functions.Module.Remote.ProcessPackageAfterCreationDocuments(documents, null, true);
       Functions.Module.Remote.SendToResponsible(documentsCreatedByRecognitionResults,  null, responsible);
