@@ -388,88 +388,88 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <param name="fromEmail">Адрес эл.почты отправителя.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
-    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognizedResult,
+    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognitionResult,
                                                                         IEmployee responsible)
     {
       // Входящее письмо.
-      var recognizedClass = recognizedResult.PredictedClass;
+      var recognizedClass = recognitionResult.PredictedClass;
       var isMockMode = GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
       if (recognizedClass == Constants.Module.LetterClassName)
       {
         document = isMockMode
-          ? CreateMockIncomingLetter(recognizedResult)
-          : CreateIncomingLetter(recognizedResult, responsible);
+          ? CreateMockIncomingLetter(recognitionResult)
+          : CreateIncomingLetter(recognitionResult, responsible);
       }
       
       // Акт выполненных работ.
       else if (recognizedClass == Constants.Module.ContractStatementClassName)
       {
         document = isMockMode
-          ? CreateMockContractStatement(recognizedResult)
-          : CreateContractStatement(recognizedResult, responsible);
+          ? CreateMockContractStatement(recognitionResult)
+          : CreateContractStatement(recognitionResult, responsible);
       }
       
       // Товарная накладная.
       else if (recognizedClass == Constants.Module.WaybillClassName)
       {
         document = isMockMode
-          ? CreateMockWaybill(recognizedResult)
-          : CreateWaybill(recognizedResult, responsible);
+          ? CreateMockWaybill(recognitionResult)
+          : CreateWaybill(recognitionResult, responsible);
       }
       
       // Счет-фактура.
       else if (recognizedClass == Constants.Module.TaxInvoiceClassName)
       {
         document = isMockMode
-          ? CreateMockIncomingTaxInvoice(recognizedResult)
-          : CreateTaxInvoice(recognizedResult, responsible, false);
+          ? CreateMockIncomingTaxInvoice(recognitionResult)
+          : CreateTaxInvoice(recognitionResult, responsible, false);
       }
       
       // Корректировочный счет-фактура.
       else if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
       {
-        document = CreateTaxInvoice(recognizedResult, responsible, true);
+        document = CreateTaxInvoice(recognitionResult, responsible, true);
       }
       
       // УПД.
       else if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
       {
-        document = CreateUniversalTransferDocument(recognizedResult, responsible, false);
+        document = CreateUniversalTransferDocument(recognitionResult, responsible, false);
       }
       
       // УКД.
       else if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
       {
-        document = CreateUniversalTransferDocument(recognizedResult, responsible, true);
+        document = CreateUniversalTransferDocument(recognitionResult, responsible, true);
       }
       
       // Счет на оплату.
       else if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
       {
         document = isMockMode
-          ? CreateMockIncomingInvoice(recognizedResult)
-          : CreateIncomingInvoice(recognizedResult, responsible);
+          ? CreateMockIncomingInvoice(recognitionResult)
+          : CreateIncomingInvoice(recognitionResult, responsible);
       }
       
       // Договор.
       else if (recognizedClass == Constants.Module.ContractClassName && isMockMode)
       {
-        document = CreateMockContract(recognizedResult);
+        document = CreateMockContract(recognitionResult);
       }
       
       // Все нераспознанные документы создать простыми.
       else
       {
-        var name = !string.IsNullOrWhiteSpace(recognizedResult.OriginalFile.Description) ? recognizedResult.OriginalFile.Description : Resources.SimpleDocumentName;
+        var name = !string.IsNullOrWhiteSpace(recognitionResult.OriginalFile.Description) ? recognitionResult.OriginalFile.Description : Resources.SimpleDocumentName;
         document = CreateSimpleDocument(name, responsible);
       }
       
-      FillDeliveryMethod(document, recognizedResult.SendedByEmail);
+      FillDeliveryMethod(document, recognitionResult.SendedByEmail);
       /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
          если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      CreateVersion(document, recognizedResult);
+      CreateVersion(document, recognitionResult);
       
       document.Save();
       return document;
