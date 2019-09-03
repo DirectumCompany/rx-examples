@@ -209,14 +209,14 @@
           "ParameterTypeFullName": "System.Collections.Generic.List"
         },
         {
-          "Name": "responsible",
-          "ParameterType": "global::Sungero.Company.IEmployee",
-          "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
-        },
-        {
           "Name": "emailBody",
           "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
           "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "responsible",
+          "ParameterType": "global::Sungero.Company.IEmployee",
+          "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
         }
       ],
       "Placement": "Shared",

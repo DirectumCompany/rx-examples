@@ -843,7 +843,7 @@ namespace Sungero.Capture.Server
     /// <returns>Простая задача.</returns>
     [Public, Remote]
     public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
-                                          List<IOfficialDocument> documentsWithRegistrationFailure, Company.IEmployee responsible, Docflow.IOfficialDocument emailBody)
+                                          List<IOfficialDocument> documentsWithRegistrationFailure, Docflow.IOfficialDocument emailBody, Company.IEmployee responsible)
     {
       if (leadingDocument == null)
         return;
@@ -955,7 +955,7 @@ namespace Sungero.Capture.Server
       var documentsWithRegistrationFailure = documentsCreatedByRecognition.DocumentWithRegistrationFailureIds != null
         ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id)).ToList()
         : new List<Docflow.IOfficialDocument>();
-      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, responsible, emailBody);
+      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, emailBody, responsible);
     }
     
     #endregion
