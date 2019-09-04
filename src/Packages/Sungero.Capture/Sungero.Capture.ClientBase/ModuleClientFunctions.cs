@@ -200,7 +200,7 @@ namespace Sungero.Capture.Client
       }
       
       // Вложения.
-      var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
+      var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, Constants.Module.MailBodyName.Html, StringComparison.InvariantCultureIgnoreCase) &&
                                            !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase)).ToList();
       
       // Фильтрация картинок из тела письма.

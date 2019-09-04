@@ -73,5 +73,58 @@ namespace Sungero.Capture.Constants
     public const string DocumentNumberingBySmartCaptureResultParamName = "DocumentNumberingBySmartCaptureResult";
     public const string FindByBarcodeParamName = "FindByBarcode";
     
+    public static class MailBodyName
+    {
+      public const string Html = "body.html";
+      
+      public const string Txt = "body.txt";
+    }
+    
+    public static class InputFiles
+    {
+      public const string InputFilesSectionName = "InputFilesSection";
+      
+      public const string FilesSectionName = "Files";
+      
+      public const string FileDescriptionTagName = "FileDescription";
+      
+      public const string FileNameTagName = "FileName";
+    }
+    
+    public static class MailInstanceInfos
+    {
+      public const string CaptureInstanceInfoListSectionName = "CaptureInstanceInfoList";
+      
+      public const string MailCaptureInstanceInfoSectionName = "MailCaptureInstanceInfo";
+      
+      public const string SubjectTag = "Subject";
+      
+      public const string FromSectionName = "From";
+      
+      public const string FromSectionAddressTag = "Address";
+      
+      public const string FromSectionNameTag = "Name";
+    }
+    
+    public static class ArioGrammarNames
+    {
+      public const string Letter = "Letter";
+      
+      public const string ContractStatement = "ContractStatement";
+      
+      public const string Waybill = "Waybill";
+      
+      public const string UniversalTransferDocument = "GeneralTransferDocument";
+      
+      public const string UniversalTransferCorrectionDocument = "GeneralCorrectionDocument";
+      
+      public const string TaxInvoice = "TaxInvoice";
+      
+      public const string TaxinvoiceCorrection = "TaxinvoiceCorrection";
+      
+      public const string IncomingInvoice = "IncomingInvoice";
+      
+      public const string Contract = "Contract";
+    }
   }
 }
