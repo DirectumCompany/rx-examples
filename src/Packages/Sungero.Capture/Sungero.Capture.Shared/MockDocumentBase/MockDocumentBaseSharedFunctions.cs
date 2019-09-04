@@ -36,5 +36,12 @@ namespace Sungero.Capture.Shared
       properties.PlacedToCaseFileDate.IsEnabled = needShow;
       properties.PlacedToCaseFileDate.IsVisible = needShow;
     }
+    
+    [Public]
+    public override bool IsVerificationModeSupported()
+    {
+      return true;
+    }
+    
   }
 }

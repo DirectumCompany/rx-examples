@@ -32,5 +32,11 @@ namespace Sungero.SmartCapture.Shared
       Capture.PublicFunctions.Module.FillNameFromKindIfEmpty(_obj);
     }
     
+    [Public]
+    public override bool IsVerificationModeSupported()
+    {
+      return true;
+    }
+    
   }
 }

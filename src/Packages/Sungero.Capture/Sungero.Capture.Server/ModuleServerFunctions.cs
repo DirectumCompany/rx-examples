@@ -2965,6 +2965,10 @@ namespace Sungero.Capture.Server
       // Очистить Subject, если он был пуст до создания версии.
       if (subjectIsEmpty)
         document.Subject = string.Empty;
+      
+      // Заполнить статус верификации для документов, в которых поддерживается режим верификации.
+      if (Docflow.PublicFunctions.OfficialDocument.IsVerificationModeSupported(document))
+        document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
     }
     
     /// <summary>
