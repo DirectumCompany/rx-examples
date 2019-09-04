@@ -397,7 +397,9 @@
     "Kinds",
     "DocumentsWithRegistrationFailureTaskText",
     "CantProcessFileByArio",
-    "DocumentsFoundByBarcodeTaskText"
+    "DocumentsFoundByBarcodeTaskText",
+    "EmptyMailPackage",
+    "EmptyScanPackage"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

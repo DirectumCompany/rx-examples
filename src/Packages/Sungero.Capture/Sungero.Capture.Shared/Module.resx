@@ -210,4 +210,10 @@
   <data name="DocumentsFoundByBarcodeTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="EmptyMailPackage" xml:space="preserve">
+    <value>Mail body and attached files does not exists.</value>
+  </data>
+  <data name="EmptyScanPackage" xml:space="preserve">
+    <value>Package not found.</value>
+  </data>
 </root>

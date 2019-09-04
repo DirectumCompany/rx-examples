@@ -156,7 +156,7 @@
     <value>Не найден классификатор с именем {0}</value>
   </data>
   <data name="EmptyArioUrl" xml:space="preserve">
-    <value>Не задан адрес сервиса Ario</value>
+    <value>Не задан адрес сервиса Ario.</value>
   </data>
   <data name="EmailBodyDocumentName" xml:space="preserve">
     <value>Эл. письмо от {0}</value>
@@ -214,5 +214,11 @@
   </data>
   <data name="DocumentsFoundByBarcodeTaskText" xml:space="preserve">
     <value>В системе найден документ по штрихкоду. Создана новая версия.</value>
+  </data>
+  <data name="EmptyMailPackage" xml:space="preserve">
+    <value>Вложения и тело письма не найдены.</value>
+  </data>
+  <data name="EmptyScanPackage" xml:space="preserve">
+    <value>Комплект документов не существует.</value>
   </data>
 </root>

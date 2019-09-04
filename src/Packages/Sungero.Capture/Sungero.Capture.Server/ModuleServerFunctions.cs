@@ -130,12 +130,12 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="package">Распознанные документы комплекта.</param>
     /// <param name="notRecognizedDocuments">Нераспознанные документы комплекта.</param>
-    /// <param name="isNeedFillNotClassifiedDocumentNames">Признак необходимости заполнять имена всех неклассифицированных документов в комплекте .</param>
+    /// <param name="isNeedRenameNotClassifiedDocumentNames">Признак необходимости переименовать неклассифицированные документы в комплекте.</param>
     /// <returns>Список Id созданных документов.</returns>
     [Remote]
     public virtual Structures.Module.DocumentsCreatedByRecognitionResults ProcessPackageAfterCreationDocuments(List<IOfficialDocument> package,
                                                                                                                List<IOfficialDocument> notRecognizedDocuments,
-                                                                                                               bool isNeedFillNotClassifiedDocumentNames)
+                                                                                                               bool isNeedRenameNotClassifiedDocumentNames)
     {
       var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
       if (!package.Any() && (notRecognizedDocuments == null || !notRecognizedDocuments.Any()))
@@ -154,7 +154,7 @@ namespace Sungero.Capture.Server
       // Для документов, нераспознанных Ario:
       // со сканера - заполнить имена,
       // с электронной почты - заполнять имена не надо, они будут как у исходного вложения.
-      if (isNeedFillNotClassifiedDocumentNames)
+      if (isNeedRenameNotClassifiedDocumentNames)
         RenameNotClassifiedDocuments(leadingDocument, package);
       
       // Добавить документы, не распознанные Ario, к документам комплекта, чтобы вложить в задачу на обработку.
@@ -416,7 +416,7 @@ namespace Sungero.Capture.Server
       var recognizedClass = recognitionResult.PredictedClass;
       var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
-      if (recognizedClass == Constants.Module.LetterClassName)
+      if (recognizedClass == Constants.Module.ArioClassNames.Letter)
       {
         document = isMockMode
           ? CreateMockIncomingLetter(recognitionResult)
@@ -424,7 +424,7 @@ namespace Sungero.Capture.Server
       }
       
       // Акт выполненных работ.
-      else if (recognizedClass == Constants.Module.ContractStatementClassName)
+      else if (recognizedClass == Constants.Module.ArioClassNames.ContractStatement)
       {
         document = isMockMode
           ? CreateMockContractStatement(recognitionResult)
@@ -432,7 +432,7 @@ namespace Sungero.Capture.Server
       }
       
       // Товарная накладная.
-      else if (recognizedClass == Constants.Module.WaybillClassName)
+      else if (recognizedClass == Constants.Module.ArioClassNames.Waybill)
       {
         document = isMockMode
           ? CreateMockWaybill(recognitionResult)
@@ -440,7 +440,7 @@ namespace Sungero.Capture.Server
       }
       
       // Счет-фактура.
-      else if (recognizedClass == Constants.Module.TaxInvoiceClassName)
+      else if (recognizedClass == Constants.Module.ArioClassNames.TaxInvoice)
       {
         document = isMockMode
           ? CreateMockIncomingTaxInvoice(recognitionResult)
@@ -448,25 +448,25 @@ namespace Sungero.Capture.Server
       }
       
       // Корректировочный счет-фактура.
-      else if (recognizedClass == Constants.Module.TaxinvoiceCorrectionClassName && !isMockMode)
+      else if (recognizedClass == Constants.Module.ArioClassNames.TaxinvoiceCorrection && !isMockMode)
       {
         document = CreateTaxInvoice(recognitionResult, true, responsible);
       }
       
       // УПД.
-      else if (recognizedClass == Constants.Module.UniversalTransferDocumentClassName && !isMockMode)
+      else if (recognizedClass == Constants.Module.ArioClassNames.UniversalTransferDocument && !isMockMode)
       {
         document = CreateUniversalTransferDocument(recognitionResult, false, responsible);
       }
       
       // УКД.
-      else if (recognizedClass == Constants.Module.GeneralCorrectionDocumentClassName && !isMockMode)
+      else if (recognizedClass == Constants.Module.ArioClassNames.UniversalTransferCorrectionDocument && !isMockMode)
       {
         document = CreateUniversalTransferDocument(recognitionResult, true, responsible);
       }
       
       // Счет на оплату.
-      else if (recognizedClass == Constants.Module.IncomingInvoiceClassName)
+      else if (recognizedClass == Constants.Module.ArioClassNames.IncomingInvoice)
       {
         document = isMockMode
           ? CreateMockIncomingInvoice(recognitionResult)
@@ -474,7 +474,7 @@ namespace Sungero.Capture.Server
       }
       
       // Договор.
-      else if (recognizedClass == Constants.Module.ContractClassName && isMockMode)
+      else if (recognizedClass == Constants.Module.ArioClassNames.Contract && isMockMode)
       {
         document = CreateMockContract(recognitionResult);
       }
