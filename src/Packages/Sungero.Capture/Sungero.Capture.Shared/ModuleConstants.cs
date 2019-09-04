@@ -242,5 +242,27 @@ namespace Sungero.Capture.Constants
       
       public const string Goods = "Goods";
     }
+    
+    public static class LetterPersonType
+    {
+      public const string Signatory = "SIGNATORY";
+      
+      public const string Responsible = "RESPONSIBLE";
+    }
+    
+    public static class CounterpartyType
+    {
+      public const string Consignee = "CONSIGNEE";
+      
+      public const string Payer = "PAYER";
+      
+      public const string Shipper = "SHIPPER";
+      
+      public const string Supplier = "SUPPLIER";
+      
+      public const string Buyer = "BUYER";
+      
+      public const string Seller = "SELLER";
+    }
   }
 }
