@@ -207,4 +207,7 @@
   <data name="CantProcessFileByArio" xml:space="preserve">
     <value>Can't process file by Ario.</value>
   </data>
+  <data name="DocumentsWithVersionByBarcodeTaskText" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

@@ -71,5 +71,7 @@ namespace Sungero.Capture.Constants
     }
     
     public const string DocumentNumberingBySmartCaptureResultParamName = "DocumentNumberingBySmartCaptureResult";
+    public const string FindByBarcodeParamName = "FindByBarcode";
+    
   }
 }

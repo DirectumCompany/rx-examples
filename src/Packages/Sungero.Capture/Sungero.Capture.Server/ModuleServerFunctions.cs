@@ -140,6 +140,9 @@ namespace Sungero.Capture.Server
       // Сформировать список документов, которые не смогли пронумеровать.
       var documentsWithRegistrationFailure = package.Where(d => IsDocumentRegistrationFailed(d)).ToList();
       
+      // Сформировать список документов, которые найдены по штрихкоду.
+      var documentsWithVersionByBarcode = package.Where(d => IsVersionCreatedByBarcode(d)).ToList();
+      
       // Получить ведущий документ из распознанных документов комплекта. Если список пуст, то из нераспознанных.
       var leadingDocument = package.Any() ? GetLeadingDocument(package) : GetLeadingDocument(notRecognizedDocuments);
       LinkDocuments(leadingDocument, package, notRecognizedDocuments);
@@ -157,6 +160,7 @@ namespace Sungero.Capture.Server
       result.LeadingDocumentId = leadingDocument.Id;
       result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
       result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
+      result.DocumentWithVersionByBarcodeIds = documentsWithVersionByBarcode.Select(x => x.Id).ToList();
       return result;
     }
     
@@ -191,6 +195,7 @@ namespace Sungero.Capture.Server
             {
               CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
               document.Save();
+              ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.FindByBarcodeParamName] = true;
             }
           }
         }
@@ -293,6 +298,15 @@ namespace Sungero.Capture.Server
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
       if (documentParams.ContainsKey(Constants.Module.DocumentNumberingBySmartCaptureResultParamName))
+        return true;
+      
+      return false;
+    }
+        
+    public virtual bool IsVersionCreatedByBarcode(IOfficialDocument document)
+    {
+      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
+      if (documentParams.ContainsKey(Constants.Module.FindByBarcodeParamName))
         return true;
       
       return false;
@@ -527,7 +541,8 @@ namespace Sungero.Capture.Server
     /// <returns>Простая задача.</returns>
     [Public, Remote]
     public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
-                                          List<IOfficialDocument> documentsWithRegistrationFailure, Docflow.IOfficialDocument emailBody, Company.IEmployee responsible)
+                                          List<IOfficialDocument> documentsWithRegistrationFailure, 
+                                          List<IOfficialDocument> documentsWithVersionByBarcode, Docflow.IOfficialDocument emailBody, Company.IEmployee responsible)
     {
       if (leadingDocument == null)
         return;
@@ -565,6 +580,9 @@ namespace Sungero.Capture.Server
       var documentsWithRegistrationFailureHyperlinks = new List<string>();
       documentsWithRegistrationFailureHyperlinks.AddRange(documentsWithRegistrationFailure.Select(x => Hyperlinks.Get(x)));
       
+      var documentsWithVersionByBarcodeHyperlinks = new List<string>();
+      documentsWithVersionByBarcodeHyperlinks.AddRange(documentsWithVersionByBarcode.Select(x => Hyperlinks.Get(x)));
+      
       // Текст задачи.
       task.ActiveText = Resources.CheckPackageTaskText;
       
@@ -596,6 +614,22 @@ namespace Sungero.Capture.Server
         
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText,
                                         documentsWithRegistrationFailureHyperlinksLabel);
+      }
+      
+      // Добавить в текст задачи список документов, которые найдены по штрихкоду.
+      if (documentsWithVersionByBarcode.Any())
+      {
+        var documentsText = documentsWithVersionByBarcode.Count() == 1 ? Sungero.Capture.Resources.Document : Sungero.Capture.Resources.Documents;
+        var documentKinds = documentsWithVersionByBarcode.Select(x => string.Format("\"{0}\"", x.DocumentKind.Name)).Distinct();
+        var documentKindsText = documentKinds.Count() == 1 ? Sungero.Capture.Resources.Kind : Sungero.Capture.Resources.Kinds;
+        var documentKindsListText = string.Join(", ", documentKinds);
+        
+        var documentsWithVersionByBarcodeTaskText = Sungero.Capture.Resources.DocumentsWithVersionByBarcodeTaskText;
+        
+        var documentsWithVersionByBarcodeHyperlinksLabel = string.Join("\n    ", documentsWithVersionByBarcodeHyperlinks);
+        
+        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithVersionByBarcodeTaskText,
+                                        documentsWithVersionByBarcodeHyperlinksLabel);
       }
       
       // Маршрут.
@@ -639,7 +673,12 @@ namespace Sungero.Capture.Server
       var documentsWithRegistrationFailure = documentsCreatedByRecognition.DocumentWithRegistrationFailureIds != null
         ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id)).ToList()
         : new List<Docflow.IOfficialDocument>();
-      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, emailBody, responsible);
+      
+      var documentsWithVersionByBarcode = documentsCreatedByRecognition.DocumentWithVersionByBarcodeIds != null
+        ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentWithVersionByBarcodeIds.Contains(x.Id)).ToList()
+        : new List<Docflow.IOfficialDocument>();
+      
+      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, documentsWithVersionByBarcode, emailBody, responsible);
     }
     
     #endregion

@@ -443,7 +443,7 @@ namespace Sungero.Capture.Client
     public virtual string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
     {
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
+      /*var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
       if (fpClassifier == null)
         throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
       
@@ -452,7 +452,9 @@ namespace Sungero.Capture.Client
         throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
 
       var fpClassifierId = fpClassifier.Id.ToString();
-      var typeClassifierId = typeClassifier.Id.ToString();
+      var typeClassifierId = typeClassifier.Id.ToString();*/
+      var fpClassifierId = "934";
+      var typeClassifierId = "936";      
       Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
       
