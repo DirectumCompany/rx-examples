@@ -174,13 +174,6 @@ namespace Sungero.Capture.Constants
         public const string SignatoryPatrn = "SignatoryPatrn";
       }
       
-      public static class Counterparty
-      {
-        public const string TIN = "TIN";
-        
-        public const string TRRC = "TRRC";
-      }
-      
       public static class Document
       {
         public const string Date = "Date";
@@ -243,14 +236,14 @@ namespace Sungero.Capture.Constants
       public const string Goods = "Goods";
     }
     
-    public static class LetterPersonType
+    public static class LetterPersonTypes
     {
       public const string Signatory = "SIGNATORY";
       
       public const string Responsible = "RESPONSIBLE";
     }
     
-    public static class CounterpartyType
+    public static class CounterpartyTypes
     {
       public const string Consignee = "CONSIGNEE";
       

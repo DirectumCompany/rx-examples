@@ -12,6 +12,10 @@ using Sungero.Capture.Structures.Module;
 using Sungero.Parties;
 using Sungero.RecordManagement;
 using Sungero.Workflow;
+using FieldNames = Sungero.Capture.Constants.Module.FieldNames;
+using FactNames = Sungero.Capture.Constants.Module.FactNames;
+using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
+using CounterpartyTypes =Sungero.Capture.Constants.Module.CounterpartyTypes;
 
 namespace Sungero.Capture.Server
 {
