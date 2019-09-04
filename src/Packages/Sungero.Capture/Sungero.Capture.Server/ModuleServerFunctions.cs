@@ -306,8 +306,8 @@ namespace Sungero.Capture.Server
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
     public virtual List<Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
-                                                                                      Structures.Module.IFileInfo originalFile,
-                                                                                      bool sendedByEmail)
+                                                                                    Structures.Module.IFileInfo originalFile,
+                                                                                    bool sendedByEmail)
     {
       var recognitionResults = new List<IRecognitionResult>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
@@ -387,7 +387,7 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
     public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognitionResult,
-                                                                        IEmployee responsible)
+                                                                       IEmployee responsible)
     {
       // Входящее письмо.
       var recognizedClass = recognitionResult.PredictedClass;
@@ -515,270 +515,13 @@ namespace Sungero.Capture.Server
       
       return leadingDocument;
     }
-
-    #endregion
-    
-    #region Фасад DirectumRX
-    
-    /// <summary>
-    /// Получить адрес сервиса Арио.
-    /// </summary>
-    /// <returns>Адрес Арио.</returns>
-    [Remote]
-    public virtual string GetArioUrl()
-    {
-      var commandExecutionResult = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey);
-      var arioUrl = string.Empty;
-      if (!(commandExecutionResult is DBNull) && commandExecutionResult != null)
-        arioUrl = commandExecutionResult.ToString();
-      
-      return arioUrl;
-    }
-
-    /// <summary>
-    /// Поиск адресата письма.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <returns>Адресат.</returns>
-    public virtual Structures.Module.EmployeeWithFact GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
-    {
-      var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
-      if (fact == null)
-        return result;
-      
-      var addressee = GetFieldValue(fact, "Addressee");
-      var employees =  Company.PublicFunctions.Employee.Remote.GetEmployeesByName(addressee);
-      result.Employee = employees.FirstOrDefault();
-      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;
-      return result;
-    }
-
-    /// <summary>
-    /// Получить полное ФИО из частей имени содержащихся в факте.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
-    public static string GetFullNameByFact(Sungero.Capture.Structures.Module.IFact fact)
-    {
-      if (fact == null)
-        return string.Empty;
-      
-      var surname = GetFieldValue(fact, "Surname");
-      var name = GetFieldValue(fact, "Name");
-      var patronymic = GetFieldValue(fact, "Patrn");
-      
-      return GetFullNameByFact(surname, name, patronymic);
-    }
-    
-    /// <summary>
-    /// Получить полное ФИО из частей имени содержащихся в факте для договоров.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
-    public static string GetFullNameByFactForContract(Sungero.Capture.Structures.Module.IFact fact)
-    {
-      if (fact == null)
-        return string.Empty;
-      
-      var surname = GetFieldValue(fact, "SignatorySurname");
-      var name = GetFieldValue(fact, "SignatoryName");
-      var patronymic = GetFieldValue(fact, "SignatoryPatrn");
-      
-      return GetFullNameByFact(surname, name, patronymic);
-    }
-    
-    /// <summary>
-    /// Сформировать полное ФИО из частей имени.
-    /// </summary>
-    /// <param name="surnameFieldValue">Фамилия.</param>
-    /// <param name="nameFieldValue">Имя.</param>
-    /// <param name="patronymicFieldValue">Отчество.</param>
-    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
-    public static string GetFullNameByFact(string surnameFieldValue, string nameFieldValue, string patronymicFieldValue)
-    {
-      // Собрать ФИО из фамилии, имени и отчества.
-      var parts = new List<string>();
-      
-      if (!string.IsNullOrWhiteSpace(surnameFieldValue))
-        parts.Add(surnameFieldValue);
-      if (!string.IsNullOrWhiteSpace(nameFieldValue))
-        parts.Add(nameFieldValue);
-      if (!string.IsNullOrWhiteSpace(patronymicFieldValue))
-        parts.Add(patronymicFieldValue);
-      
-      return string.Join(" ", parts);
-    }
-    
-    /// <summary>
-    /// Получить сокращенное ФИО из факта.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <returns>Имя в формате "Фамилия И.О.".</returns>
-    public virtual string GetShortNameByFact(Sungero.Capture.Structures.Module.IFact fact)
-    {
-      if (fact == null)
-        return string.Empty;
-      
-      var surname = GetFieldValue(fact, "Surname");
-      var name = GetFieldValue(fact, "Name");
-      var patronymic = GetFieldValue(fact, "Patrn");
-      return Parties.PublicFunctions.Person.GetSurnameAndInitialsInTenantCulture(name, patronymic, surname);
-    }
-    
-    /// <summary>
-    /// Получить контактные лица по данным из факта.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <param name="counterparty">Контрагент - владелец контактного лица.</param>
-    /// <returns>Список контактных лиц.</returns>
-    public virtual IQueryable<IContact> GetContactsByFact(Sungero.Capture.Structures.Module.IFact fact, ICounterparty counterparty)
-    {
-      if (fact == null)
-        return new List<IContact>().AsQueryable();
-      
-      var fullName = GetFullNameByFact(fact);
-      var shortName = GetShortNameByFact(fact);
-      return Parties.PublicFunctions.Contact.GetContactsByName(fullName, shortName, counterparty);
-    }
-    
-    /// <summary>
-    /// Получить контактное лицо по данным из факта.
-    /// </summary>
-    /// <param name="fact">Факт Арио.</param>
-    /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <param name="counterparty">Контрагент.</param>
-    /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
-    /// <returns>Контактное лицо.</returns>
-    public virtual Structures.Module.ContactWithFact GetContactByFact(Sungero.Capture.Structures.Module.IFact fact, string propertyName, ICounterparty counterparty, string counterpartyPropertyName)
-    {
-      var result = Structures.Module.ContactWithFact.Create(Sungero.Parties.Contacts.Null, fact, false);
-      if (fact == null)
-        return result;
-      if (counterparty != null)
-      {
-        result = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString() ,counterpartyPropertyName);
-        if (result.Contact != null)
-          return result;
-      }
-      
-      var filteredContacts =  GetContactsByFact(fact, counterparty);
-      if (!filteredContacts.Any())
-        return result;
-      result.Contact = filteredContacts.FirstOrDefault();
-      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, "Type") : false;
-      return result;
-    }
-    
-    /// <summary>
-    /// Получить контактное лицо контрагента из верифицированных данных.
-    /// </summary>
-    /// <param name="fact">Факт Арио.</param>
-    /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
-    /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
-    /// <returns>Контактное лицо.</returns>
-    public virtual Structures.Module.ContactWithFact GetContactByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
-    {
-      var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
-      var contactField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
-      if (contactField == null)
-        return result;
-      int contactId;
-      if (!int.TryParse(contactField.VerifiedValue, out contactId))
-        return result;
-      
-      var filteredContact = Contacts.GetAll(x => x.Id == contactId).FirstOrDefault();
-      if (filteredContact != null)
-      {
-        result.Contact = filteredContact;
-        result.IsTrusted = contactField.IsTrusted == true;
-      }
-      return result;
-    }
-    
-    /// <summary>
-    /// Получить ведущие документы по номеру и дате из факта.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <param name="counterparty">Контрагент.</param>
-    /// <returns>Список документов с подходящими номером и датой.</returns>
-    public virtual IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Structures.Module.IFact fact, ICounterparty counterparty)
-    {
-      if (fact == null)
-        return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
-      
-      var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
-      var number = GetFieldValue(fact, "DocumentBaseNumber");
-      
-      if (string.IsNullOrWhiteSpace(number))
-        return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
-      
-      return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
-                                                           x.RegistrationDate == docDate &&
-                                                           (counterparty == null || x.Counterparty.Equals(counterparty)));
-    }
-
-    /// <summary>
-    /// Получить ведущий документ по номеру и дате из факта.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <param name="leadingDocPropertyName">Имя связанного свойства.</param>
-    /// <param name="counterparty">Контрагент.</param>
-    /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
-    /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
-    public virtual ContractWithFact GetLeadingDocument(IFact fact, string leadingDocPropertyName,
-      ICounterparty counterparty, string counterpartyPropertyName)
-    {
-      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
-      if (fact == null)
-        return result;
-      
-      if (string.IsNullOrEmpty(leadingDocPropertyName))
-      {
-        result = GetContractByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
-        if (result.Contract != null)
-          return result;
-      }
-      var contracts = GetLeadingDocuments(fact, counterparty);
-      result.Contract = contracts.FirstOrDefault();
-      result.IsTrusted = (contracts.Count() == 1) ? IsTrustedField(fact, "DocumentBaseNumber") : false;
-      return result;
-    }
-    
-    /// <summary>
-    /// Получить ведущий документ из верифицированных данных.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
-    /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
-    /// <returns></returns>
-    public virtual Structures.Module.ContractWithFact GetContractByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
-    {
-      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
-      var contractField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
-      if (contractField == null)
-        return result;
-      
-      int docId;
-      if (!int.TryParse(contractField.VerifiedValue, out docId))
-        return result;
-      
-      var filteredDocument = Contracts.ContractualDocuments.GetAll(x => x.Id == docId).FirstOrDefault();
-      if (filteredDocument != null)
-      {
-        result.Contract = filteredDocument;
-        result.IsTrusted = contractField.IsTrusted == true;
-      }
-      return result;
-    }
     
     /// <summary>
     /// Отправить задачу на проверку документов.
     /// </summary>
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="documents">Прочие документы из комплекта.</param>
-    /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>    
+    /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
     /// <param name="emailBody">Тело электронного письма.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Простая задача.</returns>
@@ -874,7 +617,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
     /// <param name="emailBody">Тело электронного письма.</param>
-    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>    
+    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     [Remote]
     public virtual void SendToResponsible(Structures.Module.DocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
                                           Docflow.IOfficialDocument emailBody, Sungero.Company.IEmployee responsible)
@@ -1649,7 +1392,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
     /// <param name="isAdjustment">Корректировочная.</param>
-    /// <param name="responsible">Ответственный.</param>    
+    /// <param name="responsible">Ответственный.</param>
     /// <returns>Счет-фактура.</returns>
     public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
     {
@@ -1782,7 +1525,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки УПД в Ario.</param>
     /// <param name="isAdjustment">Корректировочная.</param>
-    /// <param name="responsible">Ответственный.</param>    
+    /// <param name="responsible">Ответственный.</param>
     /// <returns>УПД.</returns>
     public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
     {
@@ -2635,8 +2378,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
     public virtual BusinessUnitWithFact GetBusinessUnitWithFact(List<BusinessUnitWithFact> businessUnitsWithFacts,
-      string businessUnitPropertyName, IEmployee addressee,
-      IEmployee responsible)
+                                                                string businessUnitPropertyName, IEmployee addressee,
+                                                                IEmployee responsible)
     {
       
       // Сначала поиск по хэшам фактов.
@@ -2825,7 +2568,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить запись, которая уже сопоставлялась с переданным фактом, с дополнительной фильтжрацией по контрагенту.
+    /// Получить запись, которая уже сопоставлялась с переданным фактом, с дополнительной фильтрацией по контрагенту.
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <param name="propertyName">Имя свойства документа связанное с фактом.</param>
@@ -2890,6 +2633,21 @@ namespace Sungero.Capture.Server
       var arioUrl = Functions.Module.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
+    }
+    
+    /// <summary>
+    /// Получить адрес сервиса Арио.
+    /// </summary>
+    /// <returns>Адрес Арио.</returns>
+    [Remote]
+    public virtual string GetArioUrl()
+    {
+      var commandExecutionResult = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey);
+      var arioUrl = string.Empty;
+      if (!(commandExecutionResult is DBNull) && commandExecutionResult != null)
+        arioUrl = commandExecutionResult.ToString();
+      
+      return arioUrl;
     }
     
     /// <summary>
@@ -3161,7 +2919,7 @@ namespace Sungero.Capture.Server
     /// Создать тело документа.
     /// </summary>
     /// <param name="document">Документ Rx.</param>
-    /// <param name="versionNote">Примечание к версии.</param>    
+    /// <param name="versionNote">Примечание к версии.</param>
     /// <param name="recognitionResult">Результат обработки входящего документа в Арио.</param>
     public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
     {
@@ -3226,6 +2984,244 @@ namespace Sungero.Capture.Server
           .SingleOrDefault(x => x.Sid == Sungero.Docflow.PublicConstants.Module.UnknownAppSid);
       
       return app;
+    }
+    
+    /// <summary>
+    /// Поиск адресата письма.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Адресат.</returns>
+    public virtual Structures.Module.EmployeeWithFact GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
+    {
+      var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
+      if (fact == null)
+        return result;
+      
+      var addressee = GetFieldValue(fact, "Addressee");
+      var employees =  Company.PublicFunctions.Employee.Remote.GetEmployeesByName(addressee);
+      result.Employee = employees.FirstOrDefault();
+      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;
+      return result;
+    }
+
+    /// <summary>
+    /// Получить полное ФИО из частей имени содержащихся в факте.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
+    public static string GetFullNameByFact(Sungero.Capture.Structures.Module.IFact fact)
+    {
+      if (fact == null)
+        return string.Empty;
+      
+      var surname = GetFieldValue(fact, "Surname");
+      var name = GetFieldValue(fact, "Name");
+      var patronymic = GetFieldValue(fact, "Patrn");
+      
+      return GetFullNameByFact(surname, name, patronymic);
+    }
+    
+    /// <summary>
+    /// Получить полное ФИО из частей имени содержащихся в факте для договоров.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
+    public static string GetFullNameByFactForContract(Sungero.Capture.Structures.Module.IFact fact)
+    {
+      if (fact == null)
+        return string.Empty;
+      
+      var surname = GetFieldValue(fact, "SignatorySurname");
+      var name = GetFieldValue(fact, "SignatoryName");
+      var patronymic = GetFieldValue(fact, "SignatoryPatrn");
+      
+      return GetFullNameByFact(surname, name, patronymic);
+    }
+    
+    /// <summary>
+    /// Сформировать полное ФИО из частей имени.
+    /// </summary>
+    /// <param name="surnameFieldValue">Фамилия.</param>
+    /// <param name="nameFieldValue">Имя.</param>
+    /// <param name="patronymicFieldValue">Отчество.</param>
+    /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
+    public static string GetFullNameByFact(string surnameFieldValue, string nameFieldValue, string patronymicFieldValue)
+    {
+      // Собрать ФИО из фамилии, имени и отчества.
+      var parts = new List<string>();
+      
+      if (!string.IsNullOrWhiteSpace(surnameFieldValue))
+        parts.Add(surnameFieldValue);
+      if (!string.IsNullOrWhiteSpace(nameFieldValue))
+        parts.Add(nameFieldValue);
+      if (!string.IsNullOrWhiteSpace(patronymicFieldValue))
+        parts.Add(patronymicFieldValue);
+      
+      return string.Join(" ", parts);
+    }
+    
+    /// <summary>
+    /// Получить сокращенное ФИО из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <returns>Имя в формате "Фамилия И.О.".</returns>
+    public virtual string GetShortNameByFact(Sungero.Capture.Structures.Module.IFact fact)
+    {
+      if (fact == null)
+        return string.Empty;
+      
+      var surname = GetFieldValue(fact, "Surname");
+      var name = GetFieldValue(fact, "Name");
+      var patronymic = GetFieldValue(fact, "Patrn");
+      return Parties.PublicFunctions.Person.GetSurnameAndInitialsInTenantCulture(name, patronymic, surname);
+    }
+    
+    /// <summary>
+    /// Получить контактные лица по данным из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="counterparty">Контрагент - владелец контактного лица.</param>
+    /// <returns>Список контактных лиц.</returns>
+    public virtual IQueryable<IContact> GetContactsByFact(Sungero.Capture.Structures.Module.IFact fact, ICounterparty counterparty)
+    {
+      if (fact == null)
+        return new List<IContact>().AsQueryable();
+      
+      var fullName = GetFullNameByFact(fact);
+      var shortName = GetShortNameByFact(fact);
+      return Parties.PublicFunctions.Contact.GetContactsByName(fullName, shortName, counterparty);
+    }
+    
+    /// <summary>
+    /// Получить контактное лицо по данным из факта.
+    /// </summary>
+    /// <param name="fact">Факт Арио.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <param name="counterparty">Контрагент.</param>
+    /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
+    /// <returns>Контактное лицо.</returns>
+    public virtual Structures.Module.ContactWithFact GetContactByFact(Sungero.Capture.Structures.Module.IFact fact, string propertyName, ICounterparty counterparty, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.ContactWithFact.Create(Sungero.Parties.Contacts.Null, fact, false);
+      if (fact == null)
+        return result;
+      if (counterparty != null)
+      {
+        result = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString() ,counterpartyPropertyName);
+        if (result.Contact != null)
+          return result;
+      }
+      
+      var filteredContacts =  GetContactsByFact(fact, counterparty);
+      if (!filteredContacts.Any())
+        return result;
+      result.Contact = filteredContacts.FirstOrDefault();
+      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, "Type") : false;
+      return result;
+    }
+    
+    /// <summary>
+    /// Получить контактное лицо контрагента из верифицированных данных.
+    /// </summary>
+    /// <param name="fact">Факт Арио.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
+    /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
+    /// <returns>Контактное лицо.</returns>
+    public virtual Structures.Module.ContactWithFact GetContactByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
+      var contactField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
+      if (contactField == null)
+        return result;
+      int contactId;
+      if (!int.TryParse(contactField.VerifiedValue, out contactId))
+        return result;
+      
+      var filteredContact = Contacts.GetAll(x => x.Id == contactId).FirstOrDefault();
+      if (filteredContact != null)
+      {
+        result.Contact = filteredContact;
+        result.IsTrusted = contactField.IsTrusted == true;
+      }
+      return result;
+    }
+    
+    /// <summary>
+    /// Получить ведущие документы по номеру и дате из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="counterparty">Контрагент.</param>
+    /// <returns>Список документов с подходящими номером и датой.</returns>
+    public virtual IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Structures.Module.IFact fact, ICounterparty counterparty)
+    {
+      if (fact == null)
+        return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
+      
+      var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
+      var number = GetFieldValue(fact, "DocumentBaseNumber");
+      
+      if (string.IsNullOrWhiteSpace(number))
+        return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
+      
+      return Sungero.Contracts.ContractualDocuments.GetAll(x => x.RegistrationNumber == number &&
+                                                           x.RegistrationDate == docDate &&
+                                                           (counterparty == null || x.Counterparty.Equals(counterparty)));
+    }
+
+    /// <summary>
+    /// Получить ведущий документ по номеру и дате из факта.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="leadingDocPropertyName">Имя связанного свойства.</param>
+    /// <param name="counterparty">Контрагент.</param>
+    /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
+    /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
+    public virtual ContractWithFact GetLeadingDocument(IFact fact, string leadingDocPropertyName,
+                                                       ICounterparty counterparty, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
+      if (fact == null)
+        return result;
+      
+      if (string.IsNullOrEmpty(leadingDocPropertyName))
+      {
+        result = GetContractByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
+        if (result.Contract != null)
+          return result;
+      }
+      var contracts = GetLeadingDocuments(fact, counterparty);
+      result.Contract = contracts.FirstOrDefault();
+      result.IsTrusted = (contracts.Count() == 1) ? IsTrustedField(fact, "DocumentBaseNumber") : false;
+      return result;
+    }
+    
+    /// <summary>
+    /// Получить ведущий документ из верифицированных данных.
+    /// </summary>
+    /// <param name="fact">Факт.</param>
+    /// <param name="propertyName">Имя связанного свойства.</param>
+    /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
+    /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
+    /// <returns></returns>
+    public virtual Structures.Module.ContractWithFact GetContractByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    {
+      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
+      var contractField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
+      if (contractField == null)
+        return result;
+      
+      int docId;
+      if (!int.TryParse(contractField.VerifiedValue, out docId))
+        return result;
+      
+      var filteredDocument = Contracts.ContractualDocuments.GetAll(x => x.Id == docId).FirstOrDefault();
+      if (filteredDocument != null)
+      {
+        result.Contract = filteredDocument;
+        result.IsTrusted = contractField.IsTrusted == true;
+      }
+      return result;
     }
     
     #endregion
