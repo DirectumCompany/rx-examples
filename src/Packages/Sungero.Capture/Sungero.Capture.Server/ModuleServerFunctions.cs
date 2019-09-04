@@ -487,7 +487,7 @@ namespace Sungero.Capture.Server
          если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       CreateVersion(document, recognitionResult);
-      
+      Docflow.PublicFunctions.OfficialDocument.FillName(document);
       document.Save();
       return document;
     }
