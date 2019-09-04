@@ -156,6 +156,6 @@ namespace Sungero.Capture.Structures.Module
     public int LeadingDocumentId { get; set; }
     public List<int> RelatedDocumentIds { get; set; }
     public List<int> DocumentWithRegistrationFailureIds { get; set; }
-    public List<int> DocumentWithVersionByBarcodeIds { get; set; }
+    public List<int> DocumentFoundByBarcodeIds { get; set; }
   }
 }

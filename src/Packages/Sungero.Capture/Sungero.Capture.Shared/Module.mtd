@@ -202,7 +202,7 @@
           "ParameterTypeFullName": "System.Collections.Generic.List"
         },
         {
-          "Name": "documentsWithVersionByBarcode",
+          "Name": "documentsFoundByBarcode",
           "ParameterType": "global::System.Collections.Generic.List<global::Sungero.Docflow.IOfficialDocument>",
           "ParameterTypeFullName": "System.Collections.Generic.List"
         },
@@ -397,7 +397,7 @@
     "Kinds",
     "DocumentsWithRegistrationFailureTaskText",
     "CantProcessFileByArio",
-    "DocumentsWithVersionByBarcodeTaskText"
+    "DocumentsFoundByBarcodeTaskText"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

@@ -212,7 +212,7 @@
   <data name="CantProcessFileByArio" xml:space="preserve">
     <value>Обработать документ в Ario не получилось.</value>
   </data>
-  <data name="DocumentsWithVersionByBarcodeTaskText" xml:space="preserve">
+  <data name="DocumentsFoundByBarcodeTaskText" xml:space="preserve">
     <value>Найден существующий документ по штрихкоду. Создана новая версия.</value>
   </data>
 </root>
