@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
+using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
+using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
+using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
 
 namespace Sungero.Capture.Client
 {
@@ -244,20 +247,20 @@ namespace Sungero.Capture.Client
         return result;
       
       var mailCaptureInstanceInfoElement = infoXDoc
-        .Element(Constants.Module.InstanceInfosTagNames.CaptureInstanceInfoList)
-        .Element(Constants.Module.InstanceInfosTagNames.MailCaptureInstanceInfo);
+        .Element(InstanceInfosTagNames.CaptureInstanceInfoList)
+        .Element(InstanceInfosTagNames.MailCaptureInstanceInfo);
       
       if (mailCaptureInstanceInfoElement == null)
         return result;
       
-      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, Constants.Module.InstanceInfosTagNames.Subject);
+      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, InstanceInfosTagNames.Subject);
       
-      var fromElement = mailCaptureInstanceInfoElement.Element(Constants.Module.InstanceInfosTagNames.From);
+      var fromElement = mailCaptureInstanceInfoElement.Element(InstanceInfosTagNames.From);
       if (fromElement == null)
         return result;
       
-      result.FromEmail = GetAttributeStringValue(fromElement, Constants.Module.InstanceInfosTagNames.FromTags.Address);
-      result.Name = GetAttributeStringValue(fromElement, Constants.Module.InstanceInfosTagNames.FromTags.Name);
+      result.FromEmail = GetAttributeStringValue(fromElement, InstanceInfosTagNames.FromTags.Address);
+      result.Name = GetAttributeStringValue(fromElement, InstanceInfosTagNames.FromTags.Name);
       
       return result;
     }
@@ -281,7 +284,7 @@ namespace Sungero.Capture.Client
     public virtual void RemoveImagesFromEmailBody(string path)
     {
       // Нет смысла удалять изображения в файлах, расширение которых не html.
-      if (Path.GetExtension(path).ToLower() != Constants.Module.htmlExtension)
+      if (Path.GetExtension(path).ToLower() != Constants.Module.HtmlExtension.WithPeriod)
         return;
 
       try
@@ -504,15 +507,15 @@ namespace Sungero.Capture.Client
     {
       return new Dictionary<string, string>()
       {
-        { Constants.Module.ArioClassNames.Letter, Constants.Module.ArioGrammarNames.Letter},
-        { Constants.Module.ArioClassNames.ContractStatement, Constants.Module.ArioGrammarNames.ContractStatement},
-        { Constants.Module.ArioClassNames.Waybill, Constants.Module.ArioGrammarNames.Waybill},
-        { Constants.Module.ArioClassNames.UniversalTransferDocument, Constants.Module.ArioGrammarNames.UniversalTransferDocument},
-        { Constants.Module.ArioClassNames.UniversalTransferCorrectionDocument, Constants.Module.ArioGrammarNames.UniversalTransferCorrectionDocument},
-        { Constants.Module.ArioClassNames.TaxInvoice, Constants.Module.ArioGrammarNames.TaxInvoice},
-        { Constants.Module.ArioClassNames.TaxinvoiceCorrection, Constants.Module.ArioGrammarNames.TaxinvoiceCorrection},
-        { Constants.Module.ArioClassNames.IncomingInvoice, Constants.Module.ArioGrammarNames.IncomingInvoice},
-        { Constants.Module.ArioClassNames.Contract, Constants.Module.ArioGrammarNames.Contract}
+        { ArioClassNames.Letter, ArioGrammarNames.Letter},
+        { ArioClassNames.ContractStatement, ArioGrammarNames.ContractStatement},
+        { ArioClassNames.Waybill, ArioGrammarNames.Waybill},
+        { ArioClassNames.UniversalTransferDocument, ArioGrammarNames.UniversalTransferDocument},
+        { ArioClassNames.UniversalTransferCorrectionDocument, ArioGrammarNames.UniversalTransferCorrectionDocument},
+        { ArioClassNames.TaxInvoice, ArioGrammarNames.TaxInvoice},
+        { ArioClassNames.TaxinvoiceCorrection, ArioGrammarNames.TaxinvoiceCorrection},
+        { ArioClassNames.IncomingInvoice, ArioGrammarNames.IncomingInvoice},
+        { ArioClassNames.Contract, ArioGrammarNames.Contract}
       };
     }
     

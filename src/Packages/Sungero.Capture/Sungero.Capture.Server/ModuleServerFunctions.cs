@@ -15,7 +15,8 @@ using Sungero.Workflow;
 using FieldNames = Sungero.Capture.Constants.Module.FieldNames;
 using FactNames = Sungero.Capture.Constants.Module.FactNames;
 using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
-using CounterpartyTypes =Sungero.Capture.Constants.Module.CounterpartyTypes;
+using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
+using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 
 namespace Sungero.Capture.Server
 {
@@ -416,7 +417,7 @@ namespace Sungero.Capture.Server
       var recognizedClass = recognitionResult.PredictedClass;
       var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
-      if (recognizedClass == Constants.Module.ArioClassNames.Letter)
+      if (recognizedClass == ArioClassNames.Letter)
       {
         document = isMockMode
           ? CreateMockIncomingLetter(recognitionResult)
@@ -424,7 +425,7 @@ namespace Sungero.Capture.Server
       }
       
       // Акт выполненных работ.
-      else if (recognizedClass == Constants.Module.ArioClassNames.ContractStatement)
+      else if (recognizedClass == ArioClassNames.ContractStatement)
       {
         document = isMockMode
           ? CreateMockContractStatement(recognitionResult)
@@ -432,7 +433,7 @@ namespace Sungero.Capture.Server
       }
       
       // Товарная накладная.
-      else if (recognizedClass == Constants.Module.ArioClassNames.Waybill)
+      else if (recognizedClass == ArioClassNames.Waybill)
       {
         document = isMockMode
           ? CreateMockWaybill(recognitionResult)
@@ -440,7 +441,7 @@ namespace Sungero.Capture.Server
       }
       
       // Счет-фактура.
-      else if (recognizedClass == Constants.Module.ArioClassNames.TaxInvoice)
+      else if (recognizedClass == ArioClassNames.TaxInvoice)
       {
         document = isMockMode
           ? CreateMockIncomingTaxInvoice(recognitionResult)
@@ -448,25 +449,25 @@ namespace Sungero.Capture.Server
       }
       
       // Корректировочный счет-фактура.
-      else if (recognizedClass == Constants.Module.ArioClassNames.TaxinvoiceCorrection && !isMockMode)
+      else if (recognizedClass == ArioClassNames.TaxinvoiceCorrection && !isMockMode)
       {
         document = CreateTaxInvoice(recognitionResult, true, responsible);
       }
       
       // УПД.
-      else if (recognizedClass == Constants.Module.ArioClassNames.UniversalTransferDocument && !isMockMode)
+      else if (recognizedClass == ArioClassNames.UniversalTransferDocument && !isMockMode)
       {
         document = CreateUniversalTransferDocument(recognitionResult, false, responsible);
       }
       
       // УКД.
-      else if (recognizedClass == Constants.Module.ArioClassNames.UniversalTransferCorrectionDocument && !isMockMode)
+      else if (recognizedClass == ArioClassNames.UniversalTransferCorrectionDocument && !isMockMode)
       {
         document = CreateUniversalTransferDocument(recognitionResult, true, responsible);
       }
       
       // Счет на оплату.
-      else if (recognizedClass == Constants.Module.ArioClassNames.IncomingInvoice)
+      else if (recognizedClass == ArioClassNames.IncomingInvoice)
       {
         document = isMockMode
           ? CreateMockIncomingInvoice(recognitionResult)
@@ -474,7 +475,7 @@ namespace Sungero.Capture.Server
       }
       
       // Договор.
-      else if (recognizedClass == Constants.Module.ArioClassNames.Contract && isMockMode)
+      else if (recognizedClass == ArioClassNames.Contract && isMockMode)
       {
         document = CreateMockContract(recognitionResult);
       }
@@ -739,15 +740,15 @@ namespace Sungero.Capture.Server
       {
         document.CreateVersion();
         var version = document.LastVersion;
-        if (Path.GetExtension(bodyInfo.Path).ToLower() == ".html")
+        if (Path.GetExtension(bodyInfo.Path).ToLower() == Constants.Module.HtmlExtension.WithPeriod)
         {
           var pdfConverter = new AsposeExtensions.Converter();
-          using (var pdfDocumentStream = pdfConverter.GeneratePdf(body, "html"))
+          using (var pdfDocumentStream = pdfConverter.GeneratePdf(body, Constants.Module.HtmlExtension.WithoutPeriod))
           {
             if (pdfDocumentStream != null)
             {
               version.Body.Write(pdfDocumentStream);
-              version.AssociatedApplication = Content.AssociatedApplications.GetByExtension("pdf");
+              version.AssociatedApplication = Content.AssociatedApplications.GetByExtension(Constants.Module.PdfExtension);
             }
           }
         }
