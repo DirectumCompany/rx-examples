@@ -126,5 +126,121 @@ namespace Sungero.Capture.Constants
       
       public const string Contract = "Contract";
     }
+    
+    public static class FieldNames
+    {
+      public static class Letter
+      {
+        public const string Addressee = "Addressee";
+        
+        public const string CorrespondentLegalForm = "CorrespondentLegalForm";
+        
+        public const string CorrespondentName = "CorrespondentName";
+        
+        public const string Date = "Date";
+        
+        public const string Number = "Number";
+        
+        public const string ResponseToDate = "ResponseToDate";
+        
+        public const string ResponseToNumber = "ResponseToNumber";
+        
+        public const string Subject = "Subject";
+      }
+      
+      public static class LetterPerson
+      {
+        public const string Surname = "Surname";
+        
+        public const string Type = "Type";
+      }
+      
+      public static class Counterparty
+      {
+        public const string LegalForm = "LegalForm";
+        
+        public const string Name = "Name";
+        
+        public const string TIN = "TIN";
+        
+        public const string TRRC = "TRRC";
+        
+        public const string CounterpartyType = "CounterpartyType";
+        
+        public const string SignatorySurname = "SignatorySurname";
+        
+        public const string SignatoryName = "SignatoryName";
+        
+        public const string SignatoryPatrn = "SignatoryPatrn";
+      }
+      
+      public static class Counterparty
+      {
+        public const string TIN = "TIN";
+        
+        public const string TRRC = "TRRC";
+      }
+      
+      public static class Document
+      {
+        public const string Date = "Date";
+        
+        public const string Number = "Number";
+      }
+      
+      public static class DocumentAmount
+      {
+        public const string Amount = "Amount";
+        
+        public const string Currency = "Currency";
+        
+        public const string VatAmount = "VatAmount";
+      }
+      
+      public static class FinancialDocument
+      {
+        public const string DocumentBaseName = "DocumentBaseName";
+        
+        public const string Date = "Date";
+        
+        public const string Number = "Number";
+        
+        public const string CorrectionDate = "CorrectionDate";
+        
+        public const string CorrectionNumber = "CorrectionNumber";
+      }
+      
+      public static class Goods
+      {
+        public const string Name = "Name";
+        
+        public const string Count = "Count";
+        
+        public const string UnitName = "UnitName";
+        
+        public const string Price = "Price";
+        
+        public const string VatAmount = "VatAmount";
+        
+        public const string Amount = "Amount";
+      }
+    }
+    
+    public static class FactNames
+    {
+      public const string Letter = "Letter";
+      
+      public const string LetterPerson = "LetterPerson";
+      
+      public const string Counterparty = "Counterparty";
+      
+      public const string Document = "Document";
+      
+      public const string DocumentAmount = "DocumentAmount";
+      
+      public const string FinancialDocument = "FinancialDocument";
+      
+      public const string Goods = "Goods";
+    }
   }
 }
