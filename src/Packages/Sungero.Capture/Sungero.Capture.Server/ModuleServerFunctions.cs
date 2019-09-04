@@ -592,6 +592,17 @@ namespace Sungero.Capture.Server
       // Текст задачи.
       task.ActiveText = Resources.CheckPackageTaskText;
       
+      // Добавить в текст задачи список документов, которые найдены по штрихкоду.
+      if (documentsFoundByBarcode.Any())
+      {
+        var documentsFoundBarcodeTaskText = Sungero.Capture.Resources.DocumentsFoundByBarcodeTaskText;
+        
+        var documentsFoundByBarcodeHyperlinksLabel = string.Join("\n    ", documentsFoundByBarcodeHyperlinks);
+        
+        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsFoundBarcodeTaskText,
+                                        documentsFoundByBarcodeHyperlinksLabel);
+      }
+      
       // Добавить в текст задачи список не классифицированных документов.
       if (notClassifiedDocumentsHyperlinks.Any())
       {
@@ -621,18 +632,7 @@ namespace Sungero.Capture.Server
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText,
                                         documentsWithRegistrationFailureHyperlinksLabel);
       }
-      
-      // Добавить в текст задачи список документов, которые найдены по штрихкоду.
-      if (documentsFoundByBarcode.Any())
-      {
-        var documentsFoundBarcodeTaskText = Sungero.Capture.Resources.DocumentsFoundByBarcodeTaskText;
-        
-        var documentsFoundByBarcodeHyperlinksLabel = string.Join("\n    ", documentsFoundByBarcodeHyperlinks);
-        
-        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsFoundBarcodeTaskText,
-                                        documentsFoundByBarcodeHyperlinksLabel);
-      }
-      
+                  
       // Маршрут.
       var step = task.RouteSteps.AddNew();
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
