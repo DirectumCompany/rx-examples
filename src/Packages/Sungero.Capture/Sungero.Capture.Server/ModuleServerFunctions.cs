@@ -7,6 +7,7 @@ using System.Text;
 using Sungero.Company;
 using Sungero.Core;
 using Sungero.CoreEntities;
+using Sungero.Domain.Shared;
 using Sungero.Docflow;
 using Sungero.Capture.Structures.Module;
 using Sungero.Parties;
@@ -811,7 +812,7 @@ namespace Sungero.Capture.Server
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       var facts = recognitionResult.Facts;
       var subjectFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Subject).FirstOrDefault();
       var subject = GetFieldValue(subjectFact, FieldNames.Letter.Subject);
@@ -891,14 +892,14 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
       var props = document.Info.Properties;
       var facts = recognitionResult.Facts;
       
       // Заполнить основные свойства.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // Заполнить дату и номер письма со стороны корреспондента.
       var dateFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
@@ -1004,13 +1005,13 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public static Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       var props = document.Info.Properties;
       
       // Заполнить основные свойства.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       var facts = recognitionResult.Facts;
       
       // Договор.
@@ -1129,7 +1130,7 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var document = FinancialArchive.ContractStatements.Create();
       var props = AccountingDocumentBases.Info.Properties;
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
@@ -1175,13 +1176,13 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки накладной в Ario.</param>
     /// <returns>Накладная.</returns>
-    public static Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockWaybills.Create();
       var props = document.Info.Properties;
       
       // Основные свойства.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       var facts = recognitionResult.Facts;
       
       // Договор.
@@ -1290,7 +1291,7 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var document = FinancialArchive.Waybills.Create();
       var props = document.Info.Properties;
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
@@ -1338,12 +1339,12 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Счет-фактура.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.IRecognitionResult recognitionResult)
     {
       var facts = recognitionResult.Facts;
       var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
       var props = document.Info.Properties;
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -1515,7 +1516,7 @@ namespace Sungero.Capture.Server
       counterpartyAndBusinessUnitFacts.ResponsibleEmployeeBusinessUnit = responsibleEmployeeBusinessUnit;
       
       // Вид документа.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // НОР и КА.
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
@@ -1580,7 +1581,7 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       var props = document.Info.Properties;
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
@@ -1621,13 +1622,13 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Счет на оплату.</returns>
-    public static Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockIncomingInvoices.Create();
       var props = document.Info.Properties;
       
       // Основные свойства.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       var facts = recognitionResult.Facts;
       
       // Договор.
@@ -1734,7 +1735,7 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var document = Contracts.IncomingInvoices.Create();
       var props = document.Info.Properties;
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
@@ -1791,12 +1792,12 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <returns>Договор.</returns>
-    public static Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockContracts.Create();
       
       // Основные свойства.
-      document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      FillDocumentKind(document);
       document.Name = document.DocumentKind.ShortName;
       var props = document.Info.Properties;
       var facts = recognitionResult.Facts;
@@ -1867,6 +1868,29 @@ namespace Sungero.Capture.Server
     #endregion
     
     #region Заполнение свойств документа
+    
+    public virtual void FillDocumentKind(IOfficialDocument document)
+    {
+      var documentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
+      if (documentKind == null)
+      {        
+        documentKind = Docflow.PublicFunctions.DocumentKind.GetAvailableDocumentKinds(document).FirstOrDefault();
+        if (documentKind == null)
+        {
+          Logger.Error(string.Format("Can not fill document kind for document type {0}.", GetTypeName(document)));
+           return;           
+        }
+        Logger.Debug(string.Format("Can not find default documend kind for document type {0}", GetTypeName(document)));
+      }
+      document.DocumentKind = documentKind;      
+    }
+        
+    public string GetTypeName(Sungero.Domain.Shared.IEntity entity)
+    {
+      var entityFinalType = entity.GetType().GetFinalType();
+      var entityTypeMetadata = Sungero.Metadata.Services.MetadataSearcher.FindEntityMetadata(entityFinalType);
+      return entityTypeMetadata.GetDisplayName();
+    }
     
     /// <summary>
     /// Заполнить НОР и контрагента в бухгалтерском документе.
