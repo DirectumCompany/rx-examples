@@ -1628,49 +1628,49 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       
       // Договор.
-      var leadingDocFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      var leadingDocFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isTrusted = IsTrustedField(leadingDocFact, "DocumentBaseName");
+      var isTrusted = IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
       LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
-      var seller = GetMostProbableMockCounterparty(facts, "SELLER");
+      var seller = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Seller);
       if (seller != null)
       {
         document.SellerName = seller.Name;
         document.SellerTin = seller.Tin;
         document.SellerTrrc = seller.Trrc;
-        LinkFactAndProperty(recognitionResult, seller.Fact, "Name", props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, "LegalForm", props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, "TIN", props.SellerTin.Name, seller.Tin);
-        LinkFactAndProperty(recognitionResult, seller.Fact, "TRRC", props.SellerTrrc.Name, seller.Trrc);
+        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, seller.Name);
+        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, seller.Tin);
+        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, seller.Trrc);
       }
       
-      var buyer = GetMostProbableMockCounterparty(facts, "BUYER");
+      var buyer = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Buyer);
       if (buyer != null)
       {
         document.BuyerName = buyer.Name;
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognitionResult, buyer.Fact, "Name", props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, "LegalForm", props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, "TIN", props.BuyerTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, "TRRC", props.BuyerTrrc.Name, buyer.Trrc);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, buyer.Name);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, buyer.Tin);
+        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, buyer.Trrc);
       }
       
       // Могут прийти контрагенты без типа. Заполнить контрагентами без типа.
       if (seller == null || buyer == null)
       {
-        var withoutTypeFacts = GetFacts(facts, "Counterparty", "Name")
-          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, "CounterpartyType")))
-          .OrderByDescending(x => x.Fields.First(f => f.Name == "Name").Probability);
+        var withoutTypeFacts = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.Name)
+          .Where(f => string.IsNullOrWhiteSpace(GetFieldValue(f, FieldNames.Counterparty.CounterpartyType)))
+          .OrderByDescending(x => x.Fields.First(f => f.Name == FieldNames.Counterparty.Name).Probability);
         foreach (var fact in withoutTypeFacts)
         {
-          var name = GetCorrespondentName(fact, "Name", "LegalForm");
+          var name = GetCorrespondentName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
           
-          var tin = GetFieldValue(fact, "TIN");
-          var trrc = GetFieldValue(fact, "TRRC");
-          var type = GetFieldValue(fact, "CounterpartyType");
+          var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+          var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+          var type = GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType);
           
           if (string.IsNullOrWhiteSpace(document.SellerName))
           {
@@ -1735,31 +1735,31 @@ namespace Sungero.Capture.Server
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
-      counterpartyTypes.Add("SELLER");
-      counterpartyTypes.Add("BUYER");
+      counterpartyTypes.Add(CounterpartyTypes.Seller);
+      counterpartyTypes.Add(CounterpartyTypes.Buyer);
       counterpartyTypes.Add(string.Empty);
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault();
-      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault();
+      var sellerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
       var nonTypeFacts = factMatches.Where(m => m.Type == string.Empty).ToList();
       var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, nonTypeFacts, responsible);
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
       LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
       
       // Договор.
-      var contractFact = GetOrderedFacts(facts, "FinancialDocument", "DocumentBaseName").FirstOrDefault();
+      var contractFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       var contract = GetLeadingDocument(contractFact, document.Info.Properties.Contract.Name, document.Counterparty, document.Info.Properties.Counterparty.Name);
       document.Contract = contract.Contract;
       LinkFactAndProperty(recognitionResult, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
       
       // Дата.
-      var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
-      document.Date = GetFieldDateTimeValue(dateFact, "Date");
-      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Date.Name, document.Date);
+      var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
+      document.Date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, document.Date);
       
       // Номер.
-      var number = GetFieldValue(numberFact, "Number");
+      var number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
       Nullable<bool> isTrustedNumber = null;
       if (number.Length > document.Info.Properties.Number.Length)
       {
@@ -1767,7 +1767,7 @@ namespace Sungero.Capture.Server
         isTrustedNumber = false;
       }
       document.Number = number;
-      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.Number.Name, document.Number, isTrustedNumber);
+      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number, isTrustedNumber);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
