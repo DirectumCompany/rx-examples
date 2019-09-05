@@ -812,19 +812,19 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       var facts = recognitionResult.Facts;
-      var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
-      var subject = GetFieldValue(subjectFact, "Subject");
+      var subjectFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Subject).FirstOrDefault();
+      var subject = GetFieldValue(subjectFact, FieldNames.Letter.Subject);
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognitionResult, subjectFact, "Subject", props.Subject.Name, document.Subject);
+        LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
       }
       
       // Адресат.
-      var addresseeFact = GetOrderedFacts(facts, "Letter", "Addressee").FirstOrDefault();
+      var addresseeFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Addressee).FirstOrDefault();
       var addressee = GetAdresseeByFact(addresseeFact);
       document.Addressee = addressee.Employee;
-      LinkFactAndProperty(recognitionResult, addresseeFact, "Addressee", props.Addressee.Name, document.Addressee, addressee.IsTrusted);
+      LinkFactAndProperty(recognitionResult, addresseeFact, FieldNames.Letter.Addressee, props.Addressee.Name, document.Addressee, addressee.IsTrusted);
       
       // Заполнить данные корреспондента.
       var correspondent = GetCounterparty(facts, props.Correspondent.Name);
@@ -835,12 +835,12 @@ namespace Sungero.Capture.Server
       }
       
       // Дата номер.
-      var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
-      document.Dated = GetFieldDateTimeValue(dateFact, "Date");
-      document.InNumber = GetFieldValue(numberFact, "Number");
-      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Dated.Name, document.Dated);
-      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
+      var dateFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
+      document.Dated = GetFieldDateTimeValue(dateFact, FieldNames.Letter.Date);
+      document.InNumber = GetFieldValue(numberFact, FieldNames.Letter.Number);
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
+      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
       
       // Заполнить данные нашей стороны.
       // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
@@ -857,8 +857,8 @@ namespace Sungero.Capture.Server
         : Company.PublicFunctions.Department.GetDepartment(responsible);
       
       // Заполнить подписанта.
-      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
-      var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
+      var personFacts = GetOrderedFacts(facts, FactNames.LetterPerson, FieldNames.LetterPerson.Surname);
+      var signatoryFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Signatory).FirstOrDefault();
       var signedBy = GetContactByFact(signatoryFact, document.Info.Properties.SignedBy.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);
       
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
@@ -867,11 +867,11 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, signedBy.Contact.Company, signedBy.IsTrusted);
       }
       document.SignedBy = signedBy.Contact;
-      var isTrustedSignatory = IsTrustedField(signatoryFact, "Type");
+      var isTrustedSignatory = IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type);
       LinkFactAndProperty(recognitionResult, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
       
       // Заполнить контакт.
-      var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
+      var responsibleFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
       var contact = GetContactByFact(responsibleFact, document.Info.Properties.Contact.Name, document.Correspondent, document.Info.Properties.Correspondent.Name);
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
       if (document.Correspondent == null && contact.Contact != null)
@@ -879,7 +879,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, contact.Contact.Company, contact.IsTrusted);
       }
       document.Contact = contact.Contact;
-      var isTrustedContact = IsTrustedField(responsibleFact, "Type");
+      var isTrustedContact = IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
       LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
       return document;
@@ -900,95 +900,95 @@ namespace Sungero.Capture.Server
       document.DocumentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       
       // Заполнить дату и номер письма со стороны корреспондента.
-      var dateFact = GetOrderedFacts(facts, "Letter", "Date").FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, "Letter", "Number").FirstOrDefault();
-      document.InNumber = GetFieldValue(numberFact, "Number");
-      document.Dated = Functions.Module.GetShortDate(GetFieldValue(dateFact, "Date"));
-      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Dated.Name, document.Dated);
-      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.InNumber.Name, document.InNumber);
+      var dateFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
+      document.InNumber = GetFieldValue(numberFact, FieldNames.Letter.Number);
+      document.Dated = Functions.Module.GetShortDate(GetFieldValue(dateFact, FieldNames.Letter.Date));
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
+      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
-      var correspondentNameFacts = GetOrderedFacts(facts, "Letter", "CorrespondentName");
+      var correspondentNameFacts = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName);
       if (correspondentNameFacts.Count() > 0)
       {
         var fact = correspondentNameFacts.First();
-        document.Correspondent = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(recognitionResult, fact, "CorrespondentName", props.Correspondent.Name, document.Correspondent);
+        document.Correspondent = GetCorrespondentName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Letter.CorrespondentName, props.Correspondent.Name, document.Correspondent);
       }
       if (correspondentNameFacts.Count() > 1)
       {
         var fact = correspondentNameFacts.Last();
-        document.Recipient = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
-        LinkFactAndProperty(recognitionResult, fact, "CorrespondentName", props.Recipient.Name, document.Recipient);
+        document.Recipient = GetCorrespondentName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Letter.CorrespondentName, props.Recipient.Name, document.Recipient);
       }
       
       // Заполнить ИНН/КПП для КА и НОР.
-      var tinTrrcFacts = GetOrderedFacts(facts, "Counterparty", "TIN");
+      var tinTrrcFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN);
       if (tinTrrcFacts.Count() > 0)
       {
         var fact = tinTrrcFacts.First();
-        document.CorrespondentTin = GetFieldValue(fact, "TIN");
-        document.CorrespondentTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognitionResult, fact, "TIN", props.CorrespondentTin.Name, document.CorrespondentTin);
-        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
+        document.CorrespondentTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        document.CorrespondentTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.CorrespondentTin.Name, document.CorrespondentTin);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
       }
       
       if (tinTrrcFacts.Count() > 1)
       {
         var fact = tinTrrcFacts.Last();
-        document.RecipientTin = GetFieldValue(fact, "TIN");
-        document.RecipientTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognitionResult, fact, "TIN", props.RecipientTin.Name, document.RecipientTin);
-        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.RecipientTrrc.Name, document.RecipientTrrc);
+        document.RecipientTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        document.RecipientTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.RecipientTin.Name, document.RecipientTin);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.RecipientTrrc.Name, document.RecipientTrrc);
       }
       
       // В ответ на.
-      var responseToNumberFact = GetOrderedFacts(facts, "Letter", "ResponseToNumber").FirstOrDefault();
-      var responseToNumber = GetFieldValue(responseToNumberFact, "ResponseToNumber");
-      var responseToDateFact = GetOrderedFacts(facts, "Letter", "ResponseToDate").FirstOrDefault();
-      var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, "Letter", "ResponseToDate"));
+      var responseToNumberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.ResponseToNumber).FirstOrDefault();
+      var responseToNumber = GetFieldValue(responseToNumberFact, FieldNames.Letter.ResponseToNumber);
+      var responseToDateFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.ResponseToDate).FirstOrDefault();
+      var responseToDate = Functions.Module.GetShortDate(GetFieldValue(facts, FactNames.Letter, FieldNames.Letter.ResponseToDate));
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? responseToNumber
         : string.Format("{0} {1} {2}", responseToNumber, Sungero.Docflow.Resources.From, responseToDate);
-      LinkFactAndProperty(recognitionResult, responseToNumberFact, "ResponseToNumber", props.InResponseTo.Name, document.InResponseTo);
-      LinkFactAndProperty(recognitionResult, responseToDateFact, "ResponseToDate", props.InResponseTo.Name, document.InResponseTo);
+      LinkFactAndProperty(recognitionResult, responseToNumberFact, FieldNames.Letter.ResponseToNumber, props.InResponseTo.Name, document.InResponseTo);
+      LinkFactAndProperty(recognitionResult, responseToDateFact, FieldNames.Letter.ResponseToDate, props.InResponseTo.Name, document.InResponseTo);
       
       // Заполнить подписанта.
-      var personFacts = GetOrderedFacts(facts, "LetterPerson", "Surname");
+      var personFacts = GetOrderedFacts(facts, FactNames.LetterPerson, FieldNames.LetterPerson.Surname);
       if (document.Signatory == null)
       {
-        var signatoryFact = personFacts.Where(x => GetFieldValue(x, "Type") == "SIGNATORY").FirstOrDefault();
+        var signatoryFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Signatory).FirstOrDefault();
         document.Signatory = GetFullNameByFact(signatoryFact);
-        var isTrusted = IsTrustedField(signatoryFact, "Type");
+        var isTrusted = IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type);
         LinkFactAndProperty(recognitionResult, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
       }
       
       // Заполнить контакт.
       if (document.Contact == null)
       {
-        var responsibleFact = personFacts.Where(x => GetFieldValue(x, "Type") == "RESPONSIBLE").FirstOrDefault();
+        var responsibleFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
         document.Contact = GetFullNameByFact(responsibleFact);
-        var isTrusted = IsTrustedField(responsibleFact, "Type");
+        var isTrusted = IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
         LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
       }
       
       // Заполнить данные нашей стороны.
-      var addresseeFacts = GetFacts(facts, "Letter", "Addressee");
+      var addresseeFacts = GetFacts(facts, FactNames.Letter, FieldNames.Letter.Addressee);
       foreach (var fact in addresseeFacts)
       {
-        var addressee = GetFieldValue(fact, "Addressee");
+        var addressee = GetFieldValue(fact, FieldNames.Letter.Addressee);
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
       }
       foreach (var fact in addresseeFacts)
         LinkFactAndProperty(recognitionResult, fact, null, props.Addressees.Name, document.Addressees, true);
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
-      var subjectFact = GetOrderedFacts(facts, "Letter", "Subject").FirstOrDefault();
-      var subject = GetFieldValue(subjectFact, "Subject");
+      var subjectFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Subject).FirstOrDefault();
+      var subject = GetFieldValue(subjectFact, FieldNames.Letter.Subject);
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognitionResult, subjectFact, "Subject", props.Subject.Name, document.Subject);
+        LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
       }
       
       return document;
