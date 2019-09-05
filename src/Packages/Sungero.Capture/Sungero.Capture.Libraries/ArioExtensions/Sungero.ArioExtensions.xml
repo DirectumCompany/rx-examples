@@ -1,0 +1,677 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Sungero.ArioExtensions</name>
+    </assembly>
+    <members>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.GetDocumentByGuid(System.String)">
+            <summary>
+            Получить pdf-документ по гуиду.
+            </summary>
+            <param name="documentGuid">Гуид документа.</param>
+            <returns>PDF-документ.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.ConvertDocumentToPdfAndGetGuid(System.Byte[],System.String)">
+            <summary>
+            Преобразовать документ в pdf и получить Guid.
+            </summary>
+            <param name="document">Документ.</param>
+            <param name="docName">Имя документа.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.UpdateGuidInClassificationResults(System.String,System.String)">
+            <summary>
+            Обновить Guid pdf документа в исходном результате распознавания.
+            </summary>
+            <param name="source">Исходный json результатов распознавания.</param>
+            <param name="guid">Guid.</param>
+            <returns>json результатов распознавания с обновленным guid.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.GetTrainTaskInfo(System.String)">
+            <summary>
+            Получить информацию о состоянии задачи.
+            </summary>
+            <param name="trainTaskId"> Ид задачи.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.TrainClassifierByFolder(System.String,System.String)">
+            <summary>
+            Обучить классификатор через папку с файлами.
+            </summary>
+            <param name="classifierId">Ид классификатора.</param>
+            <param name="folderPath">Путь к папке.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.ClassifyAndExtractFacts(System.Byte[],System.String,System.String,System.String,System.Collections.Generic.Dictionary{System.String,System.String})">
+            <summary>
+            Классификация и извлечение фактов.
+            </summary>
+            <param name="document">Файл.</param>
+            <param name="mapping">Связь класса документа с правилом извлечения фактов. 
+            Ключ - имя класса, значение - имя правила.</param>
+            <param name="classifierId"> Ид классификатора</param>
+            <param name="pageClassifierId">Ид классификатора первых страниц.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.CreateClassifier(System.String,System.String,System.Boolean)">
+            <summary>
+            Создать новый классификатор.
+            </summary>
+            <param name="name">Имя классификатора.</param>
+            <param name="minProbability">Минимальная точнось.</param>
+            <param name="autoPublish">Автопубликация модели.</param>
+            <returns>Классификатор.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.Classify(System.Byte[],System.String,System.String,System.String)">
+            <summary>
+            Классификация файла.
+            </summary>
+            <param name="document">Файл.</param>
+            <param name="documentName">Имя файла.</param>
+            <param name="classifierId">Ид классификатора.</param>
+            <param name="pageClassifierId">Ид классификатора первых страниц.</param>
+            <returns>Результат классификации.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.ExportClassifierModel(System.String,System.String)">
+            <summary>
+            Экспорт модели классификатора из сервиса. 
+            </summary>
+            <param name="classifierId">Ид классификатора.</param>
+            <param name="modelId">Ид модели.</param>
+            <returns>Модель. Zip архив.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.ImportClassifierModel(System.String,System.String)">
+            <summary>
+            Импорт модели классификатора.
+            </summary>
+            <param name="filePath">Путь до файла модели.</param>
+            <param name="classifierId">ID классификатора.</param>
+            <returns>Модель классификатора.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.ExtractFacts(System.Byte[],System.String,System.String,System.String)">
+            <summary>
+            Извлечение фактов из файла.
+            </summary>
+            <param name="document">Файл.</param>
+            <param name="documentName">Имя файла.</param>
+            <param name="pageClassifierId">Ид классификатора первых страниц.</param>
+            <param name="ruleName">Имя правила извлечения файлов.</param>
+            <returns>Результат извлечения фактов.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.GetClassifiers">
+            <summary>
+            Получить список классификаторов из Арио.
+            </summary>
+            <returns>Список Классификаторов.</returns>
+        </member>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.GetClassifierByName(System.String)">
+            <summary>
+            Получить классификатор по имени.
+            </summary>
+            <param name="classifierName">Имя классификатора.</param>
+            <returns>Классификатор, или null если не найден.</returns>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.Class">
+            <summary>
+            Класс классификатора.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Class.Id">
+            <summary>
+            Ид класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Class.DisplayName">
+            <summary>
+            Отображаемое имя класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Class.Name">
+            <summary>
+            Имя класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Class.Metrics">
+            <summary>
+            Метрики класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Class.ClassifierModelId">
+            <summary>
+            Ид модели классификации.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ClassificationResult">
+            <summary>
+            Результат классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.Id">
+            <summary>
+            ИД результата классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.ClassifierId">
+            <summary>
+            ИД классификатора.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.Classifier">
+            <summary>
+            Классификатор.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.ClassifierModelId">
+            <summary>
+            ИД модели классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.Classified">
+            <summary>
+            Время выполнения классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.Duration">
+            <summary>
+            Продолжительность классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.ClassResults">
+            <summary>
+            Список результатов классификации по классам.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.PredictedClassId">
+            <summary>
+            ИД предсказанного класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.PredictedClass">
+            <summary>
+            Предсказанный класс.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.PredictedProbability">
+            <summary>
+            Вероятность предсказанного класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.ExpectedClassId">
+            <summary>
+            ИД ожидаемого класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.ExpectedClass">
+            <summary>
+            Ожидаемый класс.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.DocumentGuid">
+            <summary>
+            Guid документа.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.Error">
+            <summary>
+            Ошибки классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassificationResult.Message">
+            <summary>
+            Сообщения об ошибках классификации.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.Classifier">
+            <summary>
+            Классификатор.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.Id">
+            <summary>
+            ИД классификатора.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.Name">
+            <summary>
+            Название.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.Status">
+            <summary>
+            Статус.
+            </summary>
+            <remarks>1 - активный, 0 - черновик.</remarks>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.Created">
+            <summary>
+            Дата время создания.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.Published">
+            <summary>
+            Дата время публикации модели.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.AutoPublish">
+            <summary>
+            Признак автопубликации модели.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.MinProbability">
+            <summary>
+            Минимальная вероятность.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.PublishedModelId">
+            <summary>
+            ИД опубликованной модели.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.PublishedModel">
+            <summary>
+            Опубликованная модель.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Classifier.ClassifierModels">
+            <summary>
+            Модели классиификатора.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ClassifierModel">
+            <summary>
+            Модель классификатора.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassifierModel.Id">
+            <summary>
+            ИД классификатора.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassifierModel.Created">
+            <summary>
+            Время создания.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassifierModel.Metrics">
+            <summary>
+            Метрики.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassifierModel.TrainErrors">
+            <summary>
+            Ошибки обучения.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassifierModel.Classes">
+            <summary>
+            Классы.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ClassResult">
+            <summary>
+            Результат классификации по классу.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassResult.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassResult.ClassId">
+            <summary>
+            ИД класса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassResult.Class">
+            <summary>
+            Класс.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ClassResult.Probability">
+            <summary>
+            Вероятность.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ConvertToPdfResult">
+            <summary>
+            Результат преобразования документа в pdf.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ConvertToPdfResults">
+            <summary>
+            Результаты преобразования документа в pdf.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.Metrics">
+            <summary>
+            Метрики.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.TrainSetCount">
+            <summary>
+            Размер набора для обучения.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.Accuracy">
+            <summary>
+            Правильность.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.Precision">
+            <summary>
+            Точность.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.Recall">
+            <summary>
+            Полнота.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.F1Measure">
+            <summary>
+            F1-мера.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Metrics.TrainDuration">
+            <summary>
+            Длительность обучения.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ExtractionResult">
+            <summary>
+            Результат извлечения фактов.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.Extracted">
+            <summary>
+            Время извлечения.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.Facts">
+            <summary>
+            Факты.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.Grammar">
+            <summary>
+            Правило извлечения фактов.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.DocumentGuid">
+            <summary>
+            Guid документа.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.DocumentPages">
+            <summary>
+            Страницы документа.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.Message">
+            <summary>
+            Текст сообщения об ошибке.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ExtractionResult.Error">
+            <summary>
+            Ошибка.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.Fact">
+            <summary>
+            Факт.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Fact.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Fact.Name">
+            <summary>
+            Название.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Fact.Position">
+            <summary>
+            Позиция в тексте.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Fact.Length">
+            <summary>
+            Длина факта.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Fact.Fields">
+            <summary>
+            Поля факта.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.FactField">
+            <summary>
+            Поле факта.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.Name">
+            <summary>
+            Название.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.HasError">
+            <summary>
+            Признак наличия ошибок.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.Value">
+            <summary>
+            Значение.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.RawValue">
+            <summary>
+            Необработанное значение.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.Probability">
+            <summary>
+            Вероятность.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactField.Positions">
+            <summary>
+            Позиция.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.FactExtractionRule">
+            <summary>
+            Правило извлечения фактов.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.Name">
+            <summary>
+            Название.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.Description">
+            <summary>
+            Описание.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.RuleSetName">
+            <summary>
+            Имя набора правил.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.IsSystem">
+            <summary>
+            Признак системного правила.
+            Правило, входящее в базовую поставку.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.State">
+            <summary>
+            Состояние правила.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.FactExtractionRule.Facts">
+            <summary>
+            Извлекаемые факты.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.Position">
+            <summary>
+            Позиция факта.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Position.Page">
+            <summary>
+            Страница.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Position.Top">
+            <summary>
+            Смещение сверху.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Position.Left">
+            <summary>
+            Смещение слева.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Position.Width">
+            <summary>
+            Ширина.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Position.Height">
+            <summary>
+            Высота.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.PageInfo">
+            <summary>
+            Информация о странице.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PageInfo.Number">
+            <summary>
+            Номер страницы.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PageInfo.Width">
+            <summary>
+            Ширина.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PageInfo.Height">
+            <summary>
+            Высота.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PageInfo.Length">
+            <summary>
+            Длина текста на странице.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.PackageProcessResult">
+            <summary>
+            Результат обработки.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.ExtractionResult">
+            <summary>
+            Результат извлечения фактов.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.ClassificationResult">
+            <summary>
+            Результат классификации.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.Message">
+            <summary>
+            Сообщение об ошибке.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.StatusCode">
+            <summary>
+            Код ошибки.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.Guid">
+            <summary>
+            Guid документа.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.AdditionalClassificationResults">
+            <summary>
+            Результат классификации дополнительными классификаторами.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ProcessTask">
+            <summary>
+            Задача на обработку.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.TaskBase">
+            <summary>
+            Базовая асинхронная задача на обработку.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.TaskBase.Id">
+            <summary>
+            ИД.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.TaskBase.State">
+            <summary>
+            Состояние.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.TaskBase.Started">
+            <summary>
+            Время начала.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.TaskBase.Finished">
+            <summary>
+            Время окончания.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.TrainTask">
+            <summary>
+            Задача на обучение классификатора.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.TrainTask.Classifier">
+            <summary>
+            Классификатор.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.TrainTask.ClassifierModel">
+            <summary>
+            Модель классификатора.
+            </summary>
+        </member>
+    </members>
+</doc>

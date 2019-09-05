@@ -492,7 +492,8 @@ namespace Sungero.Capture.Server
          если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       CreateVersion(document, recognitionResult);
-      
+      // Принудительно заполняем имя документа, для случаев когда имя не автоформируемое, чтобы не падало при сохранении.
+      Docflow.PublicFunctions.OfficialDocument.FillName(document);
       document.Save();
       return document;
     }

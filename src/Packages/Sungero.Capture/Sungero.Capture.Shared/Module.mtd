@@ -102,6 +102,11 @@
       "NameGuid": "31d692fd-7aad-4156-bf02-93ce1d4f6e1d",
       "Name": "AsposeBarcode",
       "Scope": "Both"
+    },
+    {
+      "NameGuid": "2baae4dd-72d9-4793-a5e9-396ff2a36902",
+      "Name": "AsposeHtml",
+      "Scope": "Both"
     }
   ],
   "PublicConstants": [
