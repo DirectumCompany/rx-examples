@@ -284,7 +284,7 @@ namespace Sungero.Capture.Client
     public virtual void RemoveImagesFromEmailBody(string path)
     {
       // Нет смысла удалять изображения в файлах, расширение которых не html.
-      if (Path.GetExtension(path).ToLower() != Constants.Module.HtmlExtension.WithPeriod)
+      if (Path.GetExtension(path).ToLower() != Constants.Module.HtmlExtension.WithDot)
         return;
 
       try
@@ -553,10 +553,10 @@ namespace Sungero.Capture.Client
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, true);
-      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColors.Green));
+      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Green));
       
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, false);
-      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColors.Yellow));
+      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
     }
     
     /// <summary>
@@ -567,7 +567,7 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
-      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.HighlightsColors.Yellow)
+      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow)
         ? Sungero.Core.Colors.Common.Yellow
         : Sungero.Core.Colors.Common.Green;
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)

@@ -82,7 +82,7 @@ namespace Sungero.Capture.Constants
     public const char PropertyAndPositionDelimiter = '-';
     
     // Коды цвета подсветки свойств.
-    public static class HighlightsColors
+    public static class HighlightsColorCodes
     {
       public const string Green = "#E3EFD0";
       
@@ -312,9 +312,9 @@ namespace Sungero.Capture.Constants
     // Html расширение.
     public static class HtmlExtension
     {
-      public const string WithPeriod = ".html";
+      public const string WithDot = ".html";
       
-      public const string WithoutPeriod = "html";
+      public const string WithoutDot = "html";
     }
     
     // Pdf расширение.

@@ -740,10 +740,10 @@ namespace Sungero.Capture.Server
       {
         document.CreateVersion();
         var version = document.LastVersion;
-        if (Path.GetExtension(bodyInfo.Path).ToLower() == Constants.Module.HtmlExtension.WithPeriod)
+        if (Path.GetExtension(bodyInfo.Path).ToLower() == Constants.Module.HtmlExtension.WithDot)
         {
           var pdfConverter = new AsposeExtensions.Converter();
-          using (var pdfDocumentStream = pdfConverter.GeneratePdf(body, Constants.Module.HtmlExtension.WithoutPeriod))
+          using (var pdfDocumentStream = pdfConverter.GeneratePdf(body, Constants.Module.HtmlExtension.WithoutDot))
           {
             if (pdfDocumentStream != null)
             {
@@ -2969,7 +2969,7 @@ namespace Sungero.Capture.Server
     public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
     {
       var needCreatePublicBody = recognitionResult.OriginalFile != null && recognitionResult.OriginalFile.Data != null;
-      var pdfApp = Content.AssociatedApplications.GetByExtension("pdf");
+      var pdfApp = Content.AssociatedApplications.GetByExtension(Constants.Module.PdfExtension);
       if (pdfApp == Content.AssociatedApplications.Null)
         pdfApp = GetAssociatedApplicationByFileName(recognitionResult.OriginalFile.Path);
       
