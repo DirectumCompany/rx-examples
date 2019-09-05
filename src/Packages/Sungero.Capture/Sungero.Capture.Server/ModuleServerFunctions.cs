@@ -1869,6 +1869,10 @@ namespace Sungero.Capture.Server
     
     #region Заполнение свойств документа
     
+    /// <summary>
+    /// Заполнить вид документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
     public virtual void FillDocumentKind(IOfficialDocument document)
     {
       var documentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
@@ -1884,7 +1888,12 @@ namespace Sungero.Capture.Server
       }
       document.DocumentKind = documentKind;      
     }
-        
+    
+    /// <summary>
+    /// Получить имя конечного типа сущности.
+    /// </summary>
+    /// <param name="entity">Сущность.</param>
+    /// <returns>Имя конечного типа сущности.</returns>
     public string GetTypeName(Sungero.Domain.Shared.IEntity entity)
     {
       var entityFinalType = entity.GetType().GetFinalType();
