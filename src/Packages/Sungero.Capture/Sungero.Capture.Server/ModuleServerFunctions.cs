@@ -1679,10 +1679,10 @@ namespace Sungero.Capture.Server
             document.SellerName = name;
             document.SellerTin = tin;
             document.SellerTrrc = trrc;
-            LinkFactAndProperty(recognitionResult, fact, "Name", props.SellerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, "LegalForm", props.SellerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, "TIN", props.SellerTin.Name, tin);
-            LinkFactAndProperty(recognitionResult, fact, "TRRC", props.SellerTrrc.Name, trrc);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.SellerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, tin);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, trrc);
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
           else if (string.IsNullOrWhiteSpace(document.BuyerName))
@@ -1690,34 +1690,34 @@ namespace Sungero.Capture.Server
             document.BuyerName = name;
             document.BuyerTin = tin;
             document.BuyerTrrc = trrc;
-            LinkFactAndProperty(recognitionResult, fact, "Name", props.BuyerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, "LegalForm", props.BuyerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, "TIN", props.BuyerTin.Name, tin);
-            LinkFactAndProperty(recognitionResult, fact, "TRRC", props.BuyerTrrc.Name, trrc);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.BuyerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, name);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, tin);
+            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, trrc);
           }
         }
       }
       
       // Дата и номер.
-      var dateFact = GetOrderedFacts(facts, "FinancialDocument", "Date").FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, "FinancialDocument", "Number").FirstOrDefault();
-      document.Date = GetFieldDateTimeValue(dateFact, "Date");
-      document.Number = GetFieldValue(numberFact, "Number");
-      LinkFactAndProperty(recognitionResult, dateFact, "Date", props.Date.Name, document.Date);
-      LinkFactAndProperty(recognitionResult, numberFact, "Number", props.Number.Name, document.Number);
+      var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
+      var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
+      document.Date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
+      document.Number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, document.Date);
+      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number);
       
       // Сумма и валюта.
-      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
-      document.VatAmount = GetFieldNumericalValue(documentAmountFact, "VatAmount");
-      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
-      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
-      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       return document;
     }
