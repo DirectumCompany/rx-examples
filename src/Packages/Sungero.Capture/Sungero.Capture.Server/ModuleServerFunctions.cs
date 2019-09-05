@@ -1786,7 +1786,7 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать договор (демо режим).
     /// </summary>
-    /// <param name="recognitionResult">Результат обработки счета на оплату в Ario.</param>
+    /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <returns>Договор.</returns>
     public static Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognitionResult recognitionResult)
     {
@@ -1799,65 +1799,65 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       
       // Дата и номер.
-      FillMockRegistrationData(document, recognitionResult, "Document");
+      FillMockRegistrationData(document, recognitionResult, FactNames.Document);
       
       // Заполнить данные сторон.
-      var partyNameFacts = GetOrderedFacts(facts, "Counterparty", "Name");
+      var partyNameFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.Name);
       if (partyNameFacts.Count() > 0)
       {
         var fact = partyNameFacts.First();
-        document.FirstPartyName = GetCorrespondentName(fact, "Name", "LegalForm");
+        document.FirstPartyName = GetCorrespondentName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
         document.FirstPartySignatory = GetFullNameByFactForContract(fact);
-        LinkFactAndProperty(recognitionResult, fact, "Name", props.FirstPartyName.Name, document.FirstPartyName);
-        LinkFactAndProperty(recognitionResult, fact, "SignatorySurname", props.FirstPartySignatory.Name, document.FirstPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, "SignatoryName", props.FirstPartySignatory.Name, document.FirstPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, "SignatoryPatrn", props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.FirstPartyName.Name, document.FirstPartyName);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatorySurname, props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryName, props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryPatrn, props.FirstPartySignatory.Name, document.FirstPartySignatory);
       }
       if (partyNameFacts.Count() > 1)
       {
         var fact = partyNameFacts.Last();
-        document.SecondPartyName = GetCorrespondentName(fact, "Name", "LegalForm");
+        document.SecondPartyName = GetCorrespondentName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
         document.SecondPartySignatory = GetFullNameByFactForContract(fact);
-        LinkFactAndProperty(recognitionResult, fact, "Name", props.SecondPartyName.Name, document.SecondPartyName);
-        LinkFactAndProperty(recognitionResult, fact, "SignatorySurname", props.SecondPartySignatory.Name, document.SecondPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, "SignatoryName", props.SecondPartySignatory.Name, document.SecondPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, "SignatoryPatrn", props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.SecondPartyName.Name, document.SecondPartyName);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatorySurname, props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryName, props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryPatrn, props.SecondPartySignatory.Name, document.SecondPartySignatory);
       }
       
       // Заполнить ИНН/КПП сторон.
-      var tinTrrcFacts = GetOrderedFacts(facts, "Counterparty", "TIN");
+      var tinTrrcFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN);
       if (tinTrrcFacts.Count() > 0)
       {
         var fact = tinTrrcFacts.First();
-        document.FirstPartyTin = GetFieldValue(fact, "TIN");
-        document.FirstPartyTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognitionResult, fact, "TIN", props.FirstPartyTin.Name, document.FirstPartyTin);
-        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
+        document.FirstPartyTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        document.FirstPartyTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.FirstPartyTin.Name, document.FirstPartyTin);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
       }
       
       if (tinTrrcFacts.Count() > 1)
       {
         var fact = tinTrrcFacts.Last();
-        document.SecondPartyTin = GetFieldValue(fact, "TIN");
-        document.SecondPartyTrrc = GetFieldValue(fact, "TRRC");
-        LinkFactAndProperty(recognitionResult, fact, "TIN", props.SecondPartyTin.Name, document.SecondPartyTin);
-        LinkFactAndProperty(recognitionResult, fact, "TRRC", props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
+        document.SecondPartyTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        document.SecondPartyTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.SecondPartyTin.Name, document.SecondPartyTin);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
       }
       
       // Сумма и валюта.
-      var documentAmountFact = GetOrderedFacts(facts, "DocumentAmount", "Amount").FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, "Amount");
-      LinkFactAndProperty(recognitionResult, documentAmountFact, "Amount", props.TotalAmount.Name, document.TotalAmount);
+      var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
+      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       
-      var documentVatAmountFact = GetOrderedFacts(facts, "DocumentAmount", "VatAmount").FirstOrDefault();
-      document.VatAmount = GetFieldNumericalValue(documentVatAmountFact, "VatAmount");
-      LinkFactAndProperty(recognitionResult, documentVatAmountFact, "VatAmount", props.VatAmount.Name, document.VatAmount);
+      var documentVatAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.VatAmount).FirstOrDefault();
+      document.VatAmount = GetFieldNumericalValue(documentVatAmountFact, FieldNames.DocumentAmount.VatAmount);
+      LinkFactAndProperty(recognitionResult, documentVatAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
-      var documentCurrencyFact = GetOrderedFacts(facts, "DocumentAmount", "Currency").FirstOrDefault();
-      var currencyCode = GetFieldValue(documentCurrencyFact, "Currency");
+      var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
+      var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, "Currency", props.Currency.Name, document.Currency.Id);
+        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       return document;
     }
