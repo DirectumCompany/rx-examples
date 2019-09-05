@@ -159,6 +159,10 @@ namespace Sungero.Capture.Constants
       {
         public const string DocumentBaseName = "DocumentBaseName";
         
+        public const string DocumentBaseNumber = "DocumentBaseNumber";
+        
+        public const string DocumentBaseDate = "DocumentBaseDate";
+        
         public const string Date = "Date";
         
         public const string Number = "Number";
@@ -181,6 +185,15 @@ namespace Sungero.Capture.Constants
         public const string VatAmount = "VatAmount";
         
         public const string Amount = "Amount";
+      }
+      
+      public static class Person
+      {
+        public const string Surname = "Surname";
+        
+        public const string Name = "Name";
+        
+        public const string Patrn = "Patrn";
       }
     }
     

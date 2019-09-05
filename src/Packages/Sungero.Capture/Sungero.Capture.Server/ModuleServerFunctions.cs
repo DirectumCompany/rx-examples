@@ -2092,12 +2092,12 @@ namespace Sungero.Capture.Server
     /// <returns></returns>
     public virtual List<IFact> GetCounterpartyFacts(List<Structures.Module.IFact> facts, string counterpartyType)
     {
-      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name")
-        .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
+      var counterpartyFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.Name)
+        .Where(f => GetFieldValue(f, FieldNames.Counterparty.CounterpartyType) == counterpartyType);
       
       if (!counterpartyFacts.Any())
-        counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "TIN")
-          .Where(f => GetFieldValue(f, "CounterpartyType") == counterpartyType);
+        counterpartyFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN)
+          .Where(f => GetFieldValue(f, FieldNames.Counterparty.CounterpartyType) == counterpartyType);
       
       return counterpartyFacts.ToList();
     }
@@ -2143,8 +2143,8 @@ namespace Sungero.Capture.Server
         }
         
         // Поиск по инн/кпп.
-        var tin = GetFieldValue(fact, "TIN");
-        var trrc = GetFieldValue(fact, "TRRC");
+        var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
         if (businessUnit == null)
         {
           var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
@@ -2162,20 +2162,24 @@ namespace Sungero.Capture.Server
         
         if (counterparty != null || businessUnit != null)
         {
-          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), isTrusted);
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, 
+                                                                                                         GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                         isTrusted);
           businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
           continue;
         }
         
         // Если не нашли по инн/кпп то ищем по наименованию.
-        var name = GetCorrespondentName(fact, "Name", "LegalForm");
+        var name = GetCorrespondentName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
         counterparty = Counterparties.GetAll()
           .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         businessUnit = BusinessUnits.GetAll()
           .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
-          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, GetFieldValue(fact, "CounterpartyType"), false);
+          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, 
+                                                                                                         GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                         false);
           businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
         }
       }
@@ -2288,15 +2292,15 @@ namespace Sungero.Capture.Server
     /// <returns>Контрагент.</returns>
     public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.IFact> facts, string counterpartyType)
     {
-      var counterpartyFacts = GetOrderedFacts(facts, "Counterparty", "Name");
-      var mostProbabilityFact = counterpartyFacts.Where(f =>  GetFieldValue(f, "CounterpartyType") == counterpartyType).FirstOrDefault();
+      var counterpartyFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.Name);
+      var mostProbabilityFact = counterpartyFacts.Where(f =>  GetFieldValue(f, FieldNames.Counterparty.CounterpartyType) == counterpartyType).FirstOrDefault();
       if (mostProbabilityFact == null)
         return null;
 
       var counterparty = Structures.Module.MockCounterparty.Create();
-      counterparty.Name = GetCorrespondentName(mostProbabilityFact, "Name", "LegalForm");
-      counterparty.Tin = GetFieldValue(mostProbabilityFact, "TIN");
-      counterparty.Trrc = GetFieldValue(mostProbabilityFact, "TRRC");
+      counterparty.Name = GetCorrespondentName(mostProbabilityFact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
+      counterparty.Tin = GetFieldValue(mostProbabilityFact, FieldNames.Counterparty.TIN);
+      counterparty.Trrc = GetFieldValue(mostProbabilityFact, FieldNames.Counterparty.TRRC);
       counterparty.Fact = mostProbabilityFact;
       return counterparty;
     }
@@ -2317,13 +2321,13 @@ namespace Sungero.Capture.Server
       var correspondentNames = new List<string>();
       
       // Получить ИНН/КПП и наименования + форму собственности контрагентов из фактов.
-      foreach (var fact in GetFacts(facts, "Letter", "CorrespondentName"))
+      foreach (var fact in GetFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName))
       {
         var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
         if (verifiedCounterparty != null)
           return verifiedCounterparty;
 
-        var name = GetCorrespondentName(fact, "CorrespondentName", "CorrespondentLegalForm");
+        var name = GetCorrespondentName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
         correspondentNames.Add(name);
         var counterparties = filteredCounterparties
           .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
@@ -2335,7 +2339,7 @@ namespace Sungero.Capture.Server
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.
-      var correspondentTINs = GetFacts(facts, "Counterparty", "TIN");
+      var correspondentTINs = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN);
       if (!correspondentTINs.Any())
         return foundByName.FirstOrDefault();
       else
@@ -2348,8 +2352,8 @@ namespace Sungero.Capture.Server
           if (verifiedCounterparty != null)
             return verifiedCounterparty;
 
-          var tin = GetFieldValue(fact, "TIN");
-          var trrc = GetFieldValue(fact, "TRRC");
+          var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+          var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
           var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
           foreach (var counterparty in counterparties)
           {
@@ -2472,11 +2476,11 @@ namespace Sungero.Capture.Server
     {
       // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
       var businessUnitsByName = new List<Capture.Structures.Module.BusinessUnitWithFact>();
-      var correspondentNameFacts = GetFacts(facts, "Letter", "CorrespondentName")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "CorrespondentName").Probability);
+      var correspondentNameFacts = GetFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == FieldNames.Letter.CorrespondentName).Probability);
       foreach (var fact in correspondentNameFacts)
       {
-        var name = GetFieldValue(fact, "CorrespondentName");
+        var name = GetFieldValue(fact, FieldNames.Letter.CorrespondentName);
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
           .Where(x => x.Name.ToLower().Contains(name));
@@ -2484,8 +2488,8 @@ namespace Sungero.Capture.Server
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
-      var correspondentTinFacts = GetFacts(facts, "Counterparty", "TIN")
-        .OrderByDescending(x => x.Fields.First(f => f.Name == "TIN").Probability);
+      var correspondentTinFacts = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == FieldNames.Counterparty.TIN).Probability);
       if (!correspondentTinFacts.Any())
         return businessUnitsByName;
       else
@@ -2494,8 +2498,8 @@ namespace Sungero.Capture.Server
         var foundByTin = new List<Capture.Structures.Module.BusinessUnitWithFact>();
         foreach (var fact in correspondentTinFacts)
         {
-          var tin = GetFieldValue(fact, "TIN");
-          var trrc = GetFieldValue(fact, "TRRC");
+          var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+          var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
           var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
           var isTrusted = businessUnits.Count == 1;
           foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact, isTrusted)));
@@ -2744,9 +2748,9 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return string.Empty;
       
-      var documentName = GetFieldValue(fact, "DocumentBaseName");
-      var date = Functions.Module.GetShortDate(GetFieldValue(fact, "DocumentBaseDate"));
-      var number = GetFieldValue(fact, "DocumentBaseNumber");
+      var documentName = GetFieldValue(fact, FieldNames.FinancialDocument.DocumentBaseName);
+      var date = Functions.Module.GetShortDate(GetFieldValue(fact, FieldNames.FinancialDocument.DocumentBaseDate));
+      var number = GetFieldValue(fact, FieldNames.FinancialDocument.DocumentBaseNumber);
       
       if (string.IsNullOrWhiteSpace(documentName))
         return string.Empty;
@@ -3054,10 +3058,10 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return result;
       
-      var addressee = GetFieldValue(fact, "Addressee");
+      var addressee = GetFieldValue(fact, FieldNames.Letter.Addressee);
       var employees =  Company.PublicFunctions.Employee.Remote.GetEmployeesByName(addressee);
       result.Employee = employees.FirstOrDefault();
-      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, "Addressee") : false;
+      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, FieldNames.Letter.Addressee) : false;
       return result;
     }
 
@@ -3071,9 +3075,9 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return string.Empty;
       
-      var surname = GetFieldValue(fact, "Surname");
-      var name = GetFieldValue(fact, "Name");
-      var patronymic = GetFieldValue(fact, "Patrn");
+      var surname = GetFieldValue(fact, FieldNames.Person.Surname);
+      var name = GetFieldValue(fact, FieldNames.Person.Name);
+      var patronymic = GetFieldValue(fact, FieldNames.Person.Patrn);
       
       return GetFullNameByFact(surname, name, patronymic);
     }
@@ -3088,9 +3092,9 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return string.Empty;
       
-      var surname = GetFieldValue(fact, "SignatorySurname");
-      var name = GetFieldValue(fact, "SignatoryName");
-      var patronymic = GetFieldValue(fact, "SignatoryPatrn");
+      var surname = GetFieldValue(fact, FieldNames.Counterparty.SignatorySurname);
+      var name = GetFieldValue(fact, FieldNames.Counterparty.SignatoryName);
+      var patronymic = GetFieldValue(fact, FieldNames.Counterparty.SignatoryPatrn);
       
       return GetFullNameByFact(surname, name, patronymic);
     }
@@ -3127,9 +3131,9 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return string.Empty;
       
-      var surname = GetFieldValue(fact, "Surname");
-      var name = GetFieldValue(fact, "Name");
-      var patronymic = GetFieldValue(fact, "Patrn");
+      var surname = GetFieldValue(fact, FieldNames.Person.Surname);
+      var name = GetFieldValue(fact, FieldNames.Person.Name);
+      var patronymic = GetFieldValue(fact, FieldNames.Person.Patrn);
       return Parties.PublicFunctions.Person.GetSurnameAndInitialsInTenantCulture(name, patronymic, surname);
     }
     
@@ -3173,7 +3177,7 @@ namespace Sungero.Capture.Server
       if (!filteredContacts.Any())
         return result;
       result.Contact = filteredContacts.FirstOrDefault();
-      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, "Type") : false;
+      result.IsTrusted = (filteredContacts.Count() == 1) ? IsTrustedField(fact, FieldNames.LetterPerson.Type) : false;
       return result;
     }
     
@@ -3215,8 +3219,8 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
       
-      var docDate = GetFieldDateTimeValue(fact, "DocumentBaseDate");
-      var number = GetFieldValue(fact, "DocumentBaseNumber");
+      var docDate = GetFieldDateTimeValue(fact, FieldNames.FinancialDocument.DocumentBaseDate);
+      var number = GetFieldValue(fact, FieldNames.FinancialDocument.DocumentBaseNumber);
       
       if (string.IsNullOrWhiteSpace(number))
         return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
@@ -3249,7 +3253,7 @@ namespace Sungero.Capture.Server
       }
       var contracts = GetLeadingDocuments(fact, counterparty);
       result.Contract = contracts.FirstOrDefault();
-      result.IsTrusted = (contracts.Count() == 1) ? IsTrustedField(fact, "DocumentBaseNumber") : false;
+      result.IsTrusted = (contracts.Count() == 1) ? IsTrustedField(fact, FieldNames.FinancialDocument.DocumentBaseNumber) : false;
       return result;
     }
     
