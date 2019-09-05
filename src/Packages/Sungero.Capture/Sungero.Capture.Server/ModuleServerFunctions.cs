@@ -1581,14 +1581,14 @@ namespace Sungero.Capture.Server
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
-      counterpartyTypes.Add("SELLER");
-      counterpartyTypes.Add("BUYER");
-      counterpartyTypes.Add("SHIPPER");
-      counterpartyTypes.Add("CONSIGNEE");
+      counterpartyTypes.Add(CounterpartyTypes.Seller);
+      counterpartyTypes.Add(CounterpartyTypes.Buyer);
+      counterpartyTypes.Add(CounterpartyTypes.Shipper);
+      counterpartyTypes.Add(CounterpartyTypes.Consignee);
 
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var sellerFact = factMatches.Where(m => m.Type == "SELLER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "SHIPPER").FirstOrDefault();
-      var buyerFact = factMatches.Where(m => m.Type == "BUYER").FirstOrDefault() ?? factMatches.Where(m => m.Type == "CONSIGNEE").FirstOrDefault();
+      var sellerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
+      var buyerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
       var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, responsible);
       FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
       LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
@@ -1598,7 +1598,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Дата, номер и регистрация.
-      NumberDocument(document, recognitionResult, "FinancialDocument");
+      NumberDocument(document, recognitionResult, FactNames.FinancialDocument);
       
       // Корректировочный документ.
       FillCorrectedDocument(document, recognitionResult, isAdjustment);
