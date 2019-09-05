@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
+using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
+using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
+using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
 
 namespace Sungero.Capture.Client
 {
@@ -56,7 +59,7 @@ namespace Sungero.Capture.Client
         throw new ApplicationException(Resources.NoFilesInfoInPackage);
       
       var filesXDoc = System.Xml.Linq.XDocument.Load(deviceInfo);
-      var element = filesXDoc.Element("MailSourceInfo");
+      var element = filesXDoc.Element(Constants.Module.DeviceInfoTagNames.MailSourceInfo);
       if (element != null)
         return Constants.Module.CaptureSourceType.Mail;
       return Constants.Module.CaptureSourceType.Folder;
@@ -94,7 +97,7 @@ namespace Sungero.Capture.Client
       Logger.Debug("Captured Package Process. Captured package type is MAIL.");
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
       if ((mailFiles.Body == null || !File.Exists(mailFiles.Body.Path)) && !mailFiles.Attachments.Any())
-        throw new ApplicationException("Captured Package Process. Mail body and attached files does not exists.");
+        throw new ApplicationException(Resources.EmptyMailPackage);
       
       // Для писем без тела не создавать простой документ.
       var mailInfo = GetMailInfo(instanceInfo);
@@ -167,10 +170,19 @@ namespace Sungero.Capture.Client
         return mailFiles;
       }
       
+      var fileDescriptionTagName = Constants.Module.InputFilesTagNames.FileDescription;
+      var mailBodyHtmlName = Constants.Module.MailBodyName.Html;
+      var mailBodyTxtName = Constants.Module.MailBodyName.Txt;
+      
       // Тело письма.
-      var fileElements = filesXDoc.Element("InputFilesSection").Element("Files").Elements();
-      var htmlBodyElement = fileElements.FirstOrDefault(x => string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase));
-      var txtBodyElement = fileElements.FirstOrDefault(x => string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase));
+      var fileElements = filesXDoc
+        .Element(Constants.Module.InputFilesTagNames.InputFilesSection)
+        .Element(Constants.Module.InputFilesTagNames.Files)
+        .Elements();
+      var htmlBodyElement = fileElements
+        .FirstOrDefault(x => string.Equals(x.Element(fileDescriptionTagName).Value, mailBodyHtmlName, StringComparison.InvariantCultureIgnoreCase));
+      var txtBodyElement = fileElements
+        .FirstOrDefault(x => string.Equals(x.Element(fileDescriptionTagName).Value, mailBodyTxtName, StringComparison.InvariantCultureIgnoreCase));
       var hasHtmlBody = htmlBodyElement != null;
       var hasTxtBody = txtBodyElement != null;
       
@@ -200,8 +212,10 @@ namespace Sungero.Capture.Client
       }
       
       // Вложения.
-      var attachments = fileElements.Where(x => !string.Equals(x.Element("FileDescription").Value, "body.html", StringComparison.InvariantCultureIgnoreCase) &&
-                                           !string.Equals(x.Element("FileDescription").Value, "body.txt", StringComparison.InvariantCultureIgnoreCase)).ToList();
+      var attachments = fileElements
+        .Where(x => !string.Equals(x.Element(fileDescriptionTagName).Value, mailBodyHtmlName, StringComparison.InvariantCultureIgnoreCase) &&
+               !string.Equals(x.Element(fileDescriptionTagName).Value, mailBodyTxtName, StringComparison.InvariantCultureIgnoreCase))
+        .ToList();
       
       // Фильтрация картинок из тела письма.
       if (mailFiles.Body != null && !string.IsNullOrEmpty(mailFiles.Body.Path) && hasHtmlBody)
@@ -209,7 +223,7 @@ namespace Sungero.Capture.Client
 
       foreach (var attachment in attachments)
       {
-        var fileDescription = attachment.Element("FileDescription").Value;
+        var fileDescription = attachment.Element(fileDescriptionTagName).Value;
         mailFiles.Attachments.Add(CreateFileInfoFromXelement(attachment, folder));
       }
       
@@ -233,20 +247,20 @@ namespace Sungero.Capture.Client
         return result;
       
       var mailCaptureInstanceInfoElement = infoXDoc
-        .Element("CaptureInstanceInfoList")
-        .Element("MailCaptureInstanceInfo");
+        .Element(InstanceInfosTagNames.CaptureInstanceInfoList)
+        .Element(InstanceInfosTagNames.MailCaptureInstanceInfo);
       
       if (mailCaptureInstanceInfoElement == null)
         return result;
       
-      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, "Subject");
+      result.Subject = GetAttributeStringValue(mailCaptureInstanceInfoElement, InstanceInfosTagNames.Subject);
       
-      var fromElement = mailCaptureInstanceInfoElement.Element("From");
+      var fromElement = mailCaptureInstanceInfoElement.Element(InstanceInfosTagNames.From);
       if (fromElement == null)
         return result;
       
-      result.FromEmail = GetAttributeStringValue(fromElement, "Address");
-      result.Name = GetAttributeStringValue(fromElement, "Name");
+      result.FromEmail = GetAttributeStringValue(fromElement, InstanceInfosTagNames.FromTags.Address);
+      result.Name = GetAttributeStringValue(fromElement, InstanceInfosTagNames.FromTags.Name);
       
       return result;
     }
@@ -270,7 +284,7 @@ namespace Sungero.Capture.Client
     public virtual void RemoveImagesFromEmailBody(string path)
     {
       // Нет смысла удалять изображения в файлах, расширение которых не html.
-      if (Path.GetExtension(path).ToLower() != ".html")
+      if (Path.GetExtension(path).ToLower() != Constants.Module.HtmlExtension.WithDot)
         return;
 
       try
@@ -279,8 +293,8 @@ namespace Sungero.Capture.Client
         mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
         
         // В некоторых случаях Aspose не может распознать файл как html, поэтому добавляем тег html, если его нет.
-        if (!mailBody.Contains("<html"))
-          mailBody = string.Format("<html>{0}</html>", mailBody);
+        if (!mailBody.Contains(Constants.Module.HtmlTags.MaskForSearch))
+          mailBody = string.Concat(Constants.Module.HtmlTags.StartTag, mailBody, Constants.Module.HtmlTags.EndTag);
         File.WriteAllText(path, mailBody);
       }
       catch(Exception ex)
@@ -312,8 +326,8 @@ namespace Sungero.Capture.Client
     public virtual Structures.Module.IFileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
     {
       var fileInfo = Structures.Module.FileInfo.Create();
-      fileInfo.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element("FileName").Value));
-      fileInfo.Description = xmlElement.Element("FileDescription").Value;
+      fileInfo.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element(Constants.Module.InputFilesTagNames.FileName).Value));
+      fileInfo.Description = xmlElement.Element(Constants.Module.InputFilesTagNames.FileDescription).Value;
       
       return fileInfo;
     }
@@ -337,7 +351,7 @@ namespace Sungero.Capture.Client
     {
       var packagesPaths = GetScannedPackagesPaths(filesInfo, folder);
       if (!packagesPaths.Any())
-        throw new ApplicationException("Package not found");
+        throw new ApplicationException(Resources.EmptyScanPackage);
       
       foreach (var packagePath in packagesPaths)
       {
@@ -373,8 +387,8 @@ namespace Sungero.Capture.Client
       var filePaths = new List<string>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       var fileElements = filesXDoc
-        .Element("InputFilesSection")
-        .Element("Files")
+        .Element(Constants.Module.InputFilesTagNames.InputFilesSection)
+        .Element(Constants.Module.InputFilesTagNames.Files)
         .Elements();
       
       if (!fileElements.Any())
@@ -382,7 +396,7 @@ namespace Sungero.Capture.Client
       
       foreach (var fileElement in fileElements)
       {
-        var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element("FileName").Value));
+        var filePath = Path.Combine(folder, Path.GetFileName(fileElement.Element(Constants.Module.InputFilesTagNames.FileName).Value));
         if (File.Exists(filePath))
           filePaths.Add(filePath);
         else
@@ -491,16 +505,15 @@ namespace Sungero.Capture.Client
     {
       return new Dictionary<string, string>()
       {
-        { "Входящее письмо", "Letter"},
-        { Constants.Module.LetterClassName, "Letter"},
-        { Constants.Module.ContractStatementClassName, "ContractStatement"},
-        { Constants.Module.WaybillClassName, "Waybill"},
-        { Constants.Module.UniversalTransferDocumentClassName, "GeneralTransferDocument"},
-        { Constants.Module.GeneralCorrectionDocumentClassName, "GeneralCorrectionDocument"},
-        { Constants.Module.TaxInvoiceClassName, "TaxInvoice"},
-        { Constants.Module.TaxinvoiceCorrectionClassName, "TaxinvoiceCorrection"},
-        { Constants.Module.IncomingInvoiceClassName, "IncomingInvoice"},
-        { Constants.Module.ContractClassName, "Contract"}
+        { ArioClassNames.Letter, ArioGrammarNames.Letter},
+        { ArioClassNames.ContractStatement, ArioGrammarNames.ContractStatement},
+        { ArioClassNames.Waybill, ArioGrammarNames.Waybill},
+        { ArioClassNames.UniversalTransferDocument, ArioGrammarNames.UniversalTransferDocument},
+        { ArioClassNames.UniversalTransferCorrectionDocument, ArioGrammarNames.UniversalTransferCorrectionDocument},
+        { ArioClassNames.TaxInvoice, ArioGrammarNames.TaxInvoice},
+        { ArioClassNames.TaxinvoiceCorrection, ArioGrammarNames.TaxinvoiceCorrection},
+        { ArioClassNames.IncomingInvoice, ArioGrammarNames.IncomingInvoice},
+        { ArioClassNames.Contract, ArioGrammarNames.Contract}
       };
     }
     
@@ -538,10 +551,10 @@ namespace Sungero.Capture.Client
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
       var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, true);
-      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.GreenHighlightsColorCode));
+      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Green));
       
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, false);
-      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode));
+      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
     }
     
     /// <summary>
@@ -552,7 +565,7 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
-      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.YellowHighlightsColorCode)
+      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow)
         ? Sungero.Core.Colors.Common.Yellow
         : Sungero.Core.Colors.Common.Green;
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)
