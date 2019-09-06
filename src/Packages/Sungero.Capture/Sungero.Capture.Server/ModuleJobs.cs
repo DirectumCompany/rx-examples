@@ -30,8 +30,7 @@ namespace Sungero.Capture.Server
         .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id &&
                t.Status == Workflow.Task.Status.Completed &&
                (t.Subject.Contains(Resources.CheckPackage) ||
-                t.Subject.Contains(Resources.CheckDocument) ||
-                t.Subject.Contains(Resources.FailedClassifyDocumentsTaskName)));
+                t.Subject.Contains(Resources.CheckDocument)));
       
       foreach(var documentId in documentIds)
       {

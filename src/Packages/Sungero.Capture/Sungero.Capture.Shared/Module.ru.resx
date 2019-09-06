@@ -179,9 +179,6 @@
   <data name="CheckDocument" xml:space="preserve">
     <value>Проверьте документ:</value>
   </data>
-  <data name="FailedClassifyDocumentsTaskName" xml:space="preserve">
-    <value>Проверьте комплект документов, поступивший от службы ввода</value>
-  </data>
   <data name="NeedToNumberDocument" xml:space="preserve">
     <value>Необходимо пронумеровать документ.</value>
   </data>

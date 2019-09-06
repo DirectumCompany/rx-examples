@@ -391,7 +391,6 @@
     "CheckDocumentTaskName",
     "FailedClassifyDocumentsTaskText",
     "CheckDocument",
-    "FailedClassifyDocumentsTaskName",
     "NeedToNumberDocument",
     "SetDocumentNumber",
     "SetDocumentDate",

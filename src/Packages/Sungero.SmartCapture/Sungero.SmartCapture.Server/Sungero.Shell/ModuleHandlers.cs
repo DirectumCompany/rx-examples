@@ -55,8 +55,7 @@ namespace Sungero.SmartCapture.Module.Shell.Server
                                showCheckReturn && Sungero.Docflow.ApprovalCheckReturnAssignments.Is(q) ||
                                // Проверка комплектов документов.
                                showProcessPackage && (q.Subject.Contains(Sungero.Capture.Resources.CheckPackage) || 
-                                                      q.Subject.Contains(Sungero.Capture.Resources.CheckDocument) ||
-                                                      q.Subject.Contains(Sungero.Capture.Resources.FailedClassifyDocumentsTaskName)) ||
+                                                      q.Subject.Contains(Sungero.Capture.Resources.CheckDocument)) ||
                                // Прочие задания.
                                showOther && (Sungero.Docflow.ApprovalSimpleAssignments.Is(q) || Sungero.Docflow.ApprovalCheckingAssignments.Is(q)));
       
