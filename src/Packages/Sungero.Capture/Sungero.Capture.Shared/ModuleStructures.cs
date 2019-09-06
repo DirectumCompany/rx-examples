@@ -95,14 +95,7 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
     public bool IsTrusted { get; set; }
   }
-    
-  partial class BusinessUnitAndCounterparty
-  {
-    public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
-    public Sungero.Parties.ICounterparty Counterparty { get; set; }
-    public bool? IsBusinessUnitSeller { get; set; }
-  }
-  
+   
   partial class BusinessUnitAndCounterpartyFacts
   {
     public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact BusinessUnitFact { get; set; }
