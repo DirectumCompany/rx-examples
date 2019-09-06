@@ -645,6 +645,7 @@ namespace Sungero.Capture.Server
       
       // Добавить наблюдателями ответственных за документы, которые вернулись по ШК.
       var responsibleEmployees = GetDocumentsResponsibleEmployees(documentsFoundByBarcode);
+      responsibleEmployees = responsibleEmployees.Where(r => !IEmployee.Equals(r, responsible)).ToList();
       foreach (var responsibleEmployee in responsibleEmployees)
       {
         var observer = task.Observers.AddNew();
