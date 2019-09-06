@@ -140,9 +140,9 @@ namespace Sungero.Capture.Structures.Module
   }
   
   /// <summary>
-  /// Результат классификации и распознования документа.
+  /// Обработанный ответ от Арио.
   /// </summary>
-  partial class ClassificationAndExtractionResult
+  partial class ArioResponse
   {
     public string Result { get; set; }
     public string Error { get; set; }

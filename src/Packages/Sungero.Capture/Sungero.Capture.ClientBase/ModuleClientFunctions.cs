@@ -419,13 +419,13 @@ namespace Sungero.Capture.Client
     /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    public virtual Structures.Module.ClassificationAndExtractionResult TryClassifyAndExtractFacts(string filePath,
+    public virtual Structures.Module.ArioResponse TryClassifyAndExtractFacts(string filePath,
                                                                                                   string arioUrl,
                                                                                                   string firstPageClassifierName,
                                                                                                   string typeClassifierName,
                                                                                                   bool throwOnError = true)
     {
-      var classificationAndExtractionResult = Structures.Module.ClassificationAndExtractionResult.Create();
+      var classificationAndExtractionResult = Structures.Module.ArioResponse.Create();
       if (!CanArioProcessFile(filePath))
       {
         classificationAndExtractionResult.Error = Resources.CantProcessFileByArio;
