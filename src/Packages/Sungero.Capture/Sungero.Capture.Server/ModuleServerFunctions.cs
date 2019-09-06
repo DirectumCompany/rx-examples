@@ -645,6 +645,14 @@ namespace Sungero.Capture.Server
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
       step.Performer = responsible;
       
+      // Добавить наблюдателями ответственных за документы, которые вернулись по ШК.
+      var responsibleEmployees = GetDocumentsResponsibleEmployees(documentsFoundByBarcode);
+      foreach (var responsibleEmployee in responsibleEmployees)
+      {
+        var observer = task.Observers.AddNew();
+        observer.Observer = responsibleEmployee;
+      }
+      
       task.NeedsReview = false;
       task.Deadline = Calendar.Now.AddWorkingHours(4);
       task.Save();
@@ -652,6 +660,31 @@ namespace Sungero.Capture.Server
       
       // Старт фонового процесса на смену статуса верификации.
       Jobs.ChangeVerificationState.Enqueue();
+    }
+    
+    /// <summary>
+    /// Получить список ответственных за документы.
+    /// </summary>
+    /// <param name="documents">Документы.</param>
+    /// <returns>Список ответственных.</returns>
+    /// <remarks>Ответственных искать только у документов, тип которых: договорной документ, акт, накладная, УПД.</remarks>
+    public virtual List<IEmployee> GetDocumentsResponsibleEmployees(List<IOfficialDocument> documents)
+    {
+      var responsibleEmployees = new List<IEmployee>();
+      var withResponsibleDocuments = documents.Where(d => Contracts.ContractualDocuments.Is(d) ||
+                                                     FinancialArchive.ContractStatements.Is(d) ||
+                                                     FinancialArchive.Waybills.Is(d) ||
+                                                     FinancialArchive.UniversalTransferDocuments.Is(d));
+      foreach (var document in withResponsibleDocuments)
+      {
+        var responsibleEmployee = Employees.Null;
+        responsibleEmployee = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentResponsibleEmployee(document);
+        
+        if (responsibleEmployee != Employees.Null && responsibleEmployee.IsSystem != true)
+          responsibleEmployees.Add(responsibleEmployee);
+      }
+      
+      return responsibleEmployees.Distinct().ToList();
     }
     
     /// <summary>
