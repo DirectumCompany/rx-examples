@@ -466,7 +466,7 @@ namespace Sungero.Capture.Client
         throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
 
       var fpClassifierId = fpClassifier.Id.ToString();
-      var typeClassifierId = typeClassifier.Id.ToString();   
+      var typeClassifierId = typeClassifier.Id.ToString();
       Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
       
@@ -683,6 +683,181 @@ namespace Sungero.Capture.Client
 
       Logger.Debug(Calendar.Now.ToString() + " End ProcessSplitedPackage");
       Logger.Debug("End CreateDocumentByRecognitionData");
+    }
+    
+    public static void CreateClassifier(string classifierName, string minProbability)
+    {
+      Logger.DebugFormat("Begin create classifier with name {0}.", classifierName);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier != null)
+        {
+          Logger.ErrorFormat("Already exists classifier with name: {0}", classifierName);
+          return;
+        }
+
+        arioConnector.CreateClassifier(classifierName, minProbability, true);
+        Logger.DebugFormat("Successful create classifier with name {0}.", classifierName);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Create classifier error: {0}", e.Message);
+      }
+    }
+    
+    /// <summary>
+    /// Импорт классификатора из модели.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="filePath">Путь к файлу модели.</param>
+    public static void ImportClassifierModel(string classifierName, string filePath)
+    {
+      Logger.DebugFormat("Begin import classifier with name {0} from folder {1}.", classifierName, filePath);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          return;
+        }
+
+        arioConnector.ImportClassifierModel(classifier.Id.ToString(), filePath);
+        Logger.DebugFormat("Successful import classifier with name {0} from folder {1}.", classifierName, filePath);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Import classifier error: {0}", e.Message);
+      }
+    }
+    
+    public static void ExportClassifierModel(string classifierName, string modelId, string filePath)
+    {
+      Logger.DebugFormat("Begin export classifier with name {0} into file {1}.", classifierName, filePath);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          return;
+        }
+
+        var model = arioConnector.ExportClassifierModel(classifier.Id.ToString(), modelId);
+        File.WriteAllBytes(filePath, model);
+        Logger.DebugFormat("Successful export classifier with name {0} into file {1}.", classifierName, filePath);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Export classifier error: {0}", e.Message);
+      }
+    }
+    
+    public static void ShowClassifierModels(string classifierName)
+    {
+      Logger.DebugFormat("Begin showing models for classifier with name {0}.", classifierName);
+      try
+      {
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful showing models for classifier with name.", classifierName);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Showing models for classifier error: {0}", e.Message);
+      }
+    }
+    
+    private static void ShowModelsInfo(string classifierName)
+    {
+      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      var classifier = arioConnector.GetClassifierByName(classifierName);
+      if (classifier == null)
+      {
+        Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+        return;
+      }
+      
+      var models = arioConnector.GetModelsByClassifier(classifier.Id.ToString());
+      
+      Logger.Debug("---------------------------------------------------------------------------------------");
+      Logger.DebugFormat("Classifier \"{0}\" with Id {1}, created {2}, min probability {3}. Models:",
+                         classifier.Name, classifier.Id, classifier.Created, classifier.MinProbability);
+      foreach (var model in models)
+        Logger.DebugFormat("{0} Model with Id {1}, created {2}. Train set count {3}, accuracy {4}.",
+                           model.Classes != null ? "*CURRENT*" : "---------",
+                           model.Id, model.Created,
+                           model.Metrics.TrainSetCount, Math.Round(model.Metrics.Accuracy, 4));
+      Logger.Debug("---------------------------------------------------------------------------------------");
+    }
+    
+    public static void PublishClassifierModel(string classifierName, string modelId)
+    {
+      Logger.DebugFormat("Begin publish model with Id {0} for classifier with name {1}.", modelId, classifierName);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          return;
+        }
+
+        var model = arioConnector.PublishClassifierModel(classifier.Id.ToString(), modelId);
+        if (model == null)
+        {
+          Logger.ErrorFormat("Error for publish model with Id {0} for classifier with name {1}.", modelId, classifierName);
+          return;
+        }
+        
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful publish model with Id {0} for classifier with name {1}.", modelId, classifierName);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Publish classifier error: {0}", e.Message);
+      }
+    }
+    
+    public static void TrainClassifierModel(string classifierName, string filePath)
+    {
+      Logger.DebugFormat("Begin train classifier with name {0} from folder {1}.", classifierName, filePath);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          return;
+        }
+
+        var trainTask = arioConnector.TrainClassifierFromFolder(classifier.Id.ToString(), Path.GetFullPath(filePath));
+        var trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTask.Id.ToString());
+        while (trainTaskInfo.Task.Finished == null)
+        {
+          System.Threading.Thread.Sleep(10000);
+          trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTaskInfo.Task.Id.ToString());
+          Logger.DebugFormat("{0} Training in process. Processed documents: {1}.", Calendar.Now, trainTaskInfo.Task.ClassifierModel.Metrics.TrainSetCount);
+        }
+        
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful train classifier with name {0} from folder {1}.", classifierName, filePath);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Train classifier error: {0}", e.Message);
+      }
     }
     
     #endregion
