@@ -1873,20 +1873,23 @@ namespace Sungero.Capture.Server
     /// Заполнить вид документа.
     /// </summary>
     /// <param name="document">Документ.</param>
+    /// <remarks>Заполняется видом документа по умолчанию.
+    ///  Если видом документа по умолчанию не указан, то формируется список всех доступных видов документа
+    ///  и берется первый элемент из этого списка.</remarks>
     public virtual void FillDocumentKind(IOfficialDocument document)
     {
       var documentKind = Docflow.PublicFunctions.OfficialDocument.GetDefaultDocumentKind(document);
       if (documentKind == null)
-      {        
+      {
         documentKind = Docflow.PublicFunctions.DocumentKind.GetAvailableDocumentKinds(document).FirstOrDefault();
         if (documentKind == null)
         {
           Logger.Error(string.Format("Can not fill document kind for document type {0}.", GetTypeName(document)));
-           return;           
+          return;
         }
         Logger.Debug(string.Format("Can not find default documend kind for document type {0}", GetTypeName(document)));
       }
-      document.DocumentKind = documentKind;      
+      document.DocumentKind = documentKind;
     }
     
     /// <summary>
