@@ -565,7 +565,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToEnumerationBinder",
           "ParentGuid": "1b194ce3-c440-4887-9f0d-1cdc4303c583",
           "PropertyGuid": "fdcc98d0-a972-4b77-9e03-bd9a29a9b6fb",
-          "RowNumber": 2,
+          "RowNumber": 3,
           "RowSpan": 1,
           "Settings": []
         },
@@ -578,7 +578,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToEnumerationBinder",
           "ParentGuid": "1b194ce3-c440-4887-9f0d-1cdc4303c583",
           "PropertyGuid": "fec695ea-aa2c-4d91-89fd-52c644da24c5",
-          "RowNumber": 3,
+          "RowNumber": 4,
           "RowSpan": 1,
           "Settings": []
         },
@@ -591,7 +591,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToEnumerationBinder",
           "ParentGuid": "1b194ce3-c440-4887-9f0d-1cdc4303c583",
           "PropertyGuid": "5c742813-b74b-4d04-9de0-889f4e40083d",
-          "RowNumber": 5,
+          "RowNumber": 6,
           "RowSpan": 1,
           "Settings": []
         },
@@ -604,7 +604,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToEnumerationBinder",
           "ParentGuid": "1b194ce3-c440-4887-9f0d-1cdc4303c583",
           "PropertyGuid": "669e7119-15cd-46b6-9e4e-442b29d08a03",
-          "RowNumber": 6,
+          "RowNumber": 7,
           "RowSpan": 1,
           "Settings": []
         },
@@ -669,7 +669,7 @@
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToEnumerationBinder",
           "ParentGuid": "1b194ce3-c440-4887-9f0d-1cdc4303c583",
           "PropertyGuid": "0d4c6141-a3e9-431c-8138-305443f31d8b",
-          "RowNumber": 4,
+          "RowNumber": 5,
           "RowSpan": 1,
           "Settings": []
         },
@@ -978,6 +978,19 @@
           "ParentGuid": "52b6e68c-355f-4bd4-b3ea-9ef12dd8abc7",
           "PropertyGuid": "d770eb82-501d-47fc-b2a4-5e300281603a",
           "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "3aaf6f84-a6e8-47a9-9960-464c6d4c8d2f",
+          "Name": "VerificationState",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToEnumerationBinder",
+          "ParentGuid": "1b194ce3-c440-4887-9f0d-1cdc4303c583",
+          "PropertyGuid": "9b7cc9f8-d575-45a0-b9e3-e6c820a1fc83",
+          "RowNumber": 2,
           "RowSpan": 1,
           "Settings": []
         }
