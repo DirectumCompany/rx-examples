@@ -28,7 +28,6 @@ namespace Sungero.Capture.Server
       var processedIds = new List<int?>();
       var verificationTasks = SimpleTasks.GetAll()
         .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id &&
-               t.Status == Workflow.Task.Status.Completed &&
                (t.Subject.Contains(Resources.CheckPackage) ||
                 t.Subject.Contains(Resources.CheckDocument)));
       
@@ -45,7 +44,10 @@ namespace Sungero.Capture.Server
           continue;
         
         // Документ верифицирован, если последняя задача была выполнена.
-        var task = documentVerificationTasks.FirstOrDefault();
+        var task = documentVerificationTasks.First();
+        if (task.Status != Workflow.Task.Status.Completed)
+          continue;
+        
         var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
         processedIds.AddRange(attachmentIds);
         var subTasks = Tasks.GetAll()
