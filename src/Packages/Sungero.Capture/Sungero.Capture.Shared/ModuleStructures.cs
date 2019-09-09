@@ -116,7 +116,10 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
     public bool IsTrusted { get; set; }
   }
-   
+  
+  /// <summary>
+  /// Результат подбора контрагента и НОР для документа.
+  /// </summary>  
   partial class BusinessUnitAndCounterparty
   {
     public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact BusinessUnit { get; set; }
