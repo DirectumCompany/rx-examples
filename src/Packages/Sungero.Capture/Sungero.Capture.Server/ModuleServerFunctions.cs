@@ -2380,13 +2380,13 @@ namespace Sungero.Capture.Server
     /// <param name="facts">Список фактов.</param>
     /// <param name="propertyName">Имя свойства.</param>
     /// <returns>Корреспондент.</returns>
-    public virtual Structures.Module.CounterpartyWithFact GetCounterparty(List<Structures.Module.IFact> facts, string propertyName)
+    public virtual Structures.Module.CounterpartyAndFactLink GetCounterparty(List<Structures.Module.IFact> facts, string propertyName)
     {
       var filteredCounterparties = Counterparties.GetAll()
         .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
         .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
       
-      var foundByName = new List<Structures.Module.CounterpartyWithFact>();
+      var foundByName = new List<Structures.Module.CounterpartyAndFactLink>();
       var correspondentNames = new List<string>();
       
       // Получить ИНН/КПП и наименования + форму собственности контрагентов из фактов.
@@ -2402,7 +2402,7 @@ namespace Sungero.Capture.Server
           .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         foreach (var counterparty in counterparties)
         {
-          var counterpartyWithFact = Structures.Module.CounterpartyWithFact.Create(counterparty, fact, false);
+          var counterpartyWithFact = Structures.Module.CounterpartyAndFactLink.Create(counterparty, fact, false);
           foundByName.Add(counterpartyWithFact);
         }
       }
@@ -2414,7 +2414,7 @@ namespace Sungero.Capture.Server
       else
       {
         // Поиск по ИНН/КПП.
-        var foundByTin = new List<Structures.Module.CounterpartyWithFact>();
+        var foundByTin = new List<Structures.Module.CounterpartyAndFactLink>();
         foreach (var fact in correspondentTINs)
         {
           var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
@@ -2426,7 +2426,7 @@ namespace Sungero.Capture.Server
           var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
           foreach (var counterparty in counterparties)
           {
-            var counterpartyWithFact = Structures.Module.CounterpartyWithFact.Create(counterparty, fact, true);
+            var counterpartyWithFact = Structures.Module.CounterpartyAndFactLink.Create(counterparty, fact, true);
             foundByTin.Add(counterpartyWithFact);
           }
         }
@@ -2457,7 +2457,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Связка контрагент + факт.</returns>
-    public virtual Structures.Module.CounterpartyWithFact GetCounterpartyByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    public virtual Structures.Module.CounterpartyAndFactLink GetCounterpartyByVerifiedData(Structures.Module.IFact fact, string propertyName)
     {
       var counterpartyUnitField = GetFieldByVerifiedData(fact, propertyName);
       if (counterpartyUnitField == null)
@@ -2470,7 +2470,7 @@ namespace Sungero.Capture.Server
       if (filteredCounterparty == null)
         return null;
       
-      return Structures.Module.CounterpartyWithFact.Create(filteredCounterparty, fact, counterpartyUnitField.IsTrusted == true);
+      return Structures.Module.CounterpartyAndFactLink.Create(filteredCounterparty, fact, counterpartyUnitField.IsTrusted == true);
     }
     
     /// <summary>

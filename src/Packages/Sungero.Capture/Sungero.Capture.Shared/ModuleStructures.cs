@@ -61,7 +61,7 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }
   
-  partial class CounterpartyWithFact
+  partial class CounterpartyAndFactLink
   {
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
