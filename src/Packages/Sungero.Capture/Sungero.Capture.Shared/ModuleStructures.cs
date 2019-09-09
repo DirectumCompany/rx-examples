@@ -22,6 +22,9 @@ namespace Sungero.Capture.Structures.Module
     public bool SendedByEmail { get; set; }
   }
   
+  /// <summary>
+  /// Файл из службы захвата.
+  /// </summary>
   [Public]
   partial class FileDto
   {
@@ -53,6 +56,9 @@ namespace Sungero.Capture.Structures.Module
     public double Probability { get; set; }
   }
   
+  /// <summary>
+  /// Контрагент для демо документов.
+  /// </summary>
   partial class MockCounterparty
   {
     public string Name { get; set; }
@@ -61,6 +67,9 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }
   
+  /// <summary>
+  /// Контрагент и связанный с ним факт.
+  /// </summary>
   partial class CounterpartyAndFactLink
   {
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
@@ -68,6 +77,9 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
+  /// <summary>
+  /// Контактное лицо и связанный с ним факт.
+  /// </summary>
   partial class ContactAndFactLink
   {
     public Sungero.Parties.IContact Contact { get; set; }
@@ -75,6 +87,9 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
+  /// <summary>
+  /// НОР и связанный с ней факт.
+  /// </summary>
   partial class BusinessUnitAndFactLink
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
@@ -82,6 +97,9 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
+  /// <summary>
+  /// Сотрудник и связанный с ним факт.
+  /// </summary>
   partial class EmployeeAndFactLink
   {
     public Sungero.Company.IEmployee Employee { get; set; }
@@ -89,6 +107,9 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
+  /// <summary>
+  /// Договор и связанный с ним факт.
+  /// </summary>
   partial class ContractAndFactLink
   {
     public Sungero.Contracts.IContractualDocument Contract { get; set; }
@@ -103,7 +124,9 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
   }
 
-
+  /// <summary>
+  /// Результат поиска контрагента и НОР по факту с типом "Контрагент".
+  /// </summary>
   partial class SearchResultForCounterpartyFact
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
