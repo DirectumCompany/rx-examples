@@ -98,13 +98,13 @@ namespace Sungero.Capture.Structures.Module
    
   partial class BusinessUnitAndCounterpartyFacts
   {
-    public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact BusinessUnitFact { get; set; }
-    public Sungero.Capture.Structures.Module.BusinessUnitAndCounterpartyWithFact CounterpartyFact { get; set; }
+    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact BusinessUnitFact { get; set; }
+    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact CounterpartyFact { get; set; }
     public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
   }
 
 
-  partial class BusinessUnitAndCounterpartyWithFact
+  partial class SearchResultForCounterpartyFact
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
     public Sungero.Parties.ICounterparty Counterparty { get; set; }

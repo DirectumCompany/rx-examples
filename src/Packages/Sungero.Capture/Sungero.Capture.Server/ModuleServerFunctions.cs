@@ -2177,7 +2177,7 @@ namespace Sungero.Capture.Server
     /// <param name="allFacts">Факты.</param>
     /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
-    public virtual List<Structures.Module.BusinessUnitAndCounterpartyWithFact> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> allFacts,
+    public virtual List<Structures.Module.SearchResultForCounterpartyFact> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> allFacts,
                                                                                                                             List<string> counterpartyTypes)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
@@ -2188,7 +2188,7 @@ namespace Sungero.Capture.Server
       foreach (var counterpartyType in counterpartyTypes)
         facts.AddRange(GetCounterpartyFacts(allFacts, counterpartyType));
       
-      var businessUnitsAndCounterparties = new List<Structures.Module.BusinessUnitAndCounterpartyWithFact>();
+      var businessUnitsAndCounterparties = new List<Structures.Module.SearchResultForCounterpartyFact>();
       foreach (var fact in facts)
       {
         var counterparty = Counterparties.Null;
@@ -2231,7 +2231,7 @@ namespace Sungero.Capture.Server
         
         if (counterparty != null || businessUnit != null)
         {
-          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, 
+          var businessUnitAndCounterparty = Structures.Module.SearchResultForCounterpartyFact.Create(businessUnit, counterparty, fact, 
                                                                                                          GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
                                                                                                          isTrusted);
           businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
@@ -2246,7 +2246,7 @@ namespace Sungero.Capture.Server
           .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
-          var businessUnitAndCounterparty = Structures.Module.BusinessUnitAndCounterpartyWithFact.Create(businessUnit, counterparty, fact, 
+          var businessUnitAndCounterparty = Structures.Module.SearchResultForCounterpartyFact.Create(businessUnit, counterparty, fact, 
                                                                                                          GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
                                                                                                          false);
           businessUnitsAndCounterparties.Add(businessUnitAndCounterparty);
@@ -2264,65 +2264,65 @@ namespace Sungero.Capture.Server
     /// <param name="nonTypeFacts">Список фактов с данными о контрагенте. Тип контрагента не заполнен.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагента.</returns>
-    public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
-                                                                                                          Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
-                                                                                                          List<Structures.Module.BusinessUnitAndCounterpartyWithFact> nonTypeFacts,
+    public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.SearchResultForCounterpartyFact buyer,
+                                                                                                          Structures.Module.SearchResultForCounterpartyFact seller,
+                                                                                                          List<Structures.Module.SearchResultForCounterpartyFact> nonType,
                                                                                                           IEmployee responsibleEmployee)
     {
-      Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
-      Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;
+      Structures.Module.SearchResultForCounterpartyFact counterparty = null;
+      Structures.Module.SearchResultForCounterpartyFact businessUnit = null;
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsibleEmployee);
       
       // НОР.
       var businessUnitFindedNotExactly = false;
-      if (buyerFact != null)
+      if (buyer != null)
       {
         // НОР по факту с типом BUYER.
-        businessUnitFact = buyerFact;
+        businessUnit = buyer;
       }
       else
       {
         // НОР по факту без типа.
-        var nonTypeBusinessUnits = nonTypeFacts.Where(m => m.BusinessUnit != null);
+        var nonTypeBusinessUnits = nonType.Where(m => m.BusinessUnit != null);
         
         // Уточнить НОР по ответственному.
         if (nonTypeBusinessUnits.Count() > 1)
         {
-          businessUnitFact = nonTypeBusinessUnits.Where(m => Equals(m.BusinessUnit, responsibleEmployeeBusinessUnit)).FirstOrDefault();
+          businessUnit = nonTypeBusinessUnits.Where(m => Equals(m.BusinessUnit, responsibleEmployeeBusinessUnit)).FirstOrDefault();
           
           // НОР не определилась по ответственному.
-          if (businessUnitFact == null)
+          if (businessUnit == null)
             businessUnitFindedNotExactly = true;
         }
         
-        if (businessUnitFact == null)
-          businessUnitFact = nonTypeBusinessUnits.FirstOrDefault();
+        if (businessUnit == null)
+          businessUnit = nonTypeBusinessUnits.FirstOrDefault();
         
         // Подсветить жёлтым, если НОР было несколько и определить по ответственному не удалось.
         if (businessUnitFindedNotExactly)
-          businessUnitFact.IsTrusted = false;
+          businessUnit.IsTrusted = false;
       }
       
       // Контрагент.
-      if (sellerFact != null && sellerFact.Counterparty != null)
+      if (seller != null && seller.Counterparty != null)
       {
         // Контрагент по факту с типом SELLER.
-        counterpartyFact = sellerFact;
+        counterparty = seller;
       }
       else
       {
         // Контрагент по факту без типа. Исключить факт, по которому нашли НОР.
-        var nonTypeCounterparties = nonTypeFacts
+        var nonTypeCounterparties = nonType
           .Where(m => m.Counterparty != null)
-          .Where(m => !Equals(m, businessUnitFact));
-        counterpartyFact = nonTypeCounterparties.FirstOrDefault();
+          .Where(m => !Equals(m, businessUnit));
+        counterparty = nonTypeCounterparties.FirstOrDefault();
         
         // Подсветить жёлтым, если контрагентов было несколько.
         if (nonTypeCounterparties.Count() > 1 || businessUnitFindedNotExactly)
-          counterpartyFact.IsTrusted = false;
+          counterparty.IsTrusted = false;
       }
       
-      return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnitFact, counterpartyFact, responsibleEmployeeBusinessUnit);
+      return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
     }
     
     
@@ -2333,24 +2333,24 @@ namespace Sungero.Capture.Server
     /// <param name="sellerFact">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагента.</returns>
-    public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.BusinessUnitAndCounterpartyWithFact buyerFact,
-                                                                                                          Structures.Module.BusinessUnitAndCounterpartyWithFact sellerFact,
+    public virtual Structures.Module.BusinessUnitAndCounterpartyFacts GetCounterpartyAndBusinessUnitFacts(Structures.Module.SearchResultForCounterpartyFact buyer,
+                                                                                                          Structures.Module.SearchResultForCounterpartyFact seller,
                                                                                                           IEmployee responsibleEmployee)
     {
-      Structures.Module.BusinessUnitAndCounterpartyWithFact counterpartyFact = null;
-      Structures.Module.BusinessUnitAndCounterpartyWithFact businessUnitFact = null;
+      Structures.Module.SearchResultForCounterpartyFact counterparty = null;
+      Structures.Module.SearchResultForCounterpartyFact businessUnit = null;
       
       // НОР.
-      if (buyerFact != null)
-        businessUnitFact = buyerFact;
+      if (buyer != null)
+        businessUnit = buyer;
       
       // Контрагент.
-      if (sellerFact != null && sellerFact.Counterparty != null)
-        counterpartyFact = sellerFact;
+      if (seller != null && seller.Counterparty != null)
+        counterparty = seller;
       
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsibleEmployee);
       
-      return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnitFact, counterpartyFact, responsibleEmployeeBusinessUnit);
+      return Structures.Module.BusinessUnitAndCounterpartyFacts.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
     }
     
     /// <summary>
