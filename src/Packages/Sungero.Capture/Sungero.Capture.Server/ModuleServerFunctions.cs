@@ -3307,10 +3307,10 @@ namespace Sungero.Capture.Server
     /// <param name="counterparty">Контрагент.</param>
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
-    public virtual ContractWithFact GetLeadingDocument(IFact fact, string leadingDocPropertyName,
+    public virtual ContractAndFactLink GetLeadingDocument(IFact fact, string leadingDocPropertyName,
                                                        ICounterparty counterparty, string counterpartyPropertyName)
     {
-      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
+      var result = Structures.Module.ContractAndFactLink.Create(Contracts.ContractualDocuments.Null, fact, false);
       if (fact == null)
         return result;
       
@@ -3334,9 +3334,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns></returns>
-    public virtual Structures.Module.ContractWithFact GetContractByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    public virtual Structures.Module.ContractAndFactLink GetContractByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
     {
-      var result = Structures.Module.ContractWithFact.Create(Contracts.ContractualDocuments.Null, fact, false);
+      var result = Structures.Module.ContractAndFactLink.Create(Contracts.ContractualDocuments.Null, fact, false);
       var contractField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
       if (contractField == null)
         return result;

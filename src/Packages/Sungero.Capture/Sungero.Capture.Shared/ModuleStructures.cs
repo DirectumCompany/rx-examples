@@ -89,7 +89,7 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
-  partial class ContractWithFact
+  partial class ContractAndFactLink
   {
     public Sungero.Contracts.IContractualDocument Contract { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
