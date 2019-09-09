@@ -68,7 +68,7 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
-  partial class ContactWithFact
+  partial class ContactAndFactLink
   {
     public Sungero.Parties.IContact Contact { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }

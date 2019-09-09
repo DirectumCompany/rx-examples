@@ -3230,9 +3230,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterparty">Контрагент.</param>
     /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
     /// <returns>Контактное лицо.</returns>
-    public virtual Structures.Module.ContactWithFact GetContactByFact(Sungero.Capture.Structures.Module.IFact fact, string propertyName, ICounterparty counterparty, string counterpartyPropertyName)
+    public virtual Structures.Module.ContactAndFactLink GetContactByFact(Sungero.Capture.Structures.Module.IFact fact, string propertyName, ICounterparty counterparty, string counterpartyPropertyName)
     {
-      var result = Structures.Module.ContactWithFact.Create(Sungero.Parties.Contacts.Null, fact, false);
+      var result = Structures.Module.ContactAndFactLink.Create(Sungero.Parties.Contacts.Null, fact, false);
       if (fact == null)
         return result;
       if (counterparty != null)
@@ -3258,9 +3258,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
     /// <returns>Контактное лицо.</returns>
-    public virtual Structures.Module.ContactWithFact GetContactByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
+    public virtual Structures.Module.ContactAndFactLink GetContactByVerifiedData(Structures.Module.IFact fact, string propertyName, string  counterpartyPropertyValue, string counterpartyPropertyName)
     {
-      var result = Structures.Module.ContactWithFact.Create(Contacts.Null, fact, false);
+      var result = Structures.Module.ContactAndFactLink.Create(Contacts.Null, fact, false);
       var contactField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
       if (contactField == null)
         return result;
