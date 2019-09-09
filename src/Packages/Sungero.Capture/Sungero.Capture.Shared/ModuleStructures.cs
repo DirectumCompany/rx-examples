@@ -82,7 +82,7 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
-  partial class EmployeeWithFact
+  partial class EmployeeAndFactLink
   {
     public Sungero.Company.IEmployee Employee { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }

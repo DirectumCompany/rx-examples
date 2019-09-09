@@ -3121,9 +3121,9 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Адресат.</returns>
-    public virtual Structures.Module.EmployeeWithFact GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
+    public virtual Structures.Module.EmployeeAndFactLink GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
     {
-      var result = Structures.Module.EmployeeWithFact.Create(Sungero.Company.Employees.Null, fact, false);
+      var result = Structures.Module.EmployeeAndFactLink.Create(Sungero.Company.Employees.Null, fact, false);
       if (fact == null)
         return result;
       
