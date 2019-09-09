@@ -117,10 +117,10 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
    
-  partial class BusinessUnitAndCounterpartyFacts
+  partial class BusinessUnitAndCounterparty
   {
-    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact BusinessUnitFact { get; set; }
-    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact CounterpartyFact { get; set; }
+    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact BusinessUnit { get; set; }
+    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact Counterparty { get; set; }
     public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
   }
 
