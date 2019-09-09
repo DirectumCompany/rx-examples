@@ -2479,7 +2479,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Связку контрагент + факт.</returns>
-    public virtual Structures.Module.BusinessUnitWithFact GetBusinessUnitByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    public virtual Structures.Module.BusinessUnitAndFactLink GetBusinessUnitByVerifiedData(Structures.Module.IFact fact, string propertyName)
     {
       var businessUnitField = GetFieldByVerifiedData(fact, propertyName);
       if (businessUnitField == null)
@@ -2492,7 +2492,7 @@ namespace Sungero.Capture.Server
       if (filteredBusinessUnit == null)
         return null;
       
-      return Structures.Module.BusinessUnitWithFact.Create(filteredBusinessUnit, fact, businessUnitField.IsTrusted == true);
+      return Structures.Module.BusinessUnitAndFactLink.Create(filteredBusinessUnit, fact, businessUnitField.IsTrusted == true);
     }
 
     /// <summary>
@@ -2503,7 +2503,7 @@ namespace Sungero.Capture.Server
     /// <param name="addressee">Адресат.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
-    public virtual BusinessUnitWithFact GetBusinessUnitWithFact(List<BusinessUnitWithFact> businessUnitsWithFacts,
+    public virtual BusinessUnitAndFactLink GetBusinessUnitWithFact(List<BusinessUnitAndFactLink> businessUnitsWithFacts,
                                                                 string businessUnitPropertyName, IEmployee addressee,
                                                                 IEmployee responsible)
     {
@@ -2517,7 +2517,7 @@ namespace Sungero.Capture.Server
       }
       
       var businessUnitByAddressee = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(addressee);
-      var businessUnitByAddresseeWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByAddressee, null, false);
+      var businessUnitByAddresseeWithFact = Capture.Structures.Module.BusinessUnitAndFactLink.Create(businessUnitByAddressee, null, false);
       
       // Попытаться уточнить по адресату.
       var businessUnitWithFact = businessUnitsWithFacts.Any() && businessUnitByAddressee != null
@@ -2532,7 +2532,7 @@ namespace Sungero.Capture.Server
       
       // Если и по адресату не найдено, то вернуть НОР из ответственного.
       var businessUnitByResponsible = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      var businessUnitByResponsibleWithFact = Capture.Structures.Module.BusinessUnitWithFact.Create(businessUnitByResponsible, null, false);
+      var businessUnitByResponsibleWithFact = Capture.Structures.Module.BusinessUnitAndFactLink.Create(businessUnitByResponsible, null, false);
       return businessUnitByResponsibleWithFact;
     }
     
@@ -2541,10 +2541,10 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="facts">Список фактов.</param>
     /// <returns>Список НОР и соответствующих им фактов.</returns>
-    public virtual List<Capture.Structures.Module.BusinessUnitWithFact> GetBusinessUnitsWithFacts(List<Structures.Module.IFact> facts)
+    public virtual List<Capture.Structures.Module.BusinessUnitAndFactLink> GetBusinessUnitsWithFacts(List<Structures.Module.IFact> facts)
     {
       // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
-      var businessUnitsByName = new List<Capture.Structures.Module.BusinessUnitWithFact>();
+      var businessUnitsByName = new List<Capture.Structures.Module.BusinessUnitAndFactLink>();
       var correspondentNameFacts = GetFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName)
         .OrderByDescending(x => x.Fields.First(f => f.Name == FieldNames.Letter.CorrespondentName).Probability);
       foreach (var fact in correspondentNameFacts)
@@ -2553,7 +2553,7 @@ namespace Sungero.Capture.Server
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
           .Where(x => x.Name.ToLower().Contains(name));
-        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact, false)));
+        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitAndFactLink.Create(x, fact, false)));
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
@@ -2564,14 +2564,14 @@ namespace Sungero.Capture.Server
       else
       {
         // Поиск по ИНН/КПП.
-        var foundByTin = new List<Capture.Structures.Module.BusinessUnitWithFact>();
+        var foundByTin = new List<Capture.Structures.Module.BusinessUnitAndFactLink>();
         foreach (var fact in correspondentTinFacts)
         {
           var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
           var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
           var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
           var isTrusted = businessUnits.Count == 1;
-          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitWithFact.Create(x, fact, isTrusted)));
+          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.BusinessUnitAndFactLink.Create(x, fact, isTrusted)));
         }
         
         // Найдено по ИНН/КПП.

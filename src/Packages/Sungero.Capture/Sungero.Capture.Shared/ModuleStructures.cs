@@ -75,7 +75,7 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
   
-  partial class BusinessUnitWithFact
+  partial class BusinessUnitAndFactLink
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
