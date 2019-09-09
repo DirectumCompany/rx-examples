@@ -18,12 +18,12 @@ namespace Sungero.Capture.Structures.Module
     public List<Sungero.Capture.Structures.Module.IFact> Facts { get; set; }
     public string Message { get; set; }
     public IDocumentRecognitionInfo Info { get; set; }
-    public Sungero.Capture.Structures.Module.IFileInfo OriginalFile { get; set; }
+    public Sungero.Capture.Structures.Module.IFileDto File { get; set; }
     public bool SendedByEmail { get; set; }
   }
   
   [Public]
-  partial class FileInfo
+  partial class FileDto
   {
     public byte[] Data { get; set; }
     public string Path { get; set; }
@@ -118,8 +118,8 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class CapturedMailFiles
   {
-    public Sungero.Capture.Structures.Module.IFileInfo Body { get; set; }
-    public List<Sungero.Capture.Structures.Module.IFileInfo> Attachments { get; set; }
+    public Sungero.Capture.Structures.Module.IFileDto Body { get; set; }
+    public List<Sungero.Capture.Structures.Module.IFileDto> Attachments { get; set; }
   }
   
   /// <summary>

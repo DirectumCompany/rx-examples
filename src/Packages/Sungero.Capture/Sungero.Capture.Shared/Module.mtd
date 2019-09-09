@@ -301,7 +301,7 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "FileInfo",
+      "Name": "FileDto",
       "IsPublic": true,
       "Properties": [
         {
@@ -357,9 +357,9 @@
           "TypeFullName": "global::Sungero.Capture.IDocumentRecognitionInfo"
         },
         {
-          "Name": "OriginalFile",
+          "Name": "File",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileInfo"
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileDto"
         },
         {
           "Name": "SendedByEmail",

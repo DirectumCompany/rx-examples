@@ -162,7 +162,7 @@ namespace Sungero.Capture.Client
     public virtual Structures.Module.CapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
     {
       var mailFiles = Structures.Module.CapturedMailFiles.Create();
-      mailFiles.Attachments = new List<Structures.Module.IFileInfo>();
+      mailFiles.Attachments = new List<Structures.Module.IFileDto>();
       var filesXDoc = System.Xml.Linq.XDocument.Load(filesInfo);
       if (filesXDoc == null)
       {
@@ -323,13 +323,13 @@ namespace Sungero.Capture.Client
     /// <param name="xmlElement">Xml элемент.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Информация о файле.</returns>
-    public virtual Structures.Module.IFileInfo CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
+    public virtual Structures.Module.IFileDto CreateFileInfoFromXelement(System.Xml.Linq.XElement xmlElement, string folder)
     {
-      var fileInfo = Structures.Module.FileInfo.Create();
-      fileInfo.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element(Constants.Module.InputFilesTagNames.FileName).Value));
-      fileInfo.Description = xmlElement.Element(Constants.Module.InputFilesTagNames.FileDescription).Value;
+      var file = Structures.Module.FileDto.Create();
+      file.Path = Path.Combine(folder, Path.GetFileName(xmlElement.Element(Constants.Module.InputFilesTagNames.FileName).Value));
+      file.Description = xmlElement.Element(Constants.Module.InputFilesTagNames.FileDescription).Value;
       
-      return fileInfo;
+      return file;
     }
     
     #endregion
@@ -357,7 +357,7 @@ namespace Sungero.Capture.Client
       {
         var classificationAndExtractionResult = TryClassifyAndExtractFacts(packagePath, arioUrl, firstPageClassifierName, typeClassifierName);
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
-        var originalFile = new Structures.Module.FileInfo();
+        var originalFile = new Structures.Module.FileDto();
         originalFile.Path = packagePath;
         
         var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
@@ -671,7 +671,7 @@ namespace Sungero.Capture.Client
 
       // Обработать пакет.
       Logger.Debug(Calendar.Now.ToString() + " Start ProcessSplitedPackage");
-      var originalFile = new Structures.Module.FileInfo();
+      var originalFile = new Structures.Module.FileDto();
       originalFile.Path = System.IO.Path.GetFileName(bodyFilePath);
       var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(System.IO.File.ReadAllText(jsonFilePath),
                                                                                   originalFile,

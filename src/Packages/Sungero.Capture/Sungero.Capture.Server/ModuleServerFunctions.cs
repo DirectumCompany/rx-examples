@@ -180,7 +180,7 @@ namespace Sungero.Capture.Server
     /// <param name="fromEmail">Адрес эл.почты отправителя.(Не используется, добавлен для перекрытия)</param>
     /// <returns>Ид созданных документов.</returns>
     [Remote]
-    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Structures.Module.IFileInfo originalFile,
+    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Structures.Module.IFileDto originalFile,
                                                                                IEmployee responsible, bool sendedByEmail, string fromEmail)
     {
       var recognitionResults = GetRecognitionResults(recognitionResultsJson, originalFile, sendedByEmail);
@@ -331,7 +331,7 @@ namespace Sungero.Capture.Server
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
     public virtual List<Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
-                                                                                    Structures.Module.IFileInfo originalFile,
+                                                                                    Structures.Module.IFileDto file,
                                                                                     bool sendedByEmail)
     {
       var recognitionResults = new List<IRecognitionResult>();
@@ -348,7 +348,7 @@ namespace Sungero.Capture.Server
         recognitionResult.BodyGuid = packageProcessResult.Guid;
         recognitionResult.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         recognitionResult.Message = packageProcessResult.Message;
-        recognitionResult.OriginalFile = originalFile;
+        recognitionResult.File = file;
         recognitionResult.SendedByEmail = sendedByEmail;
         var docInfo = DocumentRecognitionInfos.Create();
         docInfo.Name = recognitionResult.PredictedClass;
@@ -484,7 +484,7 @@ namespace Sungero.Capture.Server
       // Все нераспознанные документы создать простыми.
       else
       {
-        var name = !string.IsNullOrWhiteSpace(recognitionResult.OriginalFile.Description) ? recognitionResult.OriginalFile.Description : Resources.SimpleDocumentName;
+        var name = !string.IsNullOrWhiteSpace(recognitionResult.File.Description) ? recognitionResult.File.Description : Resources.SimpleDocumentName;
         document = CreateSimpleDocument(name, responsible);
       }
       
@@ -749,11 +749,11 @@ namespace Sungero.Capture.Server
     /// <returns>ИД созданного документа.</returns>
     [Remote]
     public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.CapturedMailInfo mailInfo,
-                                                                                     Structures.Module.IFileInfo bodyInfo,
+                                                                                     Structures.Module.IFileDto bodyDto,
                                                                                      IEmployee responsible)
     {
-      if (!System.IO.File.Exists(bodyInfo.Path))
-        throw new ApplicationException(Resources.FileNotFoundFormat(bodyInfo.Path));
+      if (!System.IO.File.Exists(bodyDto.Path))
+        throw new ApplicationException(Resources.FileNotFoundFormat(bodyDto.Path));
       
       var documentName = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       var document = CreateSimpleDocument(documentName, responsible);
@@ -770,11 +770,11 @@ namespace Sungero.Capture.Server
         document.Subject = subject;
       }
       
-      using (var body = new MemoryStream(bodyInfo.Data))
+      using (var body = new MemoryStream(bodyDto.Data))
       {
         document.CreateVersion();
         var version = document.LastVersion;
-        if (Path.GetExtension(bodyInfo.Path).ToLower() == Constants.Module.HtmlExtension.WithDot)
+        if (Path.GetExtension(bodyDto.Path).ToLower() == Constants.Module.HtmlExtension.WithDot)
         {
           var pdfConverter = new AsposeExtensions.Converter();
           using (var pdfDocumentStream = pdfConverter.GeneratePdf(body, Constants.Module.HtmlExtension.WithoutDot))
@@ -791,7 +791,7 @@ namespace Sungero.Capture.Server
         if (version.Body.Size == 0)
         {
           version.Body.Write(body);
-          version.AssociatedApplication = GetAssociatedApplicationByFileName(bodyInfo.Path);
+          version.AssociatedApplication = GetAssociatedApplicationByFileName(bodyDto.Path);
         }
       }
       document.Save();
@@ -806,17 +806,17 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileInfo fileInfo,
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileDto file,
                                                                                 bool sendedByEmail,
                                                                                 IEmployee responsible)
     {
-      var name = Path.GetFileName(fileInfo.Description);
+      var name = Path.GetFileName(file.Description);
       var document = CreateSimpleDocument(name, responsible);
       FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
-      var application = GetAssociatedApplicationByFileName(fileInfo.Path);
-      using (var body = new MemoryStream(fileInfo.Data))
+      var application = GetAssociatedApplicationByFileName(file.Path);
+      using (var body = new MemoryStream(file.Data))
       {
         document.CreateVersion();
         var version = document.LastVersion;
@@ -3049,14 +3049,14 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки входящего документа в Арио.</param>
     public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
     {
-      var needCreatePublicBody = recognitionResult.OriginalFile != null && recognitionResult.OriginalFile.Data != null;
+      var needCreatePublicBody = recognitionResult.File != null && recognitionResult.File.Data != null;
       var pdfApp = Content.AssociatedApplications.GetByExtension(Constants.Module.PdfExtension);
       if (pdfApp == Content.AssociatedApplications.Null)
-        pdfApp = GetAssociatedApplicationByFileName(recognitionResult.OriginalFile.Path);
+        pdfApp = GetAssociatedApplicationByFileName(recognitionResult.File.Path);
       
       var originalFileApp = Content.AssociatedApplications.Null;
       if (needCreatePublicBody)
-        originalFileApp = GetAssociatedApplicationByFileName(recognitionResult.OriginalFile.Path);
+        originalFileApp = GetAssociatedApplicationByFileName(recognitionResult.File.Path);
       
       // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
       var subjectIsEmpty = string.IsNullOrEmpty(document.Subject);
@@ -3070,7 +3070,7 @@ namespace Sungero.Capture.Server
       {
         using (var publicBody = GetDocumentBody(recognitionResult.BodyGuid))
           version.PublicBody.Write(publicBody);
-        using (var body = new MemoryStream(recognitionResult.OriginalFile.Data))
+        using (var body = new MemoryStream(recognitionResult.File.Data))
           version.Body.Write(body);
         version.AssociatedApplication = pdfApp;
         version.BodyAssociatedApplication = originalFileApp;
