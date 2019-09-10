@@ -26,9 +26,6 @@ namespace Sungero.SmartCapture
          (_obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Registrable ||
           _obj.DocumentKind.GenerateDocumentName == true));
       
-      if (_obj.VerificationState != VerificationState.InProcess)
-        _obj.State.Properties.VerificationState.IsVisible = false;
-      
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
     
