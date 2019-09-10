@@ -2532,7 +2532,7 @@ namespace Sungero.Capture.Server
                                                                 IEmployee responsible)
     {
       
-      // Сначала поиск по хэшам фактов.
+      // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
       foreach(var record in businessUnitsWithFacts)
       {
         var result = GetBusinessUnitByVerifiedData(record.Fact, businessUnitPropertyName);
@@ -2544,12 +2544,21 @@ namespace Sungero.Capture.Server
       var businessUnitByAddresseeFactMatching = Capture.Structures.Module.CounterpartyFactMatching.Create();
       businessUnitByAddresseeFactMatching.BusinessUnit = businessUnitByAddressee;
       businessUnitByAddresseeFactMatching.Fact = null;
-      businessUnitByAddresseeFactMatching.IsTrusted = false;       
+      businessUnitByAddresseeFactMatching.IsTrusted = false;
       
       // Попытаться уточнить по адресату.
-      var businessUnitWithFact = businessUnitsWithFacts.Any() && businessUnitByAddressee != null
-        ? businessUnitByAddresseeFactMatching
-        : businessUnitsWithFacts.FirstOrDefault();
+      // TODO Dmitirev_IA: Скорее всего стоит уточнять по адресату, если фактов нет или их несколько.
+      var hasAnyBusinessUnitFacts = businessUnitsWithFacts.Any();
+      var hasBusinessUnitByAddressee = businessUnitByAddressee != null;
+      Structures.Module.CounterpartyFactMatching businessUnitWithFact = null;
+      if (hasAnyBusinessUnitFacts && hasBusinessUnitByAddressee)
+        businessUnitWithFact = businessUnitByAddresseeFactMatching;
+      else
+      {
+        businessUnitWithFact = businessUnitsWithFacts.FirstOrDefault();
+        if (businessUnitsWithFacts.Count > 1)
+          businessUnitWithFact.IsTrusted = false;
+      }
       if (businessUnitWithFact != null)
         return businessUnitWithFact;
       
