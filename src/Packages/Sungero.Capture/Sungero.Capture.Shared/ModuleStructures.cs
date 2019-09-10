@@ -156,13 +156,18 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>  
   partial class BusinessUnitAndCounterparty
   {
+    // НОР.
     public Sungero.Capture.Structures.Module.CounterpartyFactMatching BusinessUnit { get; set; }
+    
+    // Контрагент.
     public Sungero.Capture.Structures.Module.CounterpartyFactMatching Counterparty { get; set; }
+    
+    // НОР подобранная из ответственного сотрудника.
     public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
   }
 
   /// <summary>
-  /// Результат поиска контрагента и НОР по факту с типом "Контрагент".
+  /// Контрагента, НОР и сопоставленный с ними факт с типом "Контрагент".
   /// </summary>
   partial class CounterpartyFactMatching
   {

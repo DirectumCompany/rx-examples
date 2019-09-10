@@ -1171,12 +1171,12 @@ namespace Sungero.Capture.Server
       counterpartyTypes.Add(string.Empty);
       
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var sellerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
-      var buyerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
-      var nonTypeFacts = factMatches.Where(m => m.Type == string.Empty).ToList();
-      var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, nonTypeFacts, responsible);
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
+      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
+      var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
+      var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(buyer, seller, nonType, responsible);
+      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
       
       // Дата, номер и регистрация.
       NumberDocument(document, recognitionResult, FactNames.Document);
@@ -1491,58 +1491,58 @@ namespace Sungero.Capture.Server
       counterpartyTypes.Add(CounterpartyTypes.Consignee);
       
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var sellerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
-      var buyerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
+      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
+      var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
       
-      var buyerIsBusinessUnit = buyerFact != null && buyerFact.BusinessUnit != null;
-      var sellerIsBusinessUnit = sellerFact != null && sellerFact.BusinessUnit != null;
+      var buyerIsBusinessUnit = buyer != null && buyer.BusinessUnit != null;
+      var sellerIsBusinessUnit = seller != null && seller.BusinessUnit != null;
       var counterpartyAndBusinessUnit = Structures.Module.BusinessUnitAndCounterparty.Create();
       if (buyerIsBusinessUnit && sellerIsBusinessUnit)
       {
         // Мультинорность. Уточнить НОР по ответственному.
-        if (Equals(sellerFact.BusinessUnit, responsibleEmployeeBusinessUnit))
+        if (Equals(seller.BusinessUnit, responsibleEmployeeBusinessUnit))
         {
           // Исходящий документ.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = buyerFact;
-          counterpartyAndBusinessUnit.BusinessUnit = sellerFact;
+          counterpartyAndBusinessUnit.Counterparty = buyer;
+          counterpartyAndBusinessUnit.BusinessUnit = seller;
         }
         else
         {
           // Входящий документ.
           document = FinancialArchive.IncomingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = sellerFact;
-          counterpartyAndBusinessUnit.BusinessUnit = buyerFact;
+          counterpartyAndBusinessUnit.Counterparty = seller;
+          counterpartyAndBusinessUnit.BusinessUnit = buyer;
         }
       }
       else if (buyerIsBusinessUnit)
       {
         // Входящий документ.
         document = FinancialArchive.IncomingTaxInvoices.Create();
-        counterpartyAndBusinessUnit.Counterparty = sellerFact;
-        counterpartyAndBusinessUnit.BusinessUnit = buyerFact;
+        counterpartyAndBusinessUnit.Counterparty = seller;
+        counterpartyAndBusinessUnit.BusinessUnit = buyer;
       }
       else if (sellerIsBusinessUnit)
       {
         // Исходящий документ.
         document = FinancialArchive.OutgoingTaxInvoices.Create();
-        counterpartyAndBusinessUnit.Counterparty = buyerFact;
-        counterpartyAndBusinessUnit.BusinessUnit = sellerFact;
+        counterpartyAndBusinessUnit.Counterparty = buyer;
+        counterpartyAndBusinessUnit.BusinessUnit = seller;
       }
       else
       {
         // НОР не найдена по фактам - НОР будет взята по ответственному.
-        if (buyerFact != null && buyerFact.Counterparty != null && (sellerFact == null || sellerFact.Counterparty == null))
+        if (buyer != null && buyer.Counterparty != null && (seller == null || seller.Counterparty == null))
         {
           // Исходящий документ, потому что buyer - контрагент, а другой информации нет.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = buyerFact;
+          counterpartyAndBusinessUnit.Counterparty = buyer;
         }
         else
         {
           // Входящий документ.
           document = FinancialArchive.IncomingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = sellerFact;
+          counterpartyAndBusinessUnit.Counterparty = seller;
         }
       }
       counterpartyAndBusinessUnit.ResponsibleEmployeeBusinessUnit = responsibleEmployeeBusinessUnit;
@@ -1775,12 +1775,12 @@ namespace Sungero.Capture.Server
       counterpartyTypes.Add(CounterpartyTypes.Buyer);
       counterpartyTypes.Add(string.Empty);
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var sellerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
-      var buyerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
-      var nonTypeFacts = factMatches.Where(m => m.Type == string.Empty).ToList();
-      var counterpartyAndBusinessUnitFacts = GetCounterpartyAndBusinessUnitFacts(buyerFact, sellerFact, nonTypeFacts, responsible);
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnitFacts);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnitFacts);
+      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
+      var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
+      var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
+      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(buyer, seller, nonType, responsible);
+      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
+      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
       
       // Договор.
       var contractFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
@@ -2264,7 +2264,7 @@ namespace Sungero.Capture.Server
     /// <param name="nonType">Список фактов с данными о контрагенте. Тип контрагента не заполнен.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагента.</returns>
-    public virtual Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnitFacts(Structures.Module.CounterpartyFactMatching buyer,
+    public virtual Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.CounterpartyFactMatching buyer,
                                                                                                           Structures.Module.CounterpartyFactMatching seller,
                                                                                                           List<Structures.Module.CounterpartyFactMatching> nonType,
                                                                                                           IEmployee responsibleEmployee)
