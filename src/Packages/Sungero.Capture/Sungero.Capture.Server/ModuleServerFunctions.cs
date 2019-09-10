@@ -3367,7 +3367,7 @@ namespace Sungero.Capture.Server
     /// Поиск штрихкодов осуществляется только на первой странице документа.
     /// Формат штрихкода: Code128.
     /// </remarks>
-    public virtual List<int> GetDocumentIdByBarcode(System.IO.Stream document)
+    public virtual List<int> SearchDocumentBarcodeIds(System.IO.Stream document)
     {
       var result = new List<int>();
       try
