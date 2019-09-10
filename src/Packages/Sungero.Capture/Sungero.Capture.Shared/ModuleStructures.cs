@@ -100,7 +100,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Сотрудник и связанный с ним факт.
   /// </summary>
-  partial class EmployeeAndFactLink
+  partial class AddresseeFactMatching
   {
     public Sungero.Company.IEmployee Employee { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
