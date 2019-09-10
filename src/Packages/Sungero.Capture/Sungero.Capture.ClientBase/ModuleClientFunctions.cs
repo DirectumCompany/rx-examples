@@ -687,7 +687,7 @@ namespace Sungero.Capture.Client
     
     public static void CreateClassifier(string classifierName, string minProbability)
     {
-      Logger.DebugFormat("Begin create classifier with name {0}.", classifierName);
+      Logger.DebugFormat("Begin create classifier with name \"{0}\".", classifierName);
       try
       {
         var arioUrl = Functions.Module.Remote.GetArioUrl();
@@ -695,12 +695,12 @@ namespace Sungero.Capture.Client
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier != null)
         {
-          Logger.ErrorFormat("Already exists classifier with name: {0}", classifierName);
+          Logger.ErrorFormat("Already exists classifier with name: \"{0}\".", classifierName);
           return;
         }
 
         arioConnector.CreateClassifier(classifierName, minProbability, true);
-        Logger.DebugFormat("Successful create classifier with name {0}.", classifierName);
+        Logger.DebugFormat("Successful create classifier with name \"{0}\".", classifierName);
       }
       catch (Exception e)
       {
@@ -715,7 +715,7 @@ namespace Sungero.Capture.Client
     /// <param name="filePath">Путь к файлу модели.</param>
     public static void ImportClassifierModel(string classifierName, string filePath)
     {
-      Logger.DebugFormat("Begin import classifier with name {0} from folder {1}.", classifierName, filePath);
+      Logger.DebugFormat("Begin import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       try
       {
         var arioUrl = Functions.Module.Remote.GetArioUrl();
@@ -723,12 +723,12 @@ namespace Sungero.Capture.Client
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
         {
-          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
           return;
         }
 
         arioConnector.ImportClassifierModel(classifier.Id.ToString(), filePath);
-        Logger.DebugFormat("Successful import classifier with name {0} from folder {1}.", classifierName, filePath);
+        Logger.DebugFormat("Successful import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       }
       catch (Exception e)
       {
@@ -738,7 +738,7 @@ namespace Sungero.Capture.Client
     
     public static void ExportClassifierModel(string classifierName, string modelId, string filePath)
     {
-      Logger.DebugFormat("Begin export classifier with name {0} into file {1}.", classifierName, filePath);
+      Logger.DebugFormat("Begin export classifier with name \"{0}\" into file {1}.", classifierName, filePath);
       try
       {
         var arioUrl = Functions.Module.Remote.GetArioUrl();
@@ -746,13 +746,13 @@ namespace Sungero.Capture.Client
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
         {
-          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
           return;
         }
 
         var model = arioConnector.ExportClassifierModel(classifier.Id.ToString(), modelId);
         File.WriteAllBytes(filePath, model);
-        Logger.DebugFormat("Successful export classifier with name {0} into file {1}.", classifierName, filePath);
+        Logger.DebugFormat("Successful export classifier with name \"{0}\" into file {1}.", classifierName, filePath);
       }
       catch (Exception e)
       {
@@ -762,11 +762,11 @@ namespace Sungero.Capture.Client
     
     public static void ShowClassifierModels(string classifierName)
     {
-      Logger.DebugFormat("Begin showing models for classifier with name {0}.", classifierName);
+      Logger.DebugFormat("Begin showing models for classifier with name \"{0}\".", classifierName);
       try
       {
         ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful showing models for classifier with name.", classifierName);
+        Logger.DebugFormat("Successful showing models for classifier with name \"{0}\".", classifierName);
       }
       catch (Exception e)
       {
@@ -774,33 +774,9 @@ namespace Sungero.Capture.Client
       }
     }
     
-    private static void ShowModelsInfo(string classifierName)
-    {
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var classifier = arioConnector.GetClassifierByName(classifierName);
-      if (classifier == null)
-      {
-        Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
-        return;
-      }
-      
-      var models = arioConnector.GetModelsByClassifier(classifier.Id.ToString());
-      
-      Logger.Debug("---------------------------------------------------------------------------------------");
-      Logger.DebugFormat("Classifier \"{0}\" with Id {1}, created {2}, min probability {3}. Models:",
-                         classifier.Name, classifier.Id, classifier.Created, classifier.MinProbability);
-      foreach (var model in models)
-        Logger.DebugFormat("{0} Model with Id {1}, created {2}. Train set count {3}, accuracy {4}.",
-                           model.Classes != null ? "*CURRENT*" : "---------",
-                           model.Id, model.Created,
-                           model.Metrics.TrainSetCount, Math.Round(model.Metrics.Accuracy, 4));
-      Logger.Debug("---------------------------------------------------------------------------------------");
-    }
-    
     public static void PublishClassifierModel(string classifierName, string modelId)
     {
-      Logger.DebugFormat("Begin publish model with Id {0} for classifier with name {1}.", modelId, classifierName);
+      Logger.DebugFormat("Begin publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
       try
       {
         var arioUrl = Functions.Module.Remote.GetArioUrl();
@@ -808,19 +784,19 @@ namespace Sungero.Capture.Client
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
         {
-          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\"", classifierName);
           return;
         }
 
         var model = arioConnector.PublishClassifierModel(classifier.Id.ToString(), modelId);
         if (model == null)
         {
-          Logger.ErrorFormat("Error for publish model with Id {0} for classifier with name {1}.", modelId, classifierName);
+          Logger.ErrorFormat("Error for publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
           return;
         }
         
         ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful publish model with Id {0} for classifier with name {1}.", modelId, classifierName);
+        Logger.DebugFormat("Successful publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
       }
       catch (Exception e)
       {
@@ -830,7 +806,7 @@ namespace Sungero.Capture.Client
     
     public static void TrainClassifierModel(string classifierName, string filePath)
     {
-      Logger.DebugFormat("Begin train classifier with name {0} from folder {1}.", classifierName, filePath);
+      Logger.DebugFormat("Begin train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       try
       {
         var arioUrl = Functions.Module.Remote.GetArioUrl();
@@ -838,7 +814,7 @@ namespace Sungero.Capture.Client
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
         {
-          Logger.ErrorFormat("Cant find classifier with name: {0}", classifierName);
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
           return;
         }
 
@@ -852,12 +828,39 @@ namespace Sungero.Capture.Client
         }
         
         ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful train classifier with name {0} from folder {1}.", classifierName, filePath);
+        Logger.DebugFormat("Successful train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       }
       catch (Exception e)
       {
         Logger.ErrorFormat("Train classifier error: {0}", e.Message);
       }
+    }
+    
+    private static void ShowModelsInfo(string classifierName)
+    {
+      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      var classifier = arioConnector.GetClassifierByName(classifierName);
+      if (classifier == null)
+      {
+        Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
+        return;
+      }
+      
+      var models = arioConnector.GetModelsByClassifier(classifier.Id.ToString());
+      
+      Logger.Debug("---------------------------------------------------------------------------------------");
+      Logger.DebugFormat("Classifier \"{0}\" with Id {1}, created {2}, min probability {3}. Models:",
+                         classifier.Name, classifier.Id, classifier.Created, classifier.MinProbability);
+      if (models.Any())
+        foreach (var model in models)
+          Logger.DebugFormat("{0} Model with Id {1}, created {2}. Train set count {3}, accuracy {4}.",
+                             model.Classes != null ? "*CURRENT*" : "---------",
+                             model.Id, model.Created,
+                             model.Metrics.TrainSetCount, Math.Round(model.Metrics.Accuracy, 4));
+      else
+        Logger.Debug("Classifier has no models");   
+      Logger.Debug("---------------------------------------------------------------------------------------");
     }
     
     #endregion
