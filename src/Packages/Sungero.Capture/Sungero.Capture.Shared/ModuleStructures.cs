@@ -66,17 +66,7 @@ namespace Sungero.Capture.Structures.Module
     public string Trrc { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }
-  
-  /// <summary>
-  /// Контрагент и связанный с ним факт.
-  /// </summary>
-  partial class CounterpartyAndFactLink
-  {
-    public Sungero.Parties.ICounterparty Counterparty { get; set; }
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
-    public bool IsTrusted { get; set; }
-  }
-  
+ 
   /// <summary>
   /// Контактное лицо и связанный с ним факт.
   /// </summary>
@@ -86,17 +76,7 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
     public bool IsTrusted { get; set; }
   }
-  
-  /// <summary>
-  /// НОР и связанный с ней факт.
-  /// </summary>
-  partial class BusinessUnitAndFactLink
-  {
-    public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
-    public bool IsTrusted { get; set; }
-  }
-  
+ 
   /// <summary>
   /// Сотрудник и связанный с ним факт.
   /// </summary>
@@ -122,15 +102,15 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>  
   partial class BusinessUnitAndCounterparty
   {
-    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact BusinessUnit { get; set; }
-    public Sungero.Capture.Structures.Module.SearchResultForCounterpartyFact Counterparty { get; set; }
+    public Sungero.Capture.Structures.Module.CounterpartyFactMatching BusinessUnit { get; set; }
+    public Sungero.Capture.Structures.Module.CounterpartyFactMatching Counterparty { get; set; }
     public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
   }
 
   /// <summary>
   /// Результат поиска контрагента и НОР по факту с типом "Контрагент".
   /// </summary>
-  partial class SearchResultForCounterpartyFact
+  partial class CounterpartyFactMatching
   {
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
