@@ -143,7 +143,7 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class ArioResponse
   {
-    public string Result { get; set; }
+    public string Response { get; set; }
     public string Error { get; set; }
   }
   

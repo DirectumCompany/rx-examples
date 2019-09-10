@@ -127,11 +127,11 @@ namespace Sungero.Capture.Client
         attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
         
         Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", fileName);
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(attachment.Path, arioUrl, firstPageClassifierName, typeClassifierName, false);
-        if (string.IsNullOrWhiteSpace(classificationAndExtractionResult.Error))
+        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(attachment.Path, arioUrl, firstPageClassifierName, typeClassifierName, false);
+        if (string.IsNullOrWhiteSpace(classificationAndExtractionResponse.Error))
         {
           Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", fileName);
-          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
+          var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResponse.Response,
                                                                                       attachment,
                                                                                       responsible,
                                                                                       true, mailInfo.FromEmail);
@@ -355,12 +355,12 @@ namespace Sungero.Capture.Client
       
       foreach (var packagePath in packagesPaths)
       {
-        var classificationAndExtractionResult = TryClassifyAndExtractFacts(packagePath, arioUrl, firstPageClassifierName, typeClassifierName);
+        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(packagePath, arioUrl, firstPageClassifierName, typeClassifierName);
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileDto();
         originalFile.Path = packagePath;
         
-        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResult.Result,
+        var documents = Functions.Module.Remote.CreateDocumentsByRecognitionResults(classificationAndExtractionResponse.Response,
                                                                                     originalFile,
                                                                                     responsible,
                                                                                     false, string.Empty);
@@ -425,25 +425,25 @@ namespace Sungero.Capture.Client
                                                                                                   string typeClassifierName,
                                                                                                   bool throwOnError = true)
     {
-      var classificationAndExtractionResult = Structures.Module.ArioResponse.Create();
+      var classificationAndExtractionResponse = Structures.Module.ArioResponse.Create();
       if (!CanArioProcessFile(filePath))
       {
-        classificationAndExtractionResult.Error = Resources.CantProcessFileByArio;
-        return classificationAndExtractionResult;
+        classificationAndExtractionResponse.Error = Resources.CantProcessFileByArio;
+        return classificationAndExtractionResponse;
       }
       
       var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
-      classificationAndExtractionResult.Result = processResult;
+      classificationAndExtractionResponse.Response = processResult;
       if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
-        return classificationAndExtractionResult;
+        return classificationAndExtractionResponse;
       
       if (throwOnError)
         throw new ApplicationException(nativeError.Message);
       
       Logger.Error(nativeError.Message);
-      classificationAndExtractionResult.Error = nativeError.Message;
-      return classificationAndExtractionResult;
+      classificationAndExtractionResponse.Error = nativeError.Message;
+      return classificationAndExtractionResponse;
     }
     
     /// <summary>
