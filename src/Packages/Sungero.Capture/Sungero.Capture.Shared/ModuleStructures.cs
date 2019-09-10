@@ -110,7 +110,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Договор и связанный с ним факт.
   /// </summary>
-  partial class ContractAndFactLink
+  partial class ContractFactMatching
   {
     public Sungero.Contracts.IContractualDocument Contract { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
