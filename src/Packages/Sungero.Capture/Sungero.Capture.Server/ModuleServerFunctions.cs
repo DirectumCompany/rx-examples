@@ -2382,24 +2382,26 @@ namespace Sungero.Capture.Server
     /// <returns>Корреспондент.</returns>
     public virtual Structures.Module.CounterpartyFactMatching GetCounterparty(List<Structures.Module.IFact> facts, string propertyName)
     {
-      var filteredCounterparties = Counterparties.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-        .Where(x => x.Note == null || !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
+      var actualCounterparties = Counterparties.GetAll()
+                                               .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+                                               .Where(x => x.Note == null ||
+                                                           !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
       
       var foundByName = new List<Structures.Module.CounterpartyFactMatching>();
       var correspondentNames = new List<string>();
       
-      // Получить ИНН/КПП и наименования + форму собственности контрагентов из фактов.
+      // Подобрать контрагентов подходящих по имени для переданных фактов.
       foreach (var fact in GetFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName))
       {
+        // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
         var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
         if (verifiedCounterparty != null)
           return verifiedCounterparty;
 
         var name = GetCorrespondentName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
         correspondentNames.Add(name);
-        var counterparties = filteredCounterparties
-          .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        
+        var counterparties = actualCounterparties.Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         foreach (var counterparty in counterparties)
         {
           var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
@@ -2410,51 +2412,59 @@ namespace Sungero.Capture.Server
         }
       }
       
-      // Если факты с ИНН/КПП не найдены, то вернуть корреспондента по наименованию.
+      // Если нет фактов содержащих поле ИНН, то вернуть первого корреспондента по наименованию.
       var correspondentTINs = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN);
       if (!correspondentTINs.Any())
         return foundByName.FirstOrDefault();
-      else
+      
+      // Поиск по ИНН/КПП.
+      var foundByTin = new List<Structures.Module.CounterpartyFactMatching>();
+      foreach (var fact in correspondentTINs)
       {
-        // Поиск по ИНН/КПП.
-        var foundByTin = new List<Structures.Module.CounterpartyFactMatching>();
-        foreach (var fact in correspondentTINs)
+        // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
+        var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
+        if (verifiedCounterparty != null)
+          return verifiedCounterparty;
+        
+        var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+        var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
+        foreach (var counterparty in counterparties)
         {
-          var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
-          if (verifiedCounterparty != null)
-            return verifiedCounterparty;
-
-          var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
-          var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
-          var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
-          foreach (var counterparty in counterparties)
-          {
-            var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
-            counterpartyFactMatching.Counterparty = counterparty;
-            counterpartyFactMatching.Fact = fact;
-            counterpartyFactMatching.IsTrusted = true;
-            foundByTin.Add(counterpartyFactMatching);
-          }
+          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
+          counterpartyFactMatching.Counterparty = counterparty;
+          counterpartyFactMatching.Fact = fact;
+          counterpartyFactMatching.IsTrusted = true;
+          foundByTin.Add(counterpartyFactMatching);
         }
-        
-        // Найден ровно 1.
-        if (foundByTin.Count == 1)
-          return foundByTin.First();
-        
-        // Найдено 0. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
-        if (!foundByTin.Any())
-          return foundByName
-            .Where(x => string.IsNullOrEmpty(x.Counterparty.TIN))
-            .Where(x => !CompanyBases.Is(x.Counterparty) || string.IsNullOrEmpty(CompanyBases.As(x.Counterparty).TRRC))
-            .FirstOrDefault();
-
-        // Найдено несколько. Уточнить поиск по наименованию.
-        foundByName = foundByTin.Where(x => correspondentNames.Any(n => n == x.Counterparty.Name)).ToList();
-        if (foundByName.Any())
-          return foundByName.FirstOrDefault();
-        else
-          return foundByTin.FirstOrDefault();
       }
+      
+      Structures.Module.CounterpartyFactMatching resultCounterparty = null;
+      // Найдено 0. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
+      if (foundByTin.Count == 0)
+        resultCounterparty = foundByName.Where(x => string.IsNullOrEmpty(x.Counterparty.TIN))
+                                        .Where(x => !CompanyBases.Is(x.Counterparty) || string.IsNullOrEmpty(CompanyBases.As(x.Counterparty).TRRC))
+                                        .FirstOrDefault();
+      // Найден 1.
+      if (foundByTin.Count == 1)
+        resultCounterparty = foundByTin.First();
+      
+      // Найдено несколько. Уточнить поиск по наименованию.
+      var specifiedByName = foundByTin.Where(x => correspondentNames.Any(name => x.Counterparty.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))).ToList();
+      if (specifiedByName.Count == 0)
+      {
+        resultCounterparty = foundByTin.FirstOrDefault();
+        resultCounterparty.IsTrusted = false;
+      }
+      if (specifiedByName.Count == 1)
+        resultCounterparty = specifiedByName.First();
+      if (specifiedByName.Count > 1)
+      {
+        resultCounterparty = specifiedByName.FirstOrDefault();
+        resultCounterparty.IsTrusted = false;
+      }
+      
+      return resultCounterparty;
     }
     
     /// <summary>
