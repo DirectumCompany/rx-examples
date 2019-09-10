@@ -728,6 +728,8 @@ namespace Sungero.Capture.Client
         }
 
         arioConnector.ImportClassifierModel(classifier.Id.ToString(), filePath);
+        
+        ShowModelsInfo(classifierName);
         Logger.DebugFormat("Successful import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       }
       catch (Exception e)
@@ -822,9 +824,9 @@ namespace Sungero.Capture.Client
         var trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTask.Id.ToString());
         while (trainTaskInfo.Task.Finished == null)
         {
+          Logger.DebugFormat("[{0}] Training in process. Classifier name: \"{1}\", training task Id: {2}.", Calendar.Now, classifierName, trainTaskInfo.Task.Id);
           System.Threading.Thread.Sleep(10000);
           trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTaskInfo.Task.Id.ToString());
-          Logger.DebugFormat("{0} Training in process. Processed documents: {1}.", Calendar.Now, trainTaskInfo.Task.ClassifierModel.Metrics.TrainSetCount);
         }
         
         ShowModelsInfo(classifierName);
@@ -858,8 +860,8 @@ namespace Sungero.Capture.Client
                              model.Classes != null ? "*CURRENT*" : "---------",
                              model.Id, model.Created,
                              model.Metrics.TrainSetCount, Math.Round(model.Metrics.Accuracy, 4));
-      else
-        Logger.Debug("Classifier has no models");   
+        else
+          Logger.Debug("Classifier has no models");
       Logger.Debug("---------------------------------------------------------------------------------------");
     }
     
