@@ -2195,7 +2195,7 @@ namespace Sungero.Capture.Server
         var businessUnit = BusinessUnits.Null;
         bool isTrusted = true;
         
-        // Поиск контрагента по хэшу.
+        // Если для свойства counterpartyPropertyName по факту существует верифицированное ранее значение, то вернуть его.
         var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, counterpartyPropertyName);
         if (verifiedCounterparty != null)
         {
@@ -2203,7 +2203,7 @@ namespace Sungero.Capture.Server
           isTrusted = verifiedCounterparty.IsTrusted;
         }
         
-        // Поиск НОР по хэшу.
+        // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
         var verifiedBusinessUnit = GetBusinessUnitByVerifiedData(fact, businessUnitPropertyName);
         if (verifiedBusinessUnit != null)
         {
@@ -2240,15 +2240,15 @@ namespace Sungero.Capture.Server
         
         // Если не нашли по инн/кпп то ищем по наименованию.
         var name = GetCorrespondentName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
-        counterparty = Counterparties.GetAll()
-          .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        businessUnit = BusinessUnits.GetAll()
-          .FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed && x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        counterparty = Counterparties.GetAll().FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed &&
+                                                                   x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
+        businessUnit = BusinessUnits.GetAll().FirstOrDefault(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed &&
+                                                                  x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
           var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact, 
-                                                                                                         GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
-                                                                                                         false);
+                                                                                           GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                           false);
           matchings.Add(counterpartyFactMatching);
         }
       }
@@ -3275,6 +3275,7 @@ namespace Sungero.Capture.Server
         return result;
       if (counterparty != null)
       {
+        // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
         result = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString() ,counterpartyPropertyName);
         if (result.Contact != null)
           return result;
