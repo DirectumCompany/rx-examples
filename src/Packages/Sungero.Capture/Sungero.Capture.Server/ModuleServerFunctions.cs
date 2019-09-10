@@ -3159,9 +3159,9 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Адресат.</returns>
-    public virtual Structures.Module.AddresseeFactMatching GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
+    public virtual Structures.Module.EmployeeFactMatching GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
     {
-      var result = Structures.Module.AddresseeFactMatching.Create(Sungero.Company.Employees.Null, fact, false);
+      var result = Structures.Module.EmployeeFactMatching.Create(Sungero.Company.Employees.Null, fact, false);
       if (fact == null)
         return result;
       

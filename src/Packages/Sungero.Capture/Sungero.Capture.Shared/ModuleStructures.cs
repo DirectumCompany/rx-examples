@@ -12,13 +12,28 @@ namespace Sungero.Capture.Structures.Module
   [Public]
   partial class RecognitionResult
   {
+    // ИД результата распознования документа в Арио.
     public int ClassificationResultId { get; set; }
+    
+    // Guid pdf версии документа.
     public string BodyGuid { get; set; }
+    
+    // Класс документа.
     public string PredictedClass { get; set; }
+    
+    // Извлеченные из документа факты.
     public List<Sungero.Capture.Structures.Module.IFact> Facts { get; set; }
+    
+    // Примечание от Арио.
     public string Message { get; set; }
+    
+    // Запись в справочнике для сохранения результов распознования документа.
     public IDocumentRecognitionInfo Info { get; set; }
+    
+    // Исходный документ.
     public Sungero.Capture.Structures.Module.IFileDto File { get; set; }
+    
+    // Признак того, что документ был получен службой захвата из электронной почты.
     public bool SendedByEmail { get; set; }
   }
   
@@ -28,8 +43,13 @@ namespace Sungero.Capture.Structures.Module
   [Public]
   partial class FileDto
   {
+    // Файл.
     public byte[] Data { get; set; }
+    
+    // Путь к файлу.
     public string Path { get; set; }
+    
+    // Имя исходного файла до обработки службой ввода документов.
     public string Description { get; set; }
   }
   
@@ -39,8 +59,13 @@ namespace Sungero.Capture.Structures.Module
   [Public]
   partial class Fact
   {
+    // ИД факта в Арио.
     public int Id { get; set; }
+    
+    // Название факта.
     public string Name { get; set; }
+    
+    // Список полей.
     public List<Sungero.Capture.Structures.Module.IFactField> Fields { get; set; }
   }
   
@@ -50,9 +75,16 @@ namespace Sungero.Capture.Structures.Module
   [Public]
   partial class FactField
   {
+    // ИД поля в Арио.
     public int Id { get; set; }
+    
+    // Название поля.
     public string Name { get; set; }
+    
+    // Значение поля.
     public string Value { get; set; }
+    
+    // Вероятность.
     public double Probability { get; set; }
   }
   
@@ -61,39 +93,61 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class MockCounterparty
   {
+    // Наименование контрагента.
     public string Name { get; set; }
+    
+    // ИНН.
     public string Tin { get; set; }
+    
+    // КПП.
     public string Trrc { get; set; }
+    
+    // Факт, из полей которого были излеченны данные контрагента.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }
  
   /// <summary>
-  /// Контактное лицо и связанный с ним факт.
+  /// Контактное лицо и сопоставленный с ним факт.
   /// </summary>
   partial class ContactFactMatching
   {
+    // Контактное лицо.
     public Sungero.Parties.IContact Contact { get; set; }
+    
+    // Факт, по полям которого было найдено контактное лицо.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    
+    // Доверять ли найденному значению.
     public bool IsTrusted { get; set; }
   }
  
   /// <summary>
-  /// Сотрудник и связанный с ним факт.
+  /// Сотрудник и сопоставленный с ним факт.
   /// </summary>
-  partial class AddresseeFactMatching
+  partial class EmployeeFactMatching
   {
+    // Сотрудник.
     public Sungero.Company.IEmployee Employee { get; set; }
+    
+    // Факт, по полям которого было найден сотрудник.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    
+    // Доверять ли найденному значению.
     public bool IsTrusted { get; set; }
   }
   
   /// <summary>
-  /// Договор и связанный с ним факт.
+  /// Договорной документ и сопоставленный с ним факт.
   /// </summary>
   partial class ContractFactMatching
   {
+    // Договорной документ.
     public Sungero.Contracts.IContractualDocument Contract { get; set; }
+    
+    // Факт, по полям которого был найден договорной документ.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    
+    // Доверять ли найденному значению.
     public bool IsTrusted { get; set; }
   }
   
@@ -112,10 +166,19 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class CounterpartyFactMatching
   {
+    // НОР.
     public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
+    
+    // Контрагент.
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
+    
+    // Факт с типом контрагент, по полям которого осуществлялся поиск.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    
+    // Тип найденного значения (Buyer, Seller и т.д.).
     public string Type { get; set; }
+    
+    // Доверять ли найденному значению.
     public bool IsTrusted { get; set; }
   }
 
@@ -124,7 +187,10 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class CapturedMailFiles
   {
+    // Тело письма.
     public Sungero.Capture.Structures.Module.IFileDto Body { get; set; }
+    
+    // Вложенные в письмо файлы.
     public List<Sungero.Capture.Structures.Module.IFileDto> Attachments { get; set; }
   }
   
@@ -133,17 +199,25 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class CapturedMailInfo
   {
+    // Имя отправителя.
     public string Name { get; set; }
+    
+    // Адрес отправителя.
     public string FromEmail { get; set; }
+    
+    // Тема письма.
     public string Subject { get; set; }
   }
   
   /// <summary>
-  /// Обработанный ответ от Арио.
+  /// Ответ от Арио.
   /// </summary>
   partial class ArioResponse
   {
+    // Ответ. Json строка.
     public string Response { get; set; }
+    
+    // Текст ошибки, если не удалось обработать запрос.
     public string Error { get; set; }
   }
   
@@ -152,9 +226,16 @@ namespace Sungero.Capture.Structures.Module
   /// </summary>
   partial class DocumentsCreatedByRecognitionResults
   {
+    // Ид ведущего документа.
     public int LeadingDocumentId { get; set; }
+    
+    // Ид остальных документов в пакете.
     public List<int> RelatedDocumentIds { get; set; }
+    
+    // Ид документов, которые не удалось зарегестрировать или пронумеровать.
     public List<int> DocumentWithRegistrationFailureIds { get; set; }
+    
+    // Ид документов, которые были найдены по штрихкоду.
     public List<int> DocumentFoundByBarcodeIds { get; set; }
   }
 }
