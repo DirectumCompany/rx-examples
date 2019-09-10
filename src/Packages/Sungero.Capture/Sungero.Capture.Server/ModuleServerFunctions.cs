@@ -189,14 +189,14 @@ namespace Sungero.Capture.Server
       
       foreach (var recognitionResult in recognitionResults)
       {
-        // Поиск документа по ШК.
         var document = OfficialDocuments.Null;
         using (var body = GetDocumentBody(recognitionResult.BodyGuid))
         {
-          var docIds = GetDocumentIdByBarcode(body);
-          if (docIds != null && docIds.Any())
+          var docId = SearchDocumentBarcodeIds(body).FirstOrDefault();
+          // FOD на пустом List<int> вернет 0.
+          if (docId != 0)
           {
-            document = OfficialDocuments.GetAll().Where(x => x.Id == docIds.FirstOrDefault()).FirstOrDefault();
+            document = OfficialDocuments.GetAll().FirstOrDefault(x => x.Id == docId);
             if (document != null)
             {
               CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
@@ -3356,16 +3356,16 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region ШК
+    #region Штрихкоды
     
     /// <summary>
-    /// Поиск ШК в документе и извлечение из него ИД документа в системе.
+    /// Поиск Id документа по штрихкодам.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <returns>Ид документа или null, если ИД не найден.</returns>
+    /// <returns>Список распознанных Id документа.</returns>
     /// <remarks>
-    /// Поиск ШК осуществляется только на первой странице документа.
-    /// Формат ШК - Code128.
+    /// Поиск штрихкодов осуществляется только на первой странице документа.
+    /// Формат штрихкода: Code128.
     /// </remarks>
     public virtual List<int> GetDocumentIdByBarcode(System.IO.Stream document)
     {
