@@ -80,7 +80,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Контактное лицо и связанный с ним факт.
   /// </summary>
-  partial class ContactAndFactLink
+  partial class ContactFactMatching
   {
     public Sungero.Parties.IContact Contact { get; set; }
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
