@@ -420,10 +420,10 @@ namespace Sungero.Capture.Client
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
     public virtual Structures.Module.ArioResponse TryClassifyAndExtractFacts(string filePath,
-                                                                                                  string arioUrl,
-                                                                                                  string firstPageClassifierName,
-                                                                                                  string typeClassifierName,
-                                                                                                  bool throwOnError = true)
+                                                                             string arioUrl,
+                                                                             string firstPageClassifierName,
+                                                                             string typeClassifierName,
+                                                                             bool throwOnError = true)
     {
       var classificationAndExtractionResponse = Structures.Module.ArioResponse.Create();
       if (!CanArioProcessFile(filePath))
@@ -466,7 +466,7 @@ namespace Sungero.Capture.Client
         throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
 
       var fpClassifierId = fpClassifier.Id.ToString();
-      var typeClassifierId = typeClassifier.Id.ToString();   
+      var typeClassifierId = typeClassifier.Id.ToString();
       Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
       Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
       

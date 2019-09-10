@@ -327,7 +327,7 @@ namespace Sungero.Capture.Server
     /// Десериализовать результат классификации комплекта или отдельного документа в Ario.
     /// </summary>
     /// <param name="jsonClassificationResults">Json с результатами классификации и извлечения фактов.</param>
-    /// <param name="originalFile">Исходный файл.</param>
+    /// <param name="file">Исходный файл.</param>
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
     public virtual List<Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
@@ -744,7 +744,7 @@ namespace Sungero.Capture.Server
     /// Создать документ из тела эл. письма.
     /// </summary>
     /// <param name="mailInfo">Информация о захваченном письме.</param>
-    /// <param name="bodyInfo">Путь до тела пиьсма.</param>
+    /// <param name="bodyDto">Тело письма.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
@@ -801,7 +801,7 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать простой документ из файла.
     /// </summary>
-    /// <param name="File">Файл.</param>
+    /// <param name="file">Файл.</param>
     /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>Простой документ.</returns>
@@ -1940,7 +1940,7 @@ namespace Sungero.Capture.Server
     /// Заполнить НОР и контрагента в бухгалтерском документе.
     /// </summary>
     /// <param name="document">Бухгалтерский документ.</param>
-    /// <param name="facts">Факты для документа с подобором НОР и контрагента.</param>
+    /// <param name="businessUnitAndCounterparty">НОР и контрагент.</param>
     public virtual void FillAccountingDocumentCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
                                                                           Structures.Module.BusinessUnitAndCounterparty businessUnitAndCounterparty)
     {
@@ -1956,7 +1956,7 @@ namespace Sungero.Capture.Server
     /// Связать факты для НОР и контрагента с подобранными значениями.
     /// </summary>
     /// <param name="recognitionResult">Результаты обработки бухгалтерского документа в Ario.</param>
-    /// <param name="facts">Факты для документа с подбором НОР и контрагента.</param>
+    /// <param name="businessUnitAndCounterparty">НОР и контрагент.</param>
     public virtual void LinkAccountingDocumentCounterpartyAndBusinessUnit(Structures.Module.IRecognitionResult recognitionResult,
                                                                           Structures.Module.BusinessUnitAndCounterparty businessUnitAndCounterparty)
     {
@@ -2259,9 +2259,9 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Подобрать НОР и контрагента.
     /// </summary>
-    /// <param name="buyerFact">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
-    /// <param name="sellerFact">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
-    /// <param name="nonTypeFacts">Список фактов с данными о контрагенте. Тип контрагента не заполнен.</param>
+    /// <param name="buyer">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
+    /// <param name="seller">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
+    /// <param name="nonType">Список фактов с данными о контрагенте. Тип контрагента не заполнен.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагента.</returns>
     public virtual Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnitFacts(Structures.Module.CounterpartyFactMatching buyer,
@@ -2329,8 +2329,8 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Подобрать НОР и контрагента.
     /// </summary>
-    /// <param name="buyerFact">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
-    /// <param name="sellerFact">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
+    /// <param name="buyer">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
+    /// <param name="seller">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагента.</returns>
     public virtual Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.CounterpartyFactMatching buyer,
@@ -3063,9 +3063,9 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Создать тело документа.
     /// </summary>
-    /// <param name="document">Документ Rx.</param>
-    /// <param name="versionNote">Примечание к версии.</param>
+    /// <param name="document">Документ Rx.</param>    
     /// <param name="recognitionResult">Результат обработки входящего документа в Арио.</param>
+    /// <param name="versionNote">Примечание к версии.</param>
     public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
     {
       var needCreatePublicBody = recognitionResult.File != null && recognitionResult.File.Data != null;
