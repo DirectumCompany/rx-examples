@@ -685,6 +685,11 @@ namespace Sungero.Capture.Client
       Logger.Debug("End CreateDocumentByRecognitionData");
     }
     
+    /// <summary>
+    /// Создать классификатор.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="minProbability">Минимальная вероятность.</param>
     public static void CreateClassifier(string classifierName, string minProbability)
     {
       Logger.DebugFormat("Begin create classifier with name \"{0}\".", classifierName);
@@ -704,12 +709,12 @@ namespace Sungero.Capture.Client
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Create classifier error: {0}", e.Message);
+        Logger.ErrorFormat("Create classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
     /// <summary>
-    /// Импорт классификатора из модели.
+    /// Импорт классификатора из файла модели.
     /// </summary>
     /// <param name="classifierName">Имя классификатора.</param>
     /// <param name="filePath">Путь к файлу модели.</param>
@@ -734,10 +739,16 @@ namespace Sungero.Capture.Client
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Import classifier error: {0}", e.Message);
+        Logger.ErrorFormat("Import classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
+    /// <summary>
+    /// Экспорт модели классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="modelId">Id модели.</param>
+    /// <param name="filePath">Путь к файлу модели.</param>
     public static void ExportClassifierModel(string classifierName, string modelId, string filePath)
     {
       Logger.DebugFormat("Begin export classifier with name \"{0}\" into file {1}.", classifierName, filePath);
@@ -758,10 +769,14 @@ namespace Sungero.Capture.Client
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Export classifier error: {0}", e.Message);
+        Logger.ErrorFormat("Export classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
+    /// <summary>
+    /// Отобразить список моделей классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
     public static void ShowClassifierModels(string classifierName)
     {
       Logger.DebugFormat("Begin showing models for classifier with name \"{0}\".", classifierName);
@@ -772,10 +787,15 @@ namespace Sungero.Capture.Client
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Showing models for classifier error: {0}", e.Message);
+        Logger.ErrorFormat("Showing models for classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
+    /// <summary>
+    /// Опубликовать модель классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="modelId">Id модели.</param>
     public static void PublishClassifierModel(string classifierName, string modelId)
     {
       Logger.DebugFormat("Begin publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
@@ -802,10 +822,15 @@ namespace Sungero.Capture.Client
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Publish classifier error: {0}", e.Message);
+        Logger.ErrorFormat("Publish classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
+    /// <summary>
+    /// Обучение классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="filePath">Путь к папке с dataset для обучения.</param>
     public static void TrainClassifierModel(string classifierName, string filePath)
     {
       Logger.DebugFormat("Begin train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
@@ -828,16 +853,20 @@ namespace Sungero.Capture.Client
           System.Threading.Thread.Sleep(10000);
           trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTaskInfo.Task.Id.ToString());
         }
-        
+        System.Threading.Thread.Sleep(10000);
         ShowModelsInfo(classifierName);
         Logger.DebugFormat("Successful train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Train classifier error: {0}", e.Message);
+        Logger.ErrorFormat("Train classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
+    /// <summary>
+    /// Отобразить информацию о моделях классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
     private static void ShowModelsInfo(string classifierName)
     {
       var arioUrl = Functions.Module.Remote.GetArioUrl();
@@ -851,7 +880,7 @@ namespace Sungero.Capture.Client
       
       var models = arioConnector.GetModelsByClassifier(classifier.Id.ToString());
       
-      Logger.Debug("---------------------------------------------------------------------------------------");
+      Logger.Debug("-------------------------------------------------------------------------------------------------");
       Logger.DebugFormat("Classifier \"{0}\" with Id {1}, created {2}, min probability {3}. Models:",
                          classifier.Name, classifier.Id, classifier.Created, classifier.MinProbability);
       if (models.Any())
@@ -862,7 +891,20 @@ namespace Sungero.Capture.Client
                              model.Metrics.TrainSetCount, Math.Round(model.Metrics.Accuracy, 4));
         else
           Logger.Debug("Classifier has no models");
-      Logger.Debug("---------------------------------------------------------------------------------------");
+      Logger.Debug("-------------------------------------------------------------------------------------------------");
+    }
+    
+    /// <summary>
+    /// Собрать цепочку InnerExceptions в одну строку.
+    /// </summary>
+    /// <param name="e">Исключение.</param>
+    /// <returns>Строка InnerExceptions исключений.</returns>
+    private static string GetInnerExceptionsMessages(Exception e)
+    {
+      var result = e.InnerException != null ?
+        string.Concat(e.InnerException.Message.TrimEnd('.'), ". ",  GetInnerExceptionsMessages(e.InnerException)) :
+        string.Empty;
+      return string.IsNullOrEmpty(result) ? e.Message : result;
     }
     
     #endregion
