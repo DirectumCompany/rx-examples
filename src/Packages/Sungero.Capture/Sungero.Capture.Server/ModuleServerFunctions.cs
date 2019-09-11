@@ -2506,18 +2506,21 @@ namespace Sungero.Capture.Server
         resultCounterparty = foundByTin.First();
       
       // Найдено несколько. Уточнить поиск по наименованию.
-      var specifiedByName = foundByTin.Where(x => correspondentNames.Any(name => x.Counterparty.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))).ToList();
-      if (specifiedByName.Count == 0)
+      if (foundByTin.Count > 1)
       {
-        resultCounterparty = foundByTin.FirstOrDefault();
-        resultCounterparty.IsTrusted = false;
-      }
-      if (specifiedByName.Count == 1)
-        resultCounterparty = specifiedByName.First();
-      if (specifiedByName.Count > 1)
-      {
-        resultCounterparty = specifiedByName.FirstOrDefault();
-        resultCounterparty.IsTrusted = false;
+        var specifiedByName = foundByTin.Where(x => correspondentNames.Any(name => x.Counterparty.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))).ToList();
+        if (specifiedByName.Count == 0)
+        {
+          resultCounterparty = foundByTin.FirstOrDefault();
+          resultCounterparty.IsTrusted = false;
+        }
+        if (specifiedByName.Count == 1)
+          resultCounterparty = specifiedByName.First();
+        if (specifiedByName.Count > 1)
+        {
+          resultCounterparty = specifiedByName.FirstOrDefault();
+          resultCounterparty.IsTrusted = false;
+        }
       }
       
       return resultCounterparty;
