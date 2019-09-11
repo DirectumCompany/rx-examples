@@ -149,6 +149,9 @@ namespace Sungero.Capture.Server
       // Сформировать список документов, которые найдены по штрихкоду.
       var documentsFoundByBarcode = package.Where(d => IsDocumentFoundByBarcode(d)).ToList();
       
+      // Сформировать список заблокированных документов.
+      var lockedDocuments = package.Where(d => IsDocumentLocked(d)).ToList();
+      
       // Получить ведущий документ из распознанных документов комплекта. Если список пуст, то из нераспознанных.
       var leadingDocument = package.Any() ? GetLeadingDocument(package) : GetLeadingDocument(notRecognizedDocuments);
       LinkDocuments(leadingDocument, package, notRecognizedDocuments);
@@ -167,6 +170,7 @@ namespace Sungero.Capture.Server
       result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
       result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
       result.DocumentFoundByBarcodeIds = documentsFoundByBarcode.Select(x => x.Id).ToList();
+      result.LockedDocumentIds = lockedDocuments.Select(x => x.Id).ToList();
       return result;
     }
     
@@ -199,9 +203,15 @@ namespace Sungero.Capture.Server
             document = OfficialDocuments.GetAll().FirstOrDefault(x => x.Id == docId);
             if (document != null)
             {
-              CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
-              document.Save();
-              ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.FindByBarcodeParamName] = true;
+              var documentLockInfo = Locks.GetLockInfo(document);
+              if (documentLockInfo.IsLocked)
+                ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentIsLockedParamName] = true;
+              else
+              {
+                CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
+                document.Save();
+                ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.FindByBarcodeParamName] = true;
+              }
             }
           }
         }
@@ -313,13 +323,26 @@ namespace Sungero.Capture.Server
     /// Проверить, не найден ли уже существующий документ в Rx по штрихкоду.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <returns>True, если документ успешно пронумерован. Иначе False.</returns>    
+    /// <returns>True, если документ успешно пронумерован. Иначе False.</returns>
     public virtual bool IsDocumentFoundByBarcode(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
       if (documentParams.ContainsKey(Constants.Module.FindByBarcodeParamName))
         return true;
       
+      return false;
+    }
+    
+    /// <summary>
+    /// Проверить, заблокирован ли документ.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <returns>True, если документ заблокирован. Иначе False.</returns>
+    public virtual bool IsDocumentLocked(IOfficialDocument document)
+    {
+      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
+      if (documentParams.ContainsKey(Constants.Module.DocumentIsLockedParamName))
+        return true;
       return false;
     }
     
@@ -548,13 +571,17 @@ namespace Sungero.Capture.Server
     /// <param name="leadingDocument">Ведущий документ.</param>
     /// <param name="documents">Прочие документы из комплекта.</param>
     /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
+    /// <param name="documentsFoundByBarcode">Документы, найденные по штрихкоду.</param>
+    /// <param name="lockedDocuments">Документы, которые были заблокированы.</param>
     /// <param name="emailBody">Тело электронного письма.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Простая задача.</returns>
     [Public, Remote]
     public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
-                                          List<IOfficialDocument> documentsWithRegistrationFailure, 
-                                          List<IOfficialDocument> documentsFoundByBarcode, Docflow.IOfficialDocument emailBody, Company.IEmployee responsible)
+                                          List<IOfficialDocument> documentsWithRegistrationFailure,
+                                          List<IOfficialDocument> documentsFoundByBarcode,
+                                          List<IOfficialDocument> lockedDocuments,
+                                          Docflow.IOfficialDocument emailBody, Company.IEmployee responsible)
     {
       if (leadingDocument == null)
         return;
@@ -593,7 +620,7 @@ namespace Sungero.Capture.Server
       // Собрать ссылки на документы, которые найдены по штрихкоду.
       var documentsFoundByBarcodeHyperlinks = new List<string>();
       documentsFoundByBarcodeHyperlinks.AddRange(documentsFoundByBarcode.Select(x => Hyperlinks.Get(x)));
-      
+
       // Текст задачи.
       task.ActiveText = Resources.CheckPackageTaskText;
       
@@ -637,7 +664,32 @@ namespace Sungero.Capture.Server
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText,
                                         documentsWithRegistrationFailureHyperlinksLabel);
       }
-                  
+      
+      // Добавить в текст задачи список документов, которые были заблокированы при занесении новой версии.
+      if (lockedDocuments.Any())
+      {
+        var failedCreateVersionTaskText = lockedDocuments.Count() == 1
+          ? Sungero.Capture.Resources.FailedCreateVersionTaskText
+          : Sungero.Capture.Resources.FailedCreateVersionsTaskText;
+
+        var lockedDocumentsHyperlinksLabels = new List<string>();
+        foreach (var lockedDocument in lockedDocuments)
+        {
+          var loginId = Locks.GetLockInfo(lockedDocument).LoginId;
+          var employee = Employees.GetAll(x => x.Login.Id == loginId).FirstOrDefault();
+          // Текстовка на случай, когда блокировка снята в момент создания задачи.
+          var employeeLabel = Sungero.Capture.Resources.DocumentWasLockedTaskText.ToString();
+          if (employee != null)
+            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText, 
+                                          Hyperlinks.Get(employee));
+          var documentHyperlink = Hyperlinks.Get(lockedDocument);
+          lockedDocumentsHyperlinksLabels.Add(string.Format("{0} {1}", documentHyperlink, employeeLabel));
+        }
+        
+        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);        
+        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedCreateVersionTaskText, lockedDocumentsHyperlinksLabel);
+      }
+      
       // Маршрут.
       var step = task.RouteSteps.AddNew();
       step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
@@ -718,7 +770,11 @@ namespace Sungero.Capture.Server
         ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentFoundByBarcodeIds.Contains(x.Id)).ToList()
         : new List<Docflow.IOfficialDocument>();
       
-      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, documentsFoundByBarcode, emailBody, responsible);
+      var lockedDocuments = documentsCreatedByRecognition.LockedDocumentIds != null
+        ? allDocuments.Where(x => documentsCreatedByRecognition.LockedDocumentIds.Contains(x.Id)).ToList()
+        : new List<Docflow.IOfficialDocument>();
+      
+      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, documentsFoundByBarcode, lockedDocuments, emailBody, responsible);
     }
     
     #endregion
@@ -1333,7 +1389,7 @@ namespace Sungero.Capture.Server
       counterpartyTypes.Add(CounterpartyTypes.Consignee);
       
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Supplier).FirstOrDefault() ?? 
+      var sellerFact = factMatches.Where(m => m.Type == CounterpartyTypes.Supplier).FirstOrDefault() ??
         factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Payer).FirstOrDefault() ??
         factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
@@ -2178,7 +2234,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
     public virtual List<Structures.Module.CounterpartyFactMatching> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> allFacts,
-                                                                                                                            List<string> counterpartyTypes)
+                                                                                                                        List<string> counterpartyTypes)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
       var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
@@ -2231,9 +2287,9 @@ namespace Sungero.Capture.Server
         
         if (counterparty != null || businessUnit != null)
         {
-          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact, 
-                                                                                                         GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
-                                                                                                         isTrusted);
+          var businessUnitAndCounterparty = Structures.Module.SearchResultForCounterpartyFact.Create(businessUnit, counterparty, fact,
+                                                                                                     GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                     isTrusted);
           matchings.Add(counterpartyFactMatching);
           continue;
         }
@@ -2246,9 +2302,9 @@ namespace Sungero.Capture.Server
                                                                   x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
-          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact, 
-                                                                                           GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
-                                                                                           false);
+          var businessUnitAndCounterparty = Structures.Module.SearchResultForCounterpartyFact.Create(businessUnit, counterparty, fact,
+                                                                                                     GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                     false);
           matchings.Add(counterpartyFactMatching);
         }
       }
@@ -2265,9 +2321,9 @@ namespace Sungero.Capture.Server
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагент.</returns>
     public virtual Structures.Module.DocumentParties GetDocumentParties(Structures.Module.CounterpartyFactMatching buyer,
-                                                                                                          Structures.Module.CounterpartyFactMatching seller,
-                                                                                                          List<Structures.Module.CounterpartyFactMatching> nonType,
-                                                                                                          IEmployee responsibleEmployee)
+                                                                                                     Structures.Module.SearchResultForCounterpartyFact seller,
+                                                                                                     List<Structures.Module.SearchResultForCounterpartyFact> nonType,
+                                                                                                     IEmployee responsibleEmployee)
     {
       Structures.Module.CounterpartyFactMatching counterparty = null;
       Structures.Module.CounterpartyFactMatching businessUnit = null;
@@ -2334,8 +2390,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагент.</returns>
     public virtual Structures.Module.DocumentParties GetDocumentParties(Structures.Module.CounterpartyFactMatching buyer,
-                                                                                                          Structures.Module.CounterpartyFactMatching seller,
-                                                                                                          IEmployee responsibleEmployee)
+                                                                                                     Structures.Module.SearchResultForCounterpartyFact seller,
+                                                                                                     IEmployee responsibleEmployee)
     {
       Structures.Module.CounterpartyFactMatching counterparty = null;
       Structures.Module.CounterpartyFactMatching businessUnit = null;
@@ -2528,8 +2584,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
     public virtual CounterpartyFactMatching GetBusinessUnitWithFact(List<CounterpartyFactMatching> businessUnitsWithFacts,
-                                                                string businessUnitPropertyName, IEmployee addressee,
-                                                                IEmployee responsible)
+                                                                   string businessUnitPropertyName, IEmployee addressee,
+                                                                   IEmployee responsible)
     {
       
       // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
@@ -3347,7 +3403,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
     public virtual ContractFactMatching GetLeadingDocument(IFact fact, string leadingDocPropertyName,
-                                                       ICounterparty counterparty, string counterpartyPropertyName)
+                                                           ICounterparty counterparty, string counterpartyPropertyName)
     {
       var result = Structures.Module.ContractFactMatching.Create(Contracts.ContractualDocuments.Null, fact, false);
       if (fact == null)

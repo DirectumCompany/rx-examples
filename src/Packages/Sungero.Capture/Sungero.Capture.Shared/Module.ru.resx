@@ -218,4 +218,16 @@
   <data name="EmptyScanPackage" xml:space="preserve">
     <value>Комплект документов не существует.</value>
   </data>
+  <data name="FailedCreateVersionTaskText" xml:space="preserve">
+    <value>Службе ввода не удалось занести документ в новую версию:</value>
+  </data>
+  <data name="FailedCreateVersionsTaskText" xml:space="preserve">
+    <value>Службе ввода не удалось занести документы в новую версию:</value>
+  </data>
+  <data name="DocumentLockedByEmployeeTaskText" xml:space="preserve">
+    <value>уже редактируется пользователем {0}</value>
+  </data>
+  <data name="DocumentWasLockedTaskText" xml:space="preserve">
+    <value>редактировался ранее</value>
+  </data>
 </root>

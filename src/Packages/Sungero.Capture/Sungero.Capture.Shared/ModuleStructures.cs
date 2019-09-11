@@ -242,5 +242,6 @@ namespace Sungero.Capture.Structures.Module
     
     // Ид документов, которые были найдены по штрихкоду.
     public List<int> DocumentFoundByBarcodeIds { get; set; }
+    public List<int> LockedDocumentIds { get; set; }
   }
 }

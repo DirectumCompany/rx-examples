@@ -212,6 +212,11 @@
           "ParameterTypeFullName": "System.Collections.Generic.List"
         },
         {
+          "Name": "lockedDocuments",
+          "ParameterType": "global::System.Collections.Generic.List<global::Sungero.Docflow.IOfficialDocument>",
+          "ParameterTypeFullName": "System.Collections.Generic.List"
+        },
+        {
           "Name": "emailBody",
           "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
           "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
@@ -403,7 +408,11 @@
     "CantProcessFileByArio",
     "DocumentsFoundByBarcodeTaskText",
     "EmptyMailPackage",
-    "EmptyScanPackage"
+    "EmptyScanPackage",
+    "FailedCreateVersionTaskText",
+    "FailedCreateVersionsTaskText",
+    "DocumentLockedByEmployeeTaskText",
+    "DocumentWasLockedTaskText"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

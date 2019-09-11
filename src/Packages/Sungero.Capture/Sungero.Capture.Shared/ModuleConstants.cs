@@ -75,6 +75,9 @@ namespace Sungero.Capture.Constants
     // Имя параметра: найден ли документ по штрихкоду.
     public const string FindByBarcodeParamName = "FindByBarcode";
     
+    // Имя параметра: заблокирован ли документ.
+    public const string DocumentIsLockedParamName = "DocumentIsLocked";
+    
     public const char PositionsDelimiter = '#';
     
     public const char PositionElementDelimiter = '|';
