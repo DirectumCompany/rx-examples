@@ -203,14 +203,15 @@ namespace Sungero.Capture.Server
             document = OfficialDocuments.GetAll().FirstOrDefault(x => x.Id == docId);
             if (document != null)
             {
+              var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
               var documentLockInfo = Locks.GetLockInfo(document);
               if (documentLockInfo.IsLocked)
-                ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.DocumentIsLockedParamName] = true;
+                documentParams[Constants.Module.DocumentIsLockedParamName] = true;
               else
               {
                 CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
                 document.Save();
-                ((Domain.Shared.IExtendedEntity)document).Params[Constants.Module.FindByBarcodeParamName] = true;
+                documentParams[Constants.Module.FindByBarcodeParamName] = true;
               }
             }
           }
