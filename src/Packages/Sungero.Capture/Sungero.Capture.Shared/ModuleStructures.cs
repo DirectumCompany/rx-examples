@@ -152,9 +152,9 @@ namespace Sungero.Capture.Structures.Module
   }
   
   /// <summary>
-  /// Результат подбора контрагента и НОР для документа.
+  /// Результат подбора сторон сделки для документа.
   /// </summary>  
-  partial class BusinessUnitAndCounterparty
+  partial class DocumentParties
   {
     // НОР.
     public Sungero.Capture.Structures.Module.CounterpartyFactMatching BusinessUnit { get; set; }

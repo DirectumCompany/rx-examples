@@ -1174,9 +1174,9 @@ namespace Sungero.Capture.Server
       var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
       var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(buyer, seller, nonType, responsible);
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
+      var documentParties = GetDocumentParties(buyer, seller, nonType, responsible);
+      FillAccountingDocumentParties(document, documentParties);
+      LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Дата, номер и регистрация.
       NumberDocument(document, recognitionResult, FactNames.Document);
@@ -1337,10 +1337,10 @@ namespace Sungero.Capture.Server
         factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Payer).FirstOrDefault() ??
         factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(buyer, seller, responsible);
+      var documentParties = GetDocumentParties(buyer, seller, responsible);
       
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
+      FillAccountingDocumentParties(document, documentParties);
+      LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Дата, номер и регистрация.
       NumberDocument(document, recognitionResult, FactNames.FinancialDocument);
@@ -1496,7 +1496,7 @@ namespace Sungero.Capture.Server
       
       var buyerIsBusinessUnit = buyer != null && buyer.BusinessUnit != null;
       var sellerIsBusinessUnit = seller != null && seller.BusinessUnit != null;
-      var counterpartyAndBusinessUnit = Structures.Module.BusinessUnitAndCounterparty.Create();
+      var documentParties = Structures.Module.DocumentParties.Create();
       if (buyerIsBusinessUnit && sellerIsBusinessUnit)
       {
         // Мультинорность. Уточнить НОР по ответственному.
@@ -1504,30 +1504,30 @@ namespace Sungero.Capture.Server
         {
           // Исходящий документ.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = buyer;
-          counterpartyAndBusinessUnit.BusinessUnit = seller;
+          documentParties.Counterparty = buyer;
+          documentParties.BusinessUnit = seller;
         }
         else
         {
           // Входящий документ.
           document = FinancialArchive.IncomingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = seller;
-          counterpartyAndBusinessUnit.BusinessUnit = buyer;
+          documentParties.Counterparty = seller;
+          documentParties.BusinessUnit = buyer;
         }
       }
       else if (buyerIsBusinessUnit)
       {
         // Входящий документ.
         document = FinancialArchive.IncomingTaxInvoices.Create();
-        counterpartyAndBusinessUnit.Counterparty = seller;
-        counterpartyAndBusinessUnit.BusinessUnit = buyer;
+        documentParties.Counterparty = seller;
+        documentParties.BusinessUnit = buyer;
       }
       else if (sellerIsBusinessUnit)
       {
         // Исходящий документ.
         document = FinancialArchive.OutgoingTaxInvoices.Create();
-        counterpartyAndBusinessUnit.Counterparty = buyer;
-        counterpartyAndBusinessUnit.BusinessUnit = seller;
+        documentParties.Counterparty = buyer;
+        documentParties.BusinessUnit = seller;
       }
       else
       {
@@ -1536,23 +1536,23 @@ namespace Sungero.Capture.Server
         {
           // Исходящий документ, потому что buyer - контрагент, а другой информации нет.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = buyer;
+          documentParties.Counterparty = buyer;
         }
         else
         {
           // Входящий документ.
           document = FinancialArchive.IncomingTaxInvoices.Create();
-          counterpartyAndBusinessUnit.Counterparty = seller;
+          documentParties.Counterparty = seller;
         }
       }
-      counterpartyAndBusinessUnit.ResponsibleEmployeeBusinessUnit = responsibleEmployeeBusinessUnit;
+      documentParties.ResponsibleEmployeeBusinessUnit = responsibleEmployeeBusinessUnit;
       
       // Вид документа.
       FillDocumentKind(document);
       
       // НОР и КА.
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
+      FillAccountingDocumentParties(document, documentParties);
+      LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Дата, номер и регистрация.
       NumberDocument(document, recognitionResult, FactNames.FinancialDocument);
@@ -1625,9 +1625,9 @@ namespace Sungero.Capture.Server
       var factMatches = MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
       var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(buyer, seller, responsible);
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
+      var documentParties = GetDocumentParties(buyer, seller, responsible);
+      FillAccountingDocumentParties(document, documentParties);
+      LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
@@ -1778,9 +1778,9 @@ namespace Sungero.Capture.Server
       var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
       var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
-      var counterpartyAndBusinessUnit = GetCounterpartyAndBusinessUnit(buyer, seller, nonType, responsible);
-      FillAccountingDocumentCounterpartyAndBusinessUnit(document, counterpartyAndBusinessUnit);
-      LinkAccountingDocumentCounterpartyAndBusinessUnit(recognitionResult, counterpartyAndBusinessUnit);
+      var documentParties = GetDocumentParties(buyer, seller, nonType, responsible);
+      FillAccountingDocumentParties(document, documentParties);
+      LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Договор.
       var contractFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
@@ -1940,43 +1940,43 @@ namespace Sungero.Capture.Server
     /// Заполнить НОР и контрагента в бухгалтерском документе.
     /// </summary>
     /// <param name="document">Бухгалтерский документ.</param>
-    /// <param name="businessUnitAndCounterparty">НОР и контрагент.</param>
-    public virtual void FillAccountingDocumentCounterpartyAndBusinessUnit(IAccountingDocumentBase document,
-                                                                          Structures.Module.BusinessUnitAndCounterparty businessUnitAndCounterparty)
+    /// <param name="documentParties">НОР и контрагент.</param>
+    public virtual void FillAccountingDocumentParties(IAccountingDocumentBase document,
+                                                                          Structures.Module.DocumentParties documentParties)
     {
-      var counterparty = businessUnitAndCounterparty.Counterparty;
-      var businessUnit = businessUnitAndCounterparty.BusinessUnit;
+      var counterparty = documentParties.Counterparty;
+      var businessUnit = documentParties.BusinessUnit;
       var businessUnitMatched = businessUnit != null && businessUnit.BusinessUnit != null;
       
       document.Counterparty = counterparty != null ? counterparty.Counterparty : null;
-      document.BusinessUnit = businessUnitMatched ? businessUnit.BusinessUnit : businessUnitAndCounterparty.ResponsibleEmployeeBusinessUnit;
+      document.BusinessUnit = businessUnitMatched ? businessUnit.BusinessUnit : documentParties.ResponsibleEmployeeBusinessUnit;
     }
     
     /// <summary>
     /// Связать факты для НОР и контрагента с подобранными значениями.
     /// </summary>
     /// <param name="recognitionResult">Результаты обработки бухгалтерского документа в Ario.</param>
-    /// <param name="businessUnitAndCounterparty">НОР и контрагент.</param>
-    public virtual void LinkAccountingDocumentCounterpartyAndBusinessUnit(Structures.Module.IRecognitionResult recognitionResult,
-                                                                          Structures.Module.BusinessUnitAndCounterparty businessUnitAndCounterparty)
+    /// <param name="documentParties">НОР и контрагент.</param>
+    public virtual void LinkAccountingDocumentParties(Structures.Module.IRecognitionResult recognitionResult,
+                                                                          Structures.Module.DocumentParties documentParties)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
       var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
-      var counterpartyMatched = businessUnitAndCounterparty.Counterparty != null &&
-        businessUnitAndCounterparty.Counterparty.Counterparty != null;
-      var businessUnitMatched = businessUnitAndCounterparty.BusinessUnit != null &&
-        businessUnitAndCounterparty.BusinessUnit.BusinessUnit != null;
+      var counterpartyMatched = documentParties.Counterparty != null &&
+        documentParties.Counterparty.Counterparty != null;
+      var businessUnitMatched = documentParties.BusinessUnit != null &&
+        documentParties.BusinessUnit.BusinessUnit != null;
       
       if (counterpartyMatched)
-        LinkFactAndProperty(recognitionResult, businessUnitAndCounterparty.Counterparty.Fact, null,
-                            counterpartyPropertyName, businessUnitAndCounterparty.Counterparty.Counterparty, businessUnitAndCounterparty.Counterparty.IsTrusted);
+        LinkFactAndProperty(recognitionResult, documentParties.Counterparty.Fact, null,
+                            counterpartyPropertyName, documentParties.Counterparty.Counterparty, documentParties.Counterparty.IsTrusted);
 
       if (businessUnitMatched)
-        LinkFactAndProperty(recognitionResult, businessUnitAndCounterparty.BusinessUnit.Fact, null,
-                            businessUnitPropertyName, businessUnitAndCounterparty.BusinessUnit.BusinessUnit, businessUnitAndCounterparty.BusinessUnit.IsTrusted);
+        LinkFactAndProperty(recognitionResult, documentParties.BusinessUnit.Fact, null,
+                            businessUnitPropertyName, documentParties.BusinessUnit.BusinessUnit, documentParties.BusinessUnit.IsTrusted);
       else
         LinkFactAndProperty(recognitionResult, null, null,
-                            businessUnitPropertyName, businessUnitAndCounterparty.ResponsibleEmployeeBusinessUnit, false);
+                            businessUnitPropertyName, documentParties.ResponsibleEmployeeBusinessUnit, false);
       
     }
     
@@ -2257,14 +2257,14 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Подобрать НОР и контрагента.
+    /// Подобрать участников сделки (НОР и контрагент).
     /// </summary>
     /// <param name="buyer">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
     /// <param name="seller">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
     /// <param name="nonType">Список фактов с данными о контрагенте. Тип контрагента не заполнен.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
-    /// <returns>НОР и контрагента.</returns>
-    public virtual Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.CounterpartyFactMatching buyer,
+    /// <returns>НОР и контрагент.</returns>
+    public virtual Structures.Module.DocumentParties GetDocumentParties(Structures.Module.CounterpartyFactMatching buyer,
                                                                                                           Structures.Module.CounterpartyFactMatching seller,
                                                                                                           List<Structures.Module.CounterpartyFactMatching> nonType,
                                                                                                           IEmployee responsibleEmployee)
@@ -2322,18 +2322,18 @@ namespace Sungero.Capture.Server
           counterparty.IsTrusted = false;
       }
       
-      return Structures.Module.BusinessUnitAndCounterparty.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
+      return Structures.Module.DocumentParties.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
     }
     
     
     /// <summary>
-    /// Подобрать НОР и контрагента.
+    /// Подобрать участников сделки (НОР и контрагент).
     /// </summary>
     /// <param name="buyer">Список фактов с данными о контрагенте. Тип контрагента - покупатель.</param>
     /// <param name="seller">Список фактов с данными о контрагенте. Тип контрагента - продавец.</param>
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
-    /// <returns>НОР и контрагента.</returns>
-    public virtual Structures.Module.BusinessUnitAndCounterparty GetCounterpartyAndBusinessUnit(Structures.Module.CounterpartyFactMatching buyer,
+    /// <returns>НОР и контрагент.</returns>
+    public virtual Structures.Module.DocumentParties GetDocumentParties(Structures.Module.CounterpartyFactMatching buyer,
                                                                                                           Structures.Module.CounterpartyFactMatching seller,
                                                                                                           IEmployee responsibleEmployee)
     {
@@ -2350,7 +2350,7 @@ namespace Sungero.Capture.Server
       
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsibleEmployee);
       
-      return Structures.Module.BusinessUnitAndCounterparty.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
+      return Structures.Module.DocumentParties.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
     }
     
     /// <summary>
