@@ -734,8 +734,8 @@ namespace Sungero.Capture.Client
 
         arioConnector.ImportClassifierModel(classifier.Id.ToString(), filePath);
         
-        ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+        if (ShowModelsInfo(classifierName))
+          Logger.DebugFormat("Successful import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       }
       catch (Exception e)
       {
@@ -782,8 +782,8 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Begin showing models for classifier with name \"{0}\".", classifierName);
       try
       {
-        ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful showing models for classifier with name \"{0}\".", classifierName);
+        if (ShowModelsInfo(classifierName))
+          Logger.DebugFormat("Successful showing models for classifier with name \"{0}\".", classifierName);
       }
       catch (Exception e)
       {
@@ -817,8 +817,8 @@ namespace Sungero.Capture.Client
           return;
         }
         
-        ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
+        if (ShowModelsInfo(classifierName))
+          Logger.DebugFormat("Successful publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
       }
       catch (Exception e)
       {
@@ -853,9 +853,9 @@ namespace Sungero.Capture.Client
           System.Threading.Thread.Sleep(10000);
           trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTaskInfo.Task.Id.ToString());
         }
-        System.Threading.Thread.Sleep(10000);
-        ShowModelsInfo(classifierName);
-        Logger.DebugFormat("Successful train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+        System.Threading.Thread.Sleep(20000);
+        if (ShowModelsInfo(classifierName))
+          Logger.DebugFormat("Successful train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       }
       catch (Exception e)
       {
@@ -867,7 +867,8 @@ namespace Sungero.Capture.Client
     /// Отобразить информацию о моделях классификатора.
     /// </summary>
     /// <param name="classifierName">Имя классификатора.</param>
-    private static void ShowModelsInfo(string classifierName)
+    /// <returns>True, при успешном отображении.</returns>
+    private static bool ShowModelsInfo(string classifierName)
     {
       var arioUrl = Functions.Module.Remote.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
@@ -875,7 +876,7 @@ namespace Sungero.Capture.Client
       if (classifier == null)
       {
         Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
-        return;
+        return false;
       }
       
       var models = arioConnector.GetModelsByClassifier(classifier.Id.ToString());
@@ -892,6 +893,8 @@ namespace Sungero.Capture.Client
         else
           Logger.Debug("Classifier has no models");
       Logger.Debug("-------------------------------------------------------------------------------------------------");
+      
+      return true;
     }
     
     /// <summary>
