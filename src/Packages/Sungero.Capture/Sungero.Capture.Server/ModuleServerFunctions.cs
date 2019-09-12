@@ -541,7 +541,7 @@ namespace Sungero.Capture.Server
       
       var contract = isMockMode
         ? package.Where(d => MockContracts.Is(d)).FirstOrDefault()
-        : null;
+        : package.Where(d => Contracts.Contracts.Is(d)).FirstOrDefault();
       if (contract != null)
         return contract;
       
