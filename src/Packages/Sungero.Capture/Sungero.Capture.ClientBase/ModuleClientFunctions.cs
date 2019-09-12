@@ -685,6 +685,228 @@ namespace Sungero.Capture.Client
       Logger.Debug("End CreateDocumentByRecognitionData");
     }
     
+    /// <summary>
+    /// Создать классификатор.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="minProbability">Минимальная вероятность.</param>
+    public static void CreateClassifier(string classifierName, string minProbability)
+    {
+      Logger.DebugFormat("Begin create classifier with name \"{0}\".", classifierName);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier != null)
+        {
+          Logger.ErrorFormat("Already exists classifier with name: \"{0}\".", classifierName);
+          return;
+        }
+
+        arioConnector.CreateClassifier(classifierName, minProbability, true);
+        Logger.DebugFormat("Successful create classifier with name \"{0}\".", classifierName);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Create classifier error: {0}", GetInnerExceptionsMessages(e));
+      }
+    }
+    
+    /// <summary>
+    /// Импорт классификатора из файла модели.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="filePath">Путь к файлу модели.</param>
+    public static void ImportClassifierModel(string classifierName, string filePath)
+    {
+      Logger.DebugFormat("Begin import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
+          return;
+        }
+
+        arioConnector.ImportClassifierModel(classifier.Id.ToString(), filePath);
+        
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Import classifier error: {0}", GetInnerExceptionsMessages(e));
+      }
+    }
+    
+    /// <summary>
+    /// Экспорт модели классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="modelId">Id модели.</param>
+    /// <param name="filePath">Путь к файлу модели.</param>
+    public static void ExportClassifierModel(string classifierName, string modelId, string filePath)
+    {
+      Logger.DebugFormat("Begin export classifier with name \"{0}\" into file {1}.", classifierName, filePath);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
+          return;
+        }
+
+        var model = arioConnector.ExportClassifierModel(classifier.Id.ToString(), modelId);
+        File.WriteAllBytes(filePath, model);
+        Logger.DebugFormat("Successful export classifier with name \"{0}\" into file {1}.", classifierName, filePath);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Export classifier error: {0}", GetInnerExceptionsMessages(e));
+      }
+    }
+    
+    /// <summary>
+    /// Отобразить список моделей классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    public static void ShowClassifierModels(string classifierName)
+    {
+      Logger.DebugFormat("Begin showing models for classifier with name \"{0}\".", classifierName);
+      try
+      {
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful showing models for classifier with name \"{0}\".", classifierName);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Showing models for classifier error: {0}", GetInnerExceptionsMessages(e));
+      }
+    }
+    
+    /// <summary>
+    /// Опубликовать модель классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="modelId">Id модели.</param>
+    public static void PublishClassifierModel(string classifierName, string modelId)
+    {
+      Logger.DebugFormat("Begin publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\"", classifierName);
+          return;
+        }
+
+        var model = arioConnector.PublishClassifierModel(classifier.Id.ToString(), modelId);
+        if (model == null)
+        {
+          Logger.ErrorFormat("Error for publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
+          return;
+        }
+        
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Publish classifier error: {0}", GetInnerExceptionsMessages(e));
+      }
+    }
+    
+    /// <summary>
+    /// Обучение классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    /// <param name="filePath">Путь к папке с dataset для обучения.</param>
+    public static void TrainClassifierModel(string classifierName, string filePath)
+    {
+      Logger.DebugFormat("Begin train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+      try
+      {
+        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        var classifier = arioConnector.GetClassifierByName(classifierName);
+        if (classifier == null)
+        {
+          Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
+          return;
+        }
+
+        var trainTask = arioConnector.TrainClassifierFromFolder(classifier.Id.ToString(), Path.GetFullPath(filePath));
+        var trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTask.Id.ToString());
+        while (trainTaskInfo.Task.Finished == null)
+        {
+          Logger.DebugFormat("[{0}] Training in process. Classifier name: \"{1}\", training task Id: {2}.", Calendar.Now, classifierName, trainTaskInfo.Task.Id);
+          System.Threading.Thread.Sleep(10000);
+          trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTaskInfo.Task.Id.ToString());
+        }
+        System.Threading.Thread.Sleep(10000);
+        ShowModelsInfo(classifierName);
+        Logger.DebugFormat("Successful train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+      }
+      catch (Exception e)
+      {
+        Logger.ErrorFormat("Train classifier error: {0}", GetInnerExceptionsMessages(e));
+      }
+    }
+    
+    /// <summary>
+    /// Отобразить информацию о моделях классификатора.
+    /// </summary>
+    /// <param name="classifierName">Имя классификатора.</param>
+    private static void ShowModelsInfo(string classifierName)
+    {
+      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      var classifier = arioConnector.GetClassifierByName(classifierName);
+      if (classifier == null)
+      {
+        Logger.ErrorFormat("Cant find classifier with name: \"{0}\".", classifierName);
+        return;
+      }
+      
+      var models = arioConnector.GetModelsByClassifier(classifier.Id.ToString());
+      
+      Logger.Debug("-------------------------------------------------------------------------------------------------");
+      Logger.DebugFormat("Classifier \"{0}\" with Id {1}, created {2}, min probability {3}. Models:",
+                         classifier.Name, classifier.Id, classifier.Created, classifier.MinProbability);
+      if (models.Any())
+        foreach (var model in models)
+          Logger.DebugFormat("{0} Model with Id {1}, created {2}. Train set count {3}, accuracy {4}.",
+                             model.Classes != null ? "*CURRENT*" : "---------",
+                             model.Id, model.Created,
+                             model.Metrics.TrainSetCount, Math.Round(model.Metrics.Accuracy, 4));
+        else
+          Logger.Debug("Classifier has no models");
+      Logger.Debug("-------------------------------------------------------------------------------------------------");
+    }
+    
+    /// <summary>
+    /// Собрать цепочку InnerExceptions в одну строку.
+    /// </summary>
+    /// <param name="e">Исключение.</param>
+    /// <returns>Строка InnerExceptions исключений.</returns>
+    private static string GetInnerExceptionsMessages(Exception e)
+    {
+      var result = e.InnerException != null ?
+        string.Concat(e.InnerException.Message.TrimEnd('.'), ". ",  GetInnerExceptionsMessages(e.InnerException)) :
+        string.Empty;
+      return string.IsNullOrEmpty(result) ? e.Message : result;
+    }
+    
     #endregion
   }
 }
