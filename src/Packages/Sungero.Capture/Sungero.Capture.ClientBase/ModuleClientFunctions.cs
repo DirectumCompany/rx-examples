@@ -847,19 +847,40 @@ namespace Sungero.Capture.Client
 
         var trainTask = arioConnector.TrainClassifierFromFolder(classifier.Id.ToString(), Path.GetFullPath(filePath));
         var trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTask.Id.ToString());
-        while (trainTaskInfo.Task.Finished == null)
+
+        // Статусы задачи асинхронного обучения:
+        // New = 0
+        // InProgress = 1
+        // Completed = 2
+        // Error = 3
+        // Trained = 4
+        // Aborted = 5
+        int[] stateCodes = {2, 3, 5};
+        while (!stateCodes.Contains(trainTaskInfo.Task.State))
         {
           Logger.DebugFormat("[{0}] Training in process. Classifier name: \"{1}\", training task Id: {2}.", Calendar.Now, classifierName, trainTaskInfo.Task.Id);
           System.Threading.Thread.Sleep(10000);
           trainTaskInfo = arioConnector.GetTrainTaskInfo(trainTaskInfo.Task.Id.ToString());
         }
-        System.Threading.Thread.Sleep(20000);
-        if (ShowModelsInfo(classifierName))
-          Logger.DebugFormat("Successful train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
+        
+        switch (trainTaskInfo.Task.State)
+        {
+          case 2:
+            System.Threading.Thread.Sleep(20000);
+            ShowModelsInfo(classifierName);
+            Logger.DebugFormat("Successful classifier training with name \"{0}\" from folder {1}.", classifierName, filePath);
+            break;
+          case 3:
+            Logger.DebugFormat("Classifier training task with Id {0} completed with an error. {1}", trainTaskInfo.Task.Id, trainTaskInfo.Result ?? string.Empty);
+            break;
+          case 5:
+            Logger.DebugFormat("Classifier training task with Id {0} was aborted. {1}", trainTaskInfo.Task.Id, trainTaskInfo.Result ?? string.Empty);
+            break;
+        }
       }
       catch (Exception e)
       {
-        Logger.ErrorFormat("Train classifier error: {0}", GetInnerExceptionsMessages(e));
+        Logger.ErrorFormat("Training classifier error: {0}", GetInnerExceptionsMessages(e));
       }
     }
     
