@@ -703,8 +703,8 @@ namespace Sungero.Capture.Client
           Logger.ErrorFormat("Already exists classifier with name: \"{0}\".", classifierName);
           return;
         }
-
-        arioConnector.CreateClassifier(classifierName, minProbability, true);
+        // Некорректно обрабатывается minProbability если использовать запятую в качестве разделителя.
+        arioConnector.CreateClassifier(classifierName, minProbability.Replace(',', '.'), true);
         Logger.DebugFormat("Successful create classifier with name \"{0}\".", classifierName);
       }
       catch (Exception e)
