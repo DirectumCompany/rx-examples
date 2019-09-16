@@ -107,6 +107,11 @@
       "NameGuid": "2baae4dd-72d9-4793-a5e9-396ff2a36902",
       "Name": "AsposeHtml",
       "Scope": "Both"
+    },
+    {
+      "NameGuid": "ae871bb6-6e08-4e04-961d-f1f1dc4215ac",
+      "Name": "FuzzySearch",
+      "Scope": "Both"
     }
   ],
   "PublicConstants": [

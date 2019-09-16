@@ -681,13 +681,13 @@ namespace Sungero.Capture.Server
           // Текстовка на случай, когда блокировка снята в момент создания задачи.
           var employeeLabel = Sungero.Capture.Resources.DocumentWasLockedTaskText.ToString();
           if (employee != null)
-            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText, 
+            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText,
                                           Hyperlinks.Get(employee));
           var documentHyperlink = Hyperlinks.Get(lockedDocument);
           lockedDocumentsHyperlinksLabels.Add(string.Format("{0} {1}", documentHyperlink, employeeLabel));
         }
         
-        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);        
+        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedCreateVersionTaskText, lockedDocumentsHyperlinksLabel);
       }
       
@@ -2469,6 +2469,8 @@ namespace Sungero.Capture.Server
         }
       }
       
+      var testSearch = this.FuzzySearchCounterparties(correspondentNames);
+      
       // Если нет фактов содержащих поле ИНН, то вернуть первого корреспондента по наименованию.
       var correspondentTINs = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN);
       if (!correspondentTINs.Any())
@@ -2525,6 +2527,19 @@ namespace Sungero.Capture.Server
       }
       
       return resultCounterparty;
+    }
+    
+    public virtual System.Collections.Generic.Dictionary<string, System.Collections.Generic.Dictionary<FuzzySearchDamerauLevenshtein.Model, double>> FuzzySearchCounterparties(List<string> counterpartyNameList)
+    {
+      var actualCounterparties = Counterparties.GetAll()
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
+        .Where(x => x.Note == null ||
+               !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
+      
+      var actualCounterpartyModels = actualCounterparties.Select(x => new FuzzySearchDamerauLevenshtein.Model(x.Name, x.Id)).ToList();
+      var search = new FuzzySearchDamerauLevenshtein.Search(actualCounterpartyModels);
+      var result = search.Execute(counterpartyNameList);
+      return result;
     }
     
     /// <summary>
