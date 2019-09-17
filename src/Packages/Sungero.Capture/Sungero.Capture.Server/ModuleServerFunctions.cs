@@ -2288,7 +2288,7 @@ namespace Sungero.Capture.Server
         
         if (counterparty != null || businessUnit != null)
         {
-          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact,
+          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, counterparty.Name, fact,
                                                                                            GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
                                                                                            isTrusted);
           matchings.Add(counterpartyFactMatching);
@@ -2303,7 +2303,7 @@ namespace Sungero.Capture.Server
                                                              x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         if (counterparty != null || businessUnit != null)
         {
-          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact,
+          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, counterparty.Name, fact,
                                                                                            GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
                                                                                            false);
           matchings.Add(counterpartyFactMatching);
@@ -2445,7 +2445,7 @@ namespace Sungero.Capture.Server
                !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
       
       var foundByName = new List<Structures.Module.CounterpartyFactMatching>();
-      var correspondentNames = new List<string>();
+      var correspondentNames = new List<Structures.Module.CounterpartyFactMatching>();
       
       // Подобрать контрагентов подходящих по имени для переданных фактов.
       foreach (var fact in GetFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName))
@@ -2456,20 +2456,33 @@ namespace Sungero.Capture.Server
           return verifiedCounterparty;
 
         var name = GetCorrespondentName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
-        correspondentNames.Add(name);
-        
-        var counterparties = actualCounterparties.Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
-        foreach (var counterparty in counterparties)
-        {
-          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
-          counterpartyFactMatching.Counterparty = counterparty;
-          counterpartyFactMatching.Fact = fact;
-          counterpartyFactMatching.IsTrusted = false;
-          foundByName.Add(counterpartyFactMatching);
-        }
+        var correspondentName = Sungero.Capture.Structures.Module.CounterpartyFactMatching.Create();
+        correspondentName.CounterpartyName = name;
+        correspondentName.Fact = fact;
+        correspondentNames.Add(correspondentName);
       }
-      
-      var testSearch = this.FuzzySearchCounterparties(correspondentNames);
+
+      var foundCounterparties = this.FuzzySearchCounterparties(correspondentNames.Select(x => x.CounterpartyName).ToList());
+      int? maxValueCounterpartyId = null;
+      foreach (var correspondentName in correspondentNames)
+      {
+        if (foundCounterparties.ContainsKey(correspondentName.CounterpartyName))
+        {
+          var counterparties = foundCounterparties[correspondentName.CounterpartyName];
+          var maxValue = counterparties.Values.Max();
+          maxValueCounterpartyId = counterparties.FirstOrDefault(x => x.Value == maxValue).Key.Id;
+        }
+        
+        var counterparty = Counterparties.GetAll().FirstOrDefault(x => x.Id == maxValueCounterpartyId);
+        if (counterparty == null)
+          break;
+        
+        var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
+        counterpartyFactMatching.Counterparty = counterparty;
+        counterpartyFactMatching.Fact = correspondentName.Fact;
+        counterpartyFactMatching.IsTrusted = false;
+        foundByName.Add(counterpartyFactMatching);
+      }
       
       // Если нет фактов содержащих поле ИНН, то вернуть первого корреспондента по наименованию.
       var correspondentTINs = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN);
@@ -2511,7 +2524,7 @@ namespace Sungero.Capture.Server
       // Найдено несколько. Уточнить поиск по наименованию.
       if (foundByTin.Count > 1)
       {
-        var specifiedByName = foundByTin.Where(x => correspondentNames.Any(name => x.Counterparty.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase))).ToList();
+        var specifiedByName = foundByTin.Where(x => correspondentNames.Any(name => x.Counterparty.Name.Equals(name.CounterpartyName, StringComparison.InvariantCultureIgnoreCase))).ToList();
         if (specifiedByName.Count == 0)
         {
           resultCounterparty = foundByTin.FirstOrDefault();
@@ -2667,7 +2680,7 @@ namespace Sungero.Capture.Server
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
           .Where(x => x.Name.ToLower().Contains(name));
-        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null,false)));
+        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, string.Empty, fact, null,false)));
       }
       // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
       var correspondentTinFacts = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN)
@@ -2684,7 +2697,7 @@ namespace Sungero.Capture.Server
           var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
           var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
           var isTrusted = businessUnits.Count == 1;
-          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null, isTrusted)));
+          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, string.Empty, fact, null, isTrusted)));
         }
         
         // Найдено по ИНН/КПП.

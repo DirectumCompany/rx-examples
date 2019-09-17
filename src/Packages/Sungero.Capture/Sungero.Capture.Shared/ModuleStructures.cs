@@ -177,6 +177,9 @@ namespace Sungero.Capture.Structures.Module
     // Контрагент.
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     
+    // Имя контрагента.
+    public string CounterpartyName { get; set; }
+    
     // Факт с типом контрагент, по полям которого осуществлялся поиск.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
     
