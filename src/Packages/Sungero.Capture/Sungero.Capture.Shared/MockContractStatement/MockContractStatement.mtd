@@ -1024,9 +1024,33 @@
           "Settings": [
             {
               "Name": "NeedExpand",
-              "Value": true
+              "Value": false
             }
           ]
+        },
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "6e478334-1cb0-4325-af66-75c725f3bb23",
+          "Name": "GoodsPreviewGroup",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "GroupType": "WithTitleNoBorder",
+          "ParentGuid": "e83f2a4f-d958-46a8-accc-58562b8d1172",
+          "RowNumber": 1,
+          "RowSpan": 1
+        },
+        {
+          "$type": "Sungero.Metadata.PreviewControlMetadata, Sungero.Metadata",
+          "NameGuid": "1f173243-1016-4a9a-9cb5-c7939c7caa30",
+          "Name": "GoodsPreview",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.PreviewBinder",
+          "HeaderLocation": "None",
+          "ParentGuid": "6e478334-1cb0-4325-af66-75c725f3bb23",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
         }
       ],
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"

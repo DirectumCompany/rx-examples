@@ -162,4 +162,7 @@
   <data name="Resource_83f2f039ecf94529be545847e6564b38" xml:space="preserve">
     <value />
   </data>
+  <data name="AccusativeDisplayName" xml:space="preserve">
+    <value>Официальный документ</value>
+  </data>
 </root>
