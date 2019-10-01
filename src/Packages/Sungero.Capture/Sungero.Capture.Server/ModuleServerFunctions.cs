@@ -500,9 +500,11 @@ namespace Sungero.Capture.Server
       }
       
       // Договор.
-      else if (recognizedClass == ArioClassNames.Contract && isMockMode)
+      else if (recognizedClass == ArioClassNames.Contract)
       {
-        document = CreateMockContract(recognitionResult);
+        document = isMockMode
+          ? CreateMockContract(recognitionResult)
+          : CreateContract(recognitionResult, responsible);
       }
       
       // Все нераспознанные документы создать простыми.
@@ -681,13 +683,13 @@ namespace Sungero.Capture.Server
           // Текстовка на случай, когда блокировка снята в момент создания задачи.
           var employeeLabel = Sungero.Capture.Resources.DocumentWasLockedTaskText.ToString();
           if (employee != null)
-            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText, 
+            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText,
                                           Hyperlinks.Get(employee));
           var documentHyperlink = Hyperlinks.Get(lockedDocument);
           lockedDocumentsHyperlinksLabels.Add(string.Format("{0} {1}", documentHyperlink, employeeLabel));
         }
         
-        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);        
+        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedCreateVersionTaskText, lockedDocumentsHyperlinksLabel);
       }
       
@@ -1954,6 +1956,29 @@ namespace Sungero.Capture.Server
       
       return document;
     }
+    
+    /// <summary>
+    /// Создать договор.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Договор.</returns>
+    public Docflow.IOfficialDocument CreateContract(Structures.Module.IRecognitionResult recognitionResult, Sungero.Company.IEmployee responsible)
+    {
+      var document = Sungero.Contracts.Contracts.Create();
+      
+      FillDocumentKind(document);
+      document.DocumentGroup = Docflow.DocumentGroupBases.GetAll(x => x.Status == Docflow.DocumentGroupBase.Status.Active).FirstOrDefault();
+      document.Name = document.DocumentKind.ShortName;
+      document.Subject = SmartCapture.Contracts.Resources.Subject;
+      document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      document.Counterparty = Parties.Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
+      document.VerificationState = Contracts.Contract.VerificationState.InProcess;
+      
+      return document;
+    }
+    
     #endregion
     
     #region Заполнение свойств документа
