@@ -77,10 +77,10 @@
           "Name": "Main",
           "ColumnDefinitions": [
             {
-              "Percentage": 48.14
+              "Percentage": 50.0
             },
             {
-              "Percentage": 48.14
+              "Percentage": 50.0
             }
           ],
           "ColumnNumber": 0,
