@@ -472,9 +472,7 @@
     }
   ],
   "PublicStructures": [],
-  "ResourcesKeys": [
-    "Subject"
-  ],
+  "ResourcesKeys": [],
   "RibbonCardMetadata": {
     "NameGuid": "de10476f-7273-488a-a319-a23cdf0b9cd6",
     "Name": "RibbonCard",

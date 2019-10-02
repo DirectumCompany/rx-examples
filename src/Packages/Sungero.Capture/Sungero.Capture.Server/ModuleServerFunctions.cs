@@ -1967,13 +1967,20 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.Contracts.Create();
       
+      // Вид документа и категория.
       FillDocumentKind(document);
-      document.DocumentGroup = Docflow.DocumentGroupBases.GetAll(x => x.Status == Docflow.DocumentGroupBase.Status.Active).FirstOrDefault();
+      var categories = Docflow.PublicFunctions.DocumentGroupBase.Remote.GetDocumentGroups();
+      if (document.DocumentKind != null)
+        categories = categories.Where(c => c.DocumentKinds.Any(k => Equals(k.DocumentKind, document.DocumentKind)) || !c.DocumentKinds.Any());
+      document.DocumentGroup = categories.FirstOrDefault();
+
+      // TODO Времянка на основные свойства.
       document.Name = document.DocumentKind.ShortName;
-      document.Subject = SmartCapture.Contracts.Resources.Subject;
+      document.Subject = "TODO";
       document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.Counterparty = Parties.Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
+      
       document.VerificationState = Contracts.Contract.VerificationState.InProcess;
       
       return document;
