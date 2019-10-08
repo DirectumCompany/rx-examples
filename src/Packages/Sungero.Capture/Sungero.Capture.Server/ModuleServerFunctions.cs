@@ -507,6 +507,12 @@ namespace Sungero.Capture.Server
           : CreateContract(recognitionResult, responsible);
       }
       
+      // Доп.соглашение.
+      else if (recognizedClass == ArioClassNames.SupAgreement)
+      {
+        document = CreateSupAgreement(recognitionResult, responsible);
+      }
+      
       // Все нераспознанные документы создать простыми.
       else
       {
@@ -1981,11 +1987,35 @@ namespace Sungero.Capture.Server
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.Counterparty = Parties.Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
       
-      document.VerificationState = Contracts.Contract.VerificationState.InProcess;
-      
       return document;
     }
     
+    #endregion
+    
+    #region Доп.соглашение
+    
+    /// <summary>
+    /// Создать доп.соглашение.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки доп.соглашения в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Доп.соглашение.</returns>
+    public Docflow.IOfficialDocument CreateSupAgreement(Structures.Module.IRecognitionResult recognitionResult, Sungero.Company.IEmployee responsible)
+    {
+      var document = Sungero.Contracts.SupAgreements.Create();
+      
+      // Вид документа.
+      FillDocumentKind(document);
+      document.LeadingDocument = Contracts.Contracts.GetAll(x => x.LifeCycleState == Contracts.Contract.LifeCycleState.Active).FirstOrDefault();
+
+      // TODO Времянка на основные свойства.
+      document.Name = document.DocumentKind.ShortName;
+      document.Subject = "TODO";
+      document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      
+      return document;
+    }
     #endregion
     
     #region Заполнение свойств документа

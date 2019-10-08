@@ -180,4 +180,7 @@
   <data name="ControlGroup_d7e842e7f53f42e9a4f739725c4bc398" xml:space="preserve">
     <value>Условия</value>
   </data>
+  <data name="Property_LeadingDocument" xml:space="preserve">
+    <value>Договор</value>
+  </data>
 </root>
