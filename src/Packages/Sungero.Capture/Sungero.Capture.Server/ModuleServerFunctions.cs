@@ -2345,7 +2345,13 @@ namespace Sungero.Capture.Server
           var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
           if (counterparties.Count > 1)
             isTrusted = false;
-          counterparty = counterparties.FirstOrDefault();
+          
+          // Получить запись по точному совпадению по ИНН/КПП.
+          if (!string.IsNullOrWhiteSpace(trrc))
+            counterparty = counterparties.FirstOrDefault(x => CompanyBases.Is(x) && CompanyBases.As(x).TRRC == trrc);
+          // Получить запись с совпадением по ИНН, если не найдено по точному совпадению ИНН/КПП.
+          if (counterparty == null)
+            counterparty = counterparties.FirstOrDefault();
         }
         
         if (counterparty != null || businessUnit != null)
