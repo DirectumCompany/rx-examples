@@ -861,7 +861,7 @@
         {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "7600cbdd-56ee-47f2-bb3e-b8ac61294b9d",
-          "Name": "Control",
+          "Name": "Goods",
           "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.GridControlToChildCollectionBinder",
@@ -873,9 +873,37 @@
           "Settings": [
             {
               "Name": "NeedExpand",
-              "Value": true
+              "Value": false
+            },
+            {
+              "Name": "Height",
+              "Value": 190
             }
           ]
+        },
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "602a8c32-bdcb-4931-b794-384ff0461976",
+          "Name": "GoodsPreviewGroup",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "GroupType": "WithTitleNoBorder",
+          "ParentGuid": "e795561b-528c-4cab-9100-7122deb9d2e6",
+          "RowNumber": 1,
+          "RowSpan": 1
+        },
+        {
+          "$type": "Sungero.Metadata.PreviewControlMetadata, Sungero.Metadata",
+          "NameGuid": "edb7876a-40d2-4eff-beb1-3b2f038459ee",
+          "Name": "GoodsPreview",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.PreviewBinder",
+          "HeaderLocation": "None",
+          "ParentGuid": "602a8c32-bdcb-4931-b794-384ff0461976",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
         }
       ],
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"

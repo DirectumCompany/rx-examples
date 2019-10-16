@@ -852,9 +852,37 @@
           "Settings": [
             {
               "Name": "NeedExpand",
-              "Value": true
+              "Value": false
+            },
+            {
+              "Name": "Height",
+              "Value": 190
             }
           ]
+        },
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "c2d6f302-508e-46a9-a271-61c234150ae4",
+          "Name": "GoodsPreviewGroup",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "GroupType": "WithTitleNoBorder",
+          "ParentGuid": "efe68dd5-b83a-4ff3-ad3c-143b096f3397",
+          "RowNumber": 1,
+          "RowSpan": 1
+        },
+        {
+          "$type": "Sungero.Metadata.PreviewControlMetadata, Sungero.Metadata",
+          "NameGuid": "665cd707-3c5d-430f-8917-5d02b57fde45",
+          "Name": "GoodsPreview",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.PreviewBinder",
+          "HeaderLocation": "None",
+          "ParentGuid": "c2d6f302-508e-46a9-a271-61c234150ae4",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
         }
       ],
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"

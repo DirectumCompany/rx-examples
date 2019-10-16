@@ -41,6 +41,8 @@ namespace Sungero.Capture.Constants
       public const string IncomingInvoice = "Входящий счет на оплату";
       
       public const string Contract = "Договор";
+      
+      public const string SupAgreement = "Дополнительное соглашение";
     }
     
     // Наименование правил для извлечения фактов Ario.
@@ -63,6 +65,8 @@ namespace Sungero.Capture.Constants
       public const string IncomingInvoice = "IncomingInvoice";
       
       public const string Contract = "Contract";
+      
+      public const string SupAgreement = "SupAgreement";
     }
     
     // Имя параметра: подсвечены ли свойства.

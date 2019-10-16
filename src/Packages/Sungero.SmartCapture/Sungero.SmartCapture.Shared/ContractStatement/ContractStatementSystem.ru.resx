@@ -246,4 +246,7 @@
   <data name="ControlGroup_be4927d2f9864f818f78a145bba67c56" xml:space="preserve">
     <value>Жизненный цикл</value>
   </data>
+  <data name="Property_RegistrationNumber" xml:space="preserve">
+    <value>Номер документа</value>
+  </data>
 </root>

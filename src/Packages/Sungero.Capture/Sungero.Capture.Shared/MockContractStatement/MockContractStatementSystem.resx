@@ -309,4 +309,7 @@
   <data name="ControlGroup_9152a6a160364d25a0e29f2972b43a64" xml:space="preserve">
     <value>Customer</value>
   </data>
+  <data name="ControlGroup_6e4783341cb04325af6675c725f3bb23" xml:space="preserve">
+    <value>Предпросмотр</value>
+  </data>
 </root>

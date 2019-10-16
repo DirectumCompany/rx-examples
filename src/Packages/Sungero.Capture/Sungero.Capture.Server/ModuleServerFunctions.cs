@@ -500,9 +500,17 @@ namespace Sungero.Capture.Server
       }
       
       // Договор.
-      else if (recognizedClass == ArioClassNames.Contract && isMockMode)
+      else if (recognizedClass == ArioClassNames.Contract)
       {
-        document = CreateMockContract(recognitionResult);
+        document = isMockMode
+          ? CreateMockContract(recognitionResult)
+          : CreateContract(recognitionResult, responsible);
+      }
+      
+      // Доп.соглашение.
+      else if (recognizedClass == ArioClassNames.SupAgreement)
+      {
+        document = CreateSupAgreement(recognitionResult, responsible);
       }
       
       // Все нераспознанные документы создать простыми.
@@ -681,13 +689,13 @@ namespace Sungero.Capture.Server
           // Текстовка на случай, когда блокировка снята в момент создания задачи.
           var employeeLabel = Sungero.Capture.Resources.DocumentWasLockedTaskText.ToString();
           if (employee != null)
-            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText, 
+            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText,
                                           Hyperlinks.Get(employee));
           var documentHyperlink = Hyperlinks.Get(lockedDocument);
           lockedDocumentsHyperlinksLabels.Add(string.Format("{0} {1}", documentHyperlink, employeeLabel));
         }
         
-        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);        
+        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);
         task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedCreateVersionTaskText, lockedDocumentsHyperlinksLabel);
       }
       
@@ -1954,6 +1962,60 @@ namespace Sungero.Capture.Server
       
       return document;
     }
+    
+    /// <summary>
+    /// Создать договор.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Договор.</returns>
+    public Docflow.IOfficialDocument CreateContract(Structures.Module.IRecognitionResult recognitionResult, Sungero.Company.IEmployee responsible)
+    {
+      var document = Sungero.Contracts.Contracts.Create();
+      
+      // Вид документа и категория.
+      FillDocumentKind(document);
+      var categories = Docflow.PublicFunctions.DocumentGroupBase.Remote.GetDocumentGroups();
+      if (document.DocumentKind != null)
+        categories = categories.Where(c => c.DocumentKinds.Any(k => Equals(k.DocumentKind, document.DocumentKind)) || !c.DocumentKinds.Any());
+      document.DocumentGroup = categories.FirstOrDefault();
+
+      // TODO Времянка на основные свойства.
+      document.Name = document.DocumentKind.ShortName;
+      document.Subject = "TODO";
+      document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      document.Counterparty = Parties.Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
+      
+      return document;
+    }
+    
+    #endregion
+    
+    #region Доп.соглашение
+    
+    /// <summary>
+    /// Создать доп.соглашение.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки доп.соглашения в Ario.</param>
+    /// <param name="responsible">Ответственный.</param>
+    /// <returns>Доп.соглашение.</returns>
+    public Docflow.IOfficialDocument CreateSupAgreement(Structures.Module.IRecognitionResult recognitionResult, Sungero.Company.IEmployee responsible)
+    {
+      var document = Sungero.Contracts.SupAgreements.Create();
+      
+      // Вид документа.
+      FillDocumentKind(document);
+      document.LeadingDocument = Contracts.Contracts.GetAll(x => x.LifeCycleState == Contracts.Contract.LifeCycleState.Active).FirstOrDefault();
+
+      // TODO Времянка на основные свойства.
+      document.Name = document.DocumentKind.ShortName;
+      document.Subject = "TODO";
+      document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      
+      return document;
+    }
     #endregion
     
     #region Заполнение свойств документа
@@ -2283,7 +2345,13 @@ namespace Sungero.Capture.Server
           var counterparties = Parties.PublicFunctions.Counterparty.GetDuplicateCounterparties(tin, trrc, string.Empty, true);
           if (counterparties.Count > 1)
             isTrusted = false;
-          counterparty = counterparties.FirstOrDefault();
+          
+          // Получить запись по точному совпадению по ИНН/КПП.
+          if (!string.IsNullOrWhiteSpace(trrc))
+            counterparty = counterparties.FirstOrDefault(x => CompanyBases.Is(x) && CompanyBases.As(x).TRRC == trrc);
+          // Получить запись с совпадением по ИНН, если не найдено по точному совпадению ИНН/КПП.
+          if (counterparty == null)
+            counterparty = counterparties.FirstOrDefault();
         }
         
         if (counterparty != null || businessUnit != null)

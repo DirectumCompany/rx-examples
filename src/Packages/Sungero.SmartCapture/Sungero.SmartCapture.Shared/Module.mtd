@@ -54,6 +54,14 @@
     {
       "ItemId": "1d27283f-19ec-4f06-86d2-50bb3f4f3c43",
       "PreviousItemId": "6a32afa7-50d5-47a4-bc81-c646f7177251"
+    },
+    {
+      "ItemId": "ac821862-ecec-4df6-81a9-1ab3a9a42245",
+      "PreviousItemId": "1d27283f-19ec-4f06-86d2-50bb3f4f3c43"
+    },
+    {
+      "ItemId": "ff04fdfc-e570-4afd-ad89-ca291495e28c",
+      "PreviousItemId": "ac821862-ecec-4df6-81a9-1ab3a9a42245"
     }
   ],
   "IconResourcesKeys": [],
@@ -70,7 +78,7 @@
   "SharedAssemblyName": "Sungero.SmartCapture.Shared",
   "SharedNamespace": "Sungero.SmartCapture.Shared",
   "SpecialFolders": [],
-  "Version": "3.2.0.5",
+  "Version": "3.2.28.0",
   "Widgets": [],
   "Versions": [
     {
