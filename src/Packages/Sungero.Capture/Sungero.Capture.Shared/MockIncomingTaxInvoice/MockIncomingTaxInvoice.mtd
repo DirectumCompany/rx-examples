@@ -873,11 +873,11 @@
           "Settings": [
             {
               "Name": "NeedExpand",
-              "Value": false
+              "Value": true
             },
             {
               "Name": "Height",
-              "Value": 190
+              "Value": 1
             }
           ]
         },
@@ -908,6 +908,9 @@
       ],
       "ParentFormGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f"
     }
+  ],
+  "HandledEvents": [
+    "ShowingClient"
   ],
   "IconName": "MockIncomingTaxInvoice.ico",
   "IconResourcesKeys": [],

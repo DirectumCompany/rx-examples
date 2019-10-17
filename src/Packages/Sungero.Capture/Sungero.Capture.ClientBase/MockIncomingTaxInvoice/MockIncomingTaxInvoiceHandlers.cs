@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -9,6 +9,13 @@ namespace Sungero.Capture
 {
   partial class MockIncomingTaxInvoiceClientHandlers
   {
+
+    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
+    {
+      base.Showing(e);
+      if (!_obj.VerificationState.HasValue || _obj.VerificationState.Value == VerificationState.Completed)
+        _obj.State.Controls.GoodsPreview.IsVisible = false;
+    }
 
     public virtual void CurrencyValueInput(Sungero.Capture.Client.MockIncomingTaxInvoiceCurrencyValueInputEventArgs e)
     {

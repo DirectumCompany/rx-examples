@@ -8,18 +8,18 @@
         <property name="GroupSummary" iskey="true" value="0" />
         <property name="View" isnull="true" iskey="true">
           <property name="ShowTotalSummary">false</property>
-          <property name="AutoWidth">false</property>
-          <property name="AllowGrouping">false</property>
-          <property name="ShowGroupPanel">false</property>
+          <property name="AllowMoveColumnToDropArea">false</property>
+          <property name="AllowColumnMoving">true</property>
           <property name="ColumnChooserState" isnull="true" iskey="true">
             <property name="Location">854,-2</property>
             <property name="Size">220,250</property>
           </property>
+          <property name="AutoWidth">false</property>
+          <property name="AllowGrouping">false</property>
           <property name="AllowSorting">true</property>
-          <property name="AllowColumnMoving">true</property>
-          <property name="AllowMoveColumnToDropArea">false</property>
-          <property name="IsRowCellMenuEnabled">false</property>
+          <property name="ShowGroupPanel">false</property>
           <property name="LinesPerRowMode">None</property>
+          <property name="IsRowCellMenuEnabled">false</property>
         </property>
         <property name="GroupCount">0</property>
         <property name="TotalSummary" iskey="true" value="0" />
