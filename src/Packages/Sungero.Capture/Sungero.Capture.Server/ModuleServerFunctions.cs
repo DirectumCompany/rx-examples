@@ -1982,7 +1982,6 @@ namespace Sungero.Capture.Server
 
       // TODO Времянка на основные свойства.
       document.Name = document.DocumentKind.ShortName;
-      document.Subject = "TODO";
       document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.Counterparty = Parties.Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
