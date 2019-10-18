@@ -14,6 +14,9 @@ namespace Sungero.SmartCapture
     {
       base.Refresh(e);
       
+      // Поле Содержание обязательно для заполнения.
+      _obj.State.Properties.Subject.IsRequired = true;
+      
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 

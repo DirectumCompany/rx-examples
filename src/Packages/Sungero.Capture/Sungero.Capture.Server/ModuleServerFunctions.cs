@@ -2009,7 +2009,6 @@ namespace Sungero.Capture.Server
 
       // TODO Времянка на основные свойства.
       document.Name = document.DocumentKind.ShortName;
-      document.Subject = "TODO";
       document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       
