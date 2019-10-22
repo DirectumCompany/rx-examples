@@ -889,7 +889,8 @@
     }
   ],
   "HandledEvents": [
-    "ShowingClient"
+    "ShowingClient",
+    "RefreshClient"
   ],
   "IconResourcesKeys": [],
   "IsAutoCreated": true,

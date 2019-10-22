@@ -910,7 +910,8 @@
     }
   ],
   "HandledEvents": [
-    "ShowingClient"
+    "ShowingClient",
+    "RefreshClient"
   ],
   "IconName": "MockIncomingTaxInvoice.ico",
   "IconResourcesKeys": [],

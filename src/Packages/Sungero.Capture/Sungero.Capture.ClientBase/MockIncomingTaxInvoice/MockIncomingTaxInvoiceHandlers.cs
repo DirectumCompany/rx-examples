@@ -10,11 +10,18 @@ namespace Sungero.Capture
   partial class MockIncomingTaxInvoiceClientHandlers
   {
 
+    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
+    {
+      base.Refresh(e);
+      
+      Functions.MockIncomingTaxInvoice.ChangeGoodsVerificationView(_obj);
+    }
+
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
     {
       base.Showing(e);
-      if (!_obj.VerificationState.HasValue || _obj.VerificationState.Value == VerificationState.Completed)
-        _obj.State.Controls.GoodsPreview.IsVisible = false;
+      
+      Functions.MockIncomingTaxInvoice.ChangeGoodsVerificationView(_obj);
     }
 
     public virtual void CurrencyValueInput(Sungero.Capture.Client.MockIncomingTaxInvoiceCurrencyValueInputEventArgs e)
