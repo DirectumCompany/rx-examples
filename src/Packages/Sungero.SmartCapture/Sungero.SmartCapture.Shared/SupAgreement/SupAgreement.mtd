@@ -433,6 +433,15 @@
   "Properties": [
     {
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "f819af65-5a7c-4f59-87f3-f5f62106d162",
+      "Name": "Counterparty",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "IsRequired"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "aae1f6ae-d090-4c5a-963e-44c8b79dc92b",
       "Name": "LeadingDocument",
       "IsAncestorMetadata": true,

@@ -432,6 +432,15 @@
   "OperationsClass": "",
   "Properties": [
     {
+      "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "f819af65-5a7c-4f59-87f3-f5f62106d162",
+      "Name": "Counterparty",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "IsRequired"
+      ]
+    },
+    {
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "4bc39efb-1f46-4a1e-8b8c-04f2b90d6a8b",
       "Name": "Subject",
