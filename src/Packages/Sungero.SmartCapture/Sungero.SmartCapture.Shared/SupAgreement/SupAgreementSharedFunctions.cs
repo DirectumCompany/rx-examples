@@ -13,8 +13,9 @@ namespace Sungero.SmartCapture.Shared
     {
       base.SetRequiredProperties();
       
-      // Содержание обязательно, только если это указано в метаданных.
+      // Содержание и Ведущий документ обязательны, только если это указано в метаданных.
       _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
+      _obj.State.Properties.LeadingDocument.IsRequired = _obj.Info.Properties.LeadingDocument.IsRequired;
     }
     
     public override void FillName()

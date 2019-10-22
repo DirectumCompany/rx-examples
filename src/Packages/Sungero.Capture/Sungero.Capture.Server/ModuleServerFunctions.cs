@@ -2001,12 +2001,12 @@ namespace Sungero.Capture.Server
       
       // Вид документа.
       FillDocumentKind(document);
-      document.LeadingDocument = Contracts.Contracts.GetAll(x => x.LifeCycleState == Contracts.Contract.LifeCycleState.Active).FirstOrDefault();
 
       // TODO Времянка на основные свойства.
       document.Name = document.DocumentKind.ShortName;
       document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+      document.Counterparty = Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
       
       return document;
     }
