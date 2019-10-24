@@ -1973,19 +1973,13 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.Contracts.Create();
       
-      // Вид документа и категория.
+      // Вид документа.
       FillDocumentKind(document);
-      var categories = Docflow.PublicFunctions.DocumentGroupBase.Remote.GetDocumentGroups();
-      if (document.DocumentKind != null)
-        categories = categories.Where(c => c.DocumentKinds.Any(k => Equals(k.DocumentKind, document.DocumentKind)) || !c.DocumentKinds.Any());
-      document.DocumentGroup = categories.FirstOrDefault();
 
       // TODO Времянка на основные свойства.
       document.Name = document.DocumentKind.ShortName;
-      document.Subject = "TODO";
       document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      document.Counterparty = Parties.Counterparties.GetAll(x => x.Status == Parties.Counterparty.Status.Active).FirstOrDefault();
       
       return document;
     }
@@ -2006,11 +2000,9 @@ namespace Sungero.Capture.Server
       
       // Вид документа.
       FillDocumentKind(document);
-      document.LeadingDocument = Contracts.Contracts.GetAll(x => x.LifeCycleState == Contracts.Contract.LifeCycleState.Active).FirstOrDefault();
 
       // TODO Времянка на основные свойства.
       document.Name = document.DocumentKind.ShortName;
-      document.Subject = "TODO";
       document.BusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       

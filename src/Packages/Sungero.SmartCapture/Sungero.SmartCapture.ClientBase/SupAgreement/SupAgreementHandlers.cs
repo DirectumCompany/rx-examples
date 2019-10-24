@@ -14,6 +14,11 @@ namespace Sungero.SmartCapture
     {
       base.Refresh(e);
       
+      // Поля Содержание, Ведущий документ и Контрагент обязательны для заполнения.
+      _obj.State.Properties.Subject.IsRequired = true;
+      _obj.State.Properties.LeadingDocument.IsRequired = true;
+      _obj.State.Properties.Counterparty.IsRequired = true;
+      
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
