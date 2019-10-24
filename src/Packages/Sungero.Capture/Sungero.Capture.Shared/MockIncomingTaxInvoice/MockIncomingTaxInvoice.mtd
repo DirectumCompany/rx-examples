@@ -855,8 +855,7 @@
         {
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "e795561b-528c-4cab-9100-7122deb9d2e6",
-          "Name": "Goods",
-          "GroupType": "WithTitleNoBorder"
+          "Name": "Goods"
         },
         {
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
