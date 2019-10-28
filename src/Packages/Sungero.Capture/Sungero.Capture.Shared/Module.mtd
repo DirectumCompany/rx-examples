@@ -71,7 +71,14 @@
     {
       "ItemId": "3803bce4-67ff-4c9c-af63-7e305ae7ed69",
       "PreviousItemId": "1744d7d0-424e-4c58-9802-aec6a57ccfd7"
+    },
+    {
+      "ItemId": "af2efb99-abc0-4af7-b0e4-8bc05c4eb9bd",
+      "PreviousItemId": "3803bce4-67ff-4c9c-af63-7e305ae7ed69"
     }
+  ],
+  "HandledEvents": [
+    "InitializingServer"
   ],
   "IconResourcesKeys": [],
   "Importance": "Medium",

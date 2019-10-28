@@ -69,11 +69,11 @@ namespace Sungero.Capture.Client
     /// Задать основные настройки захвата.
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
-    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
+    /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
+    /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
+    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit)
     {
-      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, minFactProbability, trustedFactProbability);
+      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, lowerConfidenceLimit, upperConfidenceLimit);
     }
     
     #endregion

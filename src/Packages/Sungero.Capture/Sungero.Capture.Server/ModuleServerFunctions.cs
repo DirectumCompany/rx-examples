@@ -108,19 +108,17 @@ namespace Sungero.Capture.Server
     /// Установить основные параметры захвата.
     /// </summary>
     /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="minFactProbability">Минимальная вероятность для факта.</param>
-    /// <param name="trustedFactProbability">Доверительная вероятность для факта.</param>
+    /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
+    /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
     [Remote]
-    public static void SetCaptureMainSettings(string arioUrl, string minFactProbability, string trustedFactProbability)
+    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit)
     {
-      // Добавить параметр адреса сервиса Ario.
-      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.ArioUrlKey, arioUrl);
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
       
-      // Добавить параметр минимальной вероятности для факта.
-      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.MinFactProbabilityKey, minFactProbability);
-      
-      // Добавить параметр доверительной вероятности для факта.
-      Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Constants.Module.TrustedFactProbabilityKey, trustedFactProbability);
+      smartProcessingSettings.ArioUrl = arioUrl;
+      smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
+      smartProcessingSettings.UpperConfidenceLimit = int.Parse(upperConfidenceLimit);
+      smartProcessingSettings.Save();
     }
     
     #endregion
@@ -382,7 +380,8 @@ namespace Sungero.Capture.Server
         
         // Факты и поля фактов.
         recognitionResult.Facts = new List<IFact>();
-        var minFactProbability = GetDocflowParamsNumbericValue(Constants.Module.MinFactProbabilityKey);
+        var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+        //var minFactProbability = smartProcessingSettings.LowerConfidenceLimit;
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
           var pages = packageProcessResult.ExtractionResult.DocumentPages;
@@ -393,7 +392,7 @@ namespace Sungero.Capture.Server
           foreach (var fact in facts)
           {
             var fields = fact.Fields.Where(f => f != null)
-              .Where(f => f.Probability >= minFactProbability)
+              .Where(f => f.Probability >= smartProcessingSettings.LowerConfidenceLimit)
               .Select(f => FactField.Create(f.Id, f.Name, f.Value, f.Probability));
             recognitionResult.Facts.Add(Fact.Create(fact.Id, fact.Name, fields.ToList()));
             
@@ -2926,11 +2925,8 @@ namespace Sungero.Capture.Server
     [Remote]
     public virtual string GetArioUrl()
     {
-      var commandExecutionResult = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey);
-      var arioUrl = string.Empty;
-      if (!(commandExecutionResult is DBNull) && commandExecutionResult != null)
-        arioUrl = commandExecutionResult.ToString();
-      
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+      var arioUrl = smartProcessingSettings.ArioUrl;
       return arioUrl;
     }
     
@@ -3189,14 +3185,8 @@ namespace Sungero.Capture.Server
       if (field == null)
         return false;
       
-      double trustedProbability;
-      var valueReceived = Sungero.Core.Cache.TryGetValue(Constants.Module.TrustedFactProbabilityKey, out trustedProbability);
-      if (!valueReceived)
-      {
-        trustedProbability = GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
-        Sungero.Core.Cache.AddOrUpdate(Constants.Module.TrustedFactProbabilityKey, trustedProbability, Calendar.Now.AddMinutes(10));
-      }
-      return field.Probability >= trustedProbability;
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+      return field.Probability >= smartProcessingSettings.UpperConfidenceLimit;
     }
     
     /// <summary>

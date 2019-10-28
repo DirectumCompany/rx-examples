@@ -8,16 +8,6 @@ namespace Sungero.Capture.Constants
     // Имя типа связи "Прочие".
     public const string SimpleRelationRelationName = "Simple relation";
     
-    // Ключ параметра адреса веб сервиса проверки контрагентов.
-    public const string ArioUrlKey = "ArioUrl";
-    
-    // Ключ параметра минимально допустимой вероятности для поля факта, извлеченного Ario.
-    // Факт с полем, вероятность которого ниже минимально допустимой, отбрасывается как недостоверный.
-    public const string MinFactProbabilityKey = "MinFactProbability";
-    
-    // Ключ параметра вероятности для поля факта, извлеченного Ario, выше которой факт считается достоверным.
-    public const string TrustedFactProbabilityKey = "TrustedFactProbability";
-    
     // Ключ параметра демо-режима.
     public const string CaptureMockModeKey = "CaptureMockMode";
     

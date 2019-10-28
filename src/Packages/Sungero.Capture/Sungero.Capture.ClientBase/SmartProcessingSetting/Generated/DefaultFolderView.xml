@@ -1,0 +1,30 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <ViewName>Default</ViewName>
+  <Folder FormGuid="8dbb6507-6d7b-4ef2-9247-a64a15eb5dbb">
+    <XtraSerializer version="1.0" application="GridControl">
+      <property name="#LayoutVersion" isnull="true" />
+      <property name="$GridControl" iskey="true" value="GridControl">
+        <property name="Columns" iskey="true" value="3">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">T</property>
+            <property name="Visible">true</property>
+            <property name="VisibleIndex">0</property>
+          </property>
+          <property name="Item2" isnull="true" iskey="true">
+            <property name="FieldName">Id</property>
+            <property name="Visible">true</property>
+            <property name="Name">SmartProcessingSetting_Id</property>
+            <property name="VisibleIndex">1</property>
+          </property>
+          <property name="Item3" isnull="true" iskey="true">
+            <property name="FieldName">Name</property>
+            <property name="Visible">true</property>
+            <property name="Name">SmartProcessingSetting_Name</property>
+            <property name="VisibleIndex">2</property>
+          </property>
+        </property>
+      </property>
+    </XtraSerializer>
+  </Folder>
+</settings>
