@@ -147,4 +147,13 @@
   <data name="Property_PercentLabel" xml:space="preserve">
     <value>%</value>
   </data>
+  <data name="Action_CheckConnectionDescription" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Action_CheckConnectionHint" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Action_CheckConnection" xml:space="preserve">
+    <value />
+  </data>
 </root>

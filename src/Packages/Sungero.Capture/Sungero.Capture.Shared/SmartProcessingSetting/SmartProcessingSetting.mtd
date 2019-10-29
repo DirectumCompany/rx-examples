@@ -2,6 +2,16 @@
   "$type": "Sungero.Metadata.EntityMetadata, Sungero.Metadata",
   "NameGuid": "af2efb99-abc0-4af7-b0e4-8bc05c4eb9bd",
   "Name": "SmartProcessingSetting",
+  "Actions": [
+    {
+      "NameGuid": "b0f0accd-8220-4feb-bc45-8fe6df5c0b21",
+      "Name": "CheckConnection",
+      "ActionArea": "Card",
+      "GenerateHandler": true,
+      "LargeIconName": "Action_CheckConnection_large_b0f0accd82204febbc458fe6df5c0b21.png",
+      "SmallIconName": "Action_CheckConnection_small_b0f0accd82204febbc458fe6df5c0b21.png"
+    }
+  ],
   "BaseGuid": "04581d26-0780-4cfd-b3cd-c2cafc5798b0",
   "CanBeNavigationPropertyType": true,
   "Code": "SmartSetting",
@@ -186,6 +196,7 @@
       "Name": "LowerConfidenceLimit",
       "CanBeSearch": false,
       "Code": "LowerLimit",
+      "IsRequired": true,
       "IsShowedInList": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "faf6756d-2c08-4559-bfc5-9b67aec8e0ad"
@@ -196,6 +207,7 @@
       "Name": "UpperConfidenceLimit",
       "CanBeSearch": false,
       "Code": "UpperLimit",
+      "IsRequired": true,
       "IsShowedInList": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "bff73276-0d4f-4411-a2e0-46aeffd799cc"
@@ -241,7 +253,9 @@
   "ResourcesKeys": [
     "PercentLabelValue",
     "LimitsDecriptionValue",
-    "UrlTemplate"
+    "UrlTemplate",
+    "ArioConnectionEstablished",
+    "ArioConnectionError"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "364df7b8-8bc0-4230-9936-88878a5fda09",
@@ -287,9 +301,27 @@
           "IsVisible"
         ],
         "ParentGuid": "f3b0ddcd-9d1e-4ca3-8780-695ae25a9e8b"
+      },
+      {
+        "$type": "Sungero.Metadata.RibbonActionButtonMetadata, Sungero.Metadata",
+        "NameGuid": "de489022-15cd-4b85-9b19-7f36cf4b9bc5",
+        "Name": "CheckConnection",
+        "ActionGuid": "b0f0accd-8220-4feb-bc45-8fe6df5c0b21",
+        "ButtonSize": "Large",
+        "Index": -1,
+        "ParentGuid": "9e628784-1605-4589-8b4b-e1dda07f0f0b"
       }
     ],
-    "Groups": [],
+    "Groups": [
+      {
+        "NameGuid": "9e628784-1605-4589-8b4b-e1dda07f0f0b",
+        "Name": "Group",
+        "IconName": null,
+        "Index": 21,
+        "ParentGuid": "21a31627-5f58-4416-8c4a-90f538ee2e57",
+        "SmallIconName": null
+      }
+    ],
     "IsAncestorMetadata": true,
     "Pages": [],
     "RibbonKind": "Card"

@@ -147,4 +147,22 @@
   <data name="Property_PercentLabel" xml:space="preserve">
     <value>%</value>
   </data>
+  <data name="Action_CheckConnection" xml:space="preserve">
+    <value>Check Connection</value>
+  </data>
+  <data name="Action_CheckConnectionDescription" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Action_CheckConnectionHint" xml:space="preserve">
+    <value>Check Connection to Ario Service</value>
+  </data>
+  <data name="Action_CheckConnectionConfirmationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Action_CheckConnectionConfirmationDescription" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Ribbon_Group_9e628784160545898b4be1dda07f0f0b" xml:space="preserve">
+    <value>Group</value>
+  </data>
 </root>

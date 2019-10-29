@@ -128,4 +128,10 @@
   <data name="UrlTemplate" xml:space="preserve">
     <value>http://</value>
   </data>
+  <data name="ArioConnectionEstablished" xml:space="preserve">
+    <value>Сервис DIRECTUM Ario работает.</value>
+  </data>
+  <data name="ArioConnectionError" xml:space="preserve">
+    <value>Произошла ошибка при подключении к сервису. Проведите диагностику и устранение неполадок. При необходимости разверните сервис Ario.</value>
+  </data>
 </root>
