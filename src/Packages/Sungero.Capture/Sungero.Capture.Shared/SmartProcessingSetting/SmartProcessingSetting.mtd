@@ -48,16 +48,16 @@
           "Name": "LimitsGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 43.55
+              "Percentage": 45.07
             },
             {
-              "Percentage": 4.67
+              "Percentage": 4.83
             },
             {
-              "Percentage": 43.74
+              "Percentage": 45.27
             },
             {
-              "Percentage": 4.67
+              "Percentage": 4.83
             }
           ],
           "ColumnNumber": 0,
@@ -148,11 +148,13 @@
   ],
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
+  "IsCacheable": true,
   "IsVisible": false,
   "OperationsClass": "",
   "Overridden": [
     "IsVisible",
-    "IsAutoCreated"
+    "IsAutoCreated",
+    "IsCacheable"
   ],
   "Properties": [
     {

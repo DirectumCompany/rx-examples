@@ -22,13 +22,13 @@ namespace Sungero.SmartCapture.Module.Shell.Server
       
       var stageTypes = new List<Sungero.Core.Enumeration>();
       if (!typeFilterEnabled || _filter.ProcessResolution)
-        stageTypes.Add(Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.ReviewingResult);
+        stageTypes.Add(Sungero.Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.ReviewingResult);
       if (!typeFilterEnabled || _filter.ConfirmSigning)
-        stageTypes.Add(Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.ConfirmSign);
+        stageTypes.Add(Sungero.Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.ConfirmSign);
       if (!typeFilterEnabled || _filter.SendActionItem)
-        stageTypes.Add(Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.Execution);
+        stageTypes.Add(Sungero.Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.Execution);
       if (!typeFilterEnabled || _filter.Send)
-        stageTypes.Add(Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.Sending);
+        stageTypes.Add(Sungero.Docflow.ApprovalReviewAssignmentCollapsedStagesTypesRe.StageType.Sending);
       
       var showExecution = !typeFilterEnabled || _filter.SendActionItem;
       var showCheckReturn = !typeFilterEnabled || _filter.CheckReturn;

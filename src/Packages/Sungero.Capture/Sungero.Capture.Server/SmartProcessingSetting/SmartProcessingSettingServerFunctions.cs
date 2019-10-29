@@ -26,7 +26,7 @@ namespace Sungero.Capture.Server
     [Remote, Public]
     public static ISmartProcessingSetting GetSmartProcessingSettings()
     {
-      return SmartProcessingSettings.GetAll().SingleOrDefault();
+      return SmartProcessingSettings.GetAllCached().SingleOrDefault();
     }
   }
 }

@@ -1,0 +1,70 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "53a5770e-94f7-4fc1-a617-e3a2a1e5ce26",
+  "Name": "Docflow",
+  "AssociatedGuid": "f83768c8-f40d-43dd-8cfa-3098f694d645",
+  "BaseGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
+  "ClientBaseAssemblyName": "Sungero.SmartCapture.ClientBase",
+  "ClientBaseNamespace": "Sungero.SmartCapture.Module.Docflow.ClientBase",
+  "Code": "Docflow",
+  "CompanyCode": "Sungero",
+  "Cover": {
+    "NameGuid": "1125bc9f-b2d0-4461-96fc-540fc56ce158",
+    "Actions": [],
+    "Groups": [],
+    "IsAncestorMetadata": true,
+    "Overridden": [
+      "Groups",
+      "Actions"
+    ]
+  },
+  "ExplorerTreeOrder": [],
+  "IconResourcesKeys": [],
+  "Importance": "Low",
+  "Jobs": [
+    {
+      "NameGuid": "d7044e44-89bc-4fb3-9e44-5491514d9b05",
+      "Name": "SendMailNotification",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T00:00:00",
+      "TimePeriod": 30
+    },
+    {
+      "NameGuid": "1e83711c-fc18-4a48-83aa-124d8ef9b690",
+      "Name": "GrantAccessRightsToDocuments",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 60
+    },
+    {
+      "NameGuid": "133f7487-283e-476c-8774-8c87f4bc892a",
+      "Name": "ConvertDocumentToPdf",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 10
+    }
+  ],
+  "LayeredFromGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
+  "NeedResetAppliedCache": true,
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.SmartCapture.Module.Docflow",
+  "ResourcesKeys": [],
+  "SpecialFolders": [],
+  "Version": "3.3.0.0",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 6
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 6
+    }
+  ]
+}
