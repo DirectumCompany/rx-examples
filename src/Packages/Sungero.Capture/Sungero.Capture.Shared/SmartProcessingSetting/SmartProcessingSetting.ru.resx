@@ -129,9 +129,9 @@
     <value>http://</value>
   </data>
   <data name="ArioConnectionEstablished" xml:space="preserve">
-    <value>Сервис DIRECTUM Ario работает.</value>
+    <value>Подключение к сервису Ario установлено.</value>
   </data>
   <data name="ArioConnectionError" xml:space="preserve">
-    <value>Произошла ошибка при подключении к сервису. Проведите диагностику и устранение неполадок. При необходимости разверните сервис Ario.</value>
+    <value>Произошла ошибка при подключении к сервису Ario. Проведите диагностику и устраните неполадки.</value>
   </data>
 </root>

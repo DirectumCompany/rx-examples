@@ -151,7 +151,7 @@
     <value>Check Connection</value>
   </data>
   <data name="Action_CheckConnectionDescription" xml:space="preserve">
-    <value>TODO</value>
+    <value>Check Connection to Ario Service</value>
   </data>
   <data name="Action_CheckConnectionHint" xml:space="preserve">
     <value>Check Connection to Ario Service</value>

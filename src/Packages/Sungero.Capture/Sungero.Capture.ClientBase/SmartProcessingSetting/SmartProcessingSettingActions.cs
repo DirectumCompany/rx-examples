@@ -19,7 +19,7 @@ namespace Sungero.Capture.Client
 
     public virtual bool CanCheckConnection(Sungero.Domain.Client.CanExecuteActionArgs e)
     {
-      return !string.IsNullOrWhiteSpace(_obj.ArioUrl);
+      return true;
     }
 
   }
