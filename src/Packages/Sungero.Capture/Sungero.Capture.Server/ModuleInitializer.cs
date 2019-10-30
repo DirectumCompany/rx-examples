@@ -21,7 +21,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     public static void CreateSmartProcessingSettings()
     {
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       if (smartProcessingSettings == null)
         PublicFunctions.SmartProcessingSetting.Remote.CreateSmartProcessingSettings();
     }

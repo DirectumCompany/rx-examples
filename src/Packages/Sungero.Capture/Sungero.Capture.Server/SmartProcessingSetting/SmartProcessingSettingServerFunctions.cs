@@ -20,16 +20,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить настройки интеллектуальной обработки документов.
-    /// </summary>
-    /// <returns>Настройки.</returns>
-    [Remote, Public]
-    public static ISmartProcessingSetting GetSmartProcessingSettings()
-    {
-      return SmartProcessingSettings.GetAllCached().SingleOrDefault();
-    }
-    
-    /// <summary>
     /// Проверить подключение к Ario.
     /// </summary>
     /// <returns>True, если сервис работает, иначе - False.</returns>

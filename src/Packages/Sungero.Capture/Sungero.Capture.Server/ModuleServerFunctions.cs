@@ -113,7 +113,7 @@ namespace Sungero.Capture.Server
     [Remote]
     public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit)
     {
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       
       smartProcessingSettings.ArioUrl = arioUrl;
       smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
@@ -380,7 +380,7 @@ namespace Sungero.Capture.Server
         
         // Факты и поля фактов.
         recognitionResult.Facts = new List<IFact>();
-        var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+        var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
         //var minFactProbability = smartProcessingSettings.LowerConfidenceLimit;
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
@@ -2925,7 +2925,7 @@ namespace Sungero.Capture.Server
     [Remote]
     public virtual string GetArioUrl()
     {
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       var arioUrl = smartProcessingSettings.ArioUrl;
       return arioUrl;
     }
@@ -3185,7 +3185,7 @@ namespace Sungero.Capture.Server
       if (field == null)
         return false;
       
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.Remote.GetSmartProcessingSettings();
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       return field.Probability >= smartProcessingSettings.UpperConfidenceLimit;
     }
     
