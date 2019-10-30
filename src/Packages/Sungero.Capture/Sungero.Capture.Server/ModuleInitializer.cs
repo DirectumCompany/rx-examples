@@ -12,8 +12,24 @@ namespace Sungero.Capture.Server
 
     public override void Initializing(Sungero.Domain.ModuleInitializingEventArgs e)
     {
+      InitializationLogger.Debug("Init: Grant rights on databooks to all users.");
+      GrantRightsAllUsersOnDatabooks();
+      
       InitializationLogger.Debug("Init: Create smart processing settings.");
       CreateSmartProcessingSettings();
+    }
+    
+    /// <summary>
+    /// Выдать права всем пользователям на справочники.
+    /// </summary>
+    public static void GrantRightsAllUsersOnDatabooks()
+    {
+      var allUsers = Roles.AllUsers;
+      if (allUsers != null)
+      {
+        Capture.SmartProcessingSettings.AccessRights.Grant(allUsers, DefaultAccessRightsTypes.Read);
+        Capture.SmartProcessingSettings.AccessRights.Save();
+      }
     }
     
     /// <summary>
