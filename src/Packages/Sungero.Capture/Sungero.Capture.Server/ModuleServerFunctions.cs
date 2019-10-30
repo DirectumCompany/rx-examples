@@ -926,7 +926,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognitionResult, addresseeFact, FieldNames.Letter.Addressee, props.Addressee.Name, document.Addressee, addressee.IsTrusted);
       
       // Заполнить данные корреспондента.
-      var correspondent = GetCounterparty(facts, props.Correspondent.Name);
+      var correspondent = GetCounterparty(recognitionResult, props.Correspondent.Name);
       if (correspondent != null)
       {
         document.Correspondent = correspondent.Counterparty;
@@ -1995,7 +1995,7 @@ namespace Sungero.Capture.Server
       // Убираем уже использованный факт для подбора НОР, чтобы организация не искалась по тем же реквизитам что и НОР.
       if (document.BusinessUnit != null)
         facts.Remove(businessUnitWithFact.Fact);
-      var сounterparty = GetCounterparty(facts, documentProperties.Counterparty.Name);
+      var сounterparty = GetCounterparty(recognitionResult, documentProperties.Counterparty.Name);
       if (сounterparty != null)
       {
         document.Counterparty = сounterparty.Counterparty;
@@ -2534,7 +2534,7 @@ namespace Sungero.Capture.Server
     /// <param name="facts">Список фактов.</param>
     /// <param name="propertyName">Имя свойства.</param>
     /// <returns>Корреспондент.</returns>
-    public virtual Structures.Module.CounterpartyFactMatching GetCounterparty(List<Structures.Module.IFact> facts, string propertyName)
+    public virtual Structures.Module.CounterpartyFactMatching GetCounterparty(Structures.Module.IRecognitionResult recognitionResult, string propertyName)
     {
       var actualCounterparties = Counterparties.GetAll()
         .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
@@ -2543,6 +2543,27 @@ namespace Sungero.Capture.Server
       
       var foundByName = new List<Structures.Module.CounterpartyFactMatching>();
       var correspondentNames = new List<string>();
+      
+      var facts = recognitionResult.Facts;
+      var recognizedClass = recognitionResult.PredictedClass;
+      var counterpartyFactWithName = string.Empty;
+      var counterpartyFieldWithName = string.Empty;
+      
+      // Если пришло входящее письмо
+      if (recognizedClass == ArioClassNames.Letter)
+      {
+        counterpartyFactWithName = FactNames.Letter;
+        counterpartyFieldWithName = FieldNames.Letter.CorrespondentName;
+      }
+      
+      // Если пришел договорной документ
+      if ((recognizedClass == ArioClassNames.Contract) ||
+          (recognizedClass == ArioClassNames.SupAgreement))
+      {
+        counterpartyFactWithName = FactNames.Counterparty;
+        counterpartyFieldWithName = FieldNames.Counterparty.Name;
+      }
+      
       
       // Подобрать контрагентов подходящих по имени для переданных фактов.
       foreach (var fact in GetFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName))
@@ -2742,7 +2763,7 @@ namespace Sungero.Capture.Server
                                                                     string businessUnitPropertyName,
                                                                     IEmployee responsible)
     {
-      Structures.Module.CounterpartyFactMatching businessUnit = null;
+      var businessUnit = Capture.Structures.Module.CounterpartyFactMatching.Create();
       
       // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
       foreach(var record in businessUnitsWithFacts)
@@ -2754,15 +2775,14 @@ namespace Sungero.Capture.Server
       
       // Уточнить НОР по ответственному
       var businessUnitFindedNotExactly = false;
+      var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      var responsibleEmployeePersonalSettings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(responsible);
+      var responsibleEmployeePersonalSettingsBusinessUnit = responsibleEmployeePersonalSettings != null
+        ? responsibleEmployeePersonalSettings.BusinessUnit
+        : Company.BusinessUnits.Null;
       
       if (businessUnitsWithFacts.Count() > 1)
       {
-        var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-        var responsibleEmployeePersonalSettings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(responsible);
-        var responsibleEmployeePersonalSettingsBusinessUnit = responsibleEmployeePersonalSettings != null
-          ? responsibleEmployeePersonalSettings.BusinessUnit
-          : Company.BusinessUnits.Null;
-        
         // Если в персональных настройках ответственного указана НОР.
         if (responsibleEmployeePersonalSettingsBusinessUnit != null)
           businessUnit = businessUnitsWithFacts.Where(x => Equals(x.BusinessUnit, responsibleEmployeePersonalSettingsBusinessUnit)).FirstOrDefault();
@@ -2773,15 +2793,28 @@ namespace Sungero.Capture.Server
         
         // НОР не определилась по ответственному.
         if (businessUnit == null)
+        {
           businessUnitFindedNotExactly = true;
-        
-        if (businessUnit == null)
           businessUnit = businessUnitsWithFacts.FirstOrDefault();
+        }
         
         // Подсветить жёлтым, если НОР было несколько и определить по ответственному не удалось.
         if (businessUnitFindedNotExactly)
           businessUnit.IsTrusted = false;
         
+        return businessUnit;
+      }
+      
+      if (businessUnitsWithFacts.Count() == 0)
+      {
+        // Если в персональных настройках ответственного указана НОР.
+        if (responsibleEmployeePersonalSettingsBusinessUnit != null)
+          businessUnit.BusinessUnit = responsibleEmployeePersonalSettingsBusinessUnit;
+        else
+          businessUnit.BusinessUnit = responsibleEmployeeBusinessUnit;
+        
+        businessUnit.Fact = null;
+        businessUnit.IsTrusted = false;
         return businessUnit;
       }
       
