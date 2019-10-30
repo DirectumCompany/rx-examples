@@ -38,7 +38,7 @@ namespace Sungero.Capture.Server
         Logger.Error(e.Message);
       }
       
-      return !(serviceInfo == null || serviceInfo.State != Constants.SmartProcessingSetting.ArioConnectionSuccessMessage);
+      return serviceInfo != null && serviceInfo.State == Constants.SmartProcessingSetting.ArioConnectionSuccessMessage;
     }
   }
 }
