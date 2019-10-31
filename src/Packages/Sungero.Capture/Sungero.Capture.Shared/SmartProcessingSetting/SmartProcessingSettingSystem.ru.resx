@@ -163,7 +163,7 @@
     <value>Классификаторы</value>
   </data>
   <data name="Property_TypeClassifierName" xml:space="preserve">
-    <value>По типу</value>
+    <value>По типам документов</value>
   </data>
   <data name="Property_TypeClassifierId" xml:space="preserve">
     <value>ИД классификатора по типу</value>

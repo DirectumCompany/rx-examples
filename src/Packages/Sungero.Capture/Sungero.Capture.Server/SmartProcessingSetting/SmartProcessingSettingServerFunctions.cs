@@ -40,5 +40,25 @@ namespace Sungero.Capture.Server
       
       return serviceInfo != null && serviceInfo.State == Constants.SmartProcessingSetting.ArioConnectionSuccessMessage;
     }
+    
+    /// <summary>
+    /// Получить список классификаторов из Арио.
+    /// </summary>
+    /// <returns>Список классификаторов.</returns>
+    [Remote]
+    public virtual List<Structures.SmartProcessingSetting.Classifier> GetClassifiers()
+    {
+      var classifiers = new List<Structures.SmartProcessingSetting.Classifier>();
+      try
+      {
+        var arioConnector = new ArioExtensions.ArioConnector(_obj.ArioUrl);
+        classifiers = arioConnector.GetClassifiers().Select(x => Structures.SmartProcessingSetting.Classifier.Create(x.Id, x.Name)).ToList();
+      }
+      catch (Exception e)
+      {
+        Logger.Error(e.Message);
+      }
+      return classifiers;
+    }
   }
 }

@@ -132,4 +132,16 @@
   <data name="ArioConnectionError" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="Classifier" xml:space="preserve">
+    <value>Classifier</value>
+  </data>
+  <data name="ClassifierSelectionError" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="SelectTypeClassifierDialogTitle" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="SelectFirstPageClassifierDialogTitle" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

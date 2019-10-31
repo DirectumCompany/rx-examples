@@ -134,4 +134,16 @@
   <data name="ArioConnectionError" xml:space="preserve">
     <value>Произошла ошибка при подключении к сервису Ario. Проведите диагностику и устраните неполадки.</value>
   </data>
+  <data name="Classifier" xml:space="preserve">
+    <value>Классификатор</value>
+  </data>
+  <data name="ClassifierSelectionError" xml:space="preserve">
+    <value>Не удалось загрузить список классификаторов.</value>
+  </data>
+  <data name="SelectTypeClassifierDialogTitle" xml:space="preserve">
+    <value>Выбор классификатора по типам документов</value>
+  </data>
+  <data name="SelectFirstPageClassifierDialogTitle" xml:space="preserve">
+    <value>Выбор классификатора первых страниц</value>
+  </data>
 </root>

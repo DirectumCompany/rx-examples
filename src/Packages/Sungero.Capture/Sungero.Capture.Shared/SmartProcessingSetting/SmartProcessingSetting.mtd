@@ -186,7 +186,7 @@
           "ColumnNumber": 1,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.HyperlinkToSourceBinder",
-          "FunctionName": "ChooseClassifier",
+          "FunctionName": "SelectTypeClassifier",
           "HeaderLocation": "None",
           "ParentGuid": "1065954c-7462-4c95-83bf-d3edbff942f3",
           "RowNumber": 0,
@@ -200,7 +200,7 @@
           "ColumnNumber": 1,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.HyperlinkToSourceBinder",
-          "FunctionName": "ChooseClassifier",
+          "FunctionName": "SelectFirstPageClassifier",
           "HeaderLocation": "None",
           "ParentGuid": "1065954c-7462-4c95-83bf-d3edbff942f3",
           "RowNumber": 1,
@@ -380,7 +380,11 @@
     "LimitsDecriptionValue",
     "UrlTemplate",
     "ArioConnectionEstablished",
-    "ArioConnectionError"
+    "ArioConnectionError",
+    "Classifier",
+    "ClassifierSelectionError",
+    "SelectTypeClassifierDialogTitle",
+    "SelectFirstPageClassifierDialogTitle"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "364df7b8-8bc0-4230-9936-88878a5fda09",
