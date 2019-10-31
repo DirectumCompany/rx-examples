@@ -32,19 +32,6 @@
         "PreviousItemGuid": "ef0cb40d-3c65-405a-a295-9ac170813fad"
       },
       {
-        "NameGuid": "78903c99-2e7e-47fd-9d7c-4e735996d0e4",
-        "Name": "Group1",
-        "BackgroundPosition": "Stretch",
-        "PreviousItemGuid": "8676ae40-d291-4845-8270-8cccbe9b8ba7"
-      },
-      {
-        "NameGuid": "ec503367-1bd1-4699-b871-9d57e2a7ecac",
-        "Name": "SmartProcessingSettings",
-        "BackgroundPosition": "Stretch",
-        "IconName": "GroupIconSmartProcessingSettings_ec5033671bd14699b8719d57e2a7ecac.png",
-        "PreviousItemGuid": "78903c99-2e7e-47fd-9d7c-4e735996d0e4"
-      },
-      {
         "NameGuid": "f177d1e6-2cc0-4f87-a2a0-403c1f839691",
         "Name": "Group",
         "BackgroundPosition": "Stretch",
@@ -52,7 +39,7 @@
         "Overridden": [
           "PreviousItemGuid"
         ],
-        "PreviousItemGuid": "ec503367-1bd1-4699-b871-9d57e2a7ecac"
+        "PreviousItemGuid": "8676ae40-d291-4845-8270-8cccbe9b8ba7"
       },
       {
         "NameGuid": "2832d02d-6c46-42cd-84b3-35dc867d8539",
@@ -64,6 +51,13 @@
           "PreviousItemGuid"
         ],
         "PreviousItemGuid": "f177d1e6-2cc0-4f87-a2a0-403c1f839691"
+      },
+      {
+        "NameGuid": "ec503367-1bd1-4699-b871-9d57e2a7ecac",
+        "Name": "SmartProcessingSettings",
+        "BackgroundPosition": "Stretch",
+        "IconName": "GroupIconSmartProcessingSettings_ec5033671bd14699b8719d57e2a7ecac.png",
+        "PreviousItemGuid": "2832d02d-6c46-42cd-84b3-35dc867d8539"
       }
     ],
     "IsAncestorMetadata": true,

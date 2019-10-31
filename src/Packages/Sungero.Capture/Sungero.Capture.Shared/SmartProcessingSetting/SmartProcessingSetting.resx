@@ -144,4 +144,10 @@
   <data name="SelectFirstPageClassifierDialogTitle" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="SelectedSameClassifierWarning" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ClassifierDisplayNameTemplate" xml:space="preserve">
+    <value>{0} (ID {1})</value>
+  </data>
 </root>

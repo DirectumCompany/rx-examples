@@ -16,21 +16,30 @@ namespace Sungero.Capture.Client
     /// <returns>Классификатор.</returns>
     public Sungero.Capture.Structures.SmartProcessingSetting.Classifier RunClassifierSelectionDialog(string dialogTitle)
     {
+      var resources = Sungero.Capture.SmartProcessingSettings.Resources;
       var classifiers = Functions.SmartProcessingSetting.Remote.GetClassifiers(_obj);
       if (!classifiers.Any())
       {
-        Dialogs.NotifyMessage(SmartProcessingSettings.Resources.ClassifierSelectionError);
+        Dialogs.NotifyMessage(resources.ClassifierSelectionError);
         return null;
       }
-
-      var dialog = Dialogs.CreateInputDialog(dialogTitle);
-      var classifierDisplayNames = classifiers.OrderBy(x => x.Name).Select(x => string.Format("{0} ({1})", x.Name, x.Id));
-      var classifier = dialog.AddSelect(SmartProcessingSettings.Resources.Classifier, true).From(classifierDisplayNames.ToArray());
       
+      var dialog = Dialogs.CreateInputDialog(dialogTitle);
+      var classifierDisplayNames = classifiers.OrderBy(x => x.Name).Select(x => resources.ClassifierDisplayNameTemplateFormat(x.Name, x.Id).ToString());
+      var classifier = dialog.AddSelect(resources.Classifier, true).From(classifierDisplayNames.ToArray());
+      
+      dialog.SetOnRefresh(e =>
+                          {
+                            var selectedClassifier = dialogTitle == resources.SelectTypeClassifierDialogTitle
+                              ? resources.ClassifierDisplayNameTemplateFormat(_obj.FirstPageClassifierName, _obj.FirstPageClassifierId)
+                              : resources.ClassifierDisplayNameTemplateFormat(_obj.TypeClassifierName, _obj.TypeClassifierId);
+                            if (classifier.Value == selectedClassifier)
+                              e.AddWarning(resources.SelectedSameClassifierWarning);
+                          });
       dialog.Buttons.AddOkCancel();
       dialog.Buttons.Default = DialogButtons.Ok;
       if (dialog.Show() == DialogButtons.Ok)
-        return classifiers.SingleOrDefault(x => classifier.Value == string.Format("{0} ({1})", x.Name, x.Id));
+        return classifiers.SingleOrDefault(x => classifier.Value == resources.ClassifierDisplayNameTemplateFormat(x.Name, x.Id));
       return null;
     }
     

@@ -59,16 +59,13 @@
           "Name": "LimitsGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 43.55
+              "Percentage": 60.09
             },
             {
-              "Percentage": 4.67
+              "Percentage": 6.44
             },
             {
-              "Percentage": 40.75
-            },
-            {
-              "Percentage": 7.66
+              "Percentage": 56.23
             }
           ],
           "ColumnNumber": 0,
@@ -96,12 +93,12 @@
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "000eb036-c89f-4b5f-ae63-d13ac1e86677",
           "Name": "Control2",
-          "ColumnNumber": 2,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
           "ParentGuid": "e6f622ba-0dbc-4e14-9a14-65ce781200d1",
           "PropertyGuid": "061ab343-cc38-40ab-ba13-e0ad95efeac7",
-          "RowNumber": 0,
+          "RowNumber": 1,
           "RowSpan": 1,
           "Settings": []
         },
@@ -123,13 +120,13 @@
           "$type": "Sungero.Metadata.LabelControlMetadata, Sungero.Metadata",
           "NameGuid": "9ac489a3-9fa7-41ef-8d06-9c966275b507",
           "Name": "Label1",
-          "ColumnNumber": 3,
+          "ColumnNumber": 1,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.LabelToTextSourceBinder",
           "HeaderLocation": "None",
           "ParentGuid": "e6f622ba-0dbc-4e14-9a14-65ce781200d1",
           "PropertyGuid": "9e6836d6-4dfd-4772-81b3-0380981f104c",
-          "RowNumber": 0,
+          "RowNumber": 1,
           "RowSpan": 1,
           "Settings": []
         },
@@ -139,10 +136,10 @@
           "Name": "ClassifiersGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 90.84
+              "Percentage": 91.87
             },
             {
-              "Percentage": 8.04
+              "Percentage": 8.13
             }
           ],
           "ColumnNumber": 0,
@@ -217,7 +214,7 @@
           "HeaderLocation": "None",
           "ParentGuid": "e6f622ba-0dbc-4e14-9a14-65ce781200d1",
           "PropertyGuid": "880c6594-397a-415b-af7d-e627944d3a68",
-          "RowNumber": 1,
+          "RowNumber": 2,
           "RowSpan": 1,
           "Settings": [
             {
@@ -384,7 +381,9 @@
     "Classifier",
     "ClassifierSelectionError",
     "SelectTypeClassifierDialogTitle",
-    "SelectFirstPageClassifierDialogTitle"
+    "SelectFirstPageClassifierDialogTitle",
+    "SelectedSameClassifierWarning",
+    "ClassifierDisplayNameTemplate"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "364df7b8-8bc0-4230-9936-88878a5fda09",

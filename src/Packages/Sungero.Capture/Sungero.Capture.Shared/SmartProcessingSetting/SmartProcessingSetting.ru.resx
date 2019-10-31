@@ -146,4 +146,10 @@
   <data name="SelectFirstPageClassifierDialogTitle" xml:space="preserve">
     <value>Выбор классификатора первых страниц</value>
   </data>
+  <data name="SelectedSameClassifierWarning" xml:space="preserve">
+    <value>Данный классификатор уже используется.</value>
+  </data>
+  <data name="ClassifierDisplayNameTemplate" xml:space="preserve">
+    <value>{0} (ИД {1})</value>
+  </data>
 </root>
