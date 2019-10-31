@@ -125,9 +125,6 @@
 Желтым подсвечивается при вероятности факта между нижней и верхней границами.
 Поле не заполняется, если вероятность меньше нижней границы.</value>
   </data>
-  <data name="UrlTemplate" xml:space="preserve">
-    <value>http://</value>
-  </data>
   <data name="ArioConnectionEstablished" xml:space="preserve">
     <value>Подключение к сервису Ario установлено.</value>
   </data>

@@ -123,9 +123,6 @@
   <data name="LimitsDecriptionValue" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="UrlTemplate" xml:space="preserve">
-    <value>http://</value>
-  </data>
   <data name="ArioConnectionEstablished" xml:space="preserve">
     <value>TODO</value>
   </data>

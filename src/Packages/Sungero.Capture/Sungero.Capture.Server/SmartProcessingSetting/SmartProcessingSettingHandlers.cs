@@ -12,7 +12,6 @@ namespace Sungero.Capture
 
     public override void Created(Sungero.Domain.CreatedEventArgs e)
     {
-      _obj.ArioUrl = Sungero.Capture.SmartProcessingSettings.Resources.UrlTemplate;
       _obj.LowerConfidenceLimit = 40;
       _obj.UpperConfidenceLimit = 80;
       

@@ -231,7 +231,8 @@
     }
   ],
   "HandledEvents": [
-    "CreatedServer"
+    "CreatedServer",
+    "RefreshClient"
   ],
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
@@ -262,7 +263,6 @@
       "Name": "ArioUrl",
       "CanBeSearch": false,
       "Code": "ArioUrl",
-      "IsRequired": true,
       "IsShowedInList": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "852222ba-5b2b-4ab8-b9e3-4e0e21f6a1a8"
@@ -316,7 +316,6 @@
       "CanBeSearch": false,
       "Code": "TypeClassName",
       "IsEnabled": false,
-      "IsRequired": true,
       "IsShowedInList": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "9e6836d6-4dfd-4772-81b3-0380981f104c"
@@ -325,8 +324,10 @@
       "$type": "Sungero.Metadata.IntegerPropertyMetadata, Sungero.Metadata",
       "NameGuid": "950f4f66-16b6-40c5-a85f-225de14db35c",
       "Name": "TypeClassifierId",
+      "CanBeSearch": false,
       "Code": "TypeClassId",
       "IsEnabled": false,
+      "IsShowedInList": false,
       "IsVisibility": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "4ff8df07-b567-410e-b233-df625e633f64"
@@ -338,7 +339,6 @@
       "CanBeSearch": false,
       "Code": "PageClassName",
       "IsEnabled": false,
-      "IsRequired": true,
       "IsShowedInList": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "950f4f66-16b6-40c5-a85f-225de14db35c"
@@ -375,7 +375,6 @@
   "ResourcesKeys": [
     "PercentLabelValue",
     "LimitsDecriptionValue",
-    "UrlTemplate",
     "ArioConnectionEstablished",
     "ArioConnectionError",
     "Classifier",
