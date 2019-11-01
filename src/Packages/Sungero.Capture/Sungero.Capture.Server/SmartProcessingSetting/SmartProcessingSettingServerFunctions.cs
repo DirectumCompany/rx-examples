@@ -18,9 +18,9 @@ namespace Sungero.Capture.Server
       var smartProcessingSettings = SmartProcessingSettings.Create();
       
       // Заполнить из Docflow_Params, если ранее настройки хранились там.
-      var arioUrlKey = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey).ToString();
-      if (!string.IsNullOrEmpty(arioUrlKey))
-        smartProcessingSettings.ArioUrl = arioUrlKey;
+      var arioUrlKey = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey);
+      if (arioUrlKey != null)
+        smartProcessingSettings.ArioUrl = arioUrlKey.ToString();
       
       var minFactProbability = Functions.Module.GetDocflowParamsNumbericValue(Constants.Module.MinFactProbabilityKey);
       if (minFactProbability != 0)
