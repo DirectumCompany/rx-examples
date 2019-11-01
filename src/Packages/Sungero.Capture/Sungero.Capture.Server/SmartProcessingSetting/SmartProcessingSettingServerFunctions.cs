@@ -16,7 +16,24 @@ namespace Sungero.Capture.Server
     public static void CreateSmartProcessingSettings()
     {
       var smartProcessingSettings = SmartProcessingSettings.Create();
+      
+      // Заполнить из Docflow_Params, если ранее настройки хранились там.
+      var arioUrlKey = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.ArioUrlKey).ToString();
+      if (!string.IsNullOrEmpty(arioUrlKey))
+        smartProcessingSettings.ArioUrl = arioUrlKey;
+      
+      var minFactProbability = Functions.Module.GetDocflowParamsNumbericValue(Constants.Module.MinFactProbabilityKey);
+      if (minFactProbability != 0)
+        smartProcessingSettings.LowerConfidenceLimit = (int) minFactProbability;
+      
+      var trustedFactProbability = Functions.Module.GetDocflowParamsNumbericValue(Constants.Module.TrustedFactProbabilityKey);
+      if (trustedFactProbability != 0)
+        smartProcessingSettings.UpperConfidenceLimit = (int) trustedFactProbability;
+      
       smartProcessingSettings.Save();
+      
+      // Удалить параметры с настройками из Docflow_Params.
+      Docflow.PublicFunctions.Module.ExecuteSQLCommand(Queries.Module.DeleteSmartSettingsFromDocflowParams);
     }
     
     /// <summary>

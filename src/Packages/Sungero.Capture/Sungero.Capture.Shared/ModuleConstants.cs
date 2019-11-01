@@ -11,6 +11,16 @@ namespace Sungero.Capture.Constants
     // Ключ параметра демо-режима.
     public const string CaptureMockModeKey = "CaptureMockMode";
     
+    // Ключ параметра адреса сервиса Ario.
+    public const string ArioUrlKey = "ArioUrl";
+    
+    // Ключ параметра минимально допустимой вероятности для поля факта, извлеченного Ario.
+    // Факт с полем, вероятность которого ниже минимально допустимой, отбрасывается как недостоверный.
+    public const string MinFactProbabilityKey = "MinFactProbability";
+    
+    // Ключ параметра вероятности для поля факта, извлеченного Ario, выше которой факт считается достоверным.
+    public const string TrustedFactProbabilityKey = "TrustedFactProbability";
+    
     // Наименования классов из классификатора Ario.
     public static class ArioClassNames
     {
