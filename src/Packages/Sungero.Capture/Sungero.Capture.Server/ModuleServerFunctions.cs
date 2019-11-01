@@ -1546,6 +1546,10 @@ namespace Sungero.Capture.Server
     {
       var facts = recognitionResult.Facts;
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+      var responsibleEmployeePersonalSettings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(responsible);
+      var responsibleEmployeePersonalSettingsBusinessUnit = responsibleEmployeePersonalSettings != null
+        ? responsibleEmployeePersonalSettings.BusinessUnit
+        : Company.BusinessUnits.Null;
       var document = AccountingDocumentBases.Null;
       var props = AccountingDocumentBases.Info.Properties;
       
@@ -1567,7 +1571,8 @@ namespace Sungero.Capture.Server
       if (buyerIsBusinessUnit && sellerIsBusinessUnit)
       {
         // Мультинорность. Уточнить НОР по ответственному.
-        if (Equals(seller.BusinessUnit, responsibleEmployeeBusinessUnit))
+        if (Equals(seller.BusinessUnit, responsibleEmployeePersonalSettingsBusinessUnit) ||
+            Equals(seller.BusinessUnit, responsibleEmployeeBusinessUnit))
         {
           // Исходящий документ.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
@@ -1612,14 +1617,14 @@ namespace Sungero.Capture.Server
           documentParties.Counterparty = seller;
         }
       }
-      documentParties.ResponsibleEmployeeBusinessUnit = responsibleEmployeeBusinessUnit;
-      
-      // Вид документа.
-      FillDocumentKind(document);
+      documentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       
       // НОР и КА.
       FillAccountingDocumentParties(document, documentParties);
       LinkAccountingDocumentParties(recognitionResult, documentParties);
+      
+      // Вид документа.
+      FillDocumentKind(document);
       
       // Дата, номер и регистрация.
       NumberDocument(document, recognitionResult, FactNames.FinancialDocument);
