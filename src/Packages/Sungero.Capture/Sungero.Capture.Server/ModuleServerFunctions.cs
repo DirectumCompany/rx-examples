@@ -439,10 +439,10 @@ namespace Sungero.Capture.Server
                                                                        IEmployee responsible)
     {
       // Входящее письмо.
-      var recognizedClass = recognitionResult.PredictedClass;
+      var predictedClass = recognitionResult.PredictedClass;
       var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
       var document = OfficialDocuments.Null;
-      if (recognizedClass == ArioClassNames.Letter)
+      if (predictedClass == ArioClassNames.Letter)
       {
         document = isMockMode
           ? CreateMockIncomingLetter(recognitionResult)
@@ -450,7 +450,7 @@ namespace Sungero.Capture.Server
       }
       
       // Акт выполненных работ.
-      else if (recognizedClass == ArioClassNames.ContractStatement)
+      else if (predictedClass == ArioClassNames.ContractStatement)
       {
         document = isMockMode
           ? CreateMockContractStatement(recognitionResult)
@@ -458,7 +458,7 @@ namespace Sungero.Capture.Server
       }
       
       // Товарная накладная.
-      else if (recognizedClass == ArioClassNames.Waybill)
+      else if (predictedClass == ArioClassNames.Waybill)
       {
         document = isMockMode
           ? CreateMockWaybill(recognitionResult)
@@ -466,7 +466,7 @@ namespace Sungero.Capture.Server
       }
       
       // Счет-фактура.
-      else if (recognizedClass == ArioClassNames.TaxInvoice)
+      else if (predictedClass == ArioClassNames.TaxInvoice)
       {
         document = isMockMode
           ? CreateMockIncomingTaxInvoice(recognitionResult)
@@ -474,25 +474,25 @@ namespace Sungero.Capture.Server
       }
       
       // Корректировочный счет-фактура.
-      else if (recognizedClass == ArioClassNames.TaxinvoiceCorrection && !isMockMode)
+      else if (predictedClass == ArioClassNames.TaxinvoiceCorrection && !isMockMode)
       {
         document = CreateTaxInvoice(recognitionResult, true, responsible);
       }
       
       // УПД.
-      else if (recognizedClass == ArioClassNames.UniversalTransferDocument && !isMockMode)
+      else if (predictedClass == ArioClassNames.UniversalTransferDocument && !isMockMode)
       {
         document = CreateUniversalTransferDocument(recognitionResult, false, responsible);
       }
       
       // УКД.
-      else if (recognizedClass == ArioClassNames.UniversalTransferCorrectionDocument && !isMockMode)
+      else if (predictedClass == ArioClassNames.UniversalTransferCorrectionDocument && !isMockMode)
       {
         document = CreateUniversalTransferDocument(recognitionResult, true, responsible);
       }
       
       // Счет на оплату.
-      else if (recognizedClass == ArioClassNames.IncomingInvoice)
+      else if (predictedClass == ArioClassNames.IncomingInvoice)
       {
         document = isMockMode
           ? CreateMockIncomingInvoice(recognitionResult)
@@ -500,7 +500,7 @@ namespace Sungero.Capture.Server
       }
       
       // Договор.
-      else if (recognizedClass == ArioClassNames.Contract)
+      else if (predictedClass == ArioClassNames.Contract)
       {
         document = isMockMode
           ? CreateMockContract(recognitionResult)
@@ -508,7 +508,7 @@ namespace Sungero.Capture.Server
       }
       
       // Доп.соглашение.
-      else if (recognizedClass == ArioClassNames.SupAgreement)
+      else if (predictedClass == ArioClassNames.SupAgreement)
       {
         document = CreateSupAgreement(recognitionResult, responsible);
       }
@@ -947,9 +947,11 @@ namespace Sungero.Capture.Server
         facts.Remove(correspondent.Fact);
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
       
-      var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, document.Info.Properties.BusinessUnit.Name, document.Addressee, responsible);
+      var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts, 
+                                                                     document.Info.Properties.BusinessUnit.Name, document.Addressee, responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, document.BusinessUnit, businessUnitWithFact.IsTrusted);
+      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name, 
+                          document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       document.Department = document.Addressee != null
         ? Company.PublicFunctions.Department.GetDepartment(document.Addressee)
@@ -1985,8 +1987,8 @@ namespace Sungero.Capture.Server
       // Заполнить данные нашей стороны.
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
       
-      var businessUnitWithFact = GetBusinessUnitWithFact(businessUnitsWithFacts, documentProperties.BusinessUnit.Name,
-                                                         responsible);
+      var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts, 
+                                                                     documentProperties.BusinessUnit.Name, responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
       LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, documentProperties.BusinessUnit.Name,
                           document.BusinessUnit, businessUnitWithFact.IsTrusted);
@@ -2502,7 +2504,7 @@ namespace Sungero.Capture.Server
       if (seller != null && seller.Counterparty != null)
         counterparty = seller;
       
-      var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsibleEmployee);
+      var responsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsibleEmployee);
       
       return Structures.Module.DocumentParties.Create(businessUnit, counterparty, responsibleEmployeeBusinessUnit);
     }
@@ -2545,23 +2547,23 @@ namespace Sungero.Capture.Server
       var correspondentNames = new List<string>();
       
       var facts = recognitionResult.Facts;
-      var recognizedClass = recognitionResult.PredictedClass;
-      var counterpartyFactWithName = string.Empty;
-      var counterpartyFieldWithName = string.Empty;
+      var predictedClass = recognitionResult.PredictedClass;
+      var counterpartyFactName = string.Empty;
+      var counterpartyNameField = string.Empty;
       
       // Если пришло входящее письмо
-      if (recognizedClass == ArioClassNames.Letter)
+      if (predictedClass == ArioClassNames.Letter)
       {
-        counterpartyFactWithName = FactNames.Letter;
-        counterpartyFieldWithName = FieldNames.Letter.CorrespondentName;
+        counterpartyFactName = FactNames.Letter;
+        counterpartyNameField = FieldNames.Letter.CorrespondentName;
       }
       
       // Если пришел договорной документ
-      if ((recognizedClass == ArioClassNames.Contract) ||
-          (recognizedClass == ArioClassNames.SupAgreement))
+      if ((predictedClass == ArioClassNames.Contract) ||
+          (predictedClass == ArioClassNames.SupAgreement))
       {
-        counterpartyFactWithName = FactNames.Counterparty;
-        counterpartyFieldWithName = FieldNames.Counterparty.Name;
+        counterpartyFactName = FactNames.Counterparty;
+        counterpartyNameField = FieldNames.Counterparty.Name;
       }
       
       
@@ -2705,9 +2707,9 @@ namespace Sungero.Capture.Server
     /// <param name="addressee">Адресат.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
-    public virtual CounterpartyFactMatching GetBusinessUnitWithFact(List<CounterpartyFactMatching> businessUnitsWithFacts,
-                                                                    string businessUnitPropertyName, IEmployee addressee,
-                                                                    IEmployee responsible)
+    public virtual CounterpartyFactMatching GetMostProbableBusinessUnitMatching(List<CounterpartyFactMatching> businessUnitsWithFacts,
+                                                                                string businessUnitPropertyName, IEmployee addressee,
+                                                                                IEmployee responsible)
     {
       // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
       foreach(var record in businessUnitsWithFacts)
@@ -2759,9 +2761,9 @@ namespace Sungero.Capture.Server
     /// <param name="businessUnitPropertyName">Имя связанного свойства.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
-    public virtual CounterpartyFactMatching GetBusinessUnitWithFact(List<CounterpartyFactMatching> businessUnitsWithFacts,
-                                                                    string businessUnitPropertyName,
-                                                                    IEmployee responsible)
+    public virtual CounterpartyFactMatching GetMostProbableBusinessUnitMatching(List<CounterpartyFactMatching> businessUnitsWithFacts,
+                                                                                string businessUnitPropertyName,
+                                                                                IEmployee responsible)
     {
       var businessUnit = Capture.Structures.Module.CounterpartyFactMatching.Create();
       
@@ -2831,54 +2833,53 @@ namespace Sungero.Capture.Server
     public virtual List<Capture.Structures.Module.CounterpartyFactMatching> GetBusinessUnitsWithFacts(Structures.Module.IRecognitionResult recognitionResult)
     {
       var facts = recognitionResult.Facts;
-      var recognizedClass = recognitionResult.PredictedClass;
-      var counterpartyFactWithName = string.Empty;
-      var counterpartyFieldWithName = string.Empty;
+      var predictedClass = recognitionResult.PredictedClass;
+      var counterpartyFactName = string.Empty;
+      var counterpartyNameField = string.Empty;
       
       // Если пришло входящее письмо
-      if (recognizedClass == ArioClassNames.Letter)
+      if (predictedClass == ArioClassNames.Letter)
       {
-        counterpartyFactWithName = FactNames.Letter;
-        counterpartyFieldWithName = FieldNames.Letter.CorrespondentName;
+        counterpartyFactName = FactNames.Letter;
+        counterpartyNameField = FieldNames.Letter.CorrespondentName;
       }
       
       // Если пришел договорной документ
-      if ((recognizedClass == ArioClassNames.Contract) ||
-          (recognizedClass == ArioClassNames.SupAgreement))
+      if ((predictedClass == ArioClassNames.Contract) ||
+          (predictedClass == ArioClassNames.SupAgreement))
       {
-        counterpartyFactWithName = FactNames.Counterparty;
-        counterpartyFieldWithName = FieldNames.Counterparty.Name;
+        counterpartyFactName = FactNames.Counterparty;
+        counterpartyNameField = FieldNames.Counterparty.Name;
       }
       
-      // Получить ИНН/КПП и наименования/ФС корреспондентов из фактов.
+      // Получить факты с наименованиями организаций.
       var businessUnitsByName = new List<Capture.Structures.Module.CounterpartyFactMatching>();
-      var correspondentNameFacts = GetFacts(facts, counterpartyFactWithName, counterpartyFieldWithName)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == counterpartyFieldWithName).Probability);
+      var correspondentNameFacts = GetFacts(facts, counterpartyFactName, counterpartyNameField)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == counterpartyNameField).Probability);
       foreach (var fact in correspondentNameFacts)
       {
-        var name = GetFieldValue(fact, counterpartyFieldWithName);
+        var name = GetFieldValue(fact, counterpartyNameField);
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-          .Where(x => x.Name.ToLower().Contains(name));
-        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null,false)));
+          .Where(x => string.Equals(x.Name, name));
+        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null, false)));
       }
-      // Если факты с ИНН/КПП не найдены, то вернуть НОР по наименованию.
+      
+      // Если факты с ИНН/КПП не найдены, то вернуть факты с наименованиями организаций.
       var correspondentTinFacts = GetFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.TIN)
         .OrderByDescending(x => x.Fields.First(f => f.Name == FieldNames.Counterparty.TIN).Probability);
       if (!correspondentTinFacts.Any())
         return businessUnitsByName;
-      else
+
+      // Поиск по ИНН/КПП.
+      var foundByTin = new List<Capture.Structures.Module.CounterpartyFactMatching>();
+      foreach (var fact in correspondentTinFacts)
       {
-        // Поиск по ИНН/КПП.
-        var foundByTin = new List<Capture.Structures.Module.CounterpartyFactMatching>();
-        foreach (var fact in correspondentTinFacts)
-        {
-          var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
-          var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
-          var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
-          var isTrusted = businessUnits.Count == 1;
-          foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null, isTrusted)));
-        }
+        var tin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
+        var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
+        var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
+        var isTrusted = businessUnits.Count == 1;
+        foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null, isTrusted)));
         
         // Найдено по ИНН/КПП.
         if (foundByTin.Any())
