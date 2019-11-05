@@ -65,6 +65,10 @@
     {
       "Type": "ModuleMetadata",
       "Number": 6
+    },
+    {
+      "Type": "DomainApi",
+      "Number": 3
     }
   ]
 }
