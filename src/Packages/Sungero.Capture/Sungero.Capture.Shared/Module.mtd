@@ -419,7 +419,9 @@
     "FailedCreateVersionTaskText",
     "FailedCreateVersionsTaskText",
     "DocumentLockedByEmployeeTaskText",
-    "DocumentWasLockedTaskText"
+    "DocumentWasLockedTaskText",
+    "SmartProcessingSettingsNotFound",
+    "EmptyClassifiersOrArioUrl"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

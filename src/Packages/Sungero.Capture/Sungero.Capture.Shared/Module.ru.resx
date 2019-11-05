@@ -230,4 +230,10 @@
   <data name="DocumentWasLockedTaskText" xml:space="preserve">
     <value>редактировался ранее</value>
   </data>
+  <data name="SmartProcessingSettingsNotFound" xml:space="preserve">
+    <value>Настройки интеллектуальной обработки документов не найдены</value>
+  </data>
+  <data name="EmptyClassifiersOrArioUrl" xml:space="preserve">
+    <value>Не заданы классификаторы или адрес Ario.</value>
+  </data>
 </root>

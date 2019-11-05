@@ -23,10 +23,8 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <param name="responsibleId">ИД сотрудника, ответственного за обработку захваченных документов.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
-    public virtual void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo, string filesInfo, string folder,
-                                               string responsibleId, string firstPageClassifierName, string typeClassifierName)
+    public virtual void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo,
+                                               string filesInfo, string folder, string responsibleId)
     {
       // Найти ответственного.
       Logger.Debug("Begin of captured package processing...");
@@ -34,18 +32,14 @@ namespace Sungero.Capture.Client
       if (responsible == null)
         throw new ApplicationException(Resources.InvalidResponsibleId);
       
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
-      if (string.IsNullOrEmpty(arioUrl))
-        throw new ApplicationException(Resources.EmptyArioUrl);
-      
       // Захват с почты.
       var source = GetSourceType(deviceInfo);
       if (source == Constants.Module.CaptureSourceType.Mail)
-        ProcessEmailPackage(filesInfo, folder, instanceInfo, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
+        ProcessEmailPackage(filesInfo, folder, instanceInfo, responsible);
       
       // Захват с папки (сканера).
       if (source == Constants.Module.CaptureSourceType.Folder)
-        ProcessScanPackage(filesInfo, folder, arioUrl, firstPageClassifierName, typeClassifierName, responsible);
+        ProcessScanPackage(filesInfo, folder, responsible);
     }
     
     /// <summary>
@@ -86,13 +80,8 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
-    /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    public virtual void ProcessEmailPackage(string filesInfo, string folder, string instanceInfo,
-                                            string arioUrl, string firstPageClassifierName, string typeClassifierName,
-                                            Sungero.Company.IEmployee responsible)
+    public virtual void ProcessEmailPackage(string filesInfo, string folder, string instanceInfo, Sungero.Company.IEmployee responsible)
     {
       Logger.Debug("Captured Package Process. Captured package type is MAIL.");
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
@@ -127,7 +116,7 @@ namespace Sungero.Capture.Client
         attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
         
         Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", fileName);
-        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(attachment.Path, arioUrl, firstPageClassifierName, typeClassifierName, false);
+        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(attachment.Path, false);
         if (string.IsNullOrWhiteSpace(classificationAndExtractionResponse.Error))
         {
           Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", fileName);
@@ -341,13 +330,8 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    public virtual void ProcessScanPackage(string filesInfo, string folder,
-                                           string arioUrl, string firstPageClassifierName, string typeClassifierName,
-                                           Sungero.Company.IEmployee responsible)
+    public virtual void ProcessScanPackage(string filesInfo, string folder, Sungero.Company.IEmployee responsible)
     {
       var packagesPaths = GetScannedPackagesPaths(filesInfo, folder);
       if (!packagesPaths.Any())
@@ -355,7 +339,7 @@ namespace Sungero.Capture.Client
       
       foreach (var packagePath in packagesPaths)
       {
-        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(packagePath, arioUrl, firstPageClassifierName, typeClassifierName);
+        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(packagePath);
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileDto();
         originalFile.Path = packagePath;
@@ -414,16 +398,9 @@ namespace Sungero.Capture.Client
     /// Выполнить классификацию и распознавание для документа.
     /// </summary>
     /// <param name="filePath">Путь к классифицируемому файлу.</param>
-    /// <param name="arioUrl">Host Ario.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    public virtual Structures.Module.ArioResponse TryClassifyAndExtractFacts(string filePath,
-                                                                             string arioUrl,
-                                                                             string firstPageClassifierName,
-                                                                             string typeClassifierName,
-                                                                             bool throwOnError = true)
+    public virtual Structures.Module.ArioResponse TryClassifyAndExtractFacts(string filePath, bool throwOnError = true)
     {
       var classificationAndExtractionResponse = Structures.Module.ArioResponse.Create();
       if (!CanArioProcessFile(filePath))
@@ -432,7 +409,7 @@ namespace Sungero.Capture.Client
         return classificationAndExtractionResponse;
       }
       
-      var processResult = ProcessPackage(filePath, arioUrl, firstPageClassifierName, typeClassifierName);
+      var processResult = ProcessPackage(filePath);
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
       classificationAndExtractionResponse.Response = processResult;
       if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
@@ -450,25 +427,24 @@ namespace Sungero.Capture.Client
     /// Разделить пакет на документы, классифицировать и извлечь из документов факты с помощью сервиса Ario.
     /// </summary>
     /// <param name="filePath">Путь к пакету.</param>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типу.</param>
     /// <returns>Json с результатом классификации и извлечения фактов.</returns>
-    public virtual string ProcessPackage(string filePath, string arioUrl, string firstPageClassifierName, string typeClassifierName)
+    public virtual string ProcessPackage(string filePath)
     {
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      var fpClassifier = arioConnector.GetClassifierByName(firstPageClassifierName);
-      if (fpClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
+      if (smartProcessingSettings == null)
+        throw new ApplicationException(Resources.SmartProcessingSettingsNotFound);
       
-      var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
-      if (typeClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      if (string.IsNullOrEmpty(smartProcessingSettings.ArioUrl) ||
+          string.IsNullOrEmpty(smartProcessingSettings.FirstPageClassifierName) ||
+          string.IsNullOrEmpty(smartProcessingSettings.TypeClassifierName))
+        throw new ApplicationException(Resources.EmptyClassifiersOrArioUrl);
+      
+      var arioConnector = new ArioExtensions.ArioConnector(smartProcessingSettings.ArioUrl);
+      var typeClassifierId = smartProcessingSettings.TypeClassifierId.ToString();
+      var fpClassifierId = smartProcessingSettings.FirstPageClassifierId.ToString();
 
-      var fpClassifierId = fpClassifier.Id.ToString();
-      var typeClassifierId = typeClassifier.Id.ToString();
-      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", firstPageClassifierName, fpClassifierId);
-      Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", typeClassifierName, typeClassifierId);
+      Logger.DebugFormat("First page classifier: name - \"{0}\", id - {1}.", smartProcessingSettings.FirstPageClassifierName, fpClassifierId);
+      Logger.DebugFormat("Type classifier: name - \"{0}\", id - {1}.", smartProcessingSettings.TypeClassifierName, typeClassifierId);
       
       var fileName = System.IO.Path.GetFileName(filePath);
       var ruleMapping = GetClassRuleMapping();

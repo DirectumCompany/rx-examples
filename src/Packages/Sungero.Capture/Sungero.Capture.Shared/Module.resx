@@ -225,4 +225,10 @@
   <data name="DocumentWasLockedTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="SmartProcessingSettingsNotFound" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="EmptyClassifiersOrArioUrl" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
