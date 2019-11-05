@@ -94,13 +94,12 @@
       "PreviousPropertyGuid": "92e0c8f8-fb73-438d-a695-d84676db8c1b"
     },
     {
-      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "$type": "Sungero.Metadata.TextPropertyMetadata, Sungero.Metadata",
       "NameGuid": "3c14d97c-fcfb-4719-beb4-92a3a1d9e0f1",
       "Name": "Position",
       "CanBeSearch": false,
       "Code": "Position",
-      "Length": 1000,
-      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.MultilineStringEditorToTextBinder",
       "PreviousPropertyGuid": "ec19a46f-20c5-461c-95d8-5157c446ec0d"
     },
     {
