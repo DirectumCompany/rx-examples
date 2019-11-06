@@ -59,13 +59,13 @@
           "Name": "LimitsGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 60.09
+              "Percentage": 39.03
             },
             {
-              "Percentage": 6.44
+              "Percentage": 7.67
             },
             {
-              "Percentage": 56.23
+              "Percentage": 51.19
             }
           ],
           "ColumnNumber": 0,
@@ -136,10 +136,10 @@
           "Name": "ClassifiersGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 91.87
+              "Percentage": 66.68
             },
             {
-              "Percentage": 8.13
+              "Percentage": 33.33
             }
           ],
           "ColumnNumber": 0,
