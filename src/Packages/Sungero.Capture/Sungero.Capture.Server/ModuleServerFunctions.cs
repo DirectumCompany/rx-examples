@@ -110,15 +110,38 @@ namespace Sungero.Capture.Server
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
     /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
+    /// <returns>Ошибка, если заполнить настройки не удалось.</returns>
     [Remote]
-    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit)
+    public static string SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit,
+                                              string firstPageClassifierName, string typeClassifierName)
     {
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       
+      // Адрес и границы.
       smartProcessingSettings.ArioUrl = arioUrl;
       smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
       smartProcessingSettings.UpperConfidenceLimit = int.Parse(upperConfidenceLimit);
+      
+      // Классификаторы.
+      var arioClassifiers = Functions.SmartProcessingSetting.GetArioClassifiers(smartProcessingSettings);
+      var arioFirstPageClassifier = arioClassifiers.Where(a => a.Name == firstPageClassifierName).FirstOrDefault();
+      var arioTypeClassifier = arioClassifiers.Where(a => a.Name == typeClassifierName).FirstOrDefault();
+      
+      if (arioFirstPageClassifier == null)
+        return Resources.ClassifierNotFoundFormat(firstPageClassifierName);
+      
+      if (arioTypeClassifier == null)
+        return Resources.ClassifierNotFoundFormat(typeClassifierName);
+      
+      smartProcessingSettings.FirstPageClassifierName = arioFirstPageClassifier.Name;
+      smartProcessingSettings.FirstPageClassifierId = arioFirstPageClassifier.Id;
+      smartProcessingSettings.TypeClassifierName = arioTypeClassifier.Name;
+      smartProcessingSettings.TypeClassifierId = arioTypeClassifier.Id;
       smartProcessingSettings.Save();
+      
+      return string.Empty;
     }
     
     #endregion

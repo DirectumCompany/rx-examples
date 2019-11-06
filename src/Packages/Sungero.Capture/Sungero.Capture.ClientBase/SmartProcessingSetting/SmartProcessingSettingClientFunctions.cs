@@ -17,7 +17,7 @@ namespace Sungero.Capture.Client
     public Sungero.Capture.Structures.SmartProcessingSetting.Classifier RunClassifierSelectionDialog(string dialogTitle)
     {
       var resources = Sungero.Capture.SmartProcessingSettings.Resources;
-      var classifiers = Functions.SmartProcessingSetting.Remote.GetClassifiers(_obj);
+      var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
       if (!classifiers.Any())
       {
         Dialogs.NotifyMessage(resources.ClassifierSelectionError);

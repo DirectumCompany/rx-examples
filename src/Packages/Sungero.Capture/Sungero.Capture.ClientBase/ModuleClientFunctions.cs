@@ -65,9 +65,18 @@ namespace Sungero.Capture.Client
     /// <param name="arioUrl">Адрес Арио.</param>
     /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
     /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit)
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
+    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit, 
+                                              string firstPageClassifierName, string typeClassifierName)
     {
-      Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, lowerConfidenceLimit, upperConfidenceLimit);
+      var errorMessage = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, 
+                                                                                        lowerConfidenceLimit,
+                                                                                        upperConfidenceLimit,
+                                                                                        firstPageClassifierName, 
+                                                                                        typeClassifierName);
+      if (!string.IsNullOrWhiteSpace(errorMessage))
+        throw new ApplicationException(errorMessage);
     }
     
     #endregion

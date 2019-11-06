@@ -59,13 +59,13 @@
           "Name": "LimitsGroup",
           "ColumnDefinitions": [
             {
-              "Percentage": 39.03
+              "Percentage": 39.87
             },
             {
-              "Percentage": 7.67
+              "Percentage": 7.84
             },
             {
-              "Percentage": 51.19
+              "Percentage": 52.29
             }
           ],
           "ColumnNumber": 0,

@@ -63,7 +63,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <returns>Список классификаторов.</returns>
     [Remote]
-    public virtual List<Structures.SmartProcessingSetting.Classifier> GetClassifiers()
+    public virtual List<Structures.SmartProcessingSetting.Classifier> GetArioClassifiers()
     {
       var classifiers = new List<Structures.SmartProcessingSetting.Classifier>();
       try
