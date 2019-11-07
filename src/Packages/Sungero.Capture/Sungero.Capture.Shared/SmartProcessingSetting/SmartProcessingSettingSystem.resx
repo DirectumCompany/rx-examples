@@ -121,25 +121,25 @@
     <value>Name</value>
   </data>
   <data name="DisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Smart Processing Settings</value>
   </data>
   <data name="AccusativeDisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Smart Processing Settings</value>
   </data>
   <data name="CollectionDisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Smart Processing Settings</value>
   </data>
   <data name="Property_ArioUrl" xml:space="preserve">
-    <value>TODO</value>
+    <value>Ario service address</value>
   </data>
   <data name="Property_LowerConfidenceLimit" xml:space="preserve">
-    <value>TODO</value>
+    <value>Lower bound</value>
   </data>
   <data name="Property_UpperConfidenceLimit" xml:space="preserve">
-    <value>TODO</value>
+    <value>Upper bound</value>
   </data>
   <data name="ControlGroup_e6f622ba0dbc4e149a1465ce781200d1" xml:space="preserve">
-    <value>TODO</value>
+    <value>Confidence interval for extracted facts</value>
   </data>
   <data name="Property_LimitsDescription" xml:space="preserve">
     <value>TODO</value>
@@ -162,8 +162,8 @@
   <data name="Action_CheckConnectionConfirmationDescription" xml:space="preserve">
     <value />
   </data>
-  <data name="Ribbon_Group_9e628784160545898b4be1dda07f0f0b" xml:space="preserve">
-    <value>TODO</value>
+  <data name="Ribbon_ArioService_9e628784160545898b4be1dda07f0f0b" xml:space="preserve">
+    <value>Ario Service</value>
   </data>
   <data name="ControlGroup_1065954c74624c9583bfd3edbff942f3" xml:space="preserve">
     <value>TODO</value>

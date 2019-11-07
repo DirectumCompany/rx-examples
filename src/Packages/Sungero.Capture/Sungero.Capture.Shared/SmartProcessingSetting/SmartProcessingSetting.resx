@@ -121,13 +121,15 @@
     <value>%</value>
   </data>
   <data name="LimitsDecriptionValue" xml:space="preserve">
-    <value>TODO</value>
+    <value>The fact field is green if the fact reliability is above the upper confidence interval bound.
+If the field is yellow, the fact reliability is within the lower and upper confidence interval bounds.
+The blank field means that the fact reliability is below the lower confidence interval bound.</value>
   </data>
   <data name="ArioConnectionEstablished" xml:space="preserve">
-    <value>TODO</value>
+    <value>Connected to the Ario service.</value>
   </data>
   <data name="ArioConnectionError" xml:space="preserve">
-    <value>TODO</value>
+    <value>An error occurred while connecting to the service. Make sure that the Internet connection is active and the Ario Smart Service is available at the specified address.</value>
   </data>
   <data name="Classifier" xml:space="preserve">
     <value>Classifier</value>

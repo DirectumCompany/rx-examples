@@ -442,7 +442,7 @@
     "Groups": [
       {
         "NameGuid": "9e628784-1605-4589-8b4b-e1dda07f0f0b",
-        "Name": "Group",
+        "Name": "ArioService",
         "IconName": null,
         "Index": 21,
         "ParentGuid": "21a31627-5f58-4416-8c4a-90f538ee2e57",
