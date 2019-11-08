@@ -513,7 +513,8 @@ namespace Sungero.Capture.Client
         { ArioClassNames.TaxInvoice, ArioGrammarNames.TaxInvoice},
         { ArioClassNames.TaxinvoiceCorrection, ArioGrammarNames.TaxinvoiceCorrection},
         { ArioClassNames.IncomingInvoice, ArioGrammarNames.IncomingInvoice},
-        { ArioClassNames.Contract, ArioGrammarNames.Contract}
+        { ArioClassNames.Contract, ArioGrammarNames.Contract},
+        { ArioClassNames.SupAgreement, ArioGrammarNames.SupAgreement}
       };
     }
     
