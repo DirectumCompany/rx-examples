@@ -1985,7 +1985,7 @@ namespace Sungero.Capture.Server
       FillDocumentKind(document);
       
       // Заполнить данные нашей стороны и корреспондента.
-      FillBusinessUnitAndCounterpartyInContractualDocument(recognitionResult, responsible, document);
+      FillContractualDocumentBusinessUnitAndCounterparty(recognitionResult, responsible, document);
       
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -2011,7 +2011,7 @@ namespace Sungero.Capture.Server
       FillDocumentKind(document);
 
       // Заполнить данные нашей стороны и корреспондента.
-      FillBusinessUnitAndCounterpartyInContractualDocument(recognitionResult, responsible, document);
+      FillContractualDocumentBusinessUnitAndCounterparty(recognitionResult, responsible, document);
       
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -2894,31 +2894,31 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный за верификацию.</param>
     /// <param name="document">Договорной документ.</param>
-    public virtual void FillBusinessUnitAndCounterpartyInContractualDocument(Structures.Module.IRecognitionResult recognitionResult,
-                                                                             Sungero.Company.IEmployee responsible,
-                                                                             Sungero.Contracts.IContractualDocument document)
+    public virtual void FillContractualDocumentBusinessUnitAndCounterparty(Structures.Module.IRecognitionResult recognitionResult,
+                                                                           Sungero.Company.IEmployee responsible,
+                                                                           Sungero.Contracts.IContractualDocument document)
     {
-      var BusinessUnitPropertyName = document.Info.Properties.BusinessUnit.Name;
-      var CounterpartyPropertyName = document.Info.Properties.Counterparty.Name;
+      var businessUnitPropertyName = document.Info.Properties.BusinessUnit.Name;
+      var counterpartyPropertyName = document.Info.Properties.Counterparty.Name;
       
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
       
       var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts,
-                                                                     BusinessUnitPropertyName,
+                                                                     businessUnitPropertyName,
                                                                      responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, BusinessUnitPropertyName,
+      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, businessUnitPropertyName,
                           document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       // Заполнить данные корреспондента.
       // Убираем уже использованный факт для подбора НОР, чтобы организация не искалась по тем же реквизитам что и НОР.
       if (document.BusinessUnit != null)
         recognitionResult.Facts.Remove(businessUnitWithFact.Fact);
-      var сounterparty = GetCounterparty(recognitionResult, CounterpartyPropertyName);
+      var сounterparty = GetCounterparty(recognitionResult, counterpartyPropertyName);
       if (сounterparty != null)
       {
         document.Counterparty = сounterparty.Counterparty;
-        LinkFactAndProperty(recognitionResult, сounterparty.Fact, null, CounterpartyPropertyName,
+        LinkFactAndProperty(recognitionResult, сounterparty.Fact, null, counterpartyPropertyName,
                             document.Counterparty, сounterparty.IsTrusted);
       }
     }
