@@ -149,4 +149,7 @@
   <data name="ClassifierDisplayNameTemplate" xml:space="preserve">
     <value>{0} (ИД {1})</value>
   </data>
+  <data name="ClassifiersSelectionNotAvailable" xml:space="preserve">
+    <value>Выбор классификаторов доступен только администратору.</value>
+  </data>
 </root>

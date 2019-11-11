@@ -149,4 +149,7 @@ The blank field means that the fact reliability is below the lower confidence in
   <data name="ClassifierDisplayNameTemplate" xml:space="preserve">
     <value>{0} (ID {1})</value>
   </data>
+  <data name="ClassifiersSelectionNotAvailable" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
