@@ -1985,7 +1985,7 @@ namespace Sungero.Capture.Server
       FillDocumentKind(document);
       
       // Заполнить данные нашей стороны и корреспондента.
-      FillBusinessUnitAndCounterparty(recognitionResult, responsible, document);
+      FillBusinessUnitAndCounterpartyInContractualDocument(recognitionResult, responsible, document);
       
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -2011,7 +2011,7 @@ namespace Sungero.Capture.Server
       FillDocumentKind(document);
 
       // Заполнить данные нашей стороны и корреспондента.
-      FillBusinessUnitAndCounterparty(recognitionResult, responsible, document);
+      FillBusinessUnitAndCounterpartyInContractualDocument(recognitionResult, responsible, document);
       
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
@@ -2515,34 +2515,31 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить наименования факта с полями наименования и ОПФ организации.
+    /// Получить название факта контрагента с названиями полей наименования и ОПФ.
     /// </summary>
-    /// <param name="predictedClass">Класс документа.</param>
+    /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <returns>Наименование факта, наименования полей с наименованием и ОПФ организации.</returns>
-    public virtual CounterpartyFactAndFieldsName GetCounterpartyFactAndFieldsName(string predictedClass)
+    public virtual CounterpartyFactNames GetCounterpartyFactNames(string predictedClass)
     {
-      var counterpartyFactName = string.Empty;
-      var counterpartyNameField = string.Empty;
-      var counterpartyLegalFormField = string.Empty;
-      var counterpartyFactAndFieldsName = CounterpartyFactAndFieldsName.Create();
+      var counterpartyFactNames = CounterpartyFactNames.Create();
       
       // Если пришло входящее письмо
       if (predictedClass == ArioClassNames.Letter)
       {
-        counterpartyFactAndFieldsName.FactName = FactNames.Letter;
-        counterpartyFactAndFieldsName.NameField = FieldNames.Letter.CorrespondentName;
-        counterpartyFactAndFieldsName.LegalFormField = FieldNames.Letter.CorrespondentLegalForm;
+        counterpartyFactNames.Fact = FactNames.Letter;
+        counterpartyFactNames.NameField = FieldNames.Letter.CorrespondentName;
+        counterpartyFactNames.LegalFormField = FieldNames.Letter.CorrespondentLegalForm;
       }
       
       // Если пришел договорной документ
       if ((predictedClass == ArioClassNames.Contract) ||
           (predictedClass == ArioClassNames.SupAgreement))
       {
-        counterpartyFactAndFieldsName.FactName = FactNames.Counterparty;
-        counterpartyFactAndFieldsName.NameField = FieldNames.Counterparty.Name;
-        counterpartyFactAndFieldsName.LegalFormField = FieldNames.Counterparty.LegalForm;
+        counterpartyFactNames.Fact = FactNames.Counterparty;
+        counterpartyFactNames.NameField = FieldNames.Counterparty.Name;
+        counterpartyFactNames.LegalFormField = FieldNames.Counterparty.LegalForm;
       }
-      return counterpartyFactAndFieldsName;
+      return counterpartyFactNames;
     }
     
     /// <summary>
@@ -2561,17 +2558,17 @@ namespace Sungero.Capture.Server
       
       var facts = recognitionResult.Facts;
       
-      var counterpartyFactAndFieldsName = GetCounterpartyFactAndFieldsName(recognitionResult.PredictedClass);
+      var counterpartyFactNames = GetCounterpartyFactNames(recognitionResult.PredictedClass);
       
       // Подобрать контрагентов подходящих по имени для переданных фактов.
-      foreach (var fact in GetFacts(facts, counterpartyFactAndFieldsName.FactName, counterpartyFactAndFieldsName.NameField))
+      foreach (var fact in GetFacts(facts, counterpartyFactNames.Fact, counterpartyFactNames.NameField))
       {
         // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
         var verifiedCounterparty = GetCounterpartyByVerifiedData(fact, propertyName);
         if (verifiedCounterparty != null)
           return verifiedCounterparty;
 
-        var name = GetCounterpartyName(fact, counterpartyFactAndFieldsName.NameField, counterpartyFactAndFieldsName.LegalFormField);
+        var name = GetCounterpartyName(fact, counterpartyFactNames.NameField, counterpartyFactNames.LegalFormField);
         correspondentNames.Add(name);
         
         var counterparties = actualCounterparties.Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
@@ -2829,15 +2826,16 @@ namespace Sungero.Capture.Server
     {
       var facts = recognitionResult.Facts;
       
-      var counterpartyFactAndFieldsName = GetCounterpartyFactAndFieldsName(recognitionResult.PredictedClass);
+      var counterpartyFactNames = GetCounterpartyFactNames(recognitionResult.PredictedClass);
       
       // Получить факты с наименованиями организаций.
       var businessUnitsByName = new List<Capture.Structures.Module.CounterpartyFactMatching>();
-      var correspondentNameFacts = GetFacts(facts, counterpartyFactAndFieldsName.FactName, counterpartyFactAndFieldsName.NameField)
-        .OrderByDescending(x => x.Fields.First(f => f.Name == counterpartyFactAndFieldsName.NameField).Probability);
+      var correspondentNameFacts = GetFacts(facts, counterpartyFactNames.Fact, counterpartyFactNames.NameField)
+        .OrderByDescending(x => x.Fields.First(f => f.Name == counterpartyFactNames.NameField).Probability);
+      
       foreach (var fact in correspondentNameFacts)
       {
-        var name = GetCounterpartyName(fact, counterpartyFactAndFieldsName.NameField, counterpartyFactAndFieldsName.LegalFormField);
+        var name = GetCounterpartyName(fact, counterpartyFactNames.NameField, counterpartyFactNames.LegalFormField);
         
         var businessUnits = BusinessUnits.GetAll()
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
@@ -2891,36 +2889,36 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить свойства НОР и КА в карточке документа.
+    /// Заполнить свойства НОР и КА в карточке договорного документа.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный за верификацию.</param>
-    /// <param name="document">Документ.</param>
-    public virtual void FillBusinessUnitAndCounterparty(Structures.Module.IRecognitionResult recognitionResult,
-                                                        Sungero.Company.IEmployee responsible,
-                                                        Sungero.Contracts.IContractualDocument document)
+    /// <param name="document">Договорной документ.</param>
+    public virtual void FillBusinessUnitAndCounterpartyInContractualDocument(Structures.Module.IRecognitionResult recognitionResult,
+                                                                             Sungero.Company.IEmployee responsible,
+                                                                             Sungero.Contracts.IContractualDocument document)
     {
-      var facts = recognitionResult.Facts;
-      var documentProperties = document.Info.Properties;
+      var BusinessUnitPropertyName = document.Info.Properties.BusinessUnit.Name;
+      var CounterpartyPropertyName = document.Info.Properties.Counterparty.Name;
       
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
       
       var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts,
-                                                                     documentProperties.BusinessUnit.Name,
+                                                                     BusinessUnitPropertyName,
                                                                      responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, documentProperties.BusinessUnit.Name,
+      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, BusinessUnitPropertyName,
                           document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       // Заполнить данные корреспондента.
       // Убираем уже использованный факт для подбора НОР, чтобы организация не искалась по тем же реквизитам что и НОР.
       if (document.BusinessUnit != null)
-        facts.Remove(businessUnitWithFact.Fact);
-      var сounterparty = GetCounterparty(recognitionResult, documentProperties.Counterparty.Name);
+        recognitionResult.Facts.Remove(businessUnitWithFact.Fact);
+      var сounterparty = GetCounterparty(recognitionResult, CounterpartyPropertyName);
       if (сounterparty != null)
       {
         document.Counterparty = сounterparty.Counterparty;
-        LinkFactAndProperty(recognitionResult, сounterparty.Fact, null, documentProperties.Counterparty.Name,
+        LinkFactAndProperty(recognitionResult, сounterparty.Fact, null, CounterpartyPropertyName,
                             document.Counterparty, сounterparty.IsTrusted);
       }
     }

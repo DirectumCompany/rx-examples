@@ -109,10 +109,10 @@ namespace Sungero.Capture.Structures.Module
     /// <summary>
   /// Наименования факта и полей для организаций.
   /// </summary>
-  partial class CounterpartyFactAndFieldsName
+  partial class CounterpartyFactNames
   {
     // Наименование факта с данными организации.
-    public string FactName { get; set; }
+    public string Fact { get; set; }
     
     // Наименование поля с наименованием организации.
     public string NameField { get; set; }
