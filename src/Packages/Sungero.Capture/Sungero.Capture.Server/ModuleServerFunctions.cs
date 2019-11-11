@@ -2554,9 +2554,7 @@ namespace Sungero.Capture.Server
     public virtual Structures.Module.CounterpartyFactMatching GetCounterparty(Structures.Module.IRecognitionResult recognitionResult, string propertyName)
     {
       var actualCounterparties = Counterparties.GetAll()
-        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
-        .Where(x => x.Note == null ||
-               !x.Note.Equals(BusinessUnits.Resources.BusinessUnitComment));
+        .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
       
       var foundByName = new List<Structures.Module.CounterpartyFactMatching>();
       var correspondentNames = new List<string>();
