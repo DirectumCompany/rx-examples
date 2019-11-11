@@ -2819,7 +2819,6 @@ namespace Sungero.Capture.Server
       }
       
       businessUnit = businessUnitsWithFacts.FirstOrDefault();
-      businessUnit.IsTrusted = true;
       return businessUnit;
     }
     
@@ -2846,7 +2845,15 @@ namespace Sungero.Capture.Server
           .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed)
           .Where(x => x.Name.Equals(name, StringComparison.InvariantCultureIgnoreCase));
         
-        businessUnitsByName.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null, false)));
+        foreach (var businessUnit in businessUnits)
+        {
+          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
+          counterpartyFactMatching.BusinessUnit = businessUnit;
+          counterpartyFactMatching.Fact = fact;
+          counterpartyFactMatching.IsTrusted = false;
+          
+          businessUnitsByName.Add(counterpartyFactMatching);
+        }
       }
       
       // Если факты с ИНН/КПП не найдены, то вернуть факты с наименованиями организаций.
@@ -2863,7 +2870,16 @@ namespace Sungero.Capture.Server
         var trrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
         var businessUnits = Company.PublicFunctions.BusinessUnit.GetBusinessUnits(tin, trrc);
         var isTrusted = businessUnits.Count == 1;
-        foundByTin.AddRange(businessUnits.Select(x => Capture.Structures.Module.CounterpartyFactMatching.Create(x, null, fact, null, isTrusted)));
+        
+        foreach (var businessUnit in businessUnits)
+        {
+          var counterpartyFactMatching = Structures.Module.CounterpartyFactMatching.Create();
+          counterpartyFactMatching.BusinessUnit = businessUnit;
+          counterpartyFactMatching.Fact = fact;
+          counterpartyFactMatching.IsTrusted = isTrusted;
+          
+          foundByTin.Add(counterpartyFactMatching);
+        }
         
         // Найдено по ИНН/КПП.
         if (foundByTin.Any())
@@ -2882,7 +2898,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный за верификацию.</param>
     /// <param name="document">Документ.</param>
-    public virtual void FillBusinessUnitAndCounterparty(Structures.Module.IRecognitionResult recognitionResult, 
+    public virtual void FillBusinessUnitAndCounterparty(Structures.Module.IRecognitionResult recognitionResult,
                                                         Sungero.Company.IEmployee responsible,
                                                         Sungero.Contracts.IContractualDocument document)
     {
