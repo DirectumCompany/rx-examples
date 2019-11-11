@@ -263,6 +263,9 @@
       "Name": "ArioUrl",
       "CanBeSearch": false,
       "Code": "ArioUrl",
+      "HandledEvents": [
+        "ChangedShared"
+      ],
       "IsShowedInList": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "852222ba-5b2b-4ab8-b9e3-4e0e21f6a1a8"
