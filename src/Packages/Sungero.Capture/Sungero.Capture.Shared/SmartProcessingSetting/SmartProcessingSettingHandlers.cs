@@ -14,11 +14,11 @@ namespace Sungero.Capture
       if (e.NewValue == e.OldValue || e.NewValue == null)
         return;
       
-      var trimedArioUrl = e.NewValue.Trim(' ');
-      if (e.NewValue == trimedArioUrl)
+      var trimmedArioUrl = e.NewValue.Trim(' ');
+      if (e.NewValue == trimmedArioUrl)
         return;
       
-      _obj.ArioUrl = trimedArioUrl;
+      _obj.ArioUrl = trimmedArioUrl;
     }
 
   }
