@@ -119,8 +119,13 @@ namespace Sungero.Capture.Server
     {
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       
-      // Адрес и границы.
+      // Адрес.
       smartProcessingSettings.ArioUrl = arioUrl;
+      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
+      if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+        return validationError.Text;
+      
+      // Границы.
       smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
       smartProcessingSettings.UpperConfidenceLimit = int.Parse(upperConfidenceLimit);
       
