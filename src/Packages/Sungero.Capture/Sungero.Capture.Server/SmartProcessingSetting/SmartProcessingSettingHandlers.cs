@@ -10,13 +10,24 @@ namespace Sungero.Capture
   partial class SmartProcessingSettingServerHandlers
   {
 
+    public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
+    {
+      // Валидация адреса сервиса Ario.
+      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      if (!string.IsNullOrEmpty(validationError.Text))
+      {
+        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+          e.AddError(SmartProcessingSettings.Resources.ArioUrlIsNotValid);
+      }
+    }
+
     public override void Created(Sungero.Domain.CreatedEventArgs e)
     {
       _obj.LowerConfidenceLimit = 40;
       _obj.UpperConfidenceLimit = 80;
       
-      _obj.PercentLabel = Sungero.Capture.SmartProcessingSettings.Resources.PercentLabelValue;
-      _obj.LimitsDescription = Sungero.Capture.SmartProcessingSettings.Resources.LimitsDecriptionValue;
+      _obj.PercentLabel = SmartProcessingSettings.Resources.PercentLabelValue;
+      _obj.LimitsDescription = SmartProcessingSettings.Resources.LimitsDecriptionValue;
     }
   }
 

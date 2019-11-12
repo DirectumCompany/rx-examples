@@ -18,6 +18,20 @@ namespace Sungero.Capture.Shared
     {
       return SmartProcessingSettings.GetAllCached().SingleOrDefault();
     }
-
+    
+    /// <summary>
+    /// Проверить адрес сервиса Ario.
+    /// </summary>
+    /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
+    public virtual Structures.SmartProcessingSetting.ArioUrlValidationError ValidateArioUrl()
+    {
+      var result = Structures.SmartProcessingSetting.ArioUrlValidationError.Create();
+      if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
+      {
+        result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
+        result.Text = SmartProcessingSettings.Resources.ArioUrlIsNotValid;
+      }
+      return result;
+    }
   }
 }

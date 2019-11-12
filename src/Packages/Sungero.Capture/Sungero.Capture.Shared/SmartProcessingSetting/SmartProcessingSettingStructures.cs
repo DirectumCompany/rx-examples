@@ -17,4 +17,16 @@ namespace Sungero.Capture.Structures.SmartProcessingSetting
     // Наименование.
     public string Name { get; set; }
   }
+  
+  /// <summary>
+  /// Ошибка валидации адреса сервиса Ario.
+  /// </summary>
+  partial class ArioUrlValidationError
+  {
+    // Тип ошибки.
+    public string Type  { get; set; }
+    
+    // Текст ошибки.
+    public string Text  { get; set; }
+  }
 }

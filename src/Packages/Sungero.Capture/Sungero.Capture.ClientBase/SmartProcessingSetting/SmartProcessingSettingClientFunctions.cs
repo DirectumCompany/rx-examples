@@ -22,6 +22,16 @@ namespace Sungero.Capture.Client
         Dialogs.ShowMessage(resources.ClassifiersSelectionNotAvailable);
         return null;
       }
+      
+      // Валидация адреса сервиса Ario.
+      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      if (!string.IsNullOrEmpty(validationError.Text))
+      {
+        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+          Dialogs.NotifyMessage(resources.ArioUrlIsNotValid);
+        return null;
+      }
+      
       var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
       if (!classifiers.Any())
       {

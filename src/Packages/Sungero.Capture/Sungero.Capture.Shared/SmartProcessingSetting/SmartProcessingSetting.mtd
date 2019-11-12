@@ -232,7 +232,8 @@
   ],
   "HandledEvents": [
     "CreatedServer",
-    "RefreshClient"
+    "RefreshClient",
+    "BeforeSaveServer"
   ],
   "IconResourcesKeys": [],
   "IsAutoCreated": true,
@@ -386,7 +387,8 @@
     "SelectFirstPageClassifierDialogTitle",
     "SelectedSameClassifierWarning",
     "ClassifierDisplayNameTemplate",
-    "ClassifiersSelectionNotAvailable"
+    "ClassifiersSelectionNotAvailable",
+    "ArioUrlIsNotValid"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "364df7b8-8bc0-4230-9936-88878a5fda09",

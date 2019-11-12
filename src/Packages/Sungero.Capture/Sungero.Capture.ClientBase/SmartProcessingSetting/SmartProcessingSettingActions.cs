@@ -10,11 +10,20 @@ namespace Sungero.Capture.Client
   partial class SmartProcessingSettingActions
   {
     public virtual void CheckConnection(Sungero.Domain.Client.ExecuteActionArgs e)
-    {
+    {      
+      // Валидация адреса сервиса Ario.
+      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      if (!string.IsNullOrEmpty(validationError.Text))
+      {
+        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+          e.AddError(SmartProcessingSettings.Resources.ArioUrlIsNotValid);
+        return;
+      }
+      
       if (Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
-        Dialogs.NotifyMessage(Sungero.Capture.SmartProcessingSettings.Resources.ArioConnectionEstablished);
+        Dialogs.NotifyMessage(SmartProcessingSettings.Resources.ArioConnectionEstablished);
       else
-        e.AddWarning(Sungero.Capture.SmartProcessingSettings.Resources.ArioConnectionError);
+        e.AddWarning(SmartProcessingSettings.Resources.ArioConnectionError);
     }
 
     public virtual bool CanCheckConnection(Sungero.Domain.Client.CanExecuteActionArgs e)
