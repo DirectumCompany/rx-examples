@@ -29,7 +29,7 @@ namespace Sungero.Capture.Shared
       if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
       {
         result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
-        result.Text = SmartProcessingSettings.Resources.ArioUrlIsNotValid;
+        result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
       }
       return result;
     }

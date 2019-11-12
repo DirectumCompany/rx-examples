@@ -17,7 +17,7 @@ namespace Sungero.Capture
       if (!string.IsNullOrEmpty(validationError.Text))
       {
         if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
-          e.AddError(SmartProcessingSettings.Resources.ArioUrlIsNotValid);
+          e.AddError(validationError.Text);
       }
     }
 

@@ -152,7 +152,7 @@
   <data name="ClassifiersSelectionNotAvailable" xml:space="preserve">
     <value>Выбор классификаторов доступен только администратору.</value>
   </data>
-  <data name="ArioUrlIsNotValid" xml:space="preserve">
+  <data name="InvalidArioUrl" xml:space="preserve">
     <value>Введенный адрес сервиса Ario имеет неверный формат.</value>
   </data>
 </root>

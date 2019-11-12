@@ -28,7 +28,7 @@ namespace Sungero.Capture.Client
       if (!string.IsNullOrEmpty(validationError.Text))
       {
         if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
-          Dialogs.NotifyMessage(resources.ArioUrlIsNotValid);
+          Dialogs.NotifyMessage(validationError.Text);
         return null;
       }
       
