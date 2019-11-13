@@ -452,6 +452,19 @@
         "ButtonSize": "Large",
         "Index": -1,
         "ParentGuid": "9e628784-1605-4589-8b4b-e1dda07f0f0b"
+      },
+      {
+        "$type": "Sungero.Metadata.RibbonActionButtonMetadata, Sungero.Metadata",
+        "NameGuid": "e34e3e39-bcb9-4de3-a0ea-849c79ad9dcb",
+        "Name": "Cancel",
+        "ActionGuid": "8049bcb6-eb35-463f-bb18-45090e8b3add",
+        "ButtonSize": "Large",
+        "Index": 50,
+        "IsAncestorMetadata": true,
+        "Overridden": [
+          "ButtonSize"
+        ],
+        "ParentGuid": "f3b0ddcd-9d1e-4ca3-8780-695ae25a9e8b"
       }
     ],
     "Groups": [
