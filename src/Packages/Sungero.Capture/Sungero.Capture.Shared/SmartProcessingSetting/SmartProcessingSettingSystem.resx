@@ -189,4 +189,19 @@
   <data name="Control_1c24ff9555f54df9a3d56cd15f081e65_DisplayValue" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="Action_ForceSave" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Action_ForceSaveDescription" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Action_ForceSaveHint" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="Action_ForceSaveConfirmationMessage" xml:space="preserve">
+    <value />
+  </data>
+  <data name="Action_ForceSaveConfirmationDescription" xml:space="preserve">
+    <value />
+  </data>
 </root>

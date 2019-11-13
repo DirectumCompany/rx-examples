@@ -10,6 +10,14 @@
       "GenerateHandler": true,
       "LargeIconName": "Action_CheckConnection_large_b0f0accd82204febbc458fe6df5c0b21.png",
       "SmallIconName": "Action_CheckConnection_small_b0f0accd82204febbc458fe6df5c0b21.png"
+    },
+    {
+      "NameGuid": "fb3ba7b2-052d-4b1b-b7c8-c132f88efb78",
+      "Name": "ForceSave",
+      "ActionArea": "Card",
+      "GenerateHandler": true,
+      "LargeIconName": null,
+      "SmallIconName": null
     }
   ],
   "BaseGuid": "04581d26-0780-4cfd-b3cd-c2cafc5798b0",

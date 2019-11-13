@@ -28,8 +28,12 @@ namespace Sungero.Capture.Client
       if (!string.IsNullOrEmpty(validationError.Text))
       {
         if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+        {
           Dialogs.NotifyMessage(validationError.Text);
-        return null;
+          return null;
+        }
+        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown)
+          Dialogs.NotifyMessage(validationError.Text);
       }
       
       var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);

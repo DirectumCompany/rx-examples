@@ -19,6 +19,8 @@ namespace Sungero.Capture
       {
         if (isSafeFromUI && validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
           e.AddError(validationError.Text);
+        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown)
+          e.AddError(validationError.Text, _obj.Info.Actions.ForceSave);
       }
     }
 

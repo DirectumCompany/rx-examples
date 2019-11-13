@@ -32,7 +32,11 @@ namespace Sungero.Capture.Shared
         result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
         result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
       }
-      
+      else if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
+      {
+        result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown;
+        result.Text = SmartProcessingSettings.Resources.ArioConnectionError;
+      }
       return result;
     }
     

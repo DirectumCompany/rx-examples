@@ -183,4 +183,7 @@
   <data name="Control_1c24ff9555f54df9a3d56cd15f081e65_DisplayValue" xml:space="preserve">
     <value>Выбрать</value>
   </data>
+  <data name="Action_ForceSave" xml:space="preserve">
+    <value>Сохранить</value>
+  </data>
 </root>
