@@ -23,15 +23,33 @@ namespace Sungero.Capture.Shared
     /// Проверить адрес сервиса Ario.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
-    public virtual Structures.SmartProcessingSetting.ArioUrlValidationError ValidateArioUrl()
+    public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateArioUrl()
     {
-      var result = Structures.SmartProcessingSetting.ArioUrlValidationError.Create();
+      // Проверка что адрес Ario не "кривой".
+      var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
       if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
       {
         result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
         result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
       }
+      
       return result;
     }
+    
+    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateArioUrlToList()
+    {
+      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
+      
+      // Проверка что адрес Ario не "кривой".
+      if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
+      {
+        var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
+        result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
+        result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
+        messages.Add(result);
+      }
+      
+      return messages;
+    }    
   }
 }

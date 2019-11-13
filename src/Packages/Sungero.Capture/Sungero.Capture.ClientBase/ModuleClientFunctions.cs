@@ -70,13 +70,21 @@ namespace Sungero.Capture.Client
     public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit, 
                                               string firstPageClassifierName, string typeClassifierName)
     {
-      var errorMessage = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, 
+      var errorMessages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, 
                                                                                         lowerConfidenceLimit,
                                                                                         upperConfidenceLimit,
                                                                                         firstPageClassifierName, 
                                                                                         typeClassifierName);
-      if (!string.IsNullOrWhiteSpace(errorMessage))
-        throw new ApplicationException(errorMessage);
+      
+      var warnings = errorMessages.Where(m => m.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown);
+      foreach (var warning in warnings)
+        Logger.Debug(warning.Text);
+      
+      var error = errorMessages
+        .Where(m => m.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+        .FirstOrDefault();
+      if (error != null)
+        throw new ApplicationException(error.Text);
     }
     
     #endregion

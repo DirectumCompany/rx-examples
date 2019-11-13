@@ -114,16 +114,19 @@ namespace Sungero.Capture.Server
     /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
     /// <returns>Ошибка, если заполнить настройки не удалось.</returns>
     [Remote]
-    public static string SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit,
-                                              string firstPageClassifierName, string typeClassifierName)
+    public static List<Structures.SmartProcessingSetting.SettingsValidationMessage> SetCaptureMainSettings(string arioUrl, 
+                                                                                                        string lowerConfidenceLimit, 
+                                                                                                        string upperConfidenceLimit,
+                                                                                                        string firstPageClassifierName, 
+                                                                                                        string typeClassifierName)
     {
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       
       // Адрес.
       smartProcessingSettings.ArioUrl = arioUrl;
-      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
-      if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
-        return validationError.Text;
+      var validationMessages = Functions.SmartProcessingSetting.ValidateArioUrlToList(smartProcessingSettings);
+      if (validationMessages.Any())
+        return validationMessages;
       
       // Границы.
       smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
@@ -134,11 +137,23 @@ namespace Sungero.Capture.Server
       var arioFirstPageClassifier = arioClassifiers.Where(a => a.Name == firstPageClassifierName).FirstOrDefault();
       var arioTypeClassifier = arioClassifiers.Where(a => a.Name == typeClassifierName).FirstOrDefault();
       
+      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
       if (arioFirstPageClassifier == null)
-        return Resources.ClassifierNotFoundFormat(firstPageClassifierName);
-      
+      {
+        var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
+        message.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown;
+        message.Text = Resources.ClassifierNotFoundFormat(firstPageClassifierName);
+        messages.Add(message);
+      }
       if (arioTypeClassifier == null)
-        return Resources.ClassifierNotFoundFormat(typeClassifierName);
+      {
+        var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
+        message.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown;
+        message.Text = Resources.ClassifierNotFoundFormat(typeClassifierName);
+        messages.Add(message);
+      }
+      if (messages.Any())
+        return messages;
       
       smartProcessingSettings.FirstPageClassifierName = arioFirstPageClassifier.Name;
       smartProcessingSettings.FirstPageClassifierId = arioFirstPageClassifier.Id;
@@ -146,7 +161,7 @@ namespace Sungero.Capture.Server
       smartProcessingSettings.TypeClassifierId = arioTypeClassifier.Id;
       smartProcessingSettings.Save();
       
-      return string.Empty;
+      return new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
     }
     
     #endregion
