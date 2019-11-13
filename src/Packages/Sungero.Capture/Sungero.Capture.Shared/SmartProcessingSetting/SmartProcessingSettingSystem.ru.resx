@@ -184,6 +184,6 @@
     <value>Выбрать</value>
   </data>
   <data name="Action_ForceSave" xml:space="preserve">
-    <value>Сохранить как есть</value>
+    <value>Сохранить настройки</value>
   </data>
 </root>

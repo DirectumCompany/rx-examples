@@ -28,7 +28,7 @@ namespace Sungero.Capture.Client
       var message = arioUrlValidationMessages.FirstOrDefault();
       if (message != null)
       {
-        Dialogs.ShowMessage(message.Text, MessageType.Error);
+        Dialogs.ShowMessage(message.Text, MessageType.Information);
         return null;
       }
       

@@ -153,7 +153,7 @@
     <value>Выбор классификаторов доступен только администратору.</value>
   </data>
   <data name="InvalidArioUrl" xml:space="preserve">
-    <value>Введенный адрес сервиса Ario имеет неверный формат.</value>
+    <value>Адрес сервиса Ario должен соответствовать формату URL.</value>
   </data>
   <data name="SmartProcessingSettings" xml:space="preserve">
     <value>Настройки интеллектуальной обработки</value>
