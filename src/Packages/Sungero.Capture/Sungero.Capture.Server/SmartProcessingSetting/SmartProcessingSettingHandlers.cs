@@ -13,10 +13,11 @@ namespace Sungero.Capture
     public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
     {
       // Валидация адреса сервиса Ario.
+      var isSafeFromUI = e.Params.Contains(Constants.SmartProcessingSetting.SaveFromUIParamName);
       var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
       if (!string.IsNullOrEmpty(validationError.Text))
       {
-        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+        if (isSafeFromUI && validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
           e.AddError(validationError.Text);
       }
     }
@@ -26,6 +27,7 @@ namespace Sungero.Capture
       _obj.LowerConfidenceLimit = 40;
       _obj.UpperConfidenceLimit = 80;
       
+      _obj.Name = SmartProcessingSettings.Resources.SmartProcessingSettings;
       _obj.PercentLabel = SmartProcessingSettings.Resources.PercentLabelValue;
       _obj.LimitsDescription = SmartProcessingSettings.Resources.LimitsDecriptionValue;
     }

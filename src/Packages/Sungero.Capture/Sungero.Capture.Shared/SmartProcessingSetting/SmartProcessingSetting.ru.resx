@@ -155,4 +155,7 @@
   <data name="InvalidArioUrl" xml:space="preserve">
     <value>Введенный адрес сервиса Ario имеет неверный формат.</value>
   </data>
+  <data name="SmartProcessingSettings" xml:space="preserve">
+    <value>Настройки интеллектуальной обработки</value>
+  </data>
 </root>

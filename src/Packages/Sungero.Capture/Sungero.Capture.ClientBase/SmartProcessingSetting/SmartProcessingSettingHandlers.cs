@@ -15,6 +15,8 @@ namespace Sungero.Capture
       _obj.State.Properties.ArioUrl.IsRequired = true;
       _obj.State.Properties.FirstPageClassifierName.IsRequired = true;
       _obj.State.Properties.TypeClassifierName.IsRequired = true;
+      
+      e.Params.AddOrUpdate(Constants.SmartProcessingSetting.SaveFromUIParamName, true);
     }
 
   }
