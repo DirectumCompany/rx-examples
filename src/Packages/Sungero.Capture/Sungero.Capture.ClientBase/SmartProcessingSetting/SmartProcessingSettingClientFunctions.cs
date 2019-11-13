@@ -24,16 +24,12 @@ namespace Sungero.Capture.Client
       }
       
       // Валидация адреса сервиса Ario.
-      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
-      if (!string.IsNullOrEmpty(validationError.Text))
+      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      var message = arioUrlValidationMessages.FirstOrDefault();
+      if (message != null)
       {
-        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
-        {
-          Dialogs.NotifyMessage(validationError.Text);
-          return null;
-        }
-        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown)
-          Dialogs.NotifyMessage(validationError.Text);
+        Dialogs.ShowMessage(message.Text, MessageType.Error);
+        return null;
       }
       
       var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);

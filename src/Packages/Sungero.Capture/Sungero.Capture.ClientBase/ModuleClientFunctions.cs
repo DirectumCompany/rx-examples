@@ -7,6 +7,7 @@ using Sungero.CoreEntities;
 using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
 using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
+using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
 
 namespace Sungero.Capture.Client
 {
@@ -70,18 +71,18 @@ namespace Sungero.Capture.Client
     public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit, 
                                               string firstPageClassifierName, string typeClassifierName)
     {
-      var errorMessages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl, 
-                                                                                        lowerConfidenceLimit,
-                                                                                        upperConfidenceLimit,
-                                                                                        firstPageClassifierName, 
-                                                                                        typeClassifierName);
+      var messages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
+                                                                                    lowerConfidenceLimit,
+                                                                                    upperConfidenceLimit,
+                                                                                    firstPageClassifierName,
+                                                                                    typeClassifierName);
       
-      var warnings = errorMessages.Where(m => m.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown);
+      var warnings = messages.Where(m => m.Type == MessageTypes.Warning);
       foreach (var warning in warnings)
         Logger.Debug(warning.Text);
       
-      var error = errorMessages
-        .Where(m => m.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
+      var error = messages
+        .Where(m => m.Type == MessageTypes.Error)
         .FirstOrDefault();
       if (error != null)
         throw new ApplicationException(error.Text);

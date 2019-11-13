@@ -11,14 +11,17 @@ namespace Sungero.Capture.Constants
     // Имя параметра "Сохранение выполняется через UI".
     public const string SaveFromUIParamName = "Settings Saved From UI";
     
+    // Имя параметра "Сохранить принудительно".
+    public const string ForceSaveParamName = "Settings Force Saved";
+    
     // Типы ошибок при адреса валидации сервиса Ario.
-    public static class ArioUrlValidationErrorTypes
+    public static class SettingsValidationMessageTypes
     {
       // Неправильный формат адреса.
-      public const string WrongFormat = "Wrong format";
+      public const string Error = "Error";
       
       // Сервис недоступен.
-      public const string ServiceIsDown = "Service is down";
+      public const string Warning = "Warning";
     }
     
   }

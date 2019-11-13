@@ -23,24 +23,7 @@ namespace Sungero.Capture.Shared
     /// Проверить адрес сервиса Ario.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
-    public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateArioUrl()
-    {
-      // Проверка что адрес Ario не "кривой".
-      var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-      if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
-      {
-        result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
-        result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
-      }
-      else if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
-      {
-        result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown;
-        result.Text = SmartProcessingSettings.Resources.ArioConnectionError;
-      }
-      return result;
-    }
-    
-    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateArioUrlToList()
+    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateArioUrl()
     {
       var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
       
@@ -48,8 +31,15 @@ namespace Sungero.Capture.Shared
       if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
       {
         var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        result.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat;
+        result.Type = Constants.SmartProcessingSetting.SettingsValidationMessageTypes.Error;
         result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
+        messages.Add(result);
+      }
+      else if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
+      {
+        var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
+        result.Type = Constants.SmartProcessingSetting.SettingsValidationMessageTypes.Warning;
+        result.Text = SmartProcessingSettings.Resources.ArioConnectionError;
         messages.Add(result);
       }
       

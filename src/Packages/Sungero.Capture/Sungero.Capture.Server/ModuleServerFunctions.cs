@@ -18,6 +18,7 @@ using FactNames = Sungero.Capture.Constants.Module.FactNames;
 using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
 using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
+using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
 
 namespace Sungero.Capture.Server
 {
@@ -114,19 +115,19 @@ namespace Sungero.Capture.Server
     /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
     /// <returns>Ошибка, если заполнить настройки не удалось.</returns>
     [Remote]
-    public static List<Structures.SmartProcessingSetting.SettingsValidationMessage> SetCaptureMainSettings(string arioUrl, 
-                                                                                                        string lowerConfidenceLimit, 
-                                                                                                        string upperConfidenceLimit,
-                                                                                                        string firstPageClassifierName, 
-                                                                                                        string typeClassifierName)
+    public static List<Structures.SmartProcessingSetting.SettingsValidationMessage> SetCaptureMainSettings(string arioUrl,
+                                                                                                           string lowerConfidenceLimit,
+                                                                                                           string upperConfidenceLimit,
+                                                                                                           string firstPageClassifierName,
+                                                                                                           string typeClassifierName)
     {
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       
       // Адрес.
       smartProcessingSettings.ArioUrl = arioUrl;
-      var validationMessages = Functions.SmartProcessingSetting.ValidateArioUrlToList(smartProcessingSettings);
-      if (validationMessages.Any())
-        return validationMessages;
+      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
+      if (arioUrlValidationMessages.Any())
+        return arioUrlValidationMessages;
       
       // Границы.
       smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
@@ -141,14 +142,14 @@ namespace Sungero.Capture.Server
       if (arioFirstPageClassifier == null)
       {
         var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        message.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown;
+        message.Type = MessageTypes.Error;
         message.Text = Resources.ClassifierNotFoundFormat(firstPageClassifierName);
         messages.Add(message);
       }
       if (arioTypeClassifier == null)
       {
         var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        message.Type = Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown;
+        message.Type = MessageTypes.Error;
         message.Text = Resources.ClassifierNotFoundFormat(typeClassifierName);
         messages.Add(message);
       }
@@ -161,7 +162,7 @@ namespace Sungero.Capture.Server
       smartProcessingSettings.TypeClassifierId = arioTypeClassifier.Id;
       smartProcessingSettings.Save();
       
-      return new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
+      return messages;
     }
     
     #endregion

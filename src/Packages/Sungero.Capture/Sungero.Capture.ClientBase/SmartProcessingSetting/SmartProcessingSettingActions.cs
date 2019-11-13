@@ -4,6 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Capture.SmartProcessingSetting;
+using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
 
 namespace Sungero.Capture.Client
 {
@@ -11,6 +12,7 @@ namespace Sungero.Capture.Client
   {
     public virtual void ForceSave(Sungero.Domain.Client.ExecuteActionArgs e)
     {
+      e.Params.AddOrUpdate(Constants.SmartProcessingSetting.ForceSaveParamName, true);
       _obj.Save();
     }
 
@@ -22,13 +24,17 @@ namespace Sungero.Capture.Client
     public virtual void CheckConnection(Sungero.Domain.Client.ExecuteActionArgs e)
     {
       // Валидация адреса сервиса Ario.
-      var validationError = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
-      if (!string.IsNullOrEmpty(validationError.Text))
+      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      if (arioUrlValidationMessages.Any())
       {
-        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.WrongFormat)
-          e.AddError(validationError.Text);
-        if (validationError.Type == Constants.SmartProcessingSetting.ArioUrlValidationErrorTypes.ServiceIsDown)
-          e.AddWarning(validationError.Text);
+        var errorMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Error);
+        foreach (var message in errorMessages)
+          e.AddError(message.Text);
+        
+        var warningMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Warning);
+        foreach (var message in warningMessages)
+          e.AddWarning(message.Text);
+        
         return;
       }
       
