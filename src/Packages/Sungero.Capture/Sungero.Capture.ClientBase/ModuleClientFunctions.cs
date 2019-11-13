@@ -59,35 +59,7 @@ namespace Sungero.Capture.Client
         return Constants.Module.CaptureSourceType.Mail;
       return Constants.Module.CaptureSourceType.Folder;
     }
-    
-    /// <summary>
-    /// Задать основные настройки захвата.
-    /// </summary>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
-    /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit, 
-                                              string firstPageClassifierName, string typeClassifierName)
-    {
-      var messages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
-                                                                                    lowerConfidenceLimit,
-                                                                                    upperConfidenceLimit,
-                                                                                    firstPageClassifierName,
-                                                                                    typeClassifierName);
-      
-      var warnings = messages.Where(m => m.Type == MessageTypes.Warning);
-      foreach (var warning in warnings)
-        Logger.Debug(warning.Text);
-      
-      var error = messages
-        .Where(m => m.Type == MessageTypes.Error)
-        .FirstOrDefault();
-      if (error != null)
-        throw new ApplicationException(error.Text);
-    }
-    
+
     #endregion
     
     #region Обработка пакета с эл. почты
@@ -639,6 +611,34 @@ namespace Sungero.Capture.Client
     #endregion
     
     #region Настройка и тесты
+    
+    /// <summary>
+    /// Задать основные настройки захвата.
+    /// </summary>
+    /// <param name="arioUrl">Адрес Арио.</param>
+    /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
+    /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
+    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
+    /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
+    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit, 
+                                              string firstPageClassifierName, string typeClassifierName)
+    {
+      var messages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
+                                                                                    lowerConfidenceLimit,
+                                                                                    upperConfidenceLimit,
+                                                                                    firstPageClassifierName,
+                                                                                    typeClassifierName);
+      
+      var warnings = messages.Where(m => m.Type == MessageTypes.Warning);
+      foreach (var warning in warnings)
+        Logger.Debug(warning.Text);
+      
+      var error = messages
+        .Where(m => m.Type == MessageTypes.Error)
+        .FirstOrDefault();
+      if (error != null)
+        throw new ApplicationException(error.Text);
+    }
     
     /// <summary>
     /// Включить демо-режим.
