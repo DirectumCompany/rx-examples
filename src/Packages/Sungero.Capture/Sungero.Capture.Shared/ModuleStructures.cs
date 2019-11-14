@@ -105,6 +105,21 @@ namespace Sungero.Capture.Structures.Module
     // Факт, из полей которого были излеченны данные контрагента.
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }
+  
+    /// <summary>
+  /// Наименования факта и полей для организаций.
+  /// </summary>
+  partial class CounterpartyFactNames
+  {
+    // Наименование факта с данными организации.
+    public string Fact { get; set; }
+    
+    // Наименование поля с наименованием организации.
+    public string NameField { get; set; }
+    
+    // Наименование поля с организационно-правовой формой организации.
+    public string LegalFormField { get; set; }
+  }
  
   /// <summary>
   /// Контактное лицо и сопоставленный с ним факт.
@@ -167,7 +182,7 @@ namespace Sungero.Capture.Structures.Module
   }
 
   /// <summary>
-  /// Контрагента, НОР и сопоставленный с ними факт с типом "Контрагент".
+  /// Контрагент, НОР и сопоставленный с ними факт с типом "Контрагент".
   /// </summary>
   partial class CounterpartyFactMatching
   {
