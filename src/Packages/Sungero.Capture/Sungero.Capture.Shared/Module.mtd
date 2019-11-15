@@ -266,6 +266,242 @@
   ],
   "PublicStructures": [
     {
+      "Name": "ArioResponse",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Response",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Error",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "CapturedMailFiles",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Body",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileDto"
+        },
+        {
+          "Name": "Attachments",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Capture.Structures.Module.IFileDto>"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "CapturedMailInfo",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Name",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "FromEmail",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Subject",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "ContactFactMatching",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Contact",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Parties.IContact"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "ContractFactMatching",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Contract",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Contracts.IContractualDocument"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "CounterpartyFactMatching",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "BusinessUnit",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Company.IBusinessUnit"
+        },
+        {
+          "Name": "Counterparty",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Parties.ICounterparty"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        },
+        {
+          "Name": "Type",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "CounterpartyFactNames",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "NameField",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "LegalFormField",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "DocumentParties",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "BusinessUnit",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.ICounterpartyFactMatching"
+        },
+        {
+          "Name": "Counterparty",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.ICounterpartyFactMatching"
+        },
+        {
+          "Name": "ResponsibleEmployeeBusinessUnit",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Company.IBusinessUnit"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "DocumentsCreatedByRecognitionResults",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "LeadingDocumentId",
+          "TypeFullName": "global::System.Int32"
+        },
+        {
+          "Name": "RelatedDocumentIds",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::System.Int32>"
+        },
+        {
+          "Name": "DocumentWithRegistrationFailureIds",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::System.Int32>"
+        },
+        {
+          "Name": "DocumentFoundByBarcodeIds",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::System.Int32>"
+        },
+        {
+          "Name": "LockedDocumentIds",
+          "IsList": true,
+          "IsNullable": true,
+          "TypeFullName": "global::System.Collections.Generic.List<global::System.Int32>"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "EmployeeFactMatching",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Employee",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Company.IEmployee"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
       "Name": "Fact",
       "IsPublic": true,
       "Properties": [

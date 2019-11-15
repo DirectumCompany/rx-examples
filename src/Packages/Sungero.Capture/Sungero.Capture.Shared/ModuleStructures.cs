@@ -109,6 +109,7 @@ namespace Sungero.Capture.Structures.Module
     /// <summary>
   /// Наименования факта и полей для организаций.
   /// </summary>
+  [Public]
   partial class CounterpartyFactNames
   {
     // Наименование факта с данными организации.
@@ -124,6 +125,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Контактное лицо и сопоставленный с ним факт.
   /// </summary>
+  [Public]
   partial class ContactFactMatching
   {
     // Контактное лицо.
@@ -139,6 +141,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Сотрудник и сопоставленный с ним факт.
   /// </summary>
+  [Public]
   partial class EmployeeFactMatching
   {
     // Сотрудник.
@@ -154,6 +157,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Договорной документ и сопоставленный с ним факт.
   /// </summary>
+  [Public]
   partial class ContractFactMatching
   {
     // Договорной документ.
@@ -169,13 +173,14 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Результат подбора сторон сделки для документа.
   /// </summary>  
+  [Public]
   partial class DocumentParties
   {
     // НОР.
-    public Sungero.Capture.Structures.Module.CounterpartyFactMatching BusinessUnit { get; set; }
+    public Sungero.Capture.Structures.Module.ICounterpartyFactMatching BusinessUnit { get; set; }
     
     // Контрагент.
-    public Sungero.Capture.Structures.Module.CounterpartyFactMatching Counterparty { get; set; }
+    public Sungero.Capture.Structures.Module.ICounterpartyFactMatching Counterparty { get; set; }
     
     // НОР подобранная из ответственного сотрудника.
     public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
@@ -184,6 +189,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Контрагент, НОР и сопоставленный с ними факт с типом "Контрагент".
   /// </summary>
+  [Public]
   partial class CounterpartyFactMatching
   {
     // НОР.
@@ -205,6 +211,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Файлы захваченного письма.
   /// </summary>
+  [Public]
   partial class CapturedMailFiles
   {
     // Тело письма.
@@ -217,6 +224,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Информация о захваченном письме.
   /// </summary>
+  [Public]
   partial class CapturedMailInfo
   {
     // Имя отправителя.
@@ -232,6 +240,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Ответ от Арио.
   /// </summary>
+  [Public]
   partial class ArioResponse
   {
     // Ответ. Json строка.
@@ -244,6 +253,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Документы, созданные по результатам распознавания.
   /// </summary>
+  [Public]
   partial class DocumentsCreatedByRecognitionResults
   {
     // Ид ведущего документа.

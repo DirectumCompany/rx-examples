@@ -138,7 +138,7 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <returns>Пути до захваченных с почты файлов.</returns>
-    public virtual Structures.Module.CapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
+    public virtual Structures.Module.ICapturedMailFiles GetCapturedMailFiles(string filesInfo, string folder)
     {
       var mailFiles = Structures.Module.CapturedMailFiles.Create();
       mailFiles.Attachments = new List<Structures.Module.IFileDto>();
@@ -214,7 +214,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <returns>Информация о захваченном письме.</returns>
-    public virtual Structures.Module.CapturedMailInfo GetMailInfo(string instanceInfo)
+    public virtual Structures.Module.ICapturedMailInfo GetMailInfo(string instanceInfo)
     {
       var result = Structures.Module.CapturedMailInfo.Create();
       
@@ -390,7 +390,7 @@ namespace Sungero.Capture.Client
     /// <param name="filePath">Путь к классифицируемому файлу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    public virtual Structures.Module.ArioResponse TryClassifyAndExtractFacts(string filePath, bool throwOnError = true)
+    public virtual Structures.Module.IArioResponse TryClassifyAndExtractFacts(string filePath, bool throwOnError = true)
     {
       var classificationAndExtractionResponse = Structures.Module.ArioResponse.Create();
       if (!CanArioProcessFile(filePath))
