@@ -463,7 +463,7 @@ namespace Sungero.Capture.Client
       
       var typeClassifier = arioConnector.GetClassifierByName(typeClassifierName);
       if (typeClassifier == null)
-        throw new ApplicationException(Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+        throw new ApplicationException(Resources.ClassifierNotFoundFormat(typeClassifierName));
 
       var fpClassifierId = fpClassifier.Id.ToString();
       var typeClassifierId = typeClassifier.Id.ToString();
