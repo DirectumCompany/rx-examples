@@ -118,12 +118,1049 @@
   ],
   "PublicConstants": [
     {
+      "Name": "Address",
+      "ParentClasses": [
+        "Module",
+        "InstanceInfosTagNames",
+        "FromTags"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Address\""
+    },
+    {
+      "Name": "Addressee",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Addressee\""
+    },
+    {
+      "Name": "Amount",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "DocumentAmount"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Amount\""
+    },
+    {
+      "Name": "Amount",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Goods"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Amount\""
+    },
+    {
+      "Name": "ArioUrlKey",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"ArioUrl\""
+    },
+    {
+      "Name": "Buyer",
+      "ParentClasses": [
+        "Module",
+        "CounterpartyTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"BUYER\""
+    },
+    {
+      "Name": "CaptureInstanceInfoList",
+      "ParentClasses": [
+        "Module",
+        "InstanceInfosTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CaptureInstanceInfoList\""
+    },
+    {
+      "Name": "CaptureMockModeKey",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CaptureMockMode\""
+    },
+    {
+      "Name": "Consignee",
+      "ParentClasses": [
+        "Module",
+        "CounterpartyTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CONSIGNEE\""
+    },
+    {
+      "Name": "Contract",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Договор\""
+    },
+    {
+      "Name": "Contract",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Contract\""
+    },
+    {
+      "Name": "ContractStatement",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Акт выполненных работ\""
+    },
+    {
+      "Name": "ContractStatement",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"ContractStatement\""
+    },
+    {
+      "Name": "CorrectionDate",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CorrectionDate\""
+    },
+    {
+      "Name": "CorrectionNumber",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CorrectionNumber\""
+    },
+    {
+      "Name": "CorrespondentLegalForm",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CorrespondentLegalForm\""
+    },
+    {
+      "Name": "CorrespondentName",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CorrespondentName\""
+    },
+    {
+      "Name": "Count",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Goods"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Count\""
+    },
+    {
+      "Name": "Counterparty",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Counterparty\""
+    },
+    {
+      "Name": "CounterpartyType",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"CounterpartyType\""
+    },
+    {
+      "Name": "Currency",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "DocumentAmount"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Currency\""
+    },
+    {
+      "Name": "Date",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Date\""
+    },
+    {
+      "Name": "Date",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Document"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Date\""
+    },
+    {
+      "Name": "Date",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Date\""
+    },
+    {
+      "Name": "Document",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Document\""
+    },
+    {
+      "Name": "DocumentAmount",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentAmount\""
+    },
+    {
+      "Name": "DocumentBaseDate",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentBaseDate\""
+    },
+    {
+      "Name": "DocumentBaseName",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentBaseName\""
+    },
+    {
+      "Name": "DocumentBaseNumber",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentBaseNumber\""
+    },
+    {
+      "Name": "DocumentIsLockedParamName",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentIsLocked\""
+    },
+    {
+      "Name": "DocumentNumberingBySmartCaptureResultParamName",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentNumberingBySmartCaptureResult\""
+    },
+    {
+      "Name": "EndTag",
+      "ParentClasses": [
+        "Module",
+        "HtmlTags"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"</html>\""
+    },
+    {
+      "Name": "FileDescription",
+      "ParentClasses": [
+        "Module",
+        "DeviceInfoTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"FileDescription\""
+    },
+    {
+      "Name": "FileDescription",
+      "ParentClasses": [
+        "Module",
+        "InputFilesTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"FileDescription\""
+    },
+    {
+      "Name": "FileName",
+      "ParentClasses": [
+        "Module",
+        "DeviceInfoTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"FileName\""
+    },
+    {
+      "Name": "FileName",
+      "ParentClasses": [
+        "Module",
+        "InputFilesTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"FileName\""
+    },
+    {
+      "Name": "Files",
+      "ParentClasses": [
+        "Module",
+        "DeviceInfoTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Files\""
+    },
+    {
+      "Name": "Files",
+      "ParentClasses": [
+        "Module",
+        "InputFilesTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Files\""
+    },
+    {
+      "Name": "FinancialDocument",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"FinancialDocument\""
+    },
+    {
+      "Name": "FindByBarcodeParamName",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"FindByBarcode\""
+    },
+    {
+      "Name": "Folder",
+      "ParentClasses": [
+        "Module",
+        "CaptureSourceType"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"folder\""
+    },
+    {
+      "Name": "From",
+      "ParentClasses": [
+        "Module",
+        "InstanceInfosTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"From\""
+    },
+    {
+      "Name": "Goods",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Goods\""
+    },
+    {
+      "Name": "Green",
+      "ParentClasses": [
+        "Module",
+        "HighlightsColorCodes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"#E3EFD0\""
+    },
+    {
+      "Name": "Html",
+      "ParentClasses": [
+        "Module",
+        "MailBodyName"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"body.html\""
+    },
+    {
+      "Name": "IncomingInvoice",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Входящий счет на оплату\""
+    },
+    {
+      "Name": "IncomingInvoice",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"IncomingInvoice\""
+    },
+    {
+      "Name": "InputFilesSection",
+      "ParentClasses": [
+        "Module",
+        "InputFilesTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"InputFilesSection\""
+    },
+    {
+      "Name": "LegalForm",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"LegalForm\""
+    },
+    {
+      "Name": "Letter",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Письмо\""
+    },
+    {
+      "Name": "Letter",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Letter\""
+    },
+    {
+      "Name": "Letter",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Letter\""
+    },
+    {
+      "Name": "LetterPerson",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"LetterPerson\""
+    },
+    {
+      "Name": "Mail",
+      "ParentClasses": [
+        "Module",
+        "CaptureSourceType"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"mail\""
+    },
+    {
+      "Name": "MailCaptureInstanceInfo",
+      "ParentClasses": [
+        "Module",
+        "InstanceInfosTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"MailCaptureInstanceInfo\""
+    },
+    {
+      "Name": "MailSourceInfo",
+      "ParentClasses": [
+        "Module",
+        "DeviceInfoTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"MailSourceInfo\""
+    },
+    {
+      "Name": "MaskForSearch",
+      "ParentClasses": [
+        "Module",
+        "HtmlTags"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"<html\""
+    },
+    {
+      "Name": "MinFactProbabilityKey",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"MinFactProbability\""
+    },
+    {
+      "Name": "Name",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Name\""
+    },
+    {
+      "Name": "Name",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Goods"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Name\""
+    },
+    {
+      "Name": "Name",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Person"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Name\""
+    },
+    {
+      "Name": "Name",
+      "ParentClasses": [
+        "Module",
+        "InstanceInfosTagNames",
+        "FromTags"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Name\""
+    },
+    {
+      "Name": "Number",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Number\""
+    },
+    {
+      "Name": "Number",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Document"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Number\""
+    },
+    {
+      "Name": "Number",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "FinancialDocument"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Number\""
+    },
+    {
+      "Name": "Patrn",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Person"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Patrn\""
+    },
+    {
+      "Name": "Payer",
+      "ParentClasses": [
+        "Module",
+        "CounterpartyTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"PAYER\""
+    },
+    {
+      "Name": "PdfExtension",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"pdf\""
+    },
+    {
+      "Name": "PositionElementDelimiter",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.Char",
+      "Value": "'|'"
+    },
+    {
+      "Name": "PositionsDelimiter",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.Char",
+      "Value": "'#'"
+    },
+    {
+      "Name": "Price",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Goods"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Price\""
+    },
+    {
       "Name": "PropertiesAlreadyColoredParamName",
       "ParentClasses": [
         "Module"
       ],
       "TypeName": "System.String",
       "Value": "\"PropertiesAlreadyColored\""
+    },
+    {
+      "Name": "PropertyAndPositionDelimiter",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.Char",
+      "Value": "'-'"
+    },
+    {
+      "Name": "Red",
+      "ParentClasses": [
+        "Module",
+        "HighlightsColorCodes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"#FAC6B6\""
+    },
+    {
+      "Name": "ResponseToDate",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"ResponseToDate\""
+    },
+    {
+      "Name": "ResponseToNumber",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"ResponseToNumber\""
+    },
+    {
+      "Name": "Responsible",
+      "ParentClasses": [
+        "Module",
+        "LetterPersonTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"RESPONSIBLE\""
+    },
+    {
+      "Name": "Seller",
+      "ParentClasses": [
+        "Module",
+        "CounterpartyTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SELLER\""
+    },
+    {
+      "Name": "Shipper",
+      "ParentClasses": [
+        "Module",
+        "CounterpartyTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SHIPPER\""
+    },
+    {
+      "Name": "Signatory",
+      "ParentClasses": [
+        "Module",
+        "LetterPersonTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SIGNATORY\""
+    },
+    {
+      "Name": "SignatoryName",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SignatoryName\""
+    },
+    {
+      "Name": "SignatoryPatrn",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SignatoryPatrn\""
+    },
+    {
+      "Name": "SignatorySurname",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SignatorySurname\""
+    },
+    {
+      "Name": "SimpleRelationRelationName",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Simple relation\""
+    },
+    {
+      "Name": "StartTag",
+      "ParentClasses": [
+        "Module",
+        "HtmlTags"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"<html>\""
+    },
+    {
+      "Name": "Subject",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Letter"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Subject\""
+    },
+    {
+      "Name": "Subject",
+      "ParentClasses": [
+        "Module",
+        "InstanceInfosTagNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Subject\""
+    },
+    {
+      "Name": "SupAgreement",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Дополнительное соглашение\""
+    },
+    {
+      "Name": "SupAgreement",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SupAgreement\""
+    },
+    {
+      "Name": "Supplier",
+      "ParentClasses": [
+        "Module",
+        "CounterpartyTypes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SUPPLIER\""
+    },
+    {
+      "Name": "Surname",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "LetterPerson"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Surname\""
+    },
+    {
+      "Name": "Surname",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Person"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Surname\""
+    },
+    {
+      "Name": "TaxInvoice",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Счет-фактура\""
+    },
+    {
+      "Name": "TaxInvoice",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"TaxInvoice\""
+    },
+    {
+      "Name": "TaxinvoiceCorrection",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Корректировочный счет-фактура\""
+    },
+    {
+      "Name": "TaxinvoiceCorrection",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"TaxinvoiceCorrection\""
+    },
+    {
+      "Name": "TIN",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"TIN\""
+    },
+    {
+      "Name": "TRRC",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"TRRC\""
+    },
+    {
+      "Name": "TrustedFactProbabilityKey",
+      "ParentClasses": [
+        "Module"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"TrustedFactProbability\""
+    },
+    {
+      "Name": "Txt",
+      "ParentClasses": [
+        "Module",
+        "MailBodyName"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"body.txt\""
+    },
+    {
+      "Name": "Type",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "LetterPerson"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Type\""
+    },
+    {
+      "Name": "UnitName",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Goods"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"UnitName\""
+    },
+    {
+      "Name": "UniversalTransferCorrectionDocument",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Универсальный корректировочный документ\""
+    },
+    {
+      "Name": "UniversalTransferCorrectionDocument",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"GeneralCorrectionDocument\""
+    },
+    {
+      "Name": "UniversalTransferDocument",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Универсальный передаточный документ\""
+    },
+    {
+      "Name": "UniversalTransferDocument",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"GeneralTransferDocument\""
+    },
+    {
+      "Name": "VatAmount",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "DocumentAmount"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"VatAmount\""
+    },
+    {
+      "Name": "VatAmount",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Goods"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"VatAmount\""
+    },
+    {
+      "Name": "Waybill",
+      "ParentClasses": [
+        "Module",
+        "ArioClassNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Товарная накладная\""
+    },
+    {
+      "Name": "Waybill",
+      "ParentClasses": [
+        "Module",
+        "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Waybill\""
+    },
+    {
+      "Name": "WithDot",
+      "ParentClasses": [
+        "Module",
+        "HtmlExtension"
+      ],
+      "TypeName": "System.String",
+      "Value": "\".html\""
+    },
+    {
+      "Name": "WithoutDot",
+      "ParentClasses": [
+        "Module",
+        "HtmlExtension"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"html\""
+    },
+    {
+      "Name": "Yellow",
+      "ParentClasses": [
+        "Module",
+        "HighlightsColorCodes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"#FFFBCC\""
     }
   ],
   "PublicFunctions": [
