@@ -196,7 +196,7 @@ namespace Sungero.Capture.Server
         var document = OfficialDocuments.Null;
         using (var body = GetDocumentBody(recognitionResult.BodyGuid))
         {
-          var docId = SearchDocumentBarcodeIds(body).FirstOrDefault();
+          var docId = Functions.Module.SearchDocumentBarcodeIds(body).FirstOrDefault();
           // FOD на пустом List<int> вернет 0.
           if (docId != 0)
           {
@@ -3721,7 +3721,7 @@ namespace Sungero.Capture.Server
       try
       {
         var barcodeReader = new AsposeExtensions.BarcodeReader();
-        var barcodeList = barcodeReader.Extract(document);
+        var barcodeList = barcodeReader.Extract(document, Aspose.BarCode.BarCodeRecognition.DecodeType.Code128);
         if (!barcodeList.Any())
           return result;
         
