@@ -153,4 +153,7 @@
   <data name="Property_FactLabel" xml:space="preserve">
     <value>Метка факта</value>
   </data>
+  <data name="Property_GoodId" xml:space="preserve">
+    <value>ИД номенклатурной позиции</value>
+  </data>
 </root>

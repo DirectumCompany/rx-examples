@@ -522,6 +522,9 @@ namespace Sungero.Capture.Client
       
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, false);
       HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
+      
+      if (MockIncomingTaxInvoices.Is(document))
+        HighlightGoods(MockIncomingTaxInvoices.As(document));
     }
     
     /// <summary>
@@ -562,6 +565,43 @@ namespace Sungero.Capture.Client
                                                                double.Parse(pos[4]),
                                                                double.Parse(pos[5]),
                                                                double.Parse(pos[6]));
+          }
+        }
+      }
+    }
+    
+    /// <summary>
+    /// Подсветить номенклатуру в карточке документа и факты в теле.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    public virtual void HighlightGoods(IMockIncomingTaxInvoice document)
+    {
+      var recognizedFacts = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document).Facts;
+      foreach (var good in document.Goods)
+      {
+        var recognizedGood = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) && 
+                                                   x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
+        foreach (var goodProperty in recognizedGood)
+        {
+          var goodPropertyName = goodProperty.PropertyName.Split('.').LastOrDefault();
+          if (good.GetType().GetProperties().Where(p => p.Name == goodPropertyName).Any())
+          {
+            good.State.Properties[goodPropertyName].HighlightColor = goodProperty.IsTrusted.Value 
+              ? Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Green)
+              : Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Yellow);
+            
+            var positions = goodProperty.Position.Split(Constants.Module.PositionElementDelimiter);
+            if (positions.Count() < 7)
+              continue;
+            var goodsPreviewColor = goodProperty.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
+            document.State.Controls.GoodsPreview.HighlightAreas.Add(goodsPreviewColor,
+                                                                    int.Parse(positions[0]),
+                                                                    double.Parse(positions[1]),
+                                                                    double.Parse(positions[2]),
+                                                                    double.Parse(positions[3]),
+                                                                    double.Parse(positions[4]),
+                                                                    double.Parse(positions[5]),
+                                                                    double.Parse(positions[6]));
           }
         }
       }
@@ -621,7 +661,7 @@ namespace Sungero.Capture.Client
     /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
     /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
     /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit, 
+    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit,
                                               string firstPageClassifierName, string typeClassifierName)
     {
       var messages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,

@@ -129,6 +129,15 @@
       "Code": "FactLabel",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "b2541443-e609-4bae-b167-30a13173068f"
+    },
+    {
+      "$type": "Sungero.Metadata.IntegerPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "8ac6483c-1639-4990-bba2-1fe452cdb77f",
+      "Name": "GoodId",
+      "CanBeSearch": false,
+      "Code": "GoodId",
+      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
+      "PreviousPropertyGuid": "06cb566e-1dc6-4510-88e0-c4ae98588468"
     }
   ],
   "PublicStructures": [],

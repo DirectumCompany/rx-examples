@@ -153,4 +153,7 @@
   <data name="Property_FactLabel" xml:space="preserve">
     <value>Fact Label</value>
   </data>
+  <data name="Property_GoodId" xml:space="preserve">
+    <value>Good Id</value>
+  </data>
 </root>
