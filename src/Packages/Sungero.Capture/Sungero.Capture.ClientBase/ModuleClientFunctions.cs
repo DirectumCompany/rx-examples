@@ -523,8 +523,10 @@ namespace Sungero.Capture.Client
       var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, false);
       HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
       
-      if (MockIncomingTaxInvoices.Is(document))
-        HighlightGoods(MockIncomingTaxInvoices.As(document));
+      // Подсветить номенклатуру (демо-режим).
+      var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+      if (isMockMode)
+        HighlightGoodsInMockMode(document);
     }
     
     /// <summary>
@@ -571,13 +573,41 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Подсветить номенклатуру в карточке документа и факты в теле.
+    /// Подстветить номенклатуру (демо-режим).
     /// </summary>
     /// <param name="document">Документ.</param>
-    public virtual void HighlightGoods(IMockIncomingTaxInvoice document)
+    public virtual void HighlightGoodsInMockMode(Sungero.Docflow.IOfficialDocument document)
     {
-      var recognizedFacts = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document).Facts;
-      foreach (var good in document.Goods)
+      var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
+      if (MockIncomingTaxInvoices.Is(document))
+      {
+        var incomingTaxInvoice = MockIncomingTaxInvoices.As(document);
+        HighlightGoods(documentRecognitionInfo, incomingTaxInvoice.Goods, incomingTaxInvoice.State.Controls.GoodsPreview);
+      }
+      if (MockContractStatements.Is(document))
+      {
+        var contractStatement = MockContractStatements.As(document);
+        HighlightGoods(documentRecognitionInfo, contractStatement.Goods, contractStatement.State.Controls.GoodsPreview);
+      }
+      if (MockWaybills.Is(document))
+      {
+        var waybill = MockWaybills.As(document);
+        HighlightGoods(documentRecognitionInfo, waybill.Goods, waybill.State.Controls.GoodsPreview);
+      }
+    }
+    
+    /// <summary>
+    /// Подсветить номенклатуру в карточке документа и факты в предпросмотре.
+    /// </summary>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
+    /// <param name="goods">Номенклатура.</param>
+    /// <param name="goodsPreview">Контрол предпросмотра.</param>
+    public virtual void HighlightGoods(IDocumentRecognitionInfo documentRecognitionInfo,
+                                       Sungero.Domain.Shared.IChildEntityCollection<Sungero.Domain.Shared.IChildEntity> goods,
+                                       Sungero.Domain.Shared.IPreviewControlState goodsPreview)
+    {
+      var recognizedFacts = documentRecognitionInfo.Facts;
+      foreach (var good in goods)
       {
         var recognizedGood = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) &&
                                                    x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
@@ -594,14 +624,14 @@ namespace Sungero.Capture.Client
             if (positions.Count() < 7)
               continue;
             var goodsPreviewColor = goodProperty.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
-            document.State.Controls.GoodsPreview.HighlightAreas.Add(goodsPreviewColor,
-                                                                    int.Parse(positions[0]),
-                                                                    double.Parse(positions[1]),
-                                                                    double.Parse(positions[2]),
-                                                                    double.Parse(positions[3]),
-                                                                    double.Parse(positions[4]),
-                                                                    double.Parse(positions[5]),
-                                                                    double.Parse(positions[6]));
+            goodsPreview.HighlightAreas.Add(goodsPreviewColor,
+                                            int.Parse(positions[0]),
+                                            double.Parse(positions[1]),
+                                            double.Parse(positions[2]),
+                                            double.Parse(positions[3]),
+                                            double.Parse(positions[4]),
+                                            double.Parse(positions[5]),
+                                            double.Parse(positions[6]));
           }
         }
       }
