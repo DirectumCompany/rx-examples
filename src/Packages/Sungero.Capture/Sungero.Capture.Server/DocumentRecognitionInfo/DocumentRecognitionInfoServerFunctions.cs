@@ -15,7 +15,7 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <returns>Результат распознавания.</returns>
     [Remote]
-    public IDocumentRecognitionInfo GetDocumentRecognitionInfo(IOfficialDocument document)
+    public static IDocumentRecognitionInfo GetDocumentRecognitionInfo(Sungero.Docflow.IOfficialDocument document)
     {
       return DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
     }

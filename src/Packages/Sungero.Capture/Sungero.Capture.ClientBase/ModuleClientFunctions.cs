@@ -579,14 +579,14 @@ namespace Sungero.Capture.Client
       var recognizedFacts = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document).Facts;
       foreach (var good in document.Goods)
       {
-        var recognizedGood = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) && 
+        var recognizedGood = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) &&
                                                    x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
         foreach (var goodProperty in recognizedGood)
         {
           var goodPropertyName = goodProperty.PropertyName.Split('.').LastOrDefault();
           if (good.GetType().GetProperties().Where(p => p.Name == goodPropertyName).Any())
           {
-            good.State.Properties[goodPropertyName].HighlightColor = goodProperty.IsTrusted.Value 
+            good.State.Properties[goodPropertyName].HighlightColor = goodProperty.IsTrusted.Value
               ? Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Green)
               : Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Yellow);
             
