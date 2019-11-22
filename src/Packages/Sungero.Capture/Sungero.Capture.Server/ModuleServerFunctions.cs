@@ -3244,7 +3244,7 @@ namespace Sungero.Capture.Server
                                            bool? isTrusted = null,
                                            int? goodId = null)
     {
-      var propertyStringValue = GetPropertyValueAsString(propertyValue);
+      var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
       if (string.IsNullOrWhiteSpace(propertyStringValue))
         return;
       
@@ -3299,52 +3299,7 @@ namespace Sungero.Capture.Server
       }
       return factHash;
     }
-    
-    /// <summary>
-    /// Получить список распознанных свойств документа.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
-    /// <returns>Список распознанных свойств документа.</returns>
-    [Remote(IsPure = true), Public]
-    public virtual List<string> GetRecognitionResultProperties(Docflow.IOfficialDocument document, bool isTrusted)
-    {
-      var result = new List<string>();
-      
-      if (document == null)
-        return result;
-      
-      var recognitionInfo = DocumentRecognitionInfos.GetAll(x => x.DocumentId == document.Id).FirstOrDefault();
-      if (recognitionInfo == null)
-        return result;
-      
-      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
-      var linkedFacts = recognitionInfo.Facts
-        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
-        .Where(x => x.IsTrusted == isTrusted);
-      
-      // Взять только неизмененные пользователем свойства.
-      var type = document.GetType();
-      foreach (var linkedFact in linkedFacts)
-      {
-        var propertyName = linkedFact.PropertyName;
-        var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
-        if (property != null)
-        {
-          object propertyValue = property.GetValue(document);
-          var propertyStringValue = GetPropertyValueAsString(propertyValue);
-          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
-          {
-            var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
-                                                    propertyName, linkedFact.Position);
-            result.Add(propertyAndPosition);
-          }
-        }
-      }
-      
-      return result.Distinct().ToList();
-    }
-    
+
     /// <summary>
     /// Сохранить результат верификации заполнения свойств.
     /// </summary>
@@ -3375,31 +3330,14 @@ namespace Sungero.Capture.Server
             if (property != null)
             {
               object propertyValue = property.GetValue(document);
-              var propertyStringValue = GetPropertyValueAsString(propertyValue);
+              var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
               if (!string.IsNullOrWhiteSpace(propertyStringValue) && !Equals(propertyStringValue, linkedFact.PropertyValue))
                 linkedFact.VerifiedValue = propertyStringValue;
             }
           }
         });
     }
-    
-    /// <summary>
-    /// Получить строковое значение свойства.
-    /// </summary>
-    /// <param name="propertyValue">Значение свойства.</param>
-    /// <returns></returns>
-    /// <remarks>Для свойств типа сущность будет возвращена строка с Ид сущности.</remarks>
-    public static string GetPropertyValueAsString(object propertyValue)
-    {
-      if (propertyValue == null)
-        return string.Empty;
-      
-      var propertyStringValue = propertyValue.ToString();
-      if (propertyValue is Sungero.Domain.Shared.IEntity)
-        propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
-      return propertyStringValue;
-    }
-    
+
     /// <summary>
     /// Получить признак - доверять извлеченному полю или нет.
     /// </summary>

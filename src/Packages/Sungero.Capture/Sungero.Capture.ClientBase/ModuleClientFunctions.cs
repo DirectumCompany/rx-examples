@@ -517,16 +517,59 @@ namespace Sungero.Capture.Client
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
-      var exactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, true);
+      var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
+      var exactlyRecognizedProperties = GetRecognitionResultProperties(document, documentRecognitionInfo, true);
       HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Green));
       
-      var notExactlyRecognizedProperties = Sungero.Capture.PublicFunctions.Module.Remote.GetRecognitionResultProperties(document, false);
+      var notExactlyRecognizedProperties = GetRecognitionResultProperties(document, documentRecognitionInfo, false);
       HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
       
       // Подсветить номенклатуру (демо-режим).
-      var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
-      if (isMockMode)
-        HighlightGoodsInMockMode(document);
+      if (MockDocumentBases.Is(document))
+        HighlightGoodsInMockMode(document, documentRecognitionInfo);
+    }
+    
+    /// <summary>
+    /// Получить список распознанных свойств документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
+    /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
+    /// <returns>Список распознанных свойств документа.</returns>
+    public virtual List<string> GetRecognitionResultProperties(Docflow.IOfficialDocument document,
+                                                               IDocumentRecognitionInfo documentRecognitionInfo,
+                                                               bool isTrusted)
+    {
+      var result = new List<string>();
+      
+      if (document == null || documentRecognitionInfo == null)
+        return result;
+      
+      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+      var linkedFacts = documentRecognitionInfo.Facts
+        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
+        .Where(x => x.IsTrusted == isTrusted);
+      
+      // Взять только неизмененные пользователем свойства.
+      var type = document.GetType();
+      foreach (var linkedFact in linkedFacts)
+      {
+        var propertyName = linkedFact.PropertyName;
+        var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+        if (property != null)
+        {
+          object propertyValue = property.GetValue(document);
+          var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
+          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
+          {
+            var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
+                                                    propertyName, linkedFact.Position);
+            result.Add(propertyAndPosition);
+          }
+        }
+      }
+      
+      return result.Distinct().ToList();
     }
     
     /// <summary>
@@ -575,10 +618,11 @@ namespace Sungero.Capture.Client
     /// <summary>
     /// Подстветить номенклатуру (демо-режим).
     /// </summary>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
     /// <param name="document">Документ.</param>
-    public virtual void HighlightGoodsInMockMode(Sungero.Docflow.IOfficialDocument document)
+    public virtual void HighlightGoodsInMockMode(Sungero.Docflow.IOfficialDocument document,
+                                                 IDocumentRecognitionInfo documentRecognitionInfo)
     {
-      var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
       if (MockIncomingTaxInvoices.Is(document))
       {
         var incomingTaxInvoice = MockIncomingTaxInvoices.As(document);

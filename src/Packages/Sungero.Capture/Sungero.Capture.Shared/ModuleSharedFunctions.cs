@@ -28,14 +28,31 @@ namespace Sungero.Capture.Shared
     /// Заполнить имя документа из короткого имени вида документа при захвате.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <remarks>Если имя документа не сформировалось автоматически, 
+    /// <remarks>Если имя документа не сформировалось автоматически,
     /// то заполнить его из короткого имени вида документа.</remarks>
     [Public]
     public static void FillNameFromKindIfEmpty(Sungero.Docflow.IOfficialDocument document)
     {
-      if ((document.Name == Docflow.Resources.DocumentNameAutotext || string.IsNullOrEmpty(document.Name)) && 
+      if ((document.Name == Docflow.Resources.DocumentNameAutotext || string.IsNullOrEmpty(document.Name)) &&
           document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
         document.Name = document.DocumentKind.ShortName;
+    }
+    
+    /// <summary>
+    /// Получить строковое значение свойства.
+    /// </summary>
+    /// <param name="propertyValue">Значение свойства.</param>
+    /// <returns></returns>
+    /// <remarks>Для свойств типа сущность будет возвращена строка с Ид сущности.</remarks>
+    public static string GetPropertyValueAsString(object propertyValue)
+    {
+      if (propertyValue == null)
+        return string.Empty;
+      
+      var propertyStringValue = propertyValue.ToString();
+      if (propertyValue is Sungero.Domain.Shared.IEntity)
+        propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
+      return propertyStringValue;
     }
   }
 }

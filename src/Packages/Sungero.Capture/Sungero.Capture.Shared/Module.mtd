@@ -1213,25 +1213,6 @@
       "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
     },
     {
-      "Name": "GetRecognitionResultProperties",
-      "IsRemote": true,
-      "Parameters": [
-        {
-          "Name": "document",
-          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
-          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
-        },
-        {
-          "Name": "isTrusted",
-          "ParameterType": "global::System.Boolean",
-          "ParameterTypeFullName": "System.Boolean"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "global::System.Collections.Generic.List<global::System.String>",
-      "ReturnTypeFullName": "System.Collections.Generic.List"
-    },
-    {
       "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [
