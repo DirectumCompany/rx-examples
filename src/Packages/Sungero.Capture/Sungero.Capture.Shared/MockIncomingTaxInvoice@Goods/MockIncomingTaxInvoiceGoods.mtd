@@ -25,6 +25,9 @@
       "Name": "Name",
       "CanBeSearch": false,
       "Code": "Name",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "f3719780-8b17-4a41-9fff-3f4f70d0fddd"
     },
@@ -34,6 +37,9 @@
       "Name": "UnitName",
       "CanBeSearch": false,
       "Code": "UnitName",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "67456660-5fa5-48b2-a837-3a94f75f157d"
     },
@@ -43,6 +49,9 @@
       "Name": "Count",
       "CanBeSearch": false,
       "Code": "Count",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "f8974ea7-2444-4dbb-aafe-cc8e153bc011"
     },
@@ -52,6 +61,9 @@
       "Name": "Price",
       "CanBeSearch": false,
       "Code": "Price",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "ad58bb6a-e754-446a-afa4-f4519f72721b"
     },
@@ -61,6 +73,9 @@
       "Name": "VatAmount",
       "CanBeSearch": false,
       "Code": "VatAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "13f834f6-b671-4e3c-9abd-70f2b5dfa7a0"
     },
@@ -70,6 +85,9 @@
       "Name": "TotalAmount",
       "CanBeSearch": false,
       "Code": "TotalAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "be4908de-58bc-4808-aa32-4c40a03bbe63"
     },

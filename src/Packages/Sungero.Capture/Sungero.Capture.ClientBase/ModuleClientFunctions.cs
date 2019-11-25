@@ -518,10 +518,10 @@ namespace Sungero.Capture.Client
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
       var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
-      var exactlyRecognizedProperties = GetRecognitionResultProperties(document, documentRecognitionInfo, true);
+      var exactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, true);
       HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Green));
       
-      var notExactlyRecognizedProperties = GetRecognitionResultProperties(document, documentRecognitionInfo, false);
+      var notExactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, false);
       HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
       
       // Подсветить номенклатуру (демо-режим).
@@ -536,9 +536,9 @@ namespace Sungero.Capture.Client
     /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
     /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
     /// <returns>Список распознанных свойств документа.</returns>
-    public virtual List<string> GetRecognitionResultProperties(Docflow.IOfficialDocument document,
-                                                               IDocumentRecognitionInfo documentRecognitionInfo,
-                                                               bool isTrusted)
+    public virtual List<string> GetRecognizedProperties(Docflow.IOfficialDocument document,
+                                                        IDocumentRecognitionInfo documentRecognitionInfo,
+                                                        bool isTrusted)
     {
       var result = new List<string>();
       
@@ -597,20 +597,7 @@ namespace Sungero.Capture.Client
         {
           var fieldsPositions = splitedPropertyNameAndPosition[1].Split(Constants.Module.PositionsDelimiter);
           foreach (var fieldPosition in fieldsPositions)
-          {
-            var pos = fieldPosition.Split(Constants.Module.PositionElementDelimiter);
-            if (pos.Count() < 7)
-              continue;
-            
-            document.State.Controls.Preview.HighlightAreas.Add(posColor,
-                                                               int.Parse(pos[0]),
-                                                               double.Parse(pos[1]),
-                                                               double.Parse(pos[2]),
-                                                               double.Parse(pos[3]),
-                                                               double.Parse(pos[4]),
-                                                               double.Parse(pos[5]),
-                                                               double.Parse(pos[6]));
-          }
+            HighlightFactInPreview(document.State.Controls.Preview, fieldPosition, posColor);
         }
       }
     }
@@ -653,32 +640,48 @@ namespace Sungero.Capture.Client
       var recognizedFacts = documentRecognitionInfo.Facts;
       foreach (var good in goods)
       {
-        var recognizedGood = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) &&
+        var recognizedGoodFacts = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) &&
                                                    x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
-        foreach (var goodProperty in recognizedGood)
+        foreach (var recognizedGoodFact in recognizedGoodFacts)
         {
-          var goodPropertyName = goodProperty.PropertyName.Split('.').LastOrDefault();
-          if (good.GetType().GetProperties().Where(p => p.Name == goodPropertyName).Any())
+          var propertyName = recognizedGoodFact.PropertyName.Split('.').LastOrDefault();
+          var property = good.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+          if (property != null)
           {
-            good.State.Properties[goodPropertyName].HighlightColor = goodProperty.IsTrusted.Value
-              ? Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Green)
-              : Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Yellow);
-            
-            var positions = goodProperty.Position.Split(Constants.Module.PositionElementDelimiter);
-            if (positions.Count() < 7)
-              continue;
-            var goodsPreviewColor = goodProperty.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
-            goodsPreview.HighlightAreas.Add(goodsPreviewColor,
-                                            int.Parse(positions[0]),
-                                            double.Parse(positions[1]),
-                                            double.Parse(positions[2]),
-                                            double.Parse(positions[3]),
-                                            double.Parse(positions[4]),
-                                            double.Parse(positions[5]),
-                                            double.Parse(positions[6]));
+            object propertyValue = property.GetValue(good);
+            var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
+            if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, recognizedGoodFact.PropertyValue))
+            {
+              good.State.Properties[propertyName].HighlightColor = recognizedGoodFact.IsTrusted.Value
+                ? Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Green)
+                : Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Yellow);
+            }
+            var goodsPreviewColor = recognizedGoodFact.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
+            HighlightFactInPreview(goodsPreview, recognizedGoodFact.Position, goodsPreviewColor);
           }
         }
       }
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                               string position, Sungero.Core.Color color)
+    {
+      var positions = position.Split(Constants.Module.PositionElementDelimiter);
+      if (positions.Count() >= 7)
+        previewControl.HighlightAreas.Add(color,
+                                          int.Parse(positions[0]),
+                                          double.Parse(positions[1]),
+                                          double.Parse(positions[2]),
+                                          double.Parse(positions[3]),
+                                          double.Parse(positions[4]),
+                                          double.Parse(positions[5]),
+                                          double.Parse(positions[6]));
     }
     
     /// <summary>

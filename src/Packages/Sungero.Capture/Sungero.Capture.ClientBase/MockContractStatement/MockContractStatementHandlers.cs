@@ -7,6 +7,40 @@ using Sungero.Capture.MockContractStatement;
 
 namespace Sungero.Capture
 {
+  partial class MockContractStatementGoodsClientHandlers
+  {
+
+    public virtual void GoodsTotalAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
+    {
+      this._obj.State.Properties.TotalAmount.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public virtual void GoodsVatAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
+    {
+      this._obj.State.Properties.VatAmount.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public virtual void GoodsPriceValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
+    {
+      this._obj.State.Properties.Price.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public virtual void GoodsCountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
+    {
+      this._obj.State.Properties.Count.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public virtual void GoodsUnitNameValueInput(Sungero.Presentation.StringValueInputEventArgs e)
+    {
+      this._obj.State.Properties.UnitName.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public virtual void GoodsNameValueInput(Sungero.Presentation.StringValueInputEventArgs e)
+    {
+      this._obj.State.Properties.Name.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+  }
+
   partial class MockContractStatementClientHandlers
   {
 

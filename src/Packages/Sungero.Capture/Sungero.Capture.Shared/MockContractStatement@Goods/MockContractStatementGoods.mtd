@@ -25,6 +25,9 @@
       "Name": "Name",
       "CanBeSearch": false,
       "Code": "Name",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "b824523d-f029-4632-883e-f4e8b1127ab4"
     },
@@ -34,6 +37,9 @@
       "Name": "UnitName",
       "CanBeSearch": false,
       "Code": "UnitName",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",
       "PreviousPropertyGuid": "8b9f0652-9f26-4b37-9585-e305660d45bd"
     },
@@ -43,6 +49,9 @@
       "Name": "Count",
       "CanBeSearch": false,
       "Code": "Count",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "47bd9d3a-0e6e-4ee5-95a7-532591f7adb1"
     },
@@ -52,6 +61,9 @@
       "Name": "Price",
       "CanBeSearch": false,
       "Code": "Price",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "2bb3179c-dc58-4adc-83d5-7b3e3d5eaed1"
     },
@@ -61,6 +73,9 @@
       "Name": "VatAmount",
       "CanBeSearch": false,
       "Code": "VatAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "40d7dd9e-dc80-4d9a-a3ec-93f5876b59e7"
     },
@@ -70,6 +85,9 @@
       "Name": "TotalAmount",
       "CanBeSearch": false,
       "Code": "TotalAmount",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "7b87168d-182e-4122-8055-682088be7308"
     },
