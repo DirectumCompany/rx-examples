@@ -613,51 +613,53 @@ namespace Sungero.Capture.Client
       if (MockIncomingTaxInvoices.Is(document))
       {
         var incomingTaxInvoice = MockIncomingTaxInvoices.As(document);
-        HighlightGoods(documentRecognitionInfo, incomingTaxInvoice.Goods, incomingTaxInvoice.State.Controls.GoodsPreview);
+        HighlightCollection(documentRecognitionInfo, incomingTaxInvoice.Goods, incomingTaxInvoice.State.Controls.GoodsPreview);
       }
       if (MockContractStatements.Is(document))
       {
         var contractStatement = MockContractStatements.As(document);
-        HighlightGoods(documentRecognitionInfo, contractStatement.Goods, contractStatement.State.Controls.GoodsPreview);
+        HighlightCollection(documentRecognitionInfo, contractStatement.Goods, contractStatement.State.Controls.GoodsPreview);
       }
       if (MockWaybills.Is(document))
       {
         var waybill = MockWaybills.As(document);
-        HighlightGoods(documentRecognitionInfo, waybill.Goods, waybill.State.Controls.GoodsPreview);
+        HighlightCollection(documentRecognitionInfo, waybill.Goods, waybill.State.Controls.GoodsPreview);
       }
     }
     
     /// <summary>
-    /// Подсветить номенклатуру в карточке документа и факты в предпросмотре.
+    /// Подсветить записи свойства-коллекции в карточке документа и факты в предпросмотре.
     /// </summary>
     /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
-    /// <param name="goods">Номенклатура.</param>
-    /// <param name="goodsPreview">Контрол предпросмотра.</param>
-    public virtual void HighlightGoods(IDocumentRecognitionInfo documentRecognitionInfo,
-                                       Sungero.Domain.Shared.IChildEntityCollection<Sungero.Domain.Shared.IChildEntity> goods,
-                                       Sungero.Domain.Shared.IPreviewControlState goodsPreview)
+    /// <param name="collection">Коллекция.</param>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    public virtual void HighlightCollection(IDocumentRecognitionInfo documentRecognitionInfo,
+                                            Sungero.Domain.Shared.IChildEntityCollection<Sungero.Domain.Shared.IChildEntity> collection,
+                                            Sungero.Domain.Shared.IPreviewControlState previewControl)
     {
       var recognizedFacts = documentRecognitionInfo.Facts;
-      foreach (var good in goods)
+      foreach (var record in collection)
       {
-        var recognizedGoodFacts = recognizedFacts.Where(x => x.GoodId == good.Id && !string.IsNullOrEmpty(x.PropertyName) &&
-                                                   x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
-        foreach (var recognizedGoodFact in recognizedGoodFacts)
+        var recognizedRecordFacts = recognizedFacts.Where(x => x.CollectionRecordId == record.Id &&
+                                                          !string.IsNullOrEmpty(x.PropertyName) &&
+                                                          x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
+        foreach (var recognizedRecordFact in recognizedRecordFacts)
         {
-          var propertyName = recognizedGoodFact.PropertyName.Split('.').LastOrDefault();
-          var property = good.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+          var propertyName = recognizedRecordFact.PropertyName.Split('.').LastOrDefault();
+          var property = record.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
           if (property != null)
           {
-            object propertyValue = property.GetValue(good);
+            object propertyValue = property.GetValue(record);
             var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
-            if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, recognizedGoodFact.PropertyValue))
+            if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, recognizedRecordFact.PropertyValue))
             {
-              good.State.Properties[propertyName].HighlightColor = recognizedGoodFact.IsTrusted.Value
+              record.State.Properties[propertyName].HighlightColor = recognizedRecordFact.IsTrusted.Value
                 ? Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Green)
                 : Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Yellow);
+              
+              var recordPreviewColor = recognizedRecordFact.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
+              HighlightFactInPreview(previewControl, recognizedRecordFact.Position, recordPreviewColor);
             }
-            var goodsPreviewColor = recognizedGoodFact.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
-            HighlightFactInPreview(goodsPreview, recognizedGoodFact.Position, goodsPreviewColor);
           }
         }
       }

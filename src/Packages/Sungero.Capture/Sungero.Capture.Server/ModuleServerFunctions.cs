@@ -1256,12 +1256,18 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name), good.Name, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name), good.Count, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name), good.Price, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount, goodId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
+                            good.Name, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
+                            good.UnitName, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
+                            good.Count, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
+                            good.Price, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
+                            good.VatAmount, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
+                            good.TotalAmount, collectionRecordId : good.Id);
       }
       return document;
     }
@@ -1421,12 +1427,18 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name), good.Name, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name), good.Count, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name), good.Price, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount, goodId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount, goodId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
+                            good.Name, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
+                            good.UnitName, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
+                            good.Count, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
+                            good.Price, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
+                            good.VatAmount, collectionRecordId : good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
+                            good.TotalAmount, collectionRecordId : good.Id);
       }
       
       return document;
@@ -1582,12 +1594,18 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name), good.Name, goodId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name), good.UnitName, goodId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name), good.Count, goodId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name), good.Price, goodId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name), good.VatAmount, goodId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name), good.TotalAmount, goodId: good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name), 
+                            good.Name, collectionRecordId: good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
+                            good.UnitName, collectionRecordId: good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name), 
+                            good.Count, collectionRecordId: good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
+                            good.Price, collectionRecordId: good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
+                            good.VatAmount, collectionRecordId: good.Id);
+        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
+                            good.TotalAmount, collectionRecordId: good.Id);
       }
       
       return document;
@@ -3250,14 +3268,14 @@ namespace Sungero.Capture.Server
     /// <param name="propertyName">Имя свойства документа.</param>
     /// <param name="propertyValue">Значение свойства.</param>
     /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
-    /// <param name="goodId">ИД номенклатурной позиции, соответствующей факту.</param>
+    /// <param name="collectionRecordId">ИД записи свойства-коллекции.</param>
     public static void LinkFactAndProperty(Structures.Module.IRecognitionResult recognitionResult,
                                            Structures.Module.IFact fact,
                                            string fieldName,
                                            string propertyName,
                                            object propertyValue,
                                            bool? isTrusted = null,
-                                           int? goodId = null)
+                                           int? collectionRecordId = null)
     {
       var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
       if (string.IsNullOrWhiteSpace(propertyStringValue))
@@ -3287,7 +3305,7 @@ namespace Sungero.Capture.Server
           recognizedFact.PropertyValue = propertyStringValue;
           recognizedFact.IsTrusted = isTrusted;
           recognizedFact.FactLabel = factLabel;
-          recognizedFact.GoodId = goodId;
+          recognizedFact.CollectionRecordId = collectionRecordId;
         }
       }
     }

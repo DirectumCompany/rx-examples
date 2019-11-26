@@ -133,9 +133,9 @@
     {
       "$type": "Sungero.Metadata.IntegerPropertyMetadata, Sungero.Metadata",
       "NameGuid": "8ac6483c-1639-4990-bba2-1fe452cdb77f",
-      "Name": "GoodId",
+      "Name": "CollectionRecordId",
       "CanBeSearch": false,
-      "Code": "GoodId",
+      "Code": "CollectionReco",
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "06cb566e-1dc6-4510-88e0-c4ae98588468"
     }
