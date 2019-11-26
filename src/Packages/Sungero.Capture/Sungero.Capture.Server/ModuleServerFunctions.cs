@@ -1243,7 +1243,12 @@ namespace Sungero.Capture.Server
       foreach (var fact in GetFacts(facts, FactNames.Goods, FieldNames.Goods.Name))
       {
         var good = document.Goods.AddNew();
-        good.Name = GetFieldValue(fact, FieldNames.Goods.Name);
+        
+        // Обрезать наименование под размер поля.
+        var goodName = GetFieldValue(fact, FieldNames.Goods.Name);
+        if (goodName.Length > document.Info.Properties.Goods.Properties.Name.Length)
+          good.Name = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+        
         good.UnitName = GetFieldValue(fact, FieldNames.Goods.UnitName);
         good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
         good.Price = GetFieldNumericalValue(fact, FieldNames.Goods.Price);
@@ -1403,7 +1408,12 @@ namespace Sungero.Capture.Server
       foreach (var fact in GetFacts(facts, FactNames.Goods, FieldNames.Goods.Name))
       {
         var good = document.Goods.AddNew();
-        good.Name = GetFieldValue(fact, FieldNames.Goods.Name);
+        
+        // Обрезать наименование под размер поля.
+        var goodName = GetFieldValue(fact, FieldNames.Goods.Name);
+        if (goodName.Length > document.Info.Properties.Goods.Properties.Name.Length)
+          good.Name = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+        
         good.UnitName = GetFieldValue(fact, FieldNames.Goods.UnitName);
         good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
         good.Price = GetFieldNumericalValue(fact, FieldNames.Goods.Price);
@@ -1559,8 +1569,13 @@ namespace Sungero.Capture.Server
       foreach (var fact in GetFacts(facts, FactNames.Goods, FieldNames.Goods.Name))
       {
         var good = document.Goods.AddNew();
-        good.Name = GetFieldValue(fact, FieldNames.Goods.Name);
-        good.UnitName = GetFieldValue(fact, FieldNames.Goods.UnitName);
+        
+        // Обрезать наименование под размер поля.
+        var goodName = GetFieldValue(fact, FieldNames.Goods.Name);
+        if (goodName.Length > document.Info.Properties.Goods.Properties.Name.Length)
+          good.Name = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+        
+        good.UnitName =  GetFieldValue(fact, FieldNames.Goods.UnitName);
         good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
         good.Price = GetFieldNumericalValue(fact, FieldNames.Goods.Price);
         good.VatAmount = GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
