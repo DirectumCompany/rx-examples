@@ -1247,7 +1247,8 @@ namespace Sungero.Capture.Server
         // Обрезать наименование под размер поля.
         var goodName = GetFieldValue(fact, FieldNames.Goods.Name);
         if (goodName.Length > document.Info.Properties.Goods.Properties.Name.Length)
-          good.Name = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+          goodName = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+        good.Name = goodName;
         
         good.UnitName = GetFieldValue(fact, FieldNames.Goods.UnitName);
         good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
@@ -1418,7 +1419,8 @@ namespace Sungero.Capture.Server
         // Обрезать наименование под размер поля.
         var goodName = GetFieldValue(fact, FieldNames.Goods.Name);
         if (goodName.Length > document.Info.Properties.Goods.Properties.Name.Length)
-          good.Name = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+          goodName = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+        good.Name = goodName;
         
         good.UnitName = GetFieldValue(fact, FieldNames.Goods.UnitName);
         good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
@@ -1585,7 +1587,8 @@ namespace Sungero.Capture.Server
         // Обрезать наименование под размер поля.
         var goodName = GetFieldValue(fact, FieldNames.Goods.Name);
         if (goodName.Length > document.Info.Properties.Goods.Properties.Name.Length)
-          good.Name = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+          goodName = goodName.Substring(0, document.Info.Properties.Goods.Properties.Name.Length);
+        good.Name = goodName;
         
         good.UnitName =  GetFieldValue(fact, FieldNames.Goods.UnitName);
         good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
