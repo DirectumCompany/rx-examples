@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using Sungero.Capture.MockWaybill;
+using Sungero.Examples.IncomingLetter;
 
-namespace Sungero.Capture
+namespace Sungero.Examples.Client
 {
-
 }

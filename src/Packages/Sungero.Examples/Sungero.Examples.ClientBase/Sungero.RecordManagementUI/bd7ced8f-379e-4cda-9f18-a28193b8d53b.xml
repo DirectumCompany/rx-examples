@@ -1,0 +1,463 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <ViewName>Default</ViewName>
+  <Folder>
+    <XtraSerializer version="1.0" application="GridControl">
+      <property name="#LayoutVersion" isnull="true" />
+      <property name="$GridControl" iskey="true" value="GridControl">
+        <property name="GroupSummary" iskey="true" value="0" />
+        <property name="TotalSummary" iskey="true" value="0" />
+        <property name="View" isnull="true" iskey="true">
+          <property name="ShowTotalSummary">false</property>
+          <property name="ColumnChooserState" isnull="true" iskey="true">
+            <property name="Location">611.2,-214</property>
+            <property name="Size">220,250</property>
+          </property>
+          <property name="AutoWidth">true</property>
+          <property name="ShowGroupPanel">false</property>
+          <property name="LinesPerRowMode">TwoLinesMode</property>
+          <property name="WaitIndicatorType">Panel</property>
+          <property name="IsRowCellMenuEnabled">true</property>
+        </property>
+        <property name="Columns" iskey="true" value="47">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="MinWidth">48</property>
+            <property name="FieldName">T</property>
+            <property name="SortMode">Custom</property>
+            <property name="FixedWidth">true</property>
+            <property name="Visible">true</property>
+            <property name="VisibleIndex">0</property>
+            <property name="Width">48</property>
+            <property name="ActualWidth">6*</property>
+          </property>
+          <property name="Item2" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Project_da8d959bcd0c4fab8ff2053d7c2a826b</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Project_da8d959bcd0c4fab8ff2053d7c2a826b</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item3" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Electronic_exchange_ExchangeState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_Electronic_exchange_ExchangeState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">2</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item4" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Prepared_by_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Prepared_by_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">2</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item5" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Assignee_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Assignee_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">3</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item6" isnull="true" iskey="true">
+            <property name="FieldName">Integer_ID</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Integer_ID</property>
+            <property name="VisibleIndex">30</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item7" isnull="true" iskey="true">
+            <property name="FieldName">String_Name</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">true</property>
+            <property name="Name">String_Name</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">53*</property>
+          </property>
+          <property name="Item8" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Author_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Author_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item9" isnull="true" iskey="true">
+            <property name="FieldName">Boolean__64_</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Boolean__64_</property>
+            <property name="VisibleIndex">27</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item10" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Created</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Created</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item11" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Modified</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Modified</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item12" isnull="true" iskey="true">
+            <property name="FieldName">String_Reg_46__No_46_</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">String_Reg_46__No_46_</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item13" isnull="true" iskey="true">
+            <property name="FieldName">Integer_Order_Number</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Integer_Order_Number</property>
+            <property name="VisibleIndex">12</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item14" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Document_date</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Document_date</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item15" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Document_register_d7800dd5a9d241e9bbc4a39292ac1eeb</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Document_register_d7800dd5a9d241e9bbc4a39292ac1eeb</property>
+            <property name="VisibleIndex">6</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item16" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Delivery_method_276d7e4aea114740af17893abc6bc6e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">true</property>
+            <property name="Name">Navigation_Delivery_method_276d7e4aea114740af17893abc6bc6e9</property>
+            <property name="VisibleIndex">5</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item17" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_File_493bb59eae484cb5ab66071de5f890b0</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_File_493bb59eae484cb5ab66071de5f890b0</property>
+            <property name="VisibleIndex">8</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item18" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Date_placed_to_file</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Date_placed_to_file</property>
+            <property name="VisibleIndex">9</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item19" isnull="true" iskey="true">
+            <property name="FieldName">Boolean_Return_required</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">true</property>
+            <property name="Name">Boolean_Return_required</property>
+            <property name="VisibleIndex">3</property>
+            <property name="ActualWidth">3*</property>
+          </property>
+          <property name="Item20" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Delivered_to_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">true</property>
+            <property name="Name">Navigation_Delivered_to_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">2</property>
+            <property name="ActualWidth">18*</property>
+          </property>
+          <property name="Item21" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Return_deadline</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">true</property>
+            <property name="Name">DateTime_Return_deadline</property>
+            <property name="VisibleIndex">4</property>
+            <property name="ActualWidth">14*</property>
+          </property>
+          <property name="Item22" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Return_date</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Return_date</property>
+            <property name="VisibleIndex">4</property>
+            <property name="ActualWidth">18*</property>
+          </property>
+          <property name="Item23" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_State_LifeCycleState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_State_LifeCycleState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">11</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item24" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Registration_state_RegistrationState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_Registration_state_RegistrationState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">12</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item25" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Internal_approval_InternalApprovalState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_Internal_approval_InternalApprovalState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">13</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item26" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Execution_ExecutionState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_Execution_ExecutionState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">15</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item27" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_Follow_up_ControlExecutionState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_Follow_up_ControlExecutionState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">16</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item28" isnull="true" iskey="true">
+            <property name="FieldName">Text_Location</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Text_Location</property>
+            <property name="VisibleIndex">17</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item29" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Employee_resp_46__for_return_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Employee_resp_46__for_return_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">18</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item30" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Document_kind_14a5962389a24ea8b6e92ad4365f358c</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Document_kind_14a5962389a24ea8b6e92ad4365f358c</property>
+            <property name="VisibleIndex">0</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item31" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Business_unit_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Business_unit_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">31</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item32" isnull="true" iskey="true">
+            <property name="FieldName">String_Subject</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">String_Subject</property>
+            <property name="VisibleIndex">22</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item33" isnull="true" iskey="true">
+            <property name="FieldName">String_Note</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">String_Note</property>
+            <property name="VisibleIndex">3</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item34" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Signed_by_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Signed_by_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item35" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Department_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Department_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">25</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item36" isnull="true" iskey="true">
+            <property name="FieldName">Boolean_Several_addressees</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Boolean_Several_addressees</property>
+            <property name="VisibleIndex">35</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item37" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Correspondent_294767f1009f4fbd80fcf98c49ddc560</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Correspondent_294767f1009f4fbd80fcf98c49ddc560</property>
+            <property name="VisibleIndex">31</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item38" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_In_response_to_030d8d679b944f0dbcc6691016eb70f3</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_In_response_to_030d8d679b944f0dbcc6691016eb70f3</property>
+            <property name="VisibleIndex">32</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item39" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Addressee_c8daaef9a6794a29ac01b93c1637c72e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Addressee_c8daaef9a6794a29ac01b93c1637c72e</property>
+            <property name="VisibleIndex">35</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item40" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Dated</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Dated</property>
+            <property name="VisibleIndex">33</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item41" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Addressee_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Addressee_c612fc4144a3428ba97c433c333d78e9</property>
+            <property name="VisibleIndex">37</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item42" isnull="true" iskey="true">
+            <property name="FieldName">String_No_46_</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">String_No_46_</property>
+            <property name="VisibleIndex">32</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item43" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Signed_by_c8daaef9a6794a29ac01b93c1637c72e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Signed_by_c8daaef9a6794a29ac01b93c1637c72e</property>
+            <property name="VisibleIndex">35</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item44" isnull="true" iskey="true">
+            <property name="FieldName">Navigation_Contact_c8daaef9a6794a29ac01b93c1637c72e</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Navigation_Contact_c8daaef9a6794a29ac01b93c1637c72e</property>
+            <property name="VisibleIndex">36</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item45" isnull="true" iskey="true">
+            <property name="FieldName">Boolean_Return_from_counterparty_required</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Boolean_Return_from_counterparty_required</property>
+            <property name="VisibleIndex">24</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item46" isnull="true" iskey="true">
+            <property name="FieldName">Enumeration_External_approval_ExternalApprovalState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="AutoFilterCondition">Contains</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">Enumeration_External_approval_ExternalApprovalState_58cca1021e974f07b6acfd866a8b7cb1</property>
+            <property name="VisibleIndex">14</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item47" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Scheduled_return_date_from_counterparty</property>
+            <property name="AutoFilterCondition">Equals</property>
+            <property name="SortMode">Custom</property>
+            <property name="Visible">false</property>
+            <property name="Name">DateTime_Scheduled_return_date_from_counterparty</property>
+            <property name="VisibleIndex">23</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+        </property>
+        <property name="SortInfo" iskey="true" value="2">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">DateTime_Return_deadline</property>
+            <property name="SortOrder">Ascending</property>
+          </property>
+          <property name="Item2" isnull="true" iskey="true">
+            <property name="FieldName">String_Name</property>
+            <property name="SortOrder">Ascending</property>
+          </property>
+        </property>
+        <property name="GroupCount">0</property>
+        <property name="GroupSummarySortInfo" iskey="true" value="0" />
+      </property>
+    </XtraSerializer>
+  </Folder>
+</settings>
