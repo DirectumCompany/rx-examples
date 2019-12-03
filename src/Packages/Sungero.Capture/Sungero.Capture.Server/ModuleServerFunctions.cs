@@ -3344,35 +3344,37 @@ namespace Sungero.Capture.Server
     [Public]
     public virtual void StoreVerifiedPropertiesValues(Docflow.IOfficialDocument document)
     {
-      AccessRights.AllowRead(
-        () =>
+      // Сохранять только в том случае, когда статус верификации меняется на "Завершено".
+      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
+      if (!documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName))
+        return;
+      
+      var recognitionInfo = Capture.DocumentRecognitionInfos
+        .GetAll(x => x.DocumentId == document.Id)
+        .OrderByDescending(x => x.Id)
+        .FirstOrDefault();
+      if (recognitionInfo == null)
+        return;
+      
+      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+      var linkedFacts = recognitionInfo.Facts
+        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'));
+      
+      // Взять только измененные пользователем свойства.
+      var type = document.GetType();
+      foreach (var linkedFact in linkedFacts)
+      {
+        var propertyName = linkedFact.PropertyName;
+        var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+        if (property != null)
         {
-          var recognitionInfo = Capture.DocumentRecognitionInfos
-            .GetAll(x => x.DocumentId == document.Id)
-            .OrderByDescending(x => x.Id)
-            .FirstOrDefault();
-          if (recognitionInfo == null)
-            return;
-          
-          // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
-          var linkedFacts = recognitionInfo.Facts
-            .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'));
-          
-          // Взять только измененные пользователем свойства.
-          var type = document.GetType();
-          foreach (var linkedFact in linkedFacts)
-          {
-            var propertyName = linkedFact.PropertyName;
-            var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
-            if (property != null)
-            {
-              object propertyValue = property.GetValue(document);
-              var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
-              if (!string.IsNullOrWhiteSpace(propertyStringValue) && !Equals(propertyStringValue, linkedFact.PropertyValue))
-                linkedFact.VerifiedValue = propertyStringValue;
-            }
-          }
-        });
+          object propertyValue = property.GetValue(document);
+          var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
+          if (!string.IsNullOrWhiteSpace(propertyStringValue) && !Equals(propertyStringValue, linkedFact.PropertyValue))
+            linkedFact.VerifiedValue = propertyStringValue;
+        }
+      }
+      documentParams.Remove(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName);
     }
     
     /// <summary>
