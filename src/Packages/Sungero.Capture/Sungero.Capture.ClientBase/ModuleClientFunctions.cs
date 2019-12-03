@@ -519,10 +519,10 @@ namespace Sungero.Capture.Client
       // данная функция используется за пределами модуля.
       var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
       var exactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, true);
-      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Green));
+      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Green));
       
       var notExactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, false);
-      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow));
+      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Yellow));
       
       // Подсветить номенклатуру (демо-режим).
       if (MockDocumentBases.Is(document))
@@ -580,9 +580,10 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color)
     {
-      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.HighlightsColorCodes.Yellow)
-        ? Sungero.Core.Colors.Common.Yellow
-        : Sungero.Core.Colors.Common.Green;
+      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Yellow)
+        ? Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Yellow)
+        : Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Green);
+
       foreach (var propertyNameAndPosition in propertyNamesAndPositions)
       {
         // Подсветка полей карточки.
@@ -654,10 +655,12 @@ namespace Sungero.Capture.Client
             if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, recognizedRecordFact.PropertyValue))
             {
               record.State.Properties[propertyName].HighlightColor = recognizedRecordFact.IsTrusted.Value
-                ? Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Green)
-                : Colors.Parse(PublicConstants.Module.HighlightsColorCodes.Yellow);
+                ? Colors.Parse(PublicConstants.Module.PropertiesHighlightColorCodes.Green)
+                : Colors.Parse(PublicConstants.Module.PropertiesHighlightColorCodes.Yellow);
               
-              var recordPreviewColor = recognizedRecordFact.IsTrusted.Value ? Colors.Common.Green : Colors.Common.Yellow;
+              var recordPreviewColor = recognizedRecordFact.IsTrusted.Value
+                ? Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Green)
+                : Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Yellow);
               HighlightFactInPreview(previewControl, recognizedRecordFact.Position, recordPreviewColor);
             }
           }

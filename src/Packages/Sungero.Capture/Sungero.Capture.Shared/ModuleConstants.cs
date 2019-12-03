@@ -120,7 +120,7 @@ namespace Sungero.Capture.Constants
     public const char PropertyAndPositionDelimiter = '-';
     
     // Коды цвета подсветки свойств.
-    public static class HighlightsColorCodes
+    public static class PropertiesHighlightColorCodes
     {
       [Sungero.Core.Public]
       public const string Green = "#E3EFD0";
@@ -130,6 +130,16 @@ namespace Sungero.Capture.Constants
       
       [Sungero.Core.Public]
       public const string Red = "#FAC6B6";
+    }
+    
+    // Коды цвета подсветки полей в предпросмотре.
+    public static class PreviewHighlightColorCodes
+    {
+      [Sungero.Core.Public]
+      public const string Green = "#74B014";
+      
+      [Sungero.Core.Public]
+      public const string Yellow = "#FFEA00";
     }
     
     // Наименования полей для фактов Ario.

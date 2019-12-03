@@ -520,10 +520,19 @@
       "Name": "Green",
       "ParentClasses": [
         "Module",
-        "HighlightsColorCodes"
+        "PropertiesHighlightColorCodes"
       ],
       "TypeName": "System.String",
       "Value": "\"#E3EFD0\""
+    },
+    {
+      "Name": "Green",
+      "ParentClasses": [
+        "Module",
+        "PreviewHighlightColorCodes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"#74B014\""
     },
     {
       "Name": "Html",
@@ -794,7 +803,7 @@
       "Name": "Red",
       "ParentClasses": [
         "Module",
-        "HighlightsColorCodes"
+        "PropertiesHighlightColorCodes"
       ],
       "TypeName": "System.String",
       "Value": "\"#FAC6B6\""
@@ -1157,10 +1166,19 @@
       "Name": "Yellow",
       "ParentClasses": [
         "Module",
-        "HighlightsColorCodes"
+        "PropertiesHighlightColorCodes"
       ],
       "TypeName": "System.String",
       "Value": "\"#FFFBCC\""
+    },
+    {
+      "Name": "Yellow",
+      "ParentClasses": [
+        "Module",
+        "PreviewHighlightColorCodes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"#FFEA00\""
     }
   ],
   "PublicFunctions": [
