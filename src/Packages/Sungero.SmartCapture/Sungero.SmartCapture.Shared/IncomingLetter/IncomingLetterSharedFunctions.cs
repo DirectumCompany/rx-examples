@@ -17,14 +17,6 @@ namespace Sungero.SmartCapture.Shared
       _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
     }
     
-    public override List<Sungero.Parties.ICounterparty> GetCounterparties()
-    {
-      if (_obj.Correspondent == null)
-        return null;
-      
-      return base.GetCounterparties();
-    }
-    
     public override void FillName()
     {
       base.FillName();
