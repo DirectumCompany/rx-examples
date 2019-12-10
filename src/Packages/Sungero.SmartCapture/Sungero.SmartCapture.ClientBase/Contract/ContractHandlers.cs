@@ -51,6 +51,12 @@ namespace Sungero.SmartCapture
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
+      // В визуальном режиме поля содержание, категория и контрагент обязательны, при программном изменении - нет.
+      // Чтобы в зависимости от режима изменять обязательность для возможности сохранять документ с незаполненными полями,
+      // используется этот параметр. Добавляется на Refresh до отрабатывания базового события,
+      // чтобы выполнились вычисления обязательности свойств, т.к. при отмене изменений параметры откатываются.
+      ((Domain.Shared.IExtendedEntity)_obj).Params[Capture.PublicConstants.Module.IsVisualModeParamName] = true;
+      
       base.Refresh(e);
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
@@ -61,12 +67,6 @@ namespace Sungero.SmartCapture
       base.Showing(e);
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
-      
-      // В визуальном режиме поля содержание, категория и контрагент обязательны, при программном изменении - нет.
-      // При заполнении Вида документа в вычислениях меняется обязательность поля содержание.
-      // Чтобы этого не происходило в случае программного изменения, используется этот параметр.
-      ((Domain.Shared.IExtendedEntity)_obj).Params[Capture.PublicConstants.Module.IsVisualModeParamName] = true;
-
     }
 
   }
