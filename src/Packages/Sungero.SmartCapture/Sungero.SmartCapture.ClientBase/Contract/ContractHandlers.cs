@@ -17,6 +17,8 @@ namespace Sungero.SmartCapture
       _obj.State.Properties.Subject.IsRequired = false;
       _obj.State.Properties.DocumentGroup.IsRequired = false;
       _obj.State.Properties.Counterparty.IsRequired = false;
+
+      ((Domain.Shared.IExtendedEntity)_obj).Params.Remove(Capture.PublicConstants.Module.IsVisualModeParamName);
     }
 
     public override void CurrencyValueInput(Sungero.Docflow.Client.ContractualDocumentBaseCurrencyValueInputEventArgs e)
@@ -68,6 +70,12 @@ namespace Sungero.SmartCapture
       base.Showing(e);
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+      
+      // В визуальном режиме поля содержание, категория и контрагент обязательны, при программном изменении - нет.
+      // При заполнении Вида документа в вычислениях меняется обязательность поля содержание.
+      // Чтобы этого не происходило в случае программного изменения, используется этот параметр.
+      ((Domain.Shared.IExtendedEntity)_obj).Params[Capture.PublicConstants.Module.IsVisualModeParamName] = true;
+
     }
 
   }

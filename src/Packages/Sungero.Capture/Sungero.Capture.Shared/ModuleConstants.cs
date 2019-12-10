@@ -26,6 +26,10 @@ namespace Sungero.Capture.Constants
     [Sungero.Core.Public]
     public const string TrustedFactProbabilityKey = "TrustedFactProbability";
     
+    // Параметр "Визуальный режим".
+    [Sungero.Core.Public]
+    public const string IsVisualModeParamName = "IsVisualMode";
+    
     // Наименования классов из классификатора Ario.
     public static class ArioClassNames
     {
