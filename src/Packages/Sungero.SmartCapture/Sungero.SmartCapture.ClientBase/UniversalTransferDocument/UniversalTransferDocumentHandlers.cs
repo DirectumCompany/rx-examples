@@ -10,6 +10,13 @@ namespace Sungero.SmartCapture
   partial class UniversalTransferDocumentClientHandlers
   {
 
+    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
+    {
+      base.Closing(e);
+      
+      _obj.State.Properties.Counterparty.IsRequired = false;
+    }
+
     public override void RegistrationDateValueInput(Sungero.Presentation.DateTimeValueInputEventArgs e)
     {
       base.RegistrationDateValueInput(e);

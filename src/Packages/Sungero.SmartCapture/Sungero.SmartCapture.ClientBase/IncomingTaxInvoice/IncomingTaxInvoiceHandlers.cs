@@ -10,6 +10,13 @@ namespace Sungero.SmartCapture
   partial class IncomingTaxInvoiceClientHandlers
   {
 
+    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
+    {
+      base.Closing(e);
+      
+      _obj.State.Properties.Counterparty.IsRequired = false;
+    }
+
     public override void CorrectedValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCorrectedValueInputEventArgs e)
     {
       base.CorrectedValueInput(e);

@@ -10,6 +10,13 @@ namespace Sungero.SmartCapture
   partial class ContractStatementClientHandlers
   {
 
+    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
+    {
+      base.Closing(e);
+      
+      _obj.State.Properties.Counterparty.IsRequired = false;
+    }
+
     public override void TotalAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
     {
       base.TotalAmountValueInput(e);

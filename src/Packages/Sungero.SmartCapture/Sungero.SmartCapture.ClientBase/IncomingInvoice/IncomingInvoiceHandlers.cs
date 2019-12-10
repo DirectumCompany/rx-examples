@@ -10,6 +10,17 @@ namespace Sungero.SmartCapture
   partial class IncomingInvoiceClientHandlers
   {
 
+    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
+    {
+      base.Closing(e);
+      
+      _obj.State.Properties.Counterparty.IsRequired = false;
+      _obj.State.Properties.Number.IsRequired = false;
+      _obj.State.Properties.Date.IsRequired = false;
+      _obj.State.Properties.TotalAmount.IsRequired = false;
+      _obj.State.Properties.Currency.IsRequired = false;
+    }
+
     public override void ContractValueInput(Sungero.Contracts.Client.IncomingInvoiceContractValueInputEventArgs e)
     {
       base.ContractValueInput(e);
@@ -61,15 +72,15 @@ namespace Sungero.SmartCapture
 
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
     {
-       base.Showing(e);
+      base.Showing(e);
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
-       base.Refresh(e);
-         
+      base.Refresh(e);
+      
       // Восстановить обязательность.
       _obj.State.Properties.Counterparty.IsRequired = true;
       _obj.State.Properties.Number.IsRequired = true;

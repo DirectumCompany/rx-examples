@@ -256,7 +256,8 @@
   ],
   "HandledEvents": [
     "RefreshClient",
-    "ShowingClient"
+    "ShowingClient",
+    "ClosingClient"
   ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "09584896-81e2-4c83-8f6c-70eb8321e1d0",
