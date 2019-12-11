@@ -13,8 +13,15 @@ namespace Sungero.SmartCapture.Shared
     {
       base.SetRequiredProperties();
       
-      // Поле Содержание обязательно для заполнения, только если это указано в метаданных.
-      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
+      // Изменить обязательность полей в зависимости от того, программная или визульная работа.
+      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
+      if (!isVisualMode)
+      {
+        // При программной работе содержание делаем необязательными.
+        // Чтобы сбросить обязательность, если она изменилась в вызове текущего метода в базовой сущности.
+        // При визуальной работе - обязательность содержания определится в вызове текущего метода в базовой сущности.
+        _obj.State.Properties.Subject.IsRequired = false;
+      }
     }
     
     public override void FillName()
