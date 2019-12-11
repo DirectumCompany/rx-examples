@@ -15,6 +15,8 @@ namespace Sungero.SmartCapture
       base.Closing(e);
       
       _obj.State.Properties.Counterparty.IsRequired = false;
+      
+      ((Domain.Shared.IExtendedEntity)_obj).Params.Remove(Capture.PublicConstants.Module.IsVisualModeParamName);
     }
 
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
@@ -80,17 +82,15 @@ namespace Sungero.SmartCapture
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
+      // В визуальном режиме поле Контрагент обязательно, при программном изменении - нет.
+      // Чтобы в зависимости от режима изменять обязательность для возможности сохранять документ с незаполненными полями,
+      // используется этот параметр. Добавляется на Refresh до отрабатывания базового события,
+      // чтобы выполнились вычисления обязательности свойств, т.к. при отмене изменений параметры откатываются.
+      ((Domain.Shared.IExtendedEntity)_obj).Params[Capture.PublicConstants.Module.IsVisualModeParamName] = true;
+      
       base.Refresh(e);
       
-      // Восстановить обязательность контрагента.
-      _obj.State.Properties.Counterparty.IsRequired = true;
-      
-      // Контрагент не дб задизейблен, если незаполнен.
-      if (_obj.Counterparty == null)
-        _obj.State.Properties.Counterparty.IsEnabled = true;
-      
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
-      Sungero.Capture.PublicFunctions.Module.EnableRequisitesForVerification(_obj);
     }
 
   }
