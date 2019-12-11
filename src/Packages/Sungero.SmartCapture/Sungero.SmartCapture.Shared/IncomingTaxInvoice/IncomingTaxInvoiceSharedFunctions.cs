@@ -13,8 +13,23 @@ namespace Sungero.SmartCapture.Shared
     {
       base.SetRequiredProperties();
       
-      // Содержание обязательно, только если это указано в метаданных.
-      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
+      // Изменить обязательность полей в зависимости от того, программная или визульная работа.
+      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
+      if (isVisualMode)
+      {
+        // При визуальной работе обязательность контрагента как в IncomingTaxInvoice.
+        _obj.State.Properties.Counterparty.IsRequired = true;
+      }
+      else
+      {
+        // При программной работе поля делаем необязательными, чтобы сбросить обязательность,
+        // если она изменилась в вызове текущего метода в базовой сущности.
+        _obj.State.Properties.Counterparty.IsRequired = false;
+        // Содержание в базовой сущности необязательно, но может в будущем измениться,
+        // Поэтому при программной работе - явно сбрасываем необязательность.
+        // При визуальной работе - обязательность содержания определится в вызове текущего метода в базовой сущности.
+        _obj.State.Properties.Subject.IsRequired = false;
+      }
     }
     
     public override void FillName()
