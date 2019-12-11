@@ -177,14 +177,6 @@
           "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
           "NameGuid": "f34634e7-1d7f-4dd4-a6e8-96d3325c3241",
           "Name": "Counterparty",
-          "ColumnDefinitions": [
-            {
-              "Percentage": 50.0
-            },
-            {
-              "Percentage": 50.0
-            }
-          ],
           "ColumnNumber": 0,
           "ColumnSpan": 1,
           "GroupType": "WithTitleNoBorder",
@@ -197,7 +189,7 @@
           "NameGuid": "d1751297-16af-4cc1-a83d-522c97016b9b",
           "Name": "Counterparty",
           "ColumnNumber": 0,
-          "ColumnSpan": 2,
+          "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "f34634e7-1d7f-4dd4-a6e8-96d3325c3241",
           "PropertyGuid": "cc53a990-5123-4f3a-b5ac-f3899be1f40a",
@@ -209,7 +201,7 @@
           "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
           "NameGuid": "f76653b5-0293-49c1-a94f-9e1df3ae02e4",
           "Name": "Contact",
-          "ColumnNumber": 1,
+          "ColumnNumber": 0,
           "ColumnSpan": 1,
           "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
           "ParentGuid": "f34634e7-1d7f-4dd4-a6e8-96d3325c3241",
@@ -421,19 +413,6 @@
           "ParentGuid": "8f91b21b-a374-4bd5-807b-b01130dff98f",
           "RowNumber": 3,
           "RowSpan": 1
-        },
-        {
-          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
-          "NameGuid": "573821dd-2f50-4048-bb14-158b789a6687",
-          "Name": "CounterpartySignatory",
-          "ColumnNumber": 0,
-          "ColumnSpan": 1,
-          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
-          "ParentGuid": "f34634e7-1d7f-4dd4-a6e8-96d3325c3241",
-          "PropertyGuid": "394a1dbe-6e80-4739-ad9f-bcf36863714d",
-          "RowNumber": 1,
-          "RowSpan": 1,
-          "Settings": []
         }
       ],
       "IsAncestorMetadata": true,
