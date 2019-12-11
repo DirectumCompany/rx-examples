@@ -16,6 +16,8 @@ namespace Sungero.SmartCapture
       
       _obj.State.Properties.Subject.IsRequired = false;
       _obj.State.Properties.Correspondent.IsRequired = false;
+      
+      ((Domain.Shared.IExtendedEntity)_obj).Params.Remove(Capture.PublicConstants.Module.IsVisualModeParamName);
     }
 
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
@@ -104,15 +106,13 @@ namespace Sungero.SmartCapture
     
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
+      // В визуальном режиме поля содержание и корреспондент обязательны, при программном изменении - нет.
+      // Чтобы в зависимости от режима изменять обязательность для возможности сохранять документ с незаполненными полями,
+      // используется этот параметр. Добавляется на Refresh до отрабатывания базового события,
+      // чтобы выполнились вычисления обязательности свойств, т.к. при отмене изменений параметры откатываются.
+      ((Domain.Shared.IExtendedEntity)_obj).Params[Capture.PublicConstants.Module.IsVisualModeParamName] = true;
+      
       base.Refresh(e);
-      
-      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired ||
-        (_obj.DocumentKind != null &&
-         (_obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Registrable ||
-          _obj.DocumentKind.GenerateDocumentName == true));
-      
-      // Восстановить обязательность корреспондента.
-      _obj.State.Properties.Correspondent.IsRequired = true;
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
