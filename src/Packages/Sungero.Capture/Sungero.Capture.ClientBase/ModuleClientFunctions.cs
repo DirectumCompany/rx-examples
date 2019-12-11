@@ -701,8 +701,7 @@ namespace Sungero.Capture.Client
         document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
         document.DocumentRegister != null;
       
-      if (document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess &&
-          smartCaptureNumerationSucceed)
+      if (smartCaptureNumerationSucceed)
       {
         // Проверить возможность изменения реквизитов.
         if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))

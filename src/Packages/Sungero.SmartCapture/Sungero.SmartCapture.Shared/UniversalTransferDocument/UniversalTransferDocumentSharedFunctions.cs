@@ -13,8 +13,32 @@ namespace Sungero.SmartCapture.Shared
     {
       base.SetRequiredProperties();
       
-      // Содержание обязательно, только если это указано в метаданных.
-      _obj.State.Properties.Subject.IsRequired = _obj.Info.Properties.Subject.IsRequired;
+      // Изменить обязательность полей в зависимости от того, программная или визульная работа.
+      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
+      if (isVisualMode)
+      {
+        // При визуальной работе обязательность контрагента как в UniversalTransferDocument.
+        _obj.State.Properties.Counterparty.IsRequired = true;
+      }
+      else
+      {
+        // При программной работе поля делаем необязательными, чтобы сбросить обязательность,
+        // если она изменилась в вызове текущего метода в базовой сущности.
+        _obj.State.Properties.Counterparty.IsRequired = false;
+      }
+    }
+    
+    public override void ChangeDocumentPropertiesAccess(bool isEnabled, bool repeatRegister)
+    {
+      var smartCaptureNumerationSucceed = _obj.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
+        _obj.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+        _obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
+        _obj.DocumentRegister != null;
+      
+      if (smartCaptureNumerationSucceed)
+        Sungero.Capture.PublicFunctions.Module.EnableRequisitesForVerification(_obj);
+      else
+        base.ChangeDocumentPropertiesAccess(isEnabled, repeatRegister);
     }
     
     public override void FillName()
