@@ -15,21 +15,13 @@ namespace Sungero.SmartCapture.Shared
       
       // Изменить обязательность полей в зависимости от того, программная или визульная работа.
       var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
-      if (isVisualMode)
-      {
-        // При визуальной работе обязательность содержания, контрагента и ведущего документа как в SupAgreement.
-        _obj.State.Properties.Subject.IsRequired = true;
-        _obj.State.Properties.Counterparty.IsRequired = true;
-        _obj.State.Properties.LeadingDocument.IsRequired = true;
-      }
-      else
-      {
-        // При программной работе поля делаем необязательными, чтобы сбросить обязательность, 
-        // если она изменилась в вызове текущего метода в базовой сущности.
-        _obj.State.Properties.Subject.IsRequired = false;
-        _obj.State.Properties.Counterparty.IsRequired = false;
-        _obj.State.Properties.LeadingDocument.IsRequired = false;
-      }
+      
+      // При визуальной работе обязательность содержания, контрагента и ведущего документа как в SupAgreement.
+      // При программной работе поля делаем необязательными, чтобы сбросить обязательность,
+      // если она изменилась в вызове текущего метода в базовой сущности.
+      _obj.State.Properties.Subject.IsRequired = isVisualMode;
+      _obj.State.Properties.Counterparty.IsRequired = isVisualMode;
+      _obj.State.Properties.LeadingDocument.IsRequired = isVisualMode;
     }
     
     public override void FillName()
