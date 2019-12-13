@@ -3590,7 +3590,7 @@ namespace Sungero.Capture.Server
       if (counterparty != null)
       {
         // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
-        result = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString() ,counterpartyPropertyName);
+        result = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString(), counterpartyPropertyName);
         if (result.Contact != null)
           return result;
       }
@@ -3670,7 +3670,7 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return result;
       
-      if (string.IsNullOrEmpty(leadingDocPropertyName))
+      if (!string.IsNullOrEmpty(leadingDocPropertyName) && counterparty != null)
       {
         result = GetContractByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
         if (result.Contract != null)
