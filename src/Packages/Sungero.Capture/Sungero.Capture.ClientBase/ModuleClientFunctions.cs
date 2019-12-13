@@ -8,6 +8,7 @@ using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
 using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
 using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
+using CommonLibrary;
 
 namespace Sungero.Capture.Client
 {
@@ -596,9 +597,12 @@ namespace Sungero.Capture.Client
         // Подсветка фактов в теле документа.
         if (splitedPropertyNameAndPosition.Count() > 1 && !string.IsNullOrWhiteSpace(splitedPropertyNameAndPosition[1]))
         {
+          var propertyInfo = document.Info.Properties.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+          var propertyInfoValue = (Sungero.Domain.Shared.IInternalPropertyInfo)propertyInfo.GetReflectionPropertyValue(document.Info.Properties);
           var fieldsPositions = splitedPropertyNameAndPosition[1].Split(Constants.Module.PositionsDelimiter);
           foreach (var fieldPosition in fieldsPositions)
-            HighlightFactInPreview(document.State.Controls.Preview, fieldPosition, posColor);
+            HighlightFactInPreview(document.State.Controls.Preview, fieldPosition,
+                                   posColor, (Sungero.Domain.Shared.IPropertyInfo)propertyInfoValue);
         }
       }
     }
@@ -661,7 +665,11 @@ namespace Sungero.Capture.Client
               var recordPreviewColor = recognizedRecordFact.IsTrusted.Value
                 ? Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Green)
                 : Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Yellow);
-              HighlightFactInPreview(previewControl, recognizedRecordFact.Position, recordPreviewColor);
+              
+              var propertyInfo = record.Info.Properties.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+              var propertyInfoValue = (Sungero.Domain.Shared.IInternalPropertyInfo)propertyInfo.GetReflectionPropertyValue(record.Info.Properties);
+              HighlightFactInPreview(previewControl, recognizedRecordFact.Position, recordPreviewColor,
+                                     record, (Sungero.Domain.Shared.IPropertyInfo)propertyInfoValue);
             }
           }
         }
@@ -675,7 +683,7 @@ namespace Sungero.Capture.Client
     /// <param name="position">Позиция.</param>
     /// <param name="color">Цвет.</param>
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
-                                               string position, Sungero.Core.Color color)
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IPropertyInfo propertyInfo)
     {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
@@ -686,7 +694,28 @@ namespace Sungero.Capture.Client
                                           double.Parse(positions[3]),
                                           double.Parse(positions[4]),
                                           double.Parse(positions[5]),
-                                          double.Parse(positions[6]));
+                                          double.Parse(positions[6]), propertyInfo);
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity, Sungero.Domain.Shared.IPropertyInfo childpropertyInfo)
+    {
+      var positions = position.Split(Constants.Module.PositionElementDelimiter);
+      if (positions.Count() >= 7)
+        previewControl.HighlightAreas.Add(color,
+                                          int.Parse(positions[0]),
+                                          double.Parse(positions[1]),
+                                          double.Parse(positions[2]),
+                                          double.Parse(positions[3]),
+                                          double.Parse(positions[4]),
+                                          double.Parse(positions[5]),
+                                          double.Parse(positions[6]), childEntity, childpropertyInfo);
     }
     
     /// <summary>
