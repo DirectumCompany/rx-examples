@@ -158,4 +158,7 @@ The blank field means that the fact reliability is below the lower confidence in
   <data name="SmartProcessingSettings" xml:space="preserve">
     <value>Smart Processing Settings</value>
   </data>
+  <data name="SetCorrectConfidenceLimits" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

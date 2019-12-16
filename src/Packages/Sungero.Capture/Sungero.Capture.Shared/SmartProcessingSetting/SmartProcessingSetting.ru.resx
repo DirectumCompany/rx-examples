@@ -158,4 +158,7 @@
   <data name="SmartProcessingSettings" xml:space="preserve">
     <value>Настройки интеллектуальной обработки</value>
   </data>
+  <data name="SetCorrectConfidenceLimits" xml:space="preserve">
+    <value>Настройте границы доверия корректно.</value>
+  </data>
 </root>

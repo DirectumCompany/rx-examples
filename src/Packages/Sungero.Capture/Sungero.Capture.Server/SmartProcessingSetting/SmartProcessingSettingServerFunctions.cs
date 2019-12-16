@@ -40,6 +40,7 @@ namespace Sungero.Capture.Server
     /// Проверить подключение к Ario.
     /// </summary>
     /// <returns>True, если сервис работает, иначе - False.</returns>
+    /// <remarks>Проверка должна обязательно быть на сервере, т.к. с клиента может быть залочен доступ.</remarks>
     [Remote]
     public virtual bool CheckConnection()
     {

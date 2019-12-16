@@ -13,15 +13,23 @@ namespace Sungero.Capture
 
     public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
     {
-      // Валидация адреса сервиса Ario.
+      // Проверка адреса сервиса Ario.
       var isSafeFromUI = e.Params.Contains(Constants.SmartProcessingSetting.SaveFromUIParamName);
       var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
       var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      
+      // Проверка границ доверия.
+      var cofidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
+      arioUrlValidationMessages.AddRange(cofidenceLimitsValidationMessages);
+      
       if (isSafeFromUI && arioUrlValidationMessages.Any())
       {
         var errorMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Error);
         foreach (var message in errorMessages)
           e.AddError(message.Text);
+        
+        if (errorMessages.Any())
+          return;
         
         if (!isForceSave)
         {

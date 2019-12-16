@@ -23,7 +23,8 @@ namespace Sungero.Capture.Structures.SmartProcessingSetting
   /// </summary>
   partial class SettingsValidationMessage
   {
-    // Тип ошибки.
+    // Тип ошибки (Error|Warning).
+    // Доступные типы Constants.SmartProcessingSetting.SettingsValidationMessageTypes.
     public string Type { get; set; }
     
     // Текст ошибки.
