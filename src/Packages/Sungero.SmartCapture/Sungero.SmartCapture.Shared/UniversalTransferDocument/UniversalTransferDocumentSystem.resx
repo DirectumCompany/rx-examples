@@ -163,13 +163,13 @@
     <value />
   </data>
   <data name="ControlGroup_5198a4ed9142406c91a72e52a73e10e1" xml:space="preserve">
-    <value>TODO</value>
+    <value>Counterparty</value>
   </data>
   <data name="ControlGroup_68ee69aa97c04e3a975b8e31a3b9d1d9" xml:space="preserve">
-    <value>TODO</value>
+    <value>Company</value>
   </data>
   <data name="ControlGroup_1ccbb874885b4195b7fb246426496bac" xml:space="preserve">
-    <value>TODO</value>
+    <value>Terms</value>
   </data>
   <data name="ControlGroup_7467152a629047efb69f38e8f7911501" xml:space="preserve">
     <value>Lifecycle</value>
