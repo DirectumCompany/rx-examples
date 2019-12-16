@@ -106,10 +106,6 @@ namespace Sungero.Capture.Constants
     [Sungero.Core.Public]
     public const string DocumentNumberingBySmartCaptureResultParamName = "DocumentNumberingBySmartCaptureResult";
     
-    // Имя параметра: найден ли документ по штрихкоду.
-    [Sungero.Core.Public]
-    public const string FindByBarcodeParamName = "FindByBarcode";
-    
     // Имя параметра: заблокирован ли документ.
     [Sungero.Core.Public]
     public const string DocumentIsLockedParamName = "DocumentIsLocked";

@@ -251,9 +251,9 @@ namespace Sungero.Capture.Server
                 documentParams[Constants.Module.DocumentIsLockedParamName] = true;
               else
               {
-                CreateVersion(document, recognitionResult, Resources.VersionCreateFromBarcode);
+                documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
+                CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
                 document.Save();
-                documentParams[Constants.Module.FindByBarcodeParamName] = true;
               }
             }
           }
@@ -370,7 +370,7 @@ namespace Sungero.Capture.Server
     public virtual bool IsDocumentFoundByBarcode(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      if (documentParams.ContainsKey(Constants.Module.FindByBarcodeParamName))
+      if (documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName))
         return true;
       
       return false;

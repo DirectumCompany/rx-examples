@@ -483,14 +483,6 @@
       "Value": "\"FinancialDocument\""
     },
     {
-      "Name": "FindByBarcodeParamName",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"FindByBarcode\""
-    },
-    {
       "Name": "Folder",
       "ParentClasses": [
         "Module",
@@ -1679,7 +1671,6 @@
     "EmptyArioUrl",
     "EmailBodyDocumentName",
     "NoticeToAuthorSubject",
-    "VersionCreateFromBarcode",
     "FailedClassifyDocumentTaskText",
     "CheckDocumentTaskName",
     "FailedClassifyDocumentsTaskText",

@@ -159,9 +159,6 @@
   <data name="NoticeToAuthorSubject" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="VersionCreateFromBarcode" xml:space="preserve">
-    <value>TODO</value>
-  </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
