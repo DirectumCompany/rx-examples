@@ -3,6 +3,7 @@
   "NameGuid": "ef5d3409-fef2-4340-8664-4a2ce4b6caa3",
   "Name": "RecordManagementUI",
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [],
   "BaseGuid": "51247c94-981f-4bc8-819a-128704b5aa31",
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.RecordManagementUI.ClientBase",
@@ -282,7 +283,7 @@
       "OpenCardByDefault": true
     }
   ],
-  "Version": "3.3.4.1",
+  "Version": "3.3.5.1",
   "Widgets": [],
   "Versions": [
     {

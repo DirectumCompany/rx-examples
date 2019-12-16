@@ -3,6 +3,7 @@
   "NameGuid": "63d98c5e-e572-4372-9bf9-543f3da3524b",
   "Name": "Shell",
   "AssociatedGuid": "f83768c8-f40d-43dd-8cfa-3098f694d645",
+  "AsyncHandlers": [],
   "BaseGuid": "fcc573ab-5f4e-4b20-88e8-7b1e11a7a59a",
   "ClientBaseAssemblyName": "Sungero.SmartCapture.ClientBase",
   "ClientBaseNamespace": "Sungero.SmartCapture.Module.Shell.ClientBase",
@@ -64,7 +65,7 @@
       ]
     }
   ],
-  "Version": "3.3.4.1",
+  "Version": "3.3.5.1",
   "Widgets": [],
   "Versions": [
     {

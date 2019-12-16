@@ -2,6 +2,7 @@
   "$type": "Sungero.Metadata.ModuleMetadata, Sungero.Metadata",
   "NameGuid": "4c7444e6-c4af-46c1-9cfa-d9194d3ff0cb",
   "Name": "Capture",
+  "AsyncHandlers": [],
   "ClientAssemblyName": "Sungero.Capture.Client",
   "ClientBaseAssemblyName": "Sungero.Capture.ClientBase",
   "ClientBaseNamespace": "Sungero.Capture.ClientBase",

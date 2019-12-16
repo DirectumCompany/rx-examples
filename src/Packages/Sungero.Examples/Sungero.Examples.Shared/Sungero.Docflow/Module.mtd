@@ -3,6 +3,7 @@
   "NameGuid": "c5b4dd07-c302-45de-833c-0c1b22b535d0",
   "Name": "Docflow",
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [],
   "BaseGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.Docflow.ClientBase",
@@ -48,7 +49,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "3.3.4.1",
+  "Version": "3.3.5.1",
   "Widgets": [],
   "Versions": [
     {

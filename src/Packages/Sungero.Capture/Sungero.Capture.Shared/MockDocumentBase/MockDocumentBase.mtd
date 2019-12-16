@@ -75,7 +75,6 @@
       "Name": "ScanInNewVersion",
       "GenerateHandler": true,
       "IsAncestorMetadata": true,
-      "IsVisibleInWebClient": false,
       "Overridden": [
         "GenerateHandler"
       ]
