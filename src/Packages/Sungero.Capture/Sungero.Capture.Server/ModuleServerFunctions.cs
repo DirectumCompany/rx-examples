@@ -1316,7 +1316,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognitionResult);
+      FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -1492,7 +1492,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognitionResult);
+      FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -1744,7 +1744,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognitionResult);
+      FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -1792,7 +1792,7 @@ namespace Sungero.Capture.Server
       FillCorrectedDocument(document, recognitionResult, isAdjustment);
       
       // Сумма и валюта.
-      FillAmount(document, recognitionResult);
+      FillAmountAndCurrency(document, recognitionResult);
 
       return document;
     }
@@ -1962,7 +1962,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmount(document, recognitionResult);
+      FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -2070,6 +2070,9 @@ namespace Sungero.Capture.Server
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
+      // Сумма и валюта.
+      FillAmountAndCurrency(document, recognitionResult);
+      
       return document;
     }
     
@@ -2095,6 +2098,9 @@ namespace Sungero.Capture.Server
       
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
+
+      // Сумма и валюта.
+      FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -2179,36 +2185,65 @@ namespace Sungero.Capture.Server
       else
         LinkFactAndProperty(recognitionResult, null, null,
                             businessUnitPropertyName, documentParties.ResponsibleEmployeeBusinessUnit, false);
+    } 
+    
+    /// <summary>
+    /// Заполнить сумму и валюту.
+    /// </summary>
+    /// <param name="document">Бухгалтерский документ.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    public virtual void FillAmountAndCurrency(IAccountingDocumentBase document, Structures.Module.IRecognitionResult recognitionResult)
+    {
+      if (!AccountingDocumentBases.Is(document))
+        return;
+      
+      var recognizedAmount = GetAmount(recognitionResult);
+      if (recognizedAmount.HasValue)
+      {
+        var amount = recognizedAmount.Amount;
+        document.TotalAmount = amount;
+        LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
+      }
+
+      // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
+      // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
+      // а в них все расчеты ведутся в одной валюте.
+      var recognizedCurrency = GetCurrency(recognitionResult);
+      if (recognizedCurrency.HasValue)
+      {
+        var currency = recognizedCurrency.Currency;
+        document.Currency = currency;
+        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency);
+      }
     }
     
     /// <summary>
     /// Заполнить сумму и валюту.
     /// </summary>
-    /// <param name="document">Документ.</param>
+    /// <param name="document">Договорной документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    public virtual void FillAmount(IAccountingDocumentBase document, Structures.Module.IRecognitionResult recognitionResult)
+    public virtual void FillAmountAndCurrency(IContractualDocumentBase document, Structures.Module.IRecognitionResult recognitionResult)
     {
-      var facts = recognitionResult.Facts;
-      var props = document.Info.Properties;
-      var amountFacts = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount);
+      if (!ContractualDocumentBases.Is(document))
+        return;
       
-      var amountFact = amountFacts.FirstOrDefault();
-      if (amountFact != null)
+      var recognizedAmount = GetAmount(recognitionResult);
+      if (recognizedAmount.HasValue)
       {
-        document.TotalAmount = GetFieldNumericalValue(amountFact, FieldNames.DocumentAmount.Amount);
-        LinkFactAndProperty(recognitionResult, amountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+        var amount = recognizedAmount.Amount;
+        document.TotalAmount = amount;
+        LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
       }
       
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
-      // так как на данный момент функция используется только для обработки бухгалтерских документов,
+      // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
-      var currencyFacts = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency);
-      var currencyFact = currencyFacts.FirstOrDefault();
-      if (currencyFact != null)
+      var recognizedCurrency = GetCurrency(recognitionResult);
+      if (recognizedCurrency.HasValue)
       {
-        var currencyCode = GetFieldValue(currencyFact, FieldNames.DocumentAmount.Currency);
-        document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
-        LinkFactAndProperty(recognitionResult, currencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency);
+        var currency = recognizedCurrency.Currency;
+        document.Currency = currency;
+        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency);
       }
     }
     
@@ -2348,6 +2383,80 @@ namespace Sungero.Capture.Server
       document.DeliveryMethod = MailDeliveryMethods.GetAll()
         .Where(m => m.Name.Equals(methodName, StringComparison.InvariantCultureIgnoreCase))
         .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Распознать сумму.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    /// <returns>Результаты распознавания суммы.</returns>
+    public Structures.Module.IRecognizedAmount GetAmount(Structures.Module.IRecognitionResult recognitionResult)
+    {
+      var recognizedAmount = Structures.Module.RecognizedAmount.Create();
+      var facts = recognitionResult.Facts;
+      var amountFacts = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount);
+      
+      var amountFact = amountFacts.FirstOrDefault();
+      if (amountFact == null)
+        return recognizedAmount;
+      
+      recognizedAmount.Fact = amountFact;
+      
+      var totalAmount = GetFieldNumericalValue(amountFact, FieldNames.DocumentAmount.Amount);
+      if (!totalAmount.HasValue || totalAmount.Value <= 0)
+        return recognizedAmount;
+      
+      recognizedAmount.HasValue = true;
+      recognizedAmount.Amount = totalAmount.Value;
+      
+      // Если в сумме больше 2 знаков после запятой,
+      // то обрезать лишние разряды,
+      // иначе пометить, что результату извлечения можно доверять
+      var fractionalPart = totalAmount.Value - Math.Floor(totalAmount.Value);
+      if (fractionalPart.ToString().Length > 2)
+        recognizedAmount.Amount = 0.01 * Math.Truncate(totalAmount.Value / 0.01);
+      else
+        recognizedAmount.IsTrusted = true;
+      
+      return recognizedAmount;
+    }
+
+   /// <summary>
+    /// Распознать валюту.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    /// <returns>Результаты распознавания валюты.</returns>
+    public Structures.Module.IRecognizedCurrency GetCurrency(Structures.Module.IRecognitionResult recognitionResult)
+    {
+      var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
+      var facts = recognitionResult.Facts;
+      var currencyFacts = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency);
+      var currencyFact = currencyFacts.FirstOrDefault();
+      if (currencyFact == null)
+        return recognizedCurrency;
+      
+      recognizedCurrency.Fact = currencyFact;
+      
+      var currencyCode = GetFieldValue(currencyFact, FieldNames.DocumentAmount.Currency);
+      int resCurrencyCode;
+      if (!Int32.TryParse(currencyCode, out resCurrencyCode))
+        return recognizedCurrency;
+      
+      var currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).OrderBy(x => x.Status).FirstOrDefault();
+      if (currency == null)
+        return recognizedCurrency;
+      
+      var currencyStatus = currency.Status;
+      if (currencyStatus == CoreEntities.DatabookEntry.Status.Closed)
+        currency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
+      
+      if (currency != null)
+      {
+        recognizedCurrency.HasValue = true;
+        recognizedCurrency.Currency = currency;
+      }
+      
+      return recognizedCurrency;
     }
     
     #endregion

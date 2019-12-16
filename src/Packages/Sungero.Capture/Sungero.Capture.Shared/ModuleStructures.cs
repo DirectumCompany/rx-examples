@@ -269,4 +269,39 @@ namespace Sungero.Capture.Structures.Module
     public List<int> DocumentFoundByBarcodeIds { get; set; }
     public List<int> LockedDocumentIds { get; set; }
   }
+  
+  /// <summary>
+  /// Результат распознавания суммы.
+  /// </summary>
+  [Public]
+  partial class RecognizedAmount
+  {
+    // Сумма.
+    public double Amount { get; set; }
+    
+    // Признак - есть значение.
+    public bool HasValue { get; set; }
+    
+    // Признак - можно доверять.
+    public bool IsTrusted { get; set; }
+
+    // Факт
+    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+  }  
+  
+  /// <summary>
+  /// Результат распознавания валюты.
+  /// </summary>
+  [Public]
+  partial class RecognizedCurrency
+  {
+    // Валюта.
+    public Commons.ICurrency Currency { get; set; }
+    
+    // Признак - есть значение.
+    public bool HasValue { get; set; }
+
+    // Факт
+    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+  }    
 }

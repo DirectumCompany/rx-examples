@@ -1652,6 +1652,52 @@
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "RecognizedAmount",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Amount",
+          "TypeFullName": "global::System.Double"
+        },
+        {
+          "Name": "HasValue",
+          "TypeFullName": "global::System.Boolean"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "RecognizedCurrency",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Currency",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Commons.ICurrency"
+        },
+        {
+          "Name": "HasValue",
+          "TypeFullName": "global::System.Boolean"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
     }
   ],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
