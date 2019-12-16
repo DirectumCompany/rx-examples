@@ -178,6 +178,12 @@ namespace Sungero.Capture.Constants
         public const string Surname = "Surname";
         
         [Sungero.Core.Public]
+        public const string Name = "Name";
+        
+        [Sungero.Core.Public]
+        public const string Patrn = "Patrn";
+        
+        [Sungero.Core.Public]
         public const string Type = "Type";
       }
       

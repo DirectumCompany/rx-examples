@@ -666,6 +666,16 @@
       "ParentClasses": [
         "Module",
         "FieldNames",
+        "LetterPerson"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Name\""
+    },
+    {
+      "Name": "Name",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
         "Counterparty"
       ],
       "TypeName": "System.String",
@@ -730,6 +740,16 @@
       ],
       "TypeName": "System.String",
       "Value": "\"Number\""
+    },
+    {
+      "Name": "Patrn",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "LetterPerson"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Patrn\""
     },
     {
       "Name": "Patrn",
@@ -1382,6 +1402,33 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
+      "Name": "ContactFactNames",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "SurnameField",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "NameField",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "PatronymicField",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
       "Name": "ContractFactMatching",
       "IsPublic": true,
       "Properties": [
@@ -1746,7 +1793,7 @@
   "SharedAssemblyName": "Sungero.Capture.Shared",
   "SharedNamespace": "Sungero.Capture.Shared",
   "SpecialFolders": [],
-  "Version": "3.2.28.0",
+  "Version": "3.2.28.1",
   "Widgets": [],
   "Versions": [
     {

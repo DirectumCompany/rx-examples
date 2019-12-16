@@ -121,6 +121,25 @@ namespace Sungero.Capture.Structures.Module
     // Наименование поля с организационно-правовой формой организации.
     public string LegalFormField { get; set; }
   }
+  
+    /// <summary>
+  /// Наименования факта и полей для контактных лиц.
+  /// </summary>
+  [Public]
+  partial class ContactFactNames
+  {
+    // Наименование факта с данными контактного лица.
+    public string Fact { get; set; }
+    
+    // Наименование поля с фамилией контактного лица.
+    public string SurnameField { get; set; }
+    
+    // Наименование поля с именем контактного лица.
+    public string NameField { get; set; }
+    
+    // Наименование поля с отчетством контактного лица.
+    public string PatronymicField { get; set; }
+  }
  
   /// <summary>
   /// Контактное лицо и сопоставленный с ним факт.
