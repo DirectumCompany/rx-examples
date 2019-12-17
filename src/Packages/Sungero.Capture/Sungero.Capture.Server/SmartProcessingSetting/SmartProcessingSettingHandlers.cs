@@ -14,26 +14,31 @@ namespace Sungero.Capture
     public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
     {
       // Проверка адреса сервиса Ario.
-      var isSafeFromUI = e.Params.Contains(Constants.SmartProcessingSetting.SaveFromUIParamName);
-      var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
       var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
       
       // Проверка границ доверия.
-      var cofidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
-      arioUrlValidationMessages.AddRange(cofidenceLimitsValidationMessages);
+      var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
       
-      if (isSafeFromUI && arioUrlValidationMessages.Any())
+      // Вывод сообщений.
+      var isSafeFromUI = e.Params.Contains(Constants.SmartProcessingSetting.SaveFromUIParamName);
+      var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
+      var validationMessages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
+      validationMessages.AddRange(arioUrlValidationMessages);
+      validationMessages.AddRange(confidenceLimitsValidationMessages);
+      if (isSafeFromUI && validationMessages.Any())
       {
-        var errorMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Error);
+        // "Жёсткая" проверка.
+        var errorMessages = validationMessages.Where(m => m.Type == MessageTypes.Error);
         foreach (var message in errorMessages)
           e.AddError(message.Text);
         
         if (errorMessages.Any())
           return;
         
+        // "Мягкая" проверка.
         if (!isForceSave)
         {
-          var warningMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Warning);
+          var warningMessages = validationMessages.Where(m => m.Type == MessageTypes.Warning);
           foreach (var message in warningMessages)
             e.AddError(message.Text, _obj.Info.Actions.ForceSave);
         }

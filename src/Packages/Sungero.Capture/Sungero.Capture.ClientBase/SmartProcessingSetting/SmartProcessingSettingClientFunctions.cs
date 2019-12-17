@@ -23,7 +23,7 @@ namespace Sungero.Capture.Client
         return null;
       }
       
-      // Валидация адреса сервиса Ario.
+      // Проверка адреса сервиса Ario.
       var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
       var message = arioUrlValidationMessages.FirstOrDefault();
       if (message != null)

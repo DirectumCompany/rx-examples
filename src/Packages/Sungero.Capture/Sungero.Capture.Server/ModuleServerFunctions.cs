@@ -132,6 +132,9 @@ namespace Sungero.Capture.Server
       // Границы.
       smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
       smartProcessingSettings.UpperConfidenceLimit = int.Parse(upperConfidenceLimit);
+      var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(smartProcessingSettings);
+      if (confidenceLimitsValidationMessages.Any())
+        return confidenceLimitsValidationMessages;
       
       // Классификаторы.
       var arioClassifiers = Functions.SmartProcessingSetting.GetArioClassifiers(smartProcessingSettings);

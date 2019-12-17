@@ -23,7 +23,7 @@ namespace Sungero.Capture.Client
 
     public virtual void CheckConnection(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      // Валидация адреса сервиса Ario.
+      // Проверка адреса сервиса Ario.
       var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
       if (arioUrlValidationMessages.Any())
       {
