@@ -13,35 +13,40 @@ namespace Sungero.Capture
 
     public override void BeforeSave(Sungero.Domain.BeforeSaveEventArgs e)
     {
-      // Проверка адреса сервиса Ario.
-      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
-      
-      // Проверка границ доверия.
-      var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
-      
-      // Вывод сообщений.
       var isSafeFromUI = e.Params.Contains(Constants.SmartProcessingSetting.SaveFromUIParamName);
-      var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
-      var validationMessages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
-      validationMessages.AddRange(arioUrlValidationMessages);
-      validationMessages.AddRange(confidenceLimitsValidationMessages);
-      if (isSafeFromUI && validationMessages.Any())
+      if (!isSafeFromUI)
+        return;
+      
+      // "Жёсткая" проверка адреса сервиса Ario.
+      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      var arioUrlErrorMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Error);
+      if (arioUrlErrorMessages.Any())
+        foreach (var message in arioUrlErrorMessages)
+          e.AddError(_obj.Info.Properties.ArioUrl, message.Text);
+      
+      // "Жёсткая" проверка границ доверия.
+      var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
+      var confidenceLimitsErrorMessages = confidenceLimitsValidationMessages.Where(m => m.Type == MessageTypes.Error);
+      if (confidenceLimitsErrorMessages.Any())
       {
-        // "Жёсткая" проверка.
-        var errorMessages = validationMessages.Where(m => m.Type == MessageTypes.Error);
-        foreach (var message in errorMessages)
-          e.AddError(message.Text);
-        
-        if (errorMessages.Any())
-          return;
-        
-        // "Мягкая" проверка.
-        if (!isForceSave)
+        foreach (var message in confidenceLimitsValidationMessages)
         {
-          var warningMessages = validationMessages.Where(m => m.Type == MessageTypes.Warning);
-          foreach (var message in warningMessages)
-            e.AddError(message.Text, _obj.Info.Actions.ForceSave);
+          e.AddError(_obj.Info.Properties.LowerConfidenceLimit, message.Text, _obj.Info.Properties.UpperConfidenceLimit);
+          e.AddError(_obj.Info.Properties.UpperConfidenceLimit, message.Text, _obj.Info.Properties.LowerConfidenceLimit);
         }
+      }
+      
+      // При наличии "Жёстких" ошибок не переходить к ForseSave.
+      if (arioUrlErrorMessages.Any() || confidenceLimitsErrorMessages.Any())
+        return;
+      
+      // "Мягкая" адреса сервиса Ario.
+      var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
+      if (!isForceSave)
+      {
+        var arioUrlWarningMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Warning);
+        foreach (var message in arioUrlWarningMessages)
+          e.AddError(message.Text, _obj.Info.Actions.ForceSave);
       }
     }
 

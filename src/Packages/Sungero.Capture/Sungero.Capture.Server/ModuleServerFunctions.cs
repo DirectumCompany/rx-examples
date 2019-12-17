@@ -132,8 +132,8 @@ namespace Sungero.Capture.Server
       // Границы.
       int lowerLimit;
       int upperLimit;
-      smartProcessingSettings.LowerConfidenceLimit = int.TryParse(lowerConfidenceLimit, out lowerLimit) ? lowerLimit : 0;
-      smartProcessingSettings.UpperConfidenceLimit = int.TryParse(upperConfidenceLimit, out upperLimit) ? upperLimit : 0;
+      smartProcessingSettings.LowerConfidenceLimit = int.TryParse(lowerConfidenceLimit, out lowerLimit) ? lowerLimit : -1;
+      smartProcessingSettings.UpperConfidenceLimit = int.TryParse(upperConfidenceLimit, out upperLimit) ? upperLimit : -1;
       var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(smartProcessingSettings);
       if (confidenceLimitsValidationMessages.Any())
         return confidenceLimitsValidationMessages;
