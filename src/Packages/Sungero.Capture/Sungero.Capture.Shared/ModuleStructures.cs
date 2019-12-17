@@ -320,6 +320,9 @@ namespace Sungero.Capture.Structures.Module
     // Признак - есть значение.
     public bool HasValue { get; set; }
 
+    // Признак - можно доверять.
+    public bool IsTrusted { get; set; }
+    
     // Факт
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }    

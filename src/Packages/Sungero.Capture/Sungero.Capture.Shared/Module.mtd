@@ -1739,6 +1739,10 @@
           "TypeFullName": "global::System.Boolean"
         },
         {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        },
+        {
           "Name": "Fact",
           "IsNullable": true,
           "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"

@@ -1915,7 +1915,7 @@ namespace Sungero.Capture.Server
         isTrustedDate = false;
       }
       document.Date = date;
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);      
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
       document.Number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
@@ -1982,7 +1982,7 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       // Номер.
-      var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();      
+      var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
       var number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
       Nullable<bool> isTrustedNumber = null;
       if (number.Length > document.Info.Properties.Number.Length)
@@ -2233,7 +2233,7 @@ namespace Sungero.Capture.Server
       if (!AccountingDocumentBases.Is(document))
         return;
       
-      var recognizedAmount = GetAmount(recognitionResult);
+      var recognizedAmount = GetRecognizedAmount(recognitionResult);
       if (recognizedAmount.HasValue)
       {
         var amount = recognizedAmount.Amount;
@@ -2244,12 +2244,12 @@ namespace Sungero.Capture.Server
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
-      var recognizedCurrency = GetCurrency(recognitionResult);
+      var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
       if (recognizedCurrency.HasValue)
       {
         var currency = recognizedCurrency.Currency;
         document.Currency = currency;
-        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency);
+        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
       }
     }
     
@@ -2263,7 +2263,7 @@ namespace Sungero.Capture.Server
       if (!ContractualDocumentBases.Is(document))
         return;
       
-      var recognizedAmount = GetAmount(recognitionResult);
+      var recognizedAmount = GetRecognizedAmount(recognitionResult);
       if (recognizedAmount.HasValue)
       {
         var amount = recognizedAmount.Amount;
@@ -2274,12 +2274,12 @@ namespace Sungero.Capture.Server
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
-      var recognizedCurrency = GetCurrency(recognitionResult);
+      var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
       if (recognizedCurrency.HasValue)
       {
         var currency = recognizedCurrency.Currency;
         document.Currency = currency;
-        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency);
+        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
       }
     }
     
@@ -2355,7 +2355,7 @@ namespace Sungero.Capture.Server
     {
       // Дата.
       var facts = recognitionResult.Facts;
-      var dateFact = GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();      
+      var dateFact = GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
       var date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
       var isTrustedDate = true;
       if (date < Calendar.SqlMinValue)
@@ -2433,7 +2433,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Результаты распознавания суммы.</returns>
-    public Structures.Module.IRecognizedAmount GetAmount(Structures.Module.IRecognitionResult recognitionResult)
+    public Structures.Module.IRecognizedAmount GetRecognizedAmount(Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedAmount = Structures.Module.RecognizedAmount.Create();
       var facts = recognitionResult.Facts;
@@ -2451,15 +2451,18 @@ namespace Sungero.Capture.Server
       
       recognizedAmount.HasValue = true;
       recognizedAmount.Amount = totalAmount.Value;
+      recognizedAmount.IsTrusted = IsTrustedField(amountFact, FieldNames.DocumentAmount.Amount);
       
       // Если в сумме больше 2 знаков после запятой,
       // то обрезать лишние разряды,
       // иначе пометить, что результату извлечения можно доверять
-      var fractionalPart = totalAmount.Value - Math.Floor(totalAmount.Value);
-      if (fractionalPart.ToString().Length > 2)
-        recognizedAmount.Amount = 0.01 * Math.Truncate(totalAmount.Value / 0.01);
-      else
-        recognizedAmount.IsTrusted = true;
+      var roundedAmount = Math.Round(totalAmount.Value, 2);
+      var amountClipping = roundedAmount - totalAmount.Value != 0.0;
+      if (amountClipping)
+      {
+        recognizedAmount.Amount = roundedAmount;
+        recognizedAmount.IsTrusted = false;
+      }
       
       return recognizedAmount;
     }
@@ -2469,7 +2472,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Результаты распознавания валюты.</returns>
-    public Structures.Module.IRecognizedCurrency GetCurrency(Structures.Module.IRecognitionResult recognitionResult)
+    public Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
       var facts = recognitionResult.Facts;
@@ -2489,9 +2492,13 @@ namespace Sungero.Capture.Server
       if (currency == null)
         return recognizedCurrency;
       
+      recognizedCurrency.IsTrusted = true;
       var currencyStatus = currency.Status;
       if (currencyStatus == CoreEntities.DatabookEntry.Status.Closed)
+      {
         currency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
+        recognizedCurrency.IsTrusted = false;
+      }
       
       if (currency != null)
       {
