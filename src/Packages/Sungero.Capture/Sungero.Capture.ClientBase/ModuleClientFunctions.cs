@@ -751,22 +751,18 @@ namespace Sungero.Capture.Client
     {
       var smartCaptureNumerationSucceed = document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
         document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
-        document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
+        (document.DocumentKind == null || document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
         document.DocumentRegister != null;
       
       if (smartCaptureNumerationSucceed)
       {
         // Проверить возможность изменения реквизитов.
-        if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document))
+        if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) ||
+            !document.AccessRights.CanUpdate())
           return;
         
-        if (!document.AccessRights.CanUpdate() ||
-            document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess ||
-            document.DocumentKind.NumberingType != Docflow.DocumentKind.NumberingType.Numerable)
-          return;
-
         var properties = document.State.Properties;
-        properties.Name.IsEnabled = !document.DocumentKind.GenerateDocumentName.Value;
+        properties.Name.IsEnabled = document.DocumentKind == null || !document.DocumentKind.GenerateDocumentName.Value;
         properties.DocumentKind.IsEnabled = true;
         properties.Subject.IsEnabled = true;
         properties.BusinessUnit.IsEnabled = true;

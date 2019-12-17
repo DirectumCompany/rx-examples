@@ -32,7 +32,7 @@ namespace Sungero.SmartCapture.Shared
     {
       var smartCaptureNumerationSucceed = _obj.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
         _obj.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
-        _obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable &&
+        (_obj.DocumentKind == null || _obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
         _obj.DocumentRegister != null;
       
       if (smartCaptureNumerationSucceed)
