@@ -36,7 +36,7 @@ namespace Sungero.Capture
         }
       }
       
-      // При наличии "Жёстких" ошибок не переходить к ForseSave.
+      // При наличии "Жёстких" ошибок не переходить к ForceSave.
       if (arioUrlErrorMessages.Any() || confidenceLimitsErrorMessages.Any())
         return;
       
