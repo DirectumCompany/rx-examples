@@ -981,12 +981,20 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognitionResult, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
       }
       
-      // Дата номер.
+      // Дата, номер.
       var dateFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
+      var date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
+      var isTrustedDate = true;
+      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
+      {
+        date = Calendar.SqlMinValue;
+        isTrustedDate = false;
+      }
+      document.Dated = date;
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, date, isTrustedDate);
+      
       var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
-      document.Dated = GetFieldDateTimeValue(dateFact, FieldNames.Letter.Date);
       document.InNumber = GetFieldValue(numberFact, FieldNames.Letter.Number);
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
       LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
       
       // Заполнить данные нашей стороны.
@@ -1899,10 +1907,18 @@ namespace Sungero.Capture.Server
       
       // Дата и номер.
       var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
+      var date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
+      var isTrustedDate = true;
+      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
+      {
+        date = Calendar.SqlMinValue;
+        isTrustedDate = false;
+      }
+      document.Date = date;
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);      
+      
       var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
-      document.Date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
       document.Number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, document.Date);
       LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number);
       
       // Сумма и валюта.
@@ -1955,11 +1971,18 @@ namespace Sungero.Capture.Server
       
       // Дата.
       var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
-      var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
-      document.Date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, document.Date);
+      var date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
+      var isTrustedDate = true;
+      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
+      {
+        date = Calendar.SqlMinValue;
+        isTrustedDate = false;
+      }
+      document.Date = date;
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       // Номер.
+      var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();      
       var number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
       Nullable<bool> isTrustedNumber = null;
       if (number.Length > document.Info.Properties.Number.Length)
@@ -2290,7 +2313,7 @@ namespace Sungero.Capture.Server
       var regDateFact = GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
       var regDate = GetFieldDateTimeValue(regDateFact, FieldNames.Document.Date);
       Nullable<bool> isTrustedDate = null;
-      if (regDate == null || !regDate.HasValue)
+      if (regDate == null || !regDate.HasValue || regDate < Calendar.SqlMinValue)
       {
         regDate = Calendar.SqlMinValue;
         isTrustedDate = false;
@@ -2332,8 +2355,15 @@ namespace Sungero.Capture.Server
     {
       // Дата.
       var facts = recognitionResult.Facts;
-      var regDateFact = GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
-      document.RegistrationDate = GetFieldDateTimeValue(regDateFact, FieldNames.Document.Date);
+      var dateFact = GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();      
+      var date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
+      var isTrustedDate = true;
+      if (date < Calendar.SqlMinValue)
+      {
+        date = Calendar.SqlMinValue;
+        isTrustedDate = false;
+      }
+      document.RegistrationDate = date;
 
       // Номер.
       var regNumberFact = GetOrderedFacts(facts, factName, FieldNames.Document.Number).FirstOrDefault();
@@ -2347,7 +2377,7 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = regNumber;
       
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognitionResult, regDateFact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate);
+      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, isTrustedDate);
       LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                           document.RegistrationNumber, isTrustedNumber);
     }
