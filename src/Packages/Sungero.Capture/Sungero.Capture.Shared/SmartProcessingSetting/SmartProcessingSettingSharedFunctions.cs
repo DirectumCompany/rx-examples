@@ -60,7 +60,7 @@ namespace Sungero.Capture.Shared
           _obj.UpperConfidenceLimit <= 100)
         return messages;
       
-      // Если чтото настроено не так, то всегда вернуть однотипную ошибку.
+      // Однотипная ошибка для всех случаев.
       var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
       result.Type = MessageTypes.Error;
       result.Text = SmartProcessingSettings.Resources.SetCorrectConfidenceLimits;
