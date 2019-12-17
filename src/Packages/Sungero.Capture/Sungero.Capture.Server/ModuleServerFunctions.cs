@@ -2196,7 +2196,7 @@ namespace Sungero.Capture.Server
       else
         LinkFactAndProperty(recognitionResult, null, null,
                             businessUnitPropertyName, documentParties.ResponsibleEmployeeBusinessUnit, false);
-    } 
+    }
     
     /// <summary>
     /// Заполнить сумму и валюту.
@@ -2432,7 +2432,7 @@ namespace Sungero.Capture.Server
       return recognizedAmount;
     }
 
-   /// <summary>
+    /// <summary>
     /// Распознать валюту.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
@@ -3136,7 +3136,7 @@ namespace Sungero.Capture.Server
       document.CounterpartySignatory = signedBy.Contact;
       
       var isTrustedSignatory = signedBy.IsTrusted ? IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname) : signedBy.IsTrusted;
-      LinkFactAndProperty(recognitionResult, signedBy.Fact, null, props.CounterpartySignatory.Name, 
+      LinkFactAndProperty(recognitionResult, signedBy.Fact, null, props.CounterpartySignatory.Name,
                           document.CounterpartySignatory, isTrustedSignatory);
     }
     
@@ -3824,8 +3824,8 @@ namespace Sungero.Capture.Server
     /// <param name="document">Договорной документ.</param>
     /// <param name="сounterparty">Найденный контрагент.</param>
     /// <returns>Контактное лицо.</returns>
-    public virtual Structures.Module.IContactFactMatching GetContractualDocumentContact(IRecognitionResult recognitionResult, 
-                                                                                        IContractualDocumentBase document, 
+    public virtual Structures.Module.IContactFactMatching GetContractualDocumentContact(IRecognitionResult recognitionResult,
+                                                                                        IContractualDocumentBase document,
                                                                                         ICounterpartyFactMatching сounterparty)
     {
       var props = document.Info.Properties;
@@ -3846,9 +3846,9 @@ namespace Sungero.Capture.Server
         var counterpartyName = document.Counterparty.Name.Split(new string[] { ", " }, StringSplitOptions.None);
         
         signatoryFacts = signatoryFacts
-          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name && 
+          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name &&
                                    fl.Value.Equals(counterpartyName[0], StringComparison.InvariantCultureIgnoreCase)))
-          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm && 
+          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm &&
                                    fl.Value.Equals(counterpartyName[1], StringComparison.InvariantCultureIgnoreCase)));
       }
       
@@ -3908,7 +3908,7 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return result;
       
-      if (string.IsNullOrEmpty(leadingDocPropertyName))
+      if (!string.IsNullOrEmpty(leadingDocPropertyName) && counterparty != null)
       {
         result = GetContractByVerifiedData(fact, leadingDocPropertyName, counterparty.Id.ToString(), counterpartyPropertyName);
         if (result.Contract != null)
