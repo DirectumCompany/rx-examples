@@ -130,8 +130,10 @@ namespace Sungero.Capture.Server
         return arioUrlValidationMessages;
       
       // Границы.
-      smartProcessingSettings.LowerConfidenceLimit = int.Parse(lowerConfidenceLimit);
-      smartProcessingSettings.UpperConfidenceLimit = int.Parse(upperConfidenceLimit);
+      int lowerLimit;
+      int upperLimit;
+      smartProcessingSettings.LowerConfidenceLimit = int.TryParse(lowerConfidenceLimit, out lowerLimit) ? lowerLimit : 0;
+      smartProcessingSettings.UpperConfidenceLimit = int.TryParse(upperConfidenceLimit, out upperLimit) ? upperLimit : 0;
       var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(smartProcessingSettings);
       if (confidenceLimitsValidationMessages.Any())
         return confidenceLimitsValidationMessages;
