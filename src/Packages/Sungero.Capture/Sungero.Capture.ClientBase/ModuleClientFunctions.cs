@@ -682,6 +682,27 @@ namespace Sungero.Capture.Client
     /// <param name="previewControl">Контрол предпросмотра.</param>
     /// <param name="position">Позиция.</param>
     /// <param name="color">Цвет.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl, string position, Sungero.Core.Color color)
+    {
+      var positions = position.Split(Constants.Module.PositionElementDelimiter);
+      if (positions.Count() >= 7)
+        previewControl.HighlightAreas.Add(color,
+                                          int.Parse(positions[0]),
+                                          double.Parse(positions[1]),
+                                          double.Parse(positions[2]),
+                                          double.Parse(positions[3]),
+                                          double.Parse(positions[4]),
+                                          double.Parse(positions[5]),
+                                          double.Parse(positions[6]));
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре с фокусировкой по нажатию на свойство.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    /// <param name="propertyInfo">Информация о свойстве.</param>
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
                                                string position, Sungero.Core.Color color, Sungero.Domain.Shared.IPropertyInfo propertyInfo)
     {
@@ -698,13 +719,16 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Подсветить факт в предпросмотре.
+    /// Подсветить факт в предпросмотре с фокусировской по нажатию на свойство в табличной части.
     /// </summary>
     /// <param name="previewControl">Контрол предпросмотра.</param>
     /// <param name="position">Позиция.</param>
     /// <param name="color">Цвет.</param>
+    /// <param name="childEntity">Свойство-коллекция.</param>
+    /// <param name="childpropertyInfo">Информация о свойстве в коллекции.</param>
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
-                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity, Sungero.Domain.Shared.IPropertyInfo childpropertyInfo)
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity, 
+                                               Sungero.Domain.Shared.IPropertyInfo childpropertyInfo)
     {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
