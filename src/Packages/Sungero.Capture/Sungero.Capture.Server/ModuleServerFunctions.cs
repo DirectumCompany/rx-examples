@@ -1004,7 +1004,7 @@ namespace Sungero.Capture.Server
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
       
       var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts,
-                                                                     document.Info.Properties.BusinessUnit.Name,
+                                                                     props.BusinessUnit.Name,
                                                                      document.Addressee,
                                                                      responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
@@ -1018,8 +1018,8 @@ namespace Sungero.Capture.Server
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, FactNames.LetterPerson, FieldNames.LetterPerson.Surname);
       var signatoryFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Signatory).FirstOrDefault();
-      var signedBy = GetContactByFact(signatoryFact, document.Info.Properties.SignedBy.Name,
-                                      document.Correspondent, document.Info.Properties.Correspondent.Name, recognitionResult.PredictedClass);
+      var signedBy = GetContactByFact(signatoryFact, props.SignedBy.Name,
+                                      document.Correspondent, props.Correspondent.Name, recognitionResult.PredictedClass);
       
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
       if (document.Correspondent == null && signedBy.Contact != null)
@@ -1033,8 +1033,8 @@ namespace Sungero.Capture.Server
       
       // Заполнить контакт.
       var responsibleFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
-      var contact = GetContactByFact(responsibleFact, document.Info.Properties.Contact.Name,
-                                     document.Correspondent, document.Info.Properties.Correspondent.Name, recognitionResult.PredictedClass);
+      var contact = GetContactByFact(responsibleFact, props.Contact.Name,
+                                     document.Correspondent, props.Correspondent.Name, recognitionResult.PredictedClass);
       
       // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
       if (document.Correspondent == null && contact.Contact != null)
@@ -1043,7 +1043,7 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, contact.Contact.Company, false);
       }
       document.Contact = contact.Contact;
-      var isTrustedContact = contact.IsTrusted ? IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type) : contact.IsTrusted;
+      var isTrustedContact = contact.IsTrusted && IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
       LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
       return document;
@@ -3154,7 +3154,7 @@ namespace Sungero.Capture.Server
       var ourSignatory = GetContractualDocumentOurSignatory(recognitionResult, document, businessUnitWithFact);
       document.OurSignatory = ourSignatory.Employee;
       
-      var isTrustedOurSignatory = ourSignatory.IsTrusted ? IsTrustedField(ourSignatory.Fact, FieldNames.Counterparty.SignatorySurname) : ourSignatory.IsTrusted;
+      var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatory.Fact, FieldNames.Counterparty.SignatorySurname);
       LinkFactAndProperty(recognitionResult, ourSignatory.Fact, null, props.OurSignatory.Name,
                           document.OurSignatory, isTrustedOurSignatory);
       
@@ -3182,7 +3182,7 @@ namespace Sungero.Capture.Server
       
       document.CounterpartySignatory = signedBy.Contact;
       
-      var isTrustedSignatory = signedBy.IsTrusted ? IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname) : signedBy.IsTrusted;
+      var isTrustedSignatory = signedBy.IsTrusted && IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname);
       LinkFactAndProperty(recognitionResult, signedBy.Fact, null, props.CounterpartySignatory.Name,
                           document.CounterpartySignatory, isTrustedSignatory);
     }
@@ -3202,6 +3202,19 @@ namespace Sungero.Capture.Server
       if (fact == null)
         return null;
       return fact.Fields.FirstOrDefault(f => f.Name == fieldName);
+    }
+    
+    /// <summary>
+    /// Получить список полей из факта.
+    /// </summary>
+    /// <param name="fact">Имя факта.</param>
+    /// <param name="fieldName">Список имен поля.</param>
+    /// <returns>Список полей.</returns>
+    public static IQueryable<IFactField> GetFields(Structures.Module.IFact fact, List<string> fieldNames)
+    {
+      if (fact == null)
+        return null;
+      return fact.Fields.Where(f => fieldNames.Contains(f.Name)).AsQueryable();
     }
     
     /// <summary>
@@ -3319,13 +3332,25 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить список фактов с переданным именем факта.
+    /// </summary>
+    /// <param name="facts">Список фактов.</param>
+    /// <param name="factName">Имя факта.</param>
+    /// <returns>Список фактов.</returns>
+    public static List<Structures.Module.IFact> GetFacts(List<Structures.Module.IFact> facts, string factName)
+    {
+      return facts
+        .Where(f => f.Name == factName)
+        .ToList();
+    }
+    
+    /// <summary>
     /// Получить список фактов с переданными именем факта и именем поля.
     /// </summary>
     /// <param name="facts">Список фактов.</param>
     /// <param name="factName">Имя факта.</param>
     /// <param name="fieldName">Имя поля.</param>
     /// <returns>Список фактов.</returns>
-    /// <remarks>С учетом вероятности факта.</remarks>
     public static List<Structures.Module.IFact> GetFacts(List<Structures.Module.IFact> facts, string factName, string fieldName)
     {
       return facts
@@ -3699,14 +3724,14 @@ namespace Sungero.Capture.Server
     /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
     public static string GetFullNameByFact(string predictedClass, Sungero.Capture.Structures.Module.IFact fact)
     {
-      if (fact == null)
+      if ((fact == null) || (predictedClass == string.Empty))
         return string.Empty;
       
-      var ContactFactNames = GetContactFactNames(predictedClass);
+      var сontactFactNames = GetContactFactNames(predictedClass);
       
-      var surname = GetFieldValue(fact, ContactFactNames.SurnameField);
-      var name = GetFieldValue(fact, ContactFactNames.NameField);
-      var patronymic = GetFieldValue(fact, ContactFactNames.PatronymicField);
+      var surname = GetFieldValue(fact, сontactFactNames.SurnameField);
+      var name = GetFieldValue(fact, сontactFactNames.NameField);
+      var patronymic = GetFieldValue(fact, сontactFactNames.PatronymicField);
       
       return GetFullNameByFact(surname, name, patronymic);
     }
@@ -3758,7 +3783,7 @@ namespace Sungero.Capture.Server
     /// <returns>Имя в формате "Фамилия И.О.".</returns>
     public virtual string GetShortNameByFact(string predictedClass, Sungero.Capture.Structures.Module.IFact fact)
     {
-      if (fact == null)
+      if ((fact == null) || (predictedClass == string.Empty))
         return string.Empty;
       
       var ContactFactNames = GetContactFactNames(predictedClass);
@@ -3778,7 +3803,7 @@ namespace Sungero.Capture.Server
     /// <returns>Список контактных лиц.</returns>
     public virtual IQueryable<IContact> GetContactsByFact(string predictedClass, Sungero.Capture.Structures.Module.IFact fact, ICounterparty counterparty)
     {
-      if (fact == null)
+      if ((fact == null) || (predictedClass == string.Empty))
         return new List<IContact>().AsQueryable();
       
       var fullName = GetFullNameByFact(predictedClass, fact);
@@ -3788,14 +3813,14 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить контактное лицо по данным из факта.
+    /// Получить контактное лицо по данным из факта и контрагента.
     /// </summary>
-    /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <param name="counterparty">Контрагент.</param>
     /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
-    /// <returns>Контактное лицо.</returns>
+    /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
+    /// <returns>Структура, содержащая факт, контактное лицо и признак доверия.</returns>
     public virtual Structures.Module.IContactFactMatching GetContactByFact(Sungero.Capture.Structures.Module.IFact fact,
                                                                            string propertyName,
                                                                            ICounterparty counterparty,
@@ -3804,7 +3829,7 @@ namespace Sungero.Capture.Server
     {
       var signedBy = Structures.Module.ContactFactMatching.Create(Sungero.Parties.Contacts.Null, fact, false);
       
-      if (fact == null)
+      if ((fact == null) || (predictedClass == string.Empty))
         return signedBy;
 
       if (counterparty != null)
@@ -3820,7 +3845,7 @@ namespace Sungero.Capture.Server
         return signedBy;
       
       signedBy.Contact = filteredContacts.FirstOrDefault();
-      signedBy.IsTrusted = (filteredContacts.Count() == 1);
+      signedBy.IsTrusted = filteredContacts.Count() == 1;
       
       return signedBy;
     }
@@ -3891,39 +3916,43 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <param name="document">Договорной документ.</param>
     /// <param name="сounterparty">Найденный контрагент.</param>
-    /// <returns>Контактное лицо.</returns>
+    /// <returns>Структура, содержащая факт, контактное лицо и признак доверия.</returns>
     public virtual Structures.Module.IContactFactMatching GetContractualDocumentContact(IRecognitionResult recognitionResult,
                                                                                         IContractualDocumentBase document,
                                                                                         ICounterpartyFactMatching сounterparty)
     {
       var props = document.Info.Properties;
-      var signatoryFacts = recognitionResult.Facts.Where(f => f.Name == FactNames.Counterparty);
+      var signatoryFacts = GetFacts(recognitionResult.Facts, FactNames.Counterparty);
       var signedBy = Structures.Module.ContactFactMatching.Create(Sungero.Parties.Contacts.Null, null, false);
       
       if (сounterparty != null)
       {
         var сounterpartyFact = сounterparty.Fact;
         signedBy.Fact = сounterpartyFact;
-        var isCounterpartyFactWithSignatory = сounterpartyFact.Fields.Where(fl => fl.Name.Equals(FieldNames.Counterparty.SignatorySurname) ||
-                                                                            fl.Name.Equals(FieldNames.Counterparty.SignatoryName) ||
-                                                                            fl.Name.Equals(FieldNames.Counterparty.SignatoryPatrn));
-        if (isCounterpartyFactWithSignatory.Any())
+        
+        var isCounterpartyFactWithSignatory = GetFields(сounterpartyFact, 
+                                                        new List<string> {FieldNames.Counterparty.SignatorySurname, 
+                                                          FieldNames.Counterparty.SignatoryName, 
+                                                          FieldNames.Counterparty.SignatoryPatrn}).Any();
+        
+        if (isCounterpartyFactWithSignatory)
           return GetContactByFact(сounterpartyFact, props.CounterpartySignatory.Name, document.Counterparty,
                                   props.Counterparty.Name, recognitionResult.PredictedClass);
         
+        // Ожидаемое наименование контрагента в формате {Название}, {ОПФ}.
         var counterpartyName = document.Counterparty.Name.Split(new string[] { ", " }, StringSplitOptions.None);
         
         signatoryFacts = signatoryFacts
           .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name &&
                                    fl.Value.Equals(counterpartyName[0], StringComparison.InvariantCultureIgnoreCase)))
           .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm &&
-                                   fl.Value.Equals(counterpartyName[1], StringComparison.InvariantCultureIgnoreCase)));
+                                   fl.Value.Equals(counterpartyName[1], StringComparison.InvariantCultureIgnoreCase))).ToList();
       }
       
       signatoryFacts = signatoryFacts
         .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.SignatorySurname ||
                                  fl.Name == FieldNames.Counterparty.SignatoryName ||
-                                 fl.Name == FieldNames.Counterparty.SignatoryPatrn));
+                                 fl.Name == FieldNames.Counterparty.SignatoryPatrn)).ToList();
       
       var counterpartySignatories = new List<IContactFactMatching>();
       foreach (var fact in signatoryFacts)
