@@ -462,9 +462,13 @@ namespace Sungero.Capture.Server
                   .Where(p => p != null)
                   .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}",
                                              Constants.Module.PositionElementDelimiter,
-                                             p.Page, p.Top, p.Left, p.Width, p.Height,
-                                             pages.Where(x => x.Number == p.Page).Select(x => x.Width).FirstOrDefault(),
-                                             pages.Where(x => x.Number == p.Page).Select(x => x.Height).FirstOrDefault()));
+                                             p.Page,
+                                             (int)Math.Round(p.Top),
+                                             (int)Math.Round(p.Left),
+                                             (int)Math.Round(p.Width),
+                                             (int)Math.Round(p.Height),
+                                             (int)Math.Round(pages.Where(x => x.Number == p.Page).Select(x => x.Width).FirstOrDefault()),
+                                             (int)Math.Round(pages.Where(x => x.Number == p.Page).Select(x => x.Height).FirstOrDefault())));
                 fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
               }
             }

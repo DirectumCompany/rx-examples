@@ -688,12 +688,12 @@ namespace Sungero.Capture.Client
       if (positions.Count() >= 7)
         previewControl.HighlightAreas.Add(color,
                                           int.Parse(positions[0]),
-                                          double.Parse(positions[1]),
-                                          double.Parse(positions[2]),
-                                          double.Parse(positions[3]),
-                                          double.Parse(positions[4]),
-                                          double.Parse(positions[5]),
-                                          double.Parse(positions[6]));
+                                          int.Parse(positions[1]),
+                                          int.Parse(positions[2]),
+                                          int.Parse(positions[3]),
+                                          int.Parse(positions[4]),
+                                          int.Parse(positions[5]),
+                                          int.Parse(positions[6]));
     }
     
     /// <summary>
@@ -710,12 +710,13 @@ namespace Sungero.Capture.Client
       if (positions.Count() >= 7)
         previewControl.HighlightAreas.Add(color,
                                           int.Parse(positions[0]),
-                                          double.Parse(positions[1]),
-                                          double.Parse(positions[2]),
-                                          double.Parse(positions[3]),
-                                          double.Parse(positions[4]),
-                                          double.Parse(positions[5]),
-                                          double.Parse(positions[6]), propertyInfo);
+                                          int.Parse(positions[1]),
+                                          int.Parse(positions[2]),
+                                          int.Parse(positions[3]),
+                                          int.Parse(positions[4]),
+                                          int.Parse(positions[5]),
+                                          int.Parse(positions[6]),
+                                          propertyInfo);
     }
     
     /// <summary>
@@ -727,19 +728,20 @@ namespace Sungero.Capture.Client
     /// <param name="childEntity">Свойство-коллекция.</param>
     /// <param name="childpropertyInfo">Информация о свойстве в коллекции.</param>
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
-                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity, 
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity,
                                                Sungero.Domain.Shared.IPropertyInfo childpropertyInfo)
     {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
         previewControl.HighlightAreas.Add(color,
                                           int.Parse(positions[0]),
-                                          double.Parse(positions[1]),
-                                          double.Parse(positions[2]),
-                                          double.Parse(positions[3]),
-                                          double.Parse(positions[4]),
-                                          double.Parse(positions[5]),
-                                          double.Parse(positions[6]), childEntity, childpropertyInfo);
+                                          int.Parse(positions[1]),
+                                          int.Parse(positions[2]),
+                                          int.Parse(positions[3]),
+                                          int.Parse(positions[4]),
+                                          int.Parse(positions[5]),
+                                          int.Parse(positions[6]),
+                                          childEntity, childpropertyInfo);
     }
     
     /// <summary>
