@@ -984,13 +984,11 @@ namespace Sungero.Capture.Server
       // Дата, номер.
       var dateFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
       var date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-      var isTrustedDate = true;
-      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
-      {
+      var isDateValid = IsDateValid(date);
+      if (!isDateValid)
         date = Calendar.SqlMinValue;
-        isTrustedDate = false;
-      }
-      document.Dated = date;
+      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      document.Dated = date;      
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
@@ -1908,13 +1906,11 @@ namespace Sungero.Capture.Server
       // Дата и номер.
       var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
       var date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isTrustedDate = true;
-      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
-      {
+      var isDateValid = IsDateValid(date);
+      if (!isDateValid)
         date = Calendar.SqlMinValue;
-        isTrustedDate = false;
-      }
-      document.Date = date;
+      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      document.Date = date;         
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
@@ -1972,13 +1968,11 @@ namespace Sungero.Capture.Server
       // Дата.
       var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
       var date = GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isTrustedDate = true;
-      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
-      {
+      var isDateValid = IsDateValid(date);
+      if (!isDateValid)
         date = Calendar.SqlMinValue;
-        isTrustedDate = false;
-      }
-      document.Date = date;
+      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      document.Date = date;        
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       // Номер.
@@ -2349,7 +2343,7 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
-    public static void FillMockRegistrationData(IOfficialDocument document,
+    public void FillMockRegistrationData(IOfficialDocument document,
                                                 Structures.Module.IRecognitionResult recognitionResult,
                                                 string factName)
     {
@@ -2357,12 +2351,10 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var dateFact = GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
       var date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-      var isTrustedDate = true;
-      if (date < Calendar.SqlMinValue)
-      {
+      var isDateValid = IsDateValid(date);
+      if (!isDateValid)
         date = Calendar.SqlMinValue;
-        isTrustedDate = false;
-      }
+      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
       document.RegistrationDate = date;
 
       // Номер.
@@ -2433,7 +2425,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Результаты распознавания суммы.</returns>
-    public Structures.Module.IRecognizedAmount GetRecognizedAmount(Structures.Module.IRecognitionResult recognitionResult)
+    public virtual Structures.Module.IRecognizedAmount GetRecognizedAmount(Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedAmount = Structures.Module.RecognizedAmount.Create();
       var facts = recognitionResult.Facts;
@@ -2472,7 +2464,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Результаты распознавания валюты.</returns>
-    public Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Structures.Module.IRecognitionResult recognitionResult)
+    public virtual Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
       var facts = recognitionResult.Facts;
@@ -2507,6 +2499,17 @@ namespace Sungero.Capture.Server
       }
       
       return recognizedCurrency;
+    }
+    
+    /// <summary>
+    ////Проверка даты на валидность.
+    /// </summary>
+    /// <param name="date">проверяемая дата.</param>
+    /// <returns>Признак - дата валидна/невалидна.</returns>
+    public virtual bool IsDateValid(Nullable<DateTime> date)
+    {
+      return date == null ||
+        date != null && date.HasValue && date >= Calendar.SqlMinValue ;
     }
     
     #endregion
@@ -3703,8 +3706,8 @@ namespace Sungero.Capture.Server
     /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <returns>Сотрудник.</returns>
     public virtual IQueryable<IEmployee> GetOurEmployeeByFact(Sungero.Capture.Structures.Module.IFact fact,
-                                                               IBusinessUnit businessUnit,
-                                                               string predictedClass)
+                                                              IBusinessUnit businessUnit,
+                                                              string predictedClass)
     {
       if (fact == null)
         return new List<IEmployee>().AsQueryable();
