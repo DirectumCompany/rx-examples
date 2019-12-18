@@ -561,7 +561,8 @@ namespace Sungero.Capture.Client
         {
           object propertyValue = property.GetValue(document);
           var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
-          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue))
+          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue) ||
+              this.CanCompareAsNumbers(propertyStringValue, linkedFact.PropertyValue) && this.CompareAsNumbers(propertyStringValue, linkedFact.PropertyValue) == 0)
           {
             var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
                                                     propertyName, linkedFact.Position);
@@ -779,6 +780,44 @@ namespace Sungero.Capture.Client
         properties.RegistrationNumber.IsEnabled = true;
         properties.RegistrationDate.IsEnabled = true;
       }
+    }
+    
+    /// <summary>
+    /// Проверить возможность проверки строк как чисел.
+    /// </summary>
+    /// <param name="firstString">Первая строка для сравнения.</param>
+    /// <param name="secondString">Вторая строка для сравнения.</param>
+    /// <returns>True - можно сравнивать как числа, иначе - False.</returns>
+    private bool CanCompareAsNumbers(string firstString, string secondString)
+    {
+      
+      firstString = firstString.Replace(',', '.');
+      secondString = secondString.Replace(',', '.');
+      double number;
+      var numberStyles = System.Globalization.NumberStyles.Any;
+      var invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
+      
+      return double.TryParse(firstString, numberStyles, invariantCulture, out number) &&
+             double.TryParse(secondString, numberStyles, invariantCulture, out number);
+    }
+    
+    /// <summary>
+    /// Сравнить строки как числа.
+    /// </summary>
+    /// <param name="firstString">Первая строка для сравнения.</param>
+    /// <param name="secondString">Вторая строка для сравнения.</param>
+    /// <returns>Значение, указывающее, каков относительный порядок сравниваемых объектов.</returns>
+    /// <remarks>https://docs.microsoft.com/ru-ru/dotnet/api/system.icomparable.compareto?view=netframework-4.8</remarks>
+    private int CompareAsNumbers(string firstString, string secondString)
+    {
+      firstString = firstString.Replace(',', '.');
+      secondString = secondString.Replace(',', '.');
+      var numberStyles = System.Globalization.NumberStyles.Any;
+      var invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
+      var firstNumber = double.Parse(firstString, numberStyles, invariantCulture);
+      var secondNumber = double.Parse(secondString, numberStyles, invariantCulture);
+      
+      return firstNumber.CompareTo(secondNumber);
     }
     
     #endregion
