@@ -371,12 +371,15 @@ namespace Sungero.Capture.Server
     /// Проверить, не найден ли уже существующий документ в Rx по штрихкоду.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <returns>True, если документ успешно пронумерован. Иначе False.</returns>
+    /// <returns>True, если документ найден в Rx по штрихкоду. Иначе False.</returns>
     public virtual bool IsDocumentFoundByBarcode(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
       if (documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName))
+      {
+        documentParams.Remove(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName);
         return true;
+      }
       
       return false;
     }
