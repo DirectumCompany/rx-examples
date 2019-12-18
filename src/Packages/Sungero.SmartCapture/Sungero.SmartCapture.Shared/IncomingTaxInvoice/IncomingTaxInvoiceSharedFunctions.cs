@@ -28,6 +28,19 @@ namespace Sungero.SmartCapture.Shared
         _obj.State.Properties.Subject.IsRequired = false;
     }
     
+    public override void ChangeDocumentPropertiesAccess(bool isEnabled, bool repeatRegister)
+    {
+      var smartCaptureNumerationSucceed = _obj.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
+        _obj.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+        (_obj.DocumentKind == null || _obj.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
+        _obj.DocumentRegister != null;
+      
+      if (smartCaptureNumerationSucceed)
+        Sungero.Capture.PublicFunctions.Module.EnableRequisitesForVerification(_obj);
+      else
+        base.ChangeDocumentPropertiesAccess(isEnabled, repeatRegister);
+    }
+    
     public override void FillName()
     {
       base.FillName();
