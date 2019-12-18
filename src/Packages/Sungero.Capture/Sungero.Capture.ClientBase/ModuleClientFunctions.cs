@@ -689,12 +689,12 @@ namespace Sungero.Capture.Client
       if (positions.Count() >= 7)
         previewControl.HighlightAreas.Add(color,
                                           int.Parse(positions[0]),
-                                          int.Parse(positions[1]),
-                                          int.Parse(positions[2]),
-                                          int.Parse(positions[3]),
-                                          int.Parse(positions[4]),
-                                          int.Parse(positions[5]),
-                                          int.Parse(positions[6]));
+                                          double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
     }
     
     /// <summary>
@@ -711,12 +711,12 @@ namespace Sungero.Capture.Client
       if (positions.Count() >= 7)
         previewControl.HighlightAreas.Add(color,
                                           int.Parse(positions[0]),
-                                          int.Parse(positions[1]),
-                                          int.Parse(positions[2]),
-                                          int.Parse(positions[3]),
-                                          int.Parse(positions[4]),
-                                          int.Parse(positions[5]),
-                                          int.Parse(positions[6]),
+                                          double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                           propertyInfo);
     }
     
@@ -736,12 +736,12 @@ namespace Sungero.Capture.Client
       if (positions.Count() >= 7)
         previewControl.HighlightAreas.Add(color,
                                           int.Parse(positions[0]),
-                                          int.Parse(positions[1]),
-                                          int.Parse(positions[2]),
-                                          int.Parse(positions[3]),
-                                          int.Parse(positions[4]),
-                                          int.Parse(positions[5]),
-                                          int.Parse(positions[6]),
+                                          double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                           childEntity, childpropertyInfo);
     }
     
