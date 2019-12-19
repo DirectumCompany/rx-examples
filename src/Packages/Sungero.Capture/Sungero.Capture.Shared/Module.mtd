@@ -1735,10 +1735,6 @@
           "TypeFullName": "global::Sungero.Commons.ICurrency"
         },
         {
-          "Name": "HasValue",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
           "Name": "IsTrusted",
           "TypeFullName": "global::System.Boolean"
         },

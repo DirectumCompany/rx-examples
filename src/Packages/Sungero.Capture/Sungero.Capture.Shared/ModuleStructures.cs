@@ -315,10 +315,7 @@ namespace Sungero.Capture.Structures.Module
   partial class RecognizedCurrency
   {
     // Валюта.
-    public Commons.ICurrency Currency { get; set; }
-    
-    // Признак - есть значение.
-    public bool HasValue { get; set; }
+    public Commons.ICurrency Currency { get; set; }   
 
     // Признак - можно доверять.
     public bool IsTrusted { get; set; }

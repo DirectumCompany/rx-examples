@@ -995,7 +995,7 @@ namespace Sungero.Capture.Server
       if (!isDateValid)
         date = Calendar.SqlMinValue;
       var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
-      document.Dated = date;      
+      document.Dated = date;
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
@@ -1917,7 +1917,7 @@ namespace Sungero.Capture.Server
       if (!isDateValid)
         date = Calendar.SqlMinValue;
       var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
-      document.Date = date;         
+      document.Date = date;
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
@@ -1979,7 +1979,7 @@ namespace Sungero.Capture.Server
       if (!isDateValid)
         date = Calendar.SqlMinValue;
       var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
-      document.Date = date;        
+      document.Date = date;
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       // Номер.
@@ -2246,12 +2246,9 @@ namespace Sungero.Capture.Server
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
       var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
-      if (recognizedCurrency.HasValue)
-      {
-        var currency = recognizedCurrency.Currency;
-        document.Currency = currency;
-        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
-      }
+      var currency = recognizedCurrency.Currency;
+      document.Currency = currency;
+      LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
     }
     
     /// <summary>
@@ -2276,12 +2273,9 @@ namespace Sungero.Capture.Server
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
       var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
-      if (recognizedCurrency.HasValue)
-      {
-        var currency = recognizedCurrency.Currency;
-        document.Currency = currency;
-        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
-      }
+      var currency = recognizedCurrency.Currency;
+      document.Currency = currency;
+      LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
     }
     
     /// <summary>
@@ -2351,8 +2345,8 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public void FillMockRegistrationData(IOfficialDocument document,
-                                                Structures.Module.IRecognitionResult recognitionResult,
-                                                string factName)
+                                         Structures.Module.IRecognitionResult recognitionResult,
+                                         string factName)
     {
       // Дата.
       var facts = recognitionResult.Facts;
@@ -2474,6 +2468,9 @@ namespace Sungero.Capture.Server
     public virtual Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
+      var defaultCurrency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
+      recognizedCurrency.Currency = defaultCurrency;
+      
       var facts = recognitionResult.Facts;
       var currencyFacts = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency);
       var currencyFact = currencyFacts.FirstOrDefault();
@@ -2495,15 +2492,12 @@ namespace Sungero.Capture.Server
       var currencyStatus = currency.Status;
       if (currencyStatus == CoreEntities.DatabookEntry.Status.Closed)
       {
-        currency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
+        currency = defaultCurrency;
         recognizedCurrency.IsTrusted = false;
       }
       
       if (currency != null)
-      {
-        recognizedCurrency.HasValue = true;
         recognizedCurrency.Currency = currency;
-      }
       
       return recognizedCurrency;
     }
@@ -3940,9 +3934,9 @@ namespace Sungero.Capture.Server
         var сounterpartyFact = сounterparty.Fact;
         signedBy.Fact = сounterpartyFact;
         
-        var isCounterpartyFactWithSignatory = GetFields(сounterpartyFact, 
-                                                        new List<string> {FieldNames.Counterparty.SignatorySurname, 
-                                                          FieldNames.Counterparty.SignatoryName, 
+        var isCounterpartyFactWithSignatory = GetFields(сounterpartyFact,
+                                                        new List<string> {FieldNames.Counterparty.SignatorySurname,
+                                                          FieldNames.Counterparty.SignatoryName,
                                                           FieldNames.Counterparty.SignatoryPatrn}).Any();
         
         if (isCounterpartyFactWithSignatory)
