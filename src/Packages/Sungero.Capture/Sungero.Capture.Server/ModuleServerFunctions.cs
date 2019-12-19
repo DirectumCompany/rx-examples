@@ -194,7 +194,8 @@ namespace Sungero.Capture.Server
       var documentsWithRegistrationFailure = package.Where(d => IsDocumentRegistrationFailed(d)).ToList();
       
       // Сформировать список документов, которые найдены по штрихкоду.
-      var documentsFoundByBarcode = package.Where(d => IsDocumentFoundByBarcode(d)).ToList();
+      var documentsFoundByBarcode = package.Where(d => IsDocumentFoundByBarcode(d));
+      documentsFoundByBarcode = documentsFoundByBarcode.Select(d => RemoveFoundByBarcodeParameter(d)).ToList();
       
       // Сформировать список заблокированных документов.
       var lockedDocuments = package.Where(d => IsDocumentLocked(d)).ToList();
@@ -361,10 +362,19 @@ namespace Sungero.Capture.Server
     public virtual bool IsDocumentRegistrationFailed(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      if (documentParams.ContainsKey(Constants.Module.DocumentNumberingBySmartCaptureResultParamName))
-        return true;
-      
-      return false;
+      return documentParams.ContainsKey(Constants.Module.DocumentNumberingBySmartCaptureResultParamName);
+    }
+    
+    /// <summary>
+    /// Удалить параметр о нахождении документа по штрихкоду.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <returns>Документ с удалённым параметром.</returns>
+    public virtual IOfficialDocument RemoveFoundByBarcodeParameter(IOfficialDocument document)
+    {
+      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
+      documentParams.Remove(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName);
+      return document;
     }
     
     /// <summary>
@@ -375,13 +385,7 @@ namespace Sungero.Capture.Server
     public virtual bool IsDocumentFoundByBarcode(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      if (documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName))
-      {
-        documentParams.Remove(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName);
-        return true;
-      }
-      
-      return false;
+      return documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName);
     }
     
     /// <summary>
@@ -392,9 +396,7 @@ namespace Sungero.Capture.Server
     public virtual bool IsDocumentLocked(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      if (documentParams.ContainsKey(Constants.Module.DocumentIsLockedParamName))
-        return true;
-      return false;
+      return documentParams.ContainsKey(Constants.Module.DocumentIsLockedParamName);
     }
     
     /// <summary>
