@@ -161,4 +161,7 @@
   <data name="SetCorrectConfidenceLimits" xml:space="preserve">
     <value>Настройте границы доверия корректно.</value>
   </data>
+  <data name="SetCorrectClassifiers" xml:space="preserve">
+    <value>Донастройте классификаторы согласно документации.</value>
+  </data>
 </root>

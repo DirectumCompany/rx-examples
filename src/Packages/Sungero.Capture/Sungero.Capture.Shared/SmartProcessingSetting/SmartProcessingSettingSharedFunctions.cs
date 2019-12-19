@@ -48,6 +48,48 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
+    /// Проверить классификаторы.
+    /// </summary>
+    /// <returns>True, если классификаторы заполнены и найдены по Ид и наименованию, иначе - False.</returns>
+    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateClassifiers()
+    {
+      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
+      var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
+      message.Type = MessageTypes.Warning;
+      
+      if (!_obj.FirstPageClassifierId.HasValue || !_obj.TypeClassifierId.HasValue)
+      {
+        message.Text = Sungero.Capture.SmartProcessingSettings.Resources.SetCorrectClassifiers;
+        messages.Add(message);
+        return messages;
+      }
+      
+      var arioClassifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
+      var arioFirstPageClassifier = arioClassifiers.Where(a => a.Id == _obj.FirstPageClassifierId.Value &&
+                                                          a.Name == _obj.FirstPageClassifierName).FirstOrDefault();
+      var arioTypeClassifier = arioClassifiers.Where(a => a.Id == _obj.TypeClassifierId.Value &&
+                                                     a.Name == _obj.TypeClassifierName).FirstOrDefault();
+      
+      if (arioFirstPageClassifier == null && arioTypeClassifier == null)
+      {
+        message.Text = Resources.ClassifiersNotFoundFormat(_obj.FirstPageClassifierName, _obj.TypeClassifierName);
+        messages.Add(message);
+      }
+      else if (arioFirstPageClassifier == null)
+      {
+        message.Text = Resources.ClassifierNotFoundFormat(_obj.FirstPageClassifierName);
+        messages.Add(message);
+      }
+      else if (arioTypeClassifier == null)
+      {
+        message.Text = Resources.ClassifierNotFoundFormat(_obj.TypeClassifierName);
+        messages.Add(message);
+      }
+      
+      return messages;
+    }
+    
+    /// <summary>
     /// Проверить границы доверия к извлечённым фактам.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>

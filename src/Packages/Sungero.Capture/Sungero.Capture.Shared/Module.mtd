@@ -1790,7 +1790,8 @@
     "DocumentLockedByEmployeeTaskText",
     "DocumentWasLockedTaskText",
     "SmartProcessingSettingsNotFound",
-    "EmptyClassifiersOrArioUrl"
+    "EmptyClassifiersOrArioUrl",
+    "ClassifiersNotFound"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

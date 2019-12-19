@@ -153,7 +153,7 @@
     <value>Документ</value>
   </data>
   <data name="ClassifierNotFound" xml:space="preserve">
-    <value>Не найден классификатор с именем {0}</value>
+    <value>Не найден классификатор с именем {0}.</value>
   </data>
   <data name="EmptyArioUrl" xml:space="preserve">
     <value>Не задан адрес сервиса Ario.</value>
@@ -232,5 +232,8 @@
   </data>
   <data name="EmptyClassifiersOrArioUrl" xml:space="preserve">
     <value>Не заданы классификаторы или адрес Ario.</value>
+  </data>
+  <data name="ClassifiersNotFound" xml:space="preserve">
+    <value>Не найдены классификаторы с именами: {0}, {1}.</value>
   </data>
 </root>

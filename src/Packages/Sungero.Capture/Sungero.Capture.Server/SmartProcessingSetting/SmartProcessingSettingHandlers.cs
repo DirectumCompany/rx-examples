@@ -40,13 +40,20 @@ namespace Sungero.Capture
       if (arioUrlErrorMessages.Any() || confidenceLimitsErrorMessages.Any())
         return;
       
-      // "Мягкая" адреса сервиса Ario.
       var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
       if (!isForceSave)
       {
+        // "Мягкая" проверка адреса сервиса Ario.
         var arioUrlWarningMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Warning);
         foreach (var message in arioUrlWarningMessages)
           e.AddError(message.Text, _obj.Info.Actions.ForceSave);
+        
+        // "Мягкая" проверка классификаторов.
+        var classifierValidationMessages = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
+        var classifierErrorMessages = classifierValidationMessages.Where(m => m.Type == MessageTypes.Warning);
+        
+        if (classifierErrorMessages.Any())
+          e.AddError(classifierErrorMessages.First().Text, _obj.Info.Actions.ForceSave);
       }
     }
 
