@@ -3127,14 +3127,16 @@ namespace Sungero.Capture.Server
           foundByTin.Add(counterpartyFactMatching);
         }
         
-        // Найдено по ИНН/КПП.
-        if (foundByTin.Any())
-          return foundByTin;
-        
-        // Не найдено. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
-        if (businessUnitsByName.Any())
-          return businessUnitsByName.Where(x => string.IsNullOrEmpty(x.BusinessUnit.TIN) && string.IsNullOrEmpty(x.BusinessUnit.TRRC)).ToList();
       }
+      
+      // Найдено по ИНН/КПП.
+      if (foundByTin.Any())
+        return foundByTin;
+      
+      // Не найдено. Искать по наименованию в корреспондентах с пустыми ИНН/КПП.
+      if (businessUnitsByName.Any())
+        return businessUnitsByName.Where(x => string.IsNullOrEmpty(x.BusinessUnit.TIN) && string.IsNullOrEmpty(x.BusinessUnit.TRRC)).ToList();
+      
       return businessUnitsByName;
     }
     
@@ -3936,8 +3938,8 @@ namespace Sungero.Capture.Server
       var signatoryFacts = GetFacts(recognitionResult.Facts, FactNames.Counterparty);
       var signedBy = Structures.Module.SignatoryFactMatching.Create(null, null, null, false);
       var signatoryFieldNames = new List<string> {FieldNames.Counterparty.SignatorySurname,
-                                                  FieldNames.Counterparty.SignatoryName,
-                                                  FieldNames.Counterparty.SignatoryPatrn};
+        FieldNames.Counterparty.SignatoryName,
+        FieldNames.Counterparty.SignatoryPatrn};
       
       if (organizationFactMatching == null)
         return signedBy;
@@ -3951,8 +3953,8 @@ namespace Sungero.Capture.Server
         var isOrganizationFactWithSignatory = GetFields(organizationFact, signatoryFieldNames).Any();
         
         if (isOrganizationFactWithSignatory)
-          return isBusinessUnit 
-            ? GetContractualDocumentOurSignatoryByFact(organizationFact, document, recognitionResult.PredictedClass) 
+          return isBusinessUnit
+            ? GetContractualDocumentOurSignatoryByFact(organizationFact, document, recognitionResult.PredictedClass)
             : GetContactByFact(organizationFact, props.CounterpartySignatory.Name, document.Counterparty,
                                props.Counterparty.Name, recognitionResult.PredictedClass);
       }
@@ -3975,18 +3977,18 @@ namespace Sungero.Capture.Server
       foreach (var fact in signatoryFacts)
       {
         Capture.Structures.Module.ISignatoryFactMatching signatory = null;
-          if (isBusinessUnit)
+        if (isBusinessUnit)
         {
           signatory = GetContractualDocumentOurSignatoryByFact(fact, document, recognitionResult.PredictedClass);
           if (signatory.Employee != null)
-          organizationSignatories.Add(signatory);
+            organizationSignatories.Add(signatory);
         }
         else
         {
           signatory = GetContactByFact(fact, props.CounterpartySignatory.Name, document.Counterparty,
                                        props.Counterparty.Name, recognitionResult.PredictedClass);
           if (signatory.Contact != null)
-          organizationSignatories.Add(signatory);
+            organizationSignatories.Add(signatory);
         }
       }
       if (organizationSignatories.Count > 0)
