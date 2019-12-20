@@ -425,10 +425,13 @@ namespace Sungero.Capture.Client
       if (smartProcessingSettings == null)
         throw new ApplicationException(Resources.SmartProcessingSettingsNotFound);
       
-      if (string.IsNullOrEmpty(smartProcessingSettings.ArioUrl) ||
-          string.IsNullOrEmpty(smartProcessingSettings.FirstPageClassifierName) ||
-          string.IsNullOrEmpty(smartProcessingSettings.TypeClassifierName))
-        throw new ApplicationException(Resources.EmptyClassifiersOrArioUrl);
+      var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
+      if (arioUrlValidationMessage != null)
+        throw new ApplicationException(arioUrlValidationMessage.Text);
+      
+      var classifiersValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(smartProcessingSettings);
+      if (classifiersValidationMessage != null)
+        throw new ApplicationException(classifiersValidationMessage.Text);
       
       var arioConnector = new ArioExtensions.ArioConnector(smartProcessingSettings.ArioUrl);
       var typeClassifierId = smartProcessingSettings.TypeClassifierId.ToString();
