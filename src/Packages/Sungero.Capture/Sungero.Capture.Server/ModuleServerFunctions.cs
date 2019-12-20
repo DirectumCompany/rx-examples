@@ -3930,36 +3930,40 @@ namespace Sungero.Capture.Server
       var signatoryFieldNames = new List<string> {FieldNames.Counterparty.SignatorySurname,
         FieldNames.Counterparty.SignatoryName,
         FieldNames.Counterparty.SignatoryPatrn};
+      var isBusinessUnit = false;
       
-      if (organizationFactMatching == null)
+      if (!signatoryFacts.Any())
         return signedBy;
       
-      var isBusinessUnit = organizationFactMatching.BusinessUnit != null;
-      
-      var organizationFact = organizationFactMatching.Fact;
-      if (organizationFact != null)
+      if (organizationFactMatching != null)
       {
-        signedBy.Fact = organizationFact;
-        var isOrganizationFactWithSignatory = GetFields(organizationFact, signatoryFieldNames).Any();
+        isBusinessUnit = organizationFactMatching.BusinessUnit != null;
         
-        if (isOrganizationFactWithSignatory)
-          return isBusinessUnit
-            ? GetContractualDocumentOurSignatoryByFact(organizationFact, document, recognitionResult.PredictedClass)
-            : GetContactByFact(organizationFact, props.CounterpartySignatory.Name, document.Counterparty,
-                               props.Counterparty.Name, recognitionResult.PredictedClass);
+        var organizationFact = organizationFactMatching.Fact;
+        if (organizationFact != null)
+        {
+          signedBy.Fact = organizationFact;
+          var isOrganizationFactWithSignatory = GetFields(organizationFact, signatoryFieldNames).Any();
+          
+          if (isOrganizationFactWithSignatory)
+            return isBusinessUnit
+              ? GetContractualDocumentOurSignatoryByFact(organizationFact, document, recognitionResult.PredictedClass)
+              : GetContactByFact(organizationFact, props.CounterpartySignatory.Name, document.Counterparty,
+                                 props.Counterparty.Name, recognitionResult.PredictedClass);
+        }
+        
+        var organizationName = isBusinessUnit ? organizationFactMatching.BusinessUnit.Name : organizationFactMatching.Counterparty.Name;
+        
+        // Ожидаемое наименование НОР в формате {Название}, {ОПФ}.
+        var organizationNameAndLegalForm = organizationName.Split(new string[] { ", " }, StringSplitOptions.None);
+
+        signatoryFacts = signatoryFacts
+          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name &&
+                                   fl.Value.Equals(organizationNameAndLegalForm[0], StringComparison.InvariantCultureIgnoreCase)))
+          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm &&
+                                   fl.Value.Equals(organizationNameAndLegalForm[1], StringComparison.InvariantCultureIgnoreCase))).ToList();
       }
       
-      var organizationName = isBusinessUnit ? organizationFactMatching.BusinessUnit.Name : organizationFactMatching.Counterparty.Name;
-      
-      // Ожидаемое наименование НОР в формате {Название}, {ОПФ}.
-      var organizationNameAndLegalForm = organizationName.Split(new string[] { ", " }, StringSplitOptions.None);
-
-      signatoryFacts = signatoryFacts
-        .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name &&
-                                 fl.Value.Equals(organizationNameAndLegalForm[0], StringComparison.InvariantCultureIgnoreCase)))
-        .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm &&
-                                 fl.Value.Equals(organizationNameAndLegalForm[1], StringComparison.InvariantCultureIgnoreCase))).ToList();
-
       signatoryFacts = signatoryFacts
         .Where(f => GetFields(f, signatoryFieldNames).Any()).ToList();
       
