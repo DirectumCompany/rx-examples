@@ -5,6 +5,7 @@ using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Capture.SmartProcessingSetting;
 using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
+using SettingsValidationMessageStructure = Sungero.Capture.Structures.SmartProcessingSetting.SettingsValidationMessage;
 
 namespace Sungero.Capture.Shared
 {
@@ -24,91 +25,62 @@ namespace Sungero.Capture.Shared
     /// Проверить адрес сервиса Ario.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
-    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateArioUrl()
+    public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateArioUrl()
     {
-      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
-      
       // Проверка что адрес Ario не "кривой".
       if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
-      {
-        var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        result.Type = MessageTypes.Error;
-        result.Text = SmartProcessingSettings.Resources.InvalidArioUrl;
-        messages.Add(result);
-      }
-      else if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
-      {
-        var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        result.Type = MessageTypes.Warning;
-        result.Text = SmartProcessingSettings.Resources.ArioConnectionError;
-        messages.Add(result);
-      }
+        return SettingsValidationMessageStructure.Create(MessageTypes.Error, SmartProcessingSettings.Resources.InvalidArioUrl);
+        
+      if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.ArioConnectionError);
       
-      return messages;
+      return null;
     }
     
     /// <summary>
-    /// Проверить классификаторы.
+    /// 
     /// </summary>
-    /// <returns>True, если классификаторы заполнены и найдены по Ид и наименованию, иначе - False.</returns>
-    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateClassifiers()
+    /// <returns></returns>
+    public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateClassifiers()
     {
-      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
-      var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-      message.Type = MessageTypes.Warning;
-      
       if (!_obj.FirstPageClassifierId.HasValue || !_obj.TypeClassifierId.HasValue)
-      {
-        message.Text = Sungero.Capture.SmartProcessingSettings.Resources.SetCorrectClassifiers;
-        messages.Add(message);
-        return messages;
-      }
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
-      var arioClassifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
-      var arioFirstPageClassifier = arioClassifiers.Where(a => a.Id == _obj.FirstPageClassifierId.Value &&
-                                                          a.Name == _obj.FirstPageClassifierName).FirstOrDefault();
-      var arioTypeClassifier = arioClassifiers.Where(a => a.Id == _obj.TypeClassifierId.Value &&
-                                                     a.Name == _obj.TypeClassifierName).FirstOrDefault();
+      var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
+      var firstPageClassifier = classifiers.Where(a => a.Id == _obj.FirstPageClassifierId.Value &&
+                                                  a.Name == _obj.FirstPageClassifierName).FirstOrDefault();
+      var typeClassifier = classifiers.Where(a => a.Id == _obj.TypeClassifierId.Value &&
+                                             a.Name == _obj.TypeClassifierName).FirstOrDefault();
       
-      if (arioFirstPageClassifier == null && arioTypeClassifier == null)
-      {
-        message.Text = Resources.ClassifiersNotFoundFormat(_obj.FirstPageClassifierName, _obj.TypeClassifierName);
-        messages.Add(message);
-      }
-      else if (arioFirstPageClassifier == null)
-      {
-        message.Text = Resources.ClassifierNotFoundFormat(_obj.FirstPageClassifierName);
-        messages.Add(message);
-      }
-      else if (arioTypeClassifier == null)
-      {
-        message.Text = Resources.ClassifierNotFoundFormat(_obj.TypeClassifierName);
-        messages.Add(message);
-      }
+      if (firstPageClassifier == null && typeClassifier == null)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, 
+                                                         Resources.ClassifiersNotFoundFormat(_obj.FirstPageClassifierName, _obj.TypeClassifierName));
       
-      return messages;
+      if (firstPageClassifier == null)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, Resources.ClassifierNotFoundFormat(_obj.FirstPageClassifierName));
+      
+      if (typeClassifier == null)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, Resources.ClassifierNotFoundFormat(_obj.TypeClassifierName));
+      
+      if (firstPageClassifier.Id == typeClassifier.Id)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, Resources.SelectedSameClassifiers);
+      
+      return null;
     }
     
     /// <summary>
     /// Проверить границы доверия к извлечённым фактам.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
-    public virtual List<Structures.SmartProcessingSetting.SettingsValidationMessage> ValidateConfidenceLimits()
+    public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateConfidenceLimits()
     {
-      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
-      
       // Нижняя граница 0..99 включительно и < верхней. Верхняя 1..100 включительно.
       if (_obj.LowerConfidenceLimit >= 0 && _obj.LowerConfidenceLimit < _obj.UpperConfidenceLimit &&
           _obj.UpperConfidenceLimit <= 100)
-        return messages;
+        return null;
       
       // Однотипная ошибка для всех случаев.
-      var result = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-      result.Type = MessageTypes.Error;
-      result.Text = SmartProcessingSettings.Resources.SetCorrectConfidenceLimits;
-      messages.Add(result);
-
-      return messages;
+      return SettingsValidationMessageStructure.Create(MessageTypes.Error, SmartProcessingSettings.Resources.SetCorrectConfidenceLimits);
     }
   }
 }

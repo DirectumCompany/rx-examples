@@ -19,6 +19,7 @@ using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
 using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
+using SettingsValidationMessageStructure = Sungero.Capture.Structures.SmartProcessingSetting.SettingsValidationMessage;
 
 namespace Sungero.Capture.Server
 {
@@ -115,59 +116,51 @@ namespace Sungero.Capture.Server
     /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
     /// <returns>Ошибка, если заполнить настройки не удалось.</returns>
     [Remote]
-    public static List<Structures.SmartProcessingSetting.SettingsValidationMessage> SetCaptureMainSettings(string arioUrl,
-                                                                                                           string lowerConfidenceLimit,
-                                                                                                           string upperConfidenceLimit,
-                                                                                                           string firstPageClassifierName,
-                                                                                                           string typeClassifierName)
+    public static Structures.SmartProcessingSetting.SettingsValidationMessage SetCaptureMainSettings(string arioUrl,
+                                                                                                     string lowerConfidenceLimit,
+                                                                                                     string upperConfidenceLimit,
+                                                                                                     string firstPageClassifierName,
+                                                                                                     string typeClassifierName)
     {
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       
       // Адрес.
       smartProcessingSettings.ArioUrl = arioUrl;
-      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
-      if (arioUrlValidationMessages.Any())
-        return arioUrlValidationMessages;
+      var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
+      if (arioUrlValidationMessage != null)
+        return arioUrlValidationMessage;
       
       // Границы.
       int lowerLimit;
       int upperLimit;
       smartProcessingSettings.LowerConfidenceLimit = int.TryParse(lowerConfidenceLimit, out lowerLimit) ? lowerLimit : -1;
       smartProcessingSettings.UpperConfidenceLimit = int.TryParse(upperConfidenceLimit, out upperLimit) ? upperLimit : -1;
-      var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(smartProcessingSettings);
-      if (confidenceLimitsValidationMessages.Any())
-        return confidenceLimitsValidationMessages;
+      var confidenceLimitsValidationMessage = Functions.SmartProcessingSetting.ValidateConfidenceLimits(smartProcessingSettings);
+      if (confidenceLimitsValidationMessage != null)
+        return confidenceLimitsValidationMessage;
       
       // Классификаторы.
-      var arioClassifiers = Functions.SmartProcessingSetting.GetArioClassifiers(smartProcessingSettings);
-      var arioFirstPageClassifier = arioClassifiers.Where(a => a.Name == firstPageClassifierName).FirstOrDefault();
-      var arioTypeClassifier = arioClassifiers.Where(a => a.Name == typeClassifierName).FirstOrDefault();
+      var classifiers = Functions.SmartProcessingSetting.GetArioClassifiers(smartProcessingSettings);
+      var firstPageClassifier = classifiers.Where(a => a.Name == firstPageClassifierName).FirstOrDefault();
+      var typeClassifier = classifiers.Where(a => a.Name == typeClassifierName).FirstOrDefault();
       
-      var messages = new List<Structures.SmartProcessingSetting.SettingsValidationMessage>();
-      if (arioFirstPageClassifier == null)
-      {
-        var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        message.Type = MessageTypes.Error;
-        message.Text = Resources.ClassifierNotFoundFormat(firstPageClassifierName);
-        messages.Add(message);
-      }
-      if (arioTypeClassifier == null)
-      {
-        var message = Structures.SmartProcessingSetting.SettingsValidationMessage.Create();
-        message.Type = MessageTypes.Error;
-        message.Text = Resources.ClassifierNotFoundFormat(typeClassifierName);
-        messages.Add(message);
-      }
-      if (messages.Any())
-        return messages;
+      if (firstPageClassifier == null && typeClassifier == null)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Error,
+                                                         Resources.ClassifiersNotFoundFormat(firstPageClassifierName, typeClassifierName));
       
-      smartProcessingSettings.FirstPageClassifierName = arioFirstPageClassifier.Name;
-      smartProcessingSettings.FirstPageClassifierId = arioFirstPageClassifier.Id;
-      smartProcessingSettings.TypeClassifierName = arioTypeClassifier.Name;
-      smartProcessingSettings.TypeClassifierId = arioTypeClassifier.Id;
+      if (firstPageClassifier == null)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Error, Resources.ClassifierNotFoundFormat(firstPageClassifierName));
+      
+      if (typeClassifier == null)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Error, Resources.ClassifierNotFoundFormat(typeClassifierName));
+      
+      smartProcessingSettings.FirstPageClassifierName = firstPageClassifier.Name;
+      smartProcessingSettings.FirstPageClassifierId = firstPageClassifier.Id;
+      smartProcessingSettings.TypeClassifierName = typeClassifier.Name;
+      smartProcessingSettings.TypeClassifierId = typeClassifier.Id;
       smartProcessingSettings.Save();
       
-      return messages;
+      return null;
     }
     
     #endregion

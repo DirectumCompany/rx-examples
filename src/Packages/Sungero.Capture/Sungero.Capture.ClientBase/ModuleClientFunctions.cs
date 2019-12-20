@@ -835,21 +835,17 @@ namespace Sungero.Capture.Client
     public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit,
                                               string firstPageClassifierName, string typeClassifierName)
     {
-      var messages = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
+      var message = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
                                                                                     lowerConfidenceLimit,
                                                                                     upperConfidenceLimit,
                                                                                     firstPageClassifierName,
                                                                                     typeClassifierName);
       
-      var warnings = messages.Where(m => m.Type == MessageTypes.Warning);
-      foreach (var warning in warnings)
-        Logger.Debug(warning.Text);
+      if (message.Type == MessageTypes.Warning)
+        Logger.Debug(message.Text);
       
-      var error = messages
-        .Where(m => m.Type == MessageTypes.Error)
-        .FirstOrDefault();
-      if (error != null)
-        throw new ApplicationException(error.Text);
+       if (message.Type == MessageTypes.Error)
+        throw new ApplicationException(message.Text);
     }
     
     /// <summary>

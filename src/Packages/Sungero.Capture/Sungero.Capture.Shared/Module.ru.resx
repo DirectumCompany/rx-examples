@@ -236,4 +236,7 @@
   <data name="ClassifiersNotFound" xml:space="preserve">
     <value>Не найдены классификаторы с именами: {0}, {1}.</value>
   </data>
+  <data name="SelectedSameClassifiers" xml:space="preserve">
+    <value>Выбран один и тот же классификатор в качестве классификаторов по типам документов и первых страниц.</value>
+  </data>
 </root>

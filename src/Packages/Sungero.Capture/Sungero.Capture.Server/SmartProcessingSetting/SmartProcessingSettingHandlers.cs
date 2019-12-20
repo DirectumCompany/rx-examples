@@ -18,42 +18,35 @@ namespace Sungero.Capture
         return;
       
       // "Жёсткая" проверка адреса сервиса Ario.
-      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
-      var arioUrlErrorMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Error);
-      if (arioUrlErrorMessages.Any())
-        foreach (var message in arioUrlErrorMessages)
-          e.AddError(_obj.Info.Properties.ArioUrl, message.Text);
+      var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      var isArioUrlValidationMessageError = arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.Error;
+      if (isArioUrlValidationMessageError)
+        e.AddError(_obj.Info.Properties.ArioUrl, arioUrlValidationMessage.Text);
       
       // "Жёсткая" проверка границ доверия.
-      var confidenceLimitsValidationMessages = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
-      var confidenceLimitsErrorMessages = confidenceLimitsValidationMessages.Where(m => m.Type == MessageTypes.Error);
-      if (confidenceLimitsErrorMessages.Any())
+      var confidenceLimitsValidationMessage = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
+      var isConfidenceLimitsValidationMessageError = arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.Error;
+      if (isConfidenceLimitsValidationMessageError)
       {
-        foreach (var message in confidenceLimitsValidationMessages)
-        {
-          e.AddError(_obj.Info.Properties.LowerConfidenceLimit, message.Text, _obj.Info.Properties.UpperConfidenceLimit);
-          e.AddError(_obj.Info.Properties.UpperConfidenceLimit, message.Text, _obj.Info.Properties.LowerConfidenceLimit);
-        }
+        e.AddError(_obj.Info.Properties.LowerConfidenceLimit, confidenceLimitsValidationMessage.Text, _obj.Info.Properties.UpperConfidenceLimit);
+        e.AddError(_obj.Info.Properties.UpperConfidenceLimit, confidenceLimitsValidationMessage.Text, _obj.Info.Properties.LowerConfidenceLimit);
       }
       
       // При наличии "Жёстких" ошибок не переходить к ForceSave.
-      if (arioUrlErrorMessages.Any() || confidenceLimitsErrorMessages.Any())
+      if (isArioUrlValidationMessageError || isConfidenceLimitsValidationMessageError)
         return;
       
       var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
       if (!isForceSave)
       {
         // "Мягкая" проверка адреса сервиса Ario.
-        var arioUrlWarningMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Warning);
-        foreach (var message in arioUrlWarningMessages)
-          e.AddError(message.Text, _obj.Info.Actions.ForceSave);
+        if (arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.Warning)
+          e.AddError(arioUrlValidationMessage.Text, _obj.Info.Actions.ForceSave);;
         
         // "Мягкая" проверка классификаторов.
-        var classifierValidationMessages = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
-        var classifierErrorMessages = classifierValidationMessages.Where(m => m.Type == MessageTypes.Warning);
-        
-        if (classifierErrorMessages.Any())
-          e.AddError(classifierErrorMessages.First().Text, _obj.Info.Actions.ForceSave);
+        var classifierValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
+        if (classifierValidationMessage != null && classifierValidationMessage.Type == MessageTypes.Warning)
+          e.AddError(classifierValidationMessage.Text, _obj.Info.Actions.ForceSave);
       }
     }
 

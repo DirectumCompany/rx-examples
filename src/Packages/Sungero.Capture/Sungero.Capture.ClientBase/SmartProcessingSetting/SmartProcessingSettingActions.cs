@@ -24,23 +24,26 @@ namespace Sungero.Capture.Client
     public virtual void CheckConnection(Sungero.Domain.Client.ExecuteActionArgs e)
     {
       // Проверка адреса сервиса Ario.
-      var arioUrlValidationMessages = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
-      if (arioUrlValidationMessages.Any())
+      var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(_obj);
+      if (arioUrlValidationMessage != null)
       {
-        var errorMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Error);
-        foreach (var message in errorMessages)
-          e.AddError(message.Text);
+        if (arioUrlValidationMessage.Type == MessageTypes.Error)
+          e.AddError(arioUrlValidationMessage.Text);
         
-        var warningMessages = arioUrlValidationMessages.Where(m => m.Type == MessageTypes.Warning);
-        foreach (var message in warningMessages)
-          e.AddWarning(message.Text);
+        if (arioUrlValidationMessage.Type == MessageTypes.Warning)
+          e.AddWarning(arioUrlValidationMessage.Text);
         
         return;
       }
       
       Dialogs.NotifyMessage(SmartProcessingSettings.Resources.ArioConnectionEstablished);
+      
+      var classifiersValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
+      if (classifiersValidationMessage.Type == MessageTypes.Warning)
+        e.AddWarning(classifiersValidationMessage.Text);
+      
     }
-
+    
     public virtual bool CanCheckConnection(Sungero.Domain.Client.CanExecuteActionArgs e)
     {
       return _obj.AccessRights.CanUpdate();
