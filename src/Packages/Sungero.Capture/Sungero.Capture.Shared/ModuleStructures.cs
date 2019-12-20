@@ -122,7 +122,7 @@ namespace Sungero.Capture.Structures.Module
     public string LegalFormField { get; set; }
   }
   
-    /// <summary>
+  /// <summary>
   /// Наименования факта и полей для контактных лиц.
   /// </summary>
   [Public]
@@ -142,11 +142,14 @@ namespace Sungero.Capture.Structures.Module
   }
  
   /// <summary>
-  /// Контактное лицо и сопоставленный с ним факт.
+  /// Подписант (контакт или сотрудник) и сопоставленный с ним факт.
   /// </summary>
   [Public]
-  partial class ContactFactMatching
+  partial class SignatoryFactMatching
   {
+    // Сотрудник.
+    public Sungero.Company.IEmployee Employee { get; set; }
+    
     // Контактное лицо.
     public Sungero.Parties.IContact Contact { get; set; }
     
@@ -157,22 +160,6 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
   }
  
-  /// <summary>
-  /// Сотрудник и сопоставленный с ним факт.
-  /// </summary>
-  [Public]
-  partial class EmployeeFactMatching
-  {
-    // Сотрудник.
-    public Sungero.Company.IEmployee Employee { get; set; }
-    
-    // Факт, по полям которого было найден сотрудник.
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
-    
-    // Доверять ли найденному значению.
-    public bool IsTrusted { get; set; }
-  }
-  
   /// <summary>
   /// Договорной документ и сопоставленный с ним факт.
   /// </summary>

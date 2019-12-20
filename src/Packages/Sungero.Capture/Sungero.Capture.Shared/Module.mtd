@@ -1380,28 +1380,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "ContactFactMatching",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Contact",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Parties.IContact"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "ContactFactNames",
       "IsPublic": true,
       "Properties": [
@@ -1559,28 +1537,6 @@
           "IsList": true,
           "IsNullable": true,
           "TypeFullName": "global::System.Collections.Generic.List<global::System.Int32>"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "EmployeeFactMatching",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Employee",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Company.IEmployee"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1746,6 +1702,34 @@
           "Name": "Fact",
           "IsNullable": true,
           "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "SignatoryFactMatching",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Employee",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Company.IEmployee"
+        },
+        {
+          "Name": "Contact",
+          "IsEntity": true,
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Parties.IContact"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
