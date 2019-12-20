@@ -843,12 +843,14 @@ namespace Sungero.Capture.Client
                                                                                    upperConfidenceLimit,
                                                                                    firstPageClassifierName,
                                                                                    typeClassifierName);
-      
-      if (message.Type == MessageTypes.Warning)
-        Logger.Debug(message.Text);
-      
-      if (message.Type == MessageTypes.Error)
-        throw new ApplicationException(message.Text);
+      if(message != null)
+      {
+        if (message.Type == MessageTypes.Warning)
+          Logger.Debug(message.Text);
+        
+        if (message.Type == MessageTypes.Error)
+          throw new ApplicationException(message.Text);
+      }
     }
     
     /// <summary>

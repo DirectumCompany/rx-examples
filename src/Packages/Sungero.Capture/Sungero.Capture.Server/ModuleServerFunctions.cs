@@ -144,22 +144,26 @@ namespace Sungero.Capture.Server
       var firstPageClassifier = classifiers.Where(a => a.Name == firstPageClassifierName).FirstOrDefault();
       var typeClassifier = classifiers.Where(a => a.Name == typeClassifierName).FirstOrDefault();
       
-      if (firstPageClassifier == null && typeClassifier == null)
+      if (firstPageClassifier == null || typeClassifier == null)
+      {
+        smartProcessingSettings.Save();
         return SettingsValidationMessageStructure.Create(MessageTypes.Error,
-                                                         Resources.ClassifiersNotFoundFormat(firstPageClassifierName, typeClassifierName));
-      
-      if (firstPageClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Error, Resources.ClassifierNotFoundFormat(firstPageClassifierName));
-      
-      if (typeClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Error, Resources.ClassifierNotFoundFormat(typeClassifierName));
+                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
+      }
       
       smartProcessingSettings.FirstPageClassifierName = firstPageClassifier.Name;
       smartProcessingSettings.FirstPageClassifierId = firstPageClassifier.Id;
       smartProcessingSettings.TypeClassifierName = typeClassifier.Name;
       smartProcessingSettings.TypeClassifierId = typeClassifier.Id;
-      smartProcessingSettings.Save();
       
+      if (firstPageClassifierName == typeClassifierName)
+      {
+        smartProcessingSettings.Save();
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning,
+                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
+      }
+      
+      smartProcessingSettings.Save();
       return null;
     }
     
