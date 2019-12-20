@@ -317,6 +317,9 @@ namespace Sungero.Capture.Structures.Module
     // Валюта.
     public Commons.ICurrency Currency { get; set; }   
 
+    // Признак - есть значение.
+    public bool HasValue { get; set; }
+    
     // Признак - можно доверять.
     public bool IsTrusted { get; set; }
     

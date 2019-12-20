@@ -2248,9 +2248,12 @@ namespace Sungero.Capture.Server
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
       var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
-      var currency = recognizedCurrency.Currency;
-      document.Currency = currency;
-      LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+      if (recognizedCurrency.HasValue)
+      {
+        var currency = recognizedCurrency.Currency;
+        document.Currency = currency;
+        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+      }
     }
     
     /// <summary>
@@ -2275,9 +2278,12 @@ namespace Sungero.Capture.Server
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
       var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
-      var currency = recognizedCurrency.Currency;
-      document.Currency = currency;
-      LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+      if (recognizedCurrency.HasValue)
+      {
+        var currency = recognizedCurrency.Currency;
+        document.Currency = currency;
+        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+      }
     }
     
     /// <summary>
@@ -2470,8 +2476,6 @@ namespace Sungero.Capture.Server
     public virtual Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
-      var defaultCurrency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
-      recognizedCurrency.Currency = defaultCurrency;
       
       var facts = recognitionResult.Facts;
       var currencyFacts = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency);
@@ -2480,6 +2484,10 @@ namespace Sungero.Capture.Server
         return recognizedCurrency;
       
       recognizedCurrency.Fact = currencyFact;
+      
+      var defaultCurrency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
+      recognizedCurrency.Currency = defaultCurrency;
+      recognizedCurrency.HasValue = true;
       
       var currencyCode = GetFieldValue(currencyFact, FieldNames.DocumentAmount.Currency);
       int resCurrencyCode;
