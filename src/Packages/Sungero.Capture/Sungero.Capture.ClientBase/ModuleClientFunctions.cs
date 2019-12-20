@@ -798,7 +798,7 @@ namespace Sungero.Capture.Client
       var invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
       
       return double.TryParse(firstString, numberStyles, invariantCulture, out number) &&
-             double.TryParse(secondString, numberStyles, invariantCulture, out number);
+        double.TryParse(secondString, numberStyles, invariantCulture, out number);
     }
     
     /// <summary>
@@ -836,15 +836,15 @@ namespace Sungero.Capture.Client
                                               string firstPageClassifierName, string typeClassifierName)
     {
       var message = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
-                                                                                    lowerConfidenceLimit,
-                                                                                    upperConfidenceLimit,
-                                                                                    firstPageClassifierName,
-                                                                                    typeClassifierName);
+                                                                                   lowerConfidenceLimit,
+                                                                                   upperConfidenceLimit,
+                                                                                   firstPageClassifierName,
+                                                                                   typeClassifierName);
       
       if (message.Type == MessageTypes.Warning)
         Logger.Debug(message.Text);
       
-       if (message.Type == MessageTypes.Error)
+      if (message.Type == MessageTypes.Error)
         throw new ApplicationException(message.Text);
     }
     

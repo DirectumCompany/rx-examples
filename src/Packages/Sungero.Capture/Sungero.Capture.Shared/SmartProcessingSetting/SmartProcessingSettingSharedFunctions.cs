@@ -38,9 +38,9 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
-    /// 
+    /// Проверить классификаторы.
     /// </summary>
-    /// <returns></returns>
+    /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
     public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateClassifiers()
     {
       if (!_obj.FirstPageClassifierId.HasValue || !_obj.TypeClassifierId.HasValue)
@@ -52,18 +52,12 @@ namespace Sungero.Capture.Shared
       var typeClassifier = classifiers.Where(a => a.Id == _obj.TypeClassifierId.Value &&
                                              a.Name == _obj.TypeClassifierName).FirstOrDefault();
       
-      if (firstPageClassifier == null && typeClassifier == null)
+      if (firstPageClassifier == null || typeClassifier == null)
         return SettingsValidationMessageStructure.Create(MessageTypes.Warning, 
-                                                         Resources.ClassifiersNotFoundFormat(_obj.FirstPageClassifierName, _obj.TypeClassifierName));
-      
-      if (firstPageClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, Resources.ClassifierNotFoundFormat(_obj.FirstPageClassifierName));
-      
-      if (typeClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, Resources.ClassifierNotFoundFormat(_obj.TypeClassifierName));
+                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
       if (firstPageClassifier.Id == typeClassifier.Id)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, Resources.SelectedSameClassifiers);
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
       return null;
     }
