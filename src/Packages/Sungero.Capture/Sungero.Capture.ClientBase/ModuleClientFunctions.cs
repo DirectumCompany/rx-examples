@@ -431,7 +431,12 @@ namespace Sungero.Capture.Client
       
       var classifiersValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(smartProcessingSettings);
       if (classifiersValidationMessage != null)
-        throw new ApplicationException(classifiersValidationMessage.Text);
+      {
+        if (classifiersValidationMessage.Type == MessageTypes.Warning)
+          Logger.Debug(classifiersValidationMessage.Text);
+        else
+          throw new ApplicationException(classifiersValidationMessage.Text);
+      }
       
       var arioConnector = new ArioExtensions.ArioConnector(smartProcessingSettings.ArioUrl);
       var typeClassifierId = smartProcessingSettings.TypeClassifierId.ToString();
@@ -848,7 +853,7 @@ namespace Sungero.Capture.Client
         if (message.Type == MessageTypes.Warning)
           Logger.Debug(message.Text);
         
-        if (message.Type == MessageTypes.Error)
+        if (message.Type == MessageTypes.Error || message.Type == MessageTypes.SoftError)
           throw new ApplicationException(message.Text);
       }
     }

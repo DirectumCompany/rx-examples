@@ -32,7 +32,7 @@ namespace Sungero.Capture.Shared
         return SettingsValidationMessageStructure.Create(MessageTypes.Error, SmartProcessingSettings.Resources.InvalidArioUrl);
         
       if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.ArioConnectionError);
+        return SettingsValidationMessageStructure.Create(MessageTypes.SoftError, SmartProcessingSettings.Resources.ArioConnectionError);
       
       return null;
     }
@@ -44,7 +44,7 @@ namespace Sungero.Capture.Shared
     public virtual Structures.SmartProcessingSetting.SettingsValidationMessage ValidateClassifiers()
     {
       if (!_obj.FirstPageClassifierId.HasValue || !_obj.TypeClassifierId.HasValue)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
+        return SettingsValidationMessageStructure.Create(MessageTypes.SoftError, SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
       var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
       var firstPageClassifier = classifiers
@@ -55,7 +55,7 @@ namespace Sungero.Capture.Shared
         .FirstOrDefault();
       
       if (firstPageClassifier == null || typeClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
+        return SettingsValidationMessageStructure.Create(MessageTypes.SoftError, SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
       if (firstPageClassifier.Id == typeClassifier.Id)
         return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);

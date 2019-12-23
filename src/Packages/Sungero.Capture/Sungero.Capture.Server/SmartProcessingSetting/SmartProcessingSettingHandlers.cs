@@ -40,12 +40,12 @@ namespace Sungero.Capture
       if (!isForceSave)
       {
         // "Мягкая" проверка адреса сервиса Ario.
-        if (arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.Warning)
+        if (arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.SoftError)
           e.AddError(arioUrlValidationMessage.Text, _obj.Info.Actions.ForceSave);
         
         // "Мягкая" проверка классификаторов.
         var classifierValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
-        if (classifierValidationMessage != null && classifierValidationMessage.Type == MessageTypes.Warning)
+        if (classifierValidationMessage != null)
           e.AddError(classifierValidationMessage.Text, _obj.Info.Actions.ForceSave);
       }
     }

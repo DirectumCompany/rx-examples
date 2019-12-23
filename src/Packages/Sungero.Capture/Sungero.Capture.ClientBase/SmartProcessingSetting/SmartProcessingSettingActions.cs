@@ -30,7 +30,7 @@ namespace Sungero.Capture.Client
         if (arioUrlValidationMessage.Type == MessageTypes.Error)
           e.AddError(arioUrlValidationMessage.Text);
         
-        if (arioUrlValidationMessage.Type == MessageTypes.Warning)
+        if (arioUrlValidationMessage.Type == MessageTypes.SoftError)
           e.AddWarning(arioUrlValidationMessage.Text);
         
         return;
@@ -40,7 +40,7 @@ namespace Sungero.Capture.Client
       
       // Проверка классификаторов.
       var classifiersValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
-      if (classifiersValidationMessage != null && classifiersValidationMessage.Type == MessageTypes.Warning)
+      if (classifiersValidationMessage != null)
         e.AddWarning(classifiersValidationMessage.Text);
     }
     
