@@ -3496,8 +3496,36 @@ namespace Sungero.Capture.Server
                                            bool? isTrusted = null,
                                            int? collectionRecordId = null)
     {
+      var fieldNames = new List<string>() { fieldName };
+      if (fieldName == null)
+        fieldNames = null;
+      LinkFactFieldsAndProperty(recognitionResult, fact, fieldNames, propertyName, propertyValue, isTrusted, collectionRecordId);
+    }
+    
+    /// <summary>
+    /// Проложить связь между полями факта и свойством документа.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
+    /// <param name="fact">Факт, который будет связан со свойством документа.</param>
+    /// <param name="fieldNames">Поля, которые будут связаны со свойством документа. Если не указано, то будут связаны все поля факта.</param>
+    /// <param name="propertyName">Имя свойства документа.</param>
+    /// <param name="propertyValue">Значение свойства.</param>
+    /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
+    /// <param name="collectionRecordId">ИД записи свойства-коллекции.</param>
+    public static void LinkFactFieldsAndProperty(Structures.Module.IRecognitionResult recognitionResult,
+                                                 Structures.Module.IFact fact,
+                                                 List<string> fieldNames,
+                                                 string propertyName,
+                                                 object propertyValue,
+                                                 bool? isTrusted = null,
+                                                 int? collectionRecordId = null)
+    {
       var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
       if (string.IsNullOrWhiteSpace(propertyStringValue))
+        return;
+      
+      var hasFieldNames = fieldNames != null;
+      if (hasFieldNames && !fieldNames.Any())
         return;
       
       // Если значение определилось не из фактов,
@@ -3511,20 +3539,21 @@ namespace Sungero.Capture.Server
       }
       else
       {
-        if (isTrusted == null)
-          isTrusted = IsTrustedField(fact, fieldName);
+        var documentRecognitionInfoByFact = recognitionResult.Info.Facts.Where(f => f.FactId == fact.Id);
+        var documentRecognitionInfoByFields = documentRecognitionInfoByFact.Where(f => !hasFieldNames || fieldNames.Contains(f.FieldName));
         
-        var facts = recognitionResult.Info.Facts
-          .Where(f => f.FactId == fact.Id)
-          .Where(f => string.IsNullOrWhiteSpace(fieldName) || f.FieldName == fieldName);
-        var factLabel = GetFactLabel(fact, propertyName);
-        foreach (var recognizedFact in facts)
+        foreach (var field in documentRecognitionInfoByFields)
         {
-          recognizedFact.PropertyName = propertyName;
-          recognizedFact.PropertyValue = propertyStringValue;
-          recognizedFact.IsTrusted = isTrusted;
-          recognizedFact.FactLabel = factLabel;
-          recognizedFact.CollectionRecordId = collectionRecordId;
+          if (isTrusted == null)
+            isTrusted = IsTrustedField(fact, field.FieldName);
+          
+          var factLabel = GetFactLabel(fact, propertyName);
+          
+          field.PropertyName = propertyName;
+          field.PropertyValue = propertyStringValue;
+          field.IsTrusted = isTrusted;
+          field.FactLabel = factLabel;
+          field.CollectionRecordId = collectionRecordId;
         }
       }
     }
