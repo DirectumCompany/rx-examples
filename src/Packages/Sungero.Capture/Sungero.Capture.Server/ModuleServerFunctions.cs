@@ -3802,6 +3802,17 @@ namespace Sungero.Capture.Server
       var surname = GetFieldValue(fact, ContactFactNames.SurnameField);
       var name = GetFieldValue(fact, ContactFactNames.NameField);
       var patronymic = GetFieldValue(fact, ContactFactNames.PatronymicField);
+      
+      // Если 2 из 3 полей пустые, то скорее всего сервис Ario вернул Фамилию И.О. в третье поле.
+      if (string.IsNullOrWhiteSpace(surname) && string.IsNullOrWhiteSpace(name) && !string.IsNullOrWhiteSpace(patronymic))
+        return patronymic;
+      
+      if (string.IsNullOrWhiteSpace(name) && string.IsNullOrWhiteSpace(patronymic) && !string.IsNullOrWhiteSpace(surname))
+        return surname;
+      
+      if (string.IsNullOrWhiteSpace(surname) && string.IsNullOrWhiteSpace(patronymic) && !string.IsNullOrWhiteSpace(name))
+        return name;
+      
       return Parties.PublicFunctions.Person.GetSurnameAndInitialsInTenantCulture(name, patronymic, surname);
     }
     
@@ -3820,7 +3831,18 @@ namespace Sungero.Capture.Server
       var fullName = GetFullNameByFact(predictedClass, fact);
       var shortName = GetShortNameByFact(predictedClass, fact);
       
-      return Parties.PublicFunctions.Contact.GetContactsByName(fullName, shortName, counterparty);
+      var nonBreakingSpace = new string('\u00A0', 1);
+      var space = new string('\u0020', 1);
+      
+      // Короткое имя персоны содержит неразрывный пробел.
+      shortName = shortName.Replace(". ", ".").Replace(space, nonBreakingSpace);
+      
+      var contacts = Parties.PublicFunctions.Contact.GetContactsByName(fullName, shortName, counterparty);
+      
+      if (!contacts.Any())
+        contacts = Parties.PublicFunctions.Contact.GetContactsByName(shortName, shortName, counterparty);
+      
+      return contacts;
     }
     
     /// <summary>
