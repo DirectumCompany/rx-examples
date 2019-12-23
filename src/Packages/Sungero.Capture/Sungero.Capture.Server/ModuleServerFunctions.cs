@@ -128,7 +128,11 @@ namespace Sungero.Capture.Server
       smartProcessingSettings.ArioUrl = arioUrl;
       var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
       if (arioUrlValidationMessage != null)
+      {
+        // В настройках через скрипты проверки адреса Арио "жесткие".
+        arioUrlValidationMessage.Type = MessageTypes.Error;
         return arioUrlValidationMessage;
+      }
       
       // Границы.
       int lowerLimit;
@@ -154,6 +158,11 @@ namespace Sungero.Capture.Server
       smartProcessingSettings.TypeClassifierId = typeClassifier.Id;
       
       smartProcessingSettings.Save();
+      
+      // Предупредить, что выбраны одинаковые классификаторы.
+      if (firstPageClassifierName == typeClassifierName)
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning,
+                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
       return null;
     }
     
