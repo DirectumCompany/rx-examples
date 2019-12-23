@@ -38,10 +38,10 @@ namespace Sungero.Capture.Client
       
       Dialogs.NotifyMessage(SmartProcessingSettings.Resources.ArioConnectionEstablished);
       
+      // Проверка классификаторов.
       var classifiersValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);
-      if (classifiersValidationMessage.Type == MessageTypes.Warning)
+      if (classifiersValidationMessage != null && classifiersValidationMessage.Type == MessageTypes.Warning)
         e.AddWarning(classifiersValidationMessage.Text);
-      
     }
     
     public virtual bool CanCheckConnection(Sungero.Domain.Client.CanExecuteActionArgs e)

@@ -25,7 +25,7 @@ namespace Sungero.Capture
       
       // "Жёсткая" проверка границ доверия.
       var confidenceLimitsValidationMessage = Functions.SmartProcessingSetting.ValidateConfidenceLimits(_obj);
-      var isConfidenceLimitsValidationMessageError = arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.Error;
+      var isConfidenceLimitsValidationMessageError = confidenceLimitsValidationMessage != null && confidenceLimitsValidationMessage.Type == MessageTypes.Error;
       if (isConfidenceLimitsValidationMessageError)
       {
         e.AddError(_obj.Info.Properties.LowerConfidenceLimit, confidenceLimitsValidationMessage.Text, _obj.Info.Properties.UpperConfidenceLimit);
@@ -41,7 +41,7 @@ namespace Sungero.Capture
       {
         // "Мягкая" проверка адреса сервиса Ario.
         if (arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.Warning)
-          e.AddError(arioUrlValidationMessage.Text, _obj.Info.Actions.ForceSave);;
+          e.AddError(arioUrlValidationMessage.Text, _obj.Info.Actions.ForceSave);
         
         // "Мягкая" проверка классификаторов.
         var classifierValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);

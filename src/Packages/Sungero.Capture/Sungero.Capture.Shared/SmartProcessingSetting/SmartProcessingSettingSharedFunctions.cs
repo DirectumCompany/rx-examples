@@ -47,14 +47,15 @@ namespace Sungero.Capture.Shared
         return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
       var classifiers = Functions.SmartProcessingSetting.Remote.GetArioClassifiers(_obj);
-      var firstPageClassifier = classifiers.Where(a => a.Id == _obj.FirstPageClassifierId.Value &&
-                                                  a.Name == _obj.FirstPageClassifierName).FirstOrDefault();
-      var typeClassifier = classifiers.Where(a => a.Id == _obj.TypeClassifierId.Value &&
-                                             a.Name == _obj.TypeClassifierName).FirstOrDefault();
+      var firstPageClassifier = classifiers
+        .Where(a => a.Id == _obj.FirstPageClassifierId.Value && a.Name == _obj.FirstPageClassifierName)
+        .FirstOrDefault();
+      var typeClassifier = classifiers
+        .Where(a => a.Id == _obj.TypeClassifierId.Value && a.Name == _obj.TypeClassifierName)
+        .FirstOrDefault();
       
       if (firstPageClassifier == null || typeClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, 
-                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
+        return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
       
       if (firstPageClassifier.Id == typeClassifier.Id)
         return SettingsValidationMessageStructure.Create(MessageTypes.Warning, SmartProcessingSettings.Resources.SetCorrectClassifiers);
