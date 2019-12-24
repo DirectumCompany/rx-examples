@@ -2993,7 +2993,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Поиск НОР, наиболее подходящей для ответственного.
+    /// Поиск НОР, наиболее подходящей для ответственного в договорных документах.
     /// </summary>
     /// <param name="businessUnitsWithFacts">НОР, найденные по фактам.</param>
     /// <param name="businessUnitPropertyName">Имя связанного свойства.</param>
@@ -3047,12 +3047,6 @@ namespace Sungero.Capture.Server
       
       if (businessUnitsWithFacts.Count() == 0)
       {
-        // Если в персональных настройках ответственного указана НОР.
-        if (responsibleEmployeePersonalSettingsBusinessUnit != null)
-          businessUnit.BusinessUnit = responsibleEmployeePersonalSettingsBusinessUnit;
-        else
-          businessUnit.BusinessUnit = responsibleEmployeeBusinessUnit;
-        
         businessUnit.Fact = null;
         businessUnit.IsTrusted = false;
         return businessUnit;
@@ -3155,18 +3149,40 @@ namespace Sungero.Capture.Server
       var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts,
                                                                      businessUnitPropertyName,
                                                                      responsible);
-      document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, businessUnitPropertyName,
-                          document.BusinessUnit, businessUnitWithFact.IsTrusted);
-      // Заполнить подписанта.
-      var ourSignatory = GetContractualDocumentSignatory(recognitionResult, document, businessUnitWithFact);
-      document.OurSignatory = ourSignatory.Employee;
+      if (businessUnitWithFact.BusinessUnit != null)
+      {
+        document.BusinessUnit = businessUnitWithFact.BusinessUnit;
+        LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, businessUnitPropertyName,
+                            document.BusinessUnit, businessUnitWithFact.IsTrusted);
+      }
       
+      // Заполнить подписанта.
+      var ourSignatory = GetContractualDocumentSignatory(recognitionResult, document, businessUnitWithFact, true);
+      document.OurSignatory = ourSignatory.Employee;
       var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatory.Fact,
                                                                            FieldNames.Counterparty.SignatorySurname);
-      
       LinkFactAndProperty(recognitionResult, ourSignatory.Fact, null, props.OurSignatory.Name,
                           document.OurSignatory, isTrustedOurSignatory);
+      
+      // Если НОР не заполнена, она подставляется из подписанта и результату не доверяем.
+      if (document.BusinessUnit == null && ourSignatory.Employee != null)
+        LinkFactAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, ourSignatory.Employee.Department.BusinessUnit, false);
+      
+      // Если НОР по фактам не нашли, то взять ее из персональных настроек, или от ответственного.
+      if (document.BusinessUnit == null)
+      {
+        var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
+        var responsibleEmployeePersonalSettings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(responsible);
+        var responsibleEmployeePersonalSettingsBusinessUnit = responsibleEmployeePersonalSettings != null
+          ? responsibleEmployeePersonalSettings.BusinessUnit
+          : Company.BusinessUnits.Null;
+        
+        // Если в персональных настройках ответственного указана НОР.
+        if (responsibleEmployeePersonalSettingsBusinessUnit != null)
+          document.BusinessUnit = responsibleEmployeePersonalSettingsBusinessUnit;
+        else
+          document.BusinessUnit = responsibleEmployeeBusinessUnit;
+      }
       
       // Заполнить данные корреспондента.
       // Убираем уже использованный факт для подбора НОР, чтобы организация не искалась по тем же реквизитам что и НОР.
@@ -3182,15 +3198,14 @@ namespace Sungero.Capture.Server
       
       // Заполнить подписанта.
       var signedBy = GetContractualDocumentSignatory(recognitionResult, document, сounterparty);
-      
-      // Если контрагент не заполнен, он подставляется из подписанта и результату не доверяем.
-      if (document.Counterparty == null && signedBy.Contact != null)
-        LinkFactAndProperty(recognitionResult, null, null, props.Counterparty.Name, signedBy.Contact.Company, false);
-      
       document.CounterpartySignatory = signedBy.Contact;
       var isTrustedSignatory = signedBy.IsTrusted && IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname);
       LinkFactAndProperty(recognitionResult, signedBy.Fact, null, props.CounterpartySignatory.Name,
                           document.CounterpartySignatory, isTrustedSignatory);
+      
+      // Если контрагент не заполнен, он подставляется из подписанта и результату не доверяем.
+      if (document.Counterparty == null && signedBy.Contact != null)
+        LinkFactAndProperty(recognitionResult, null, null, props.Counterparty.Name, signedBy.Contact.Company, false);
     }
     
     #endregion
@@ -3746,9 +3761,11 @@ namespace Sungero.Capture.Server
         return new List<IEmployee>();
       
       var fullName = GetFullNameByFact(predictedClass, fact);
+      var employees = Company.PublicFunctions.Employee.Remote.GetEmployeesByName(fullName);
       
-      var businessUnitEmployees = Company.PublicFunctions.Employee.Remote.GetEmployeesByName(fullName);
-      var employees = businessUnitEmployees.Where(e => e.Department.BusinessUnit.Equals(businessUnit)).ToList();
+      if (businessUnit != null)
+        employees = employees.Where(e => e.Department.BusinessUnit.Equals(businessUnit)).ToList();
+      
       return employees;
     }
 
@@ -3974,11 +3991,13 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <param name="document">Договорной документ.</param>
-    /// <param name="сounterparty">Найденная НОР.</param>
+    /// <param name="сounterparty">Структура с НОР, КА, фактом и признаком доверия.</param>
+    /// <param name="isOurSignatory">Признак поиска нашего подписанта (true) или подписанта КА (false).</param>
     /// <returns>Сотрудник.</returns>
     public virtual Structures.Module.ISignatoryFactMatching GetContractualDocumentSignatory(IRecognitionResult recognitionResult,
                                                                                             IContractualDocumentBase document,
-                                                                                            ICounterpartyFactMatching organizationFactMatching)
+                                                                                            ICounterpartyFactMatching organizationFactMatching,
+                                                                                            bool isOurSignatory = false)
     {
       var props = document.Info.Properties;
       var signatoryFacts = GetFacts(recognitionResult.Facts, FactNames.Counterparty);
@@ -3986,15 +4005,12 @@ namespace Sungero.Capture.Server
       var signatoryFieldNames = new List<string> {FieldNames.Counterparty.SignatorySurname,
         FieldNames.Counterparty.SignatoryName,
         FieldNames.Counterparty.SignatoryPatrn};
-      var isBusinessUnit = false;
       
       if (!signatoryFacts.Any())
         return signedBy;
       
       if (organizationFactMatching != null)
       {
-        isBusinessUnit = organizationFactMatching.BusinessUnit != null;
-        
         var organizationFact = organizationFactMatching.Fact;
         if (organizationFact != null)
         {
@@ -4002,22 +4018,25 @@ namespace Sungero.Capture.Server
           var isOrganizationFactWithSignatory = GetFields(organizationFact, signatoryFieldNames).Any();
           
           if (isOrganizationFactWithSignatory)
-            return isBusinessUnit
+            return isOurSignatory
               ? GetContractualDocumentOurSignatoryByFact(organizationFact, document, recognitionResult.PredictedClass)
               : GetContactByFact(organizationFact, props.CounterpartySignatory.Name, document.Counterparty,
                                  props.Counterparty.Name, recognitionResult.PredictedClass);
         }
         
-        var organizationName = isBusinessUnit ? organizationFactMatching.BusinessUnit.Name : organizationFactMatching.Counterparty.Name;
-        
-        // Ожидаемое наименование НОР в формате {Название}, {ОПФ}.
-        var organizationNameAndLegalForm = organizationName.Split(new string[] { ", " }, StringSplitOptions.None);
+        if (organizationFactMatching.BusinessUnit != null || organizationFactMatching.Counterparty != null)
+        {
+          var organizationName = isOurSignatory ? organizationFactMatching.BusinessUnit.Name : organizationFactMatching.Counterparty.Name;
+          
+          // Ожидаемое наименование НОР в формате {Название}, {ОПФ}.
+          var organizationNameAndLegalForm = organizationName.Split(new string[] { ", " }, StringSplitOptions.None);
 
-        signatoryFacts = signatoryFacts
-          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name &&
-                                   fl.Value.Equals(organizationNameAndLegalForm[0], StringComparison.InvariantCultureIgnoreCase)))
-          .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm &&
-                                   fl.Value.Equals(organizationNameAndLegalForm[1], StringComparison.InvariantCultureIgnoreCase))).ToList();
+          signatoryFacts = signatoryFacts
+            .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.Name &&
+                                     fl.Value.Equals(organizationNameAndLegalForm[0], StringComparison.InvariantCultureIgnoreCase)))
+            .Where(f => f.Fields.Any(fl => fl.Name == FieldNames.Counterparty.LegalForm &&
+                                     fl.Value.Equals(organizationNameAndLegalForm[1], StringComparison.InvariantCultureIgnoreCase))).ToList();
+        }
       }
       
       signatoryFacts = signatoryFacts
@@ -4027,7 +4046,7 @@ namespace Sungero.Capture.Server
       foreach (var fact in signatoryFacts)
       {
         Capture.Structures.Module.ISignatoryFactMatching signatory = null;
-        if (isBusinessUnit)
+        if (isOurSignatory)
         {
           signatory = GetContractualDocumentOurSignatoryByFact(fact, document, recognitionResult.PredictedClass);
           if (signatory.Employee != null)
