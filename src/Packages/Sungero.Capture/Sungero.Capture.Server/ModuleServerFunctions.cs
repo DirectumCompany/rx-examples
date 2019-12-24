@@ -4216,8 +4216,12 @@ namespace Sungero.Capture.Server
       if (!filteredEmloyees.Any())
         return signedBy;
       
+      var fullName = GetFullNameByFact(predictedClass, fact);
       signedBy.Employee = filteredEmloyees.FirstOrDefault();
-      signedBy.IsTrusted = (filteredEmloyees.Count() == 1);
+      
+      // Если сотрудник подобран по короткому имени персоны, то значение заведомо недоверенное.
+      signedBy.IsTrusted = filteredEmloyees.Count() == 1 &&
+                           string.Equals(signedBy.Employee.Name, fullName, StringComparison.InvariantCultureIgnoreCase);
       
       return signedBy;
     }
