@@ -3184,6 +3184,8 @@ namespace Sungero.Capture.Server
           document.BusinessUnit = responsibleEmployeePersonalSettingsBusinessUnit;
         else
           document.BusinessUnit = responsibleEmployeeBusinessUnit;
+        
+        LinkFactFieldsAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
       }
       
       // Заполнить данные корреспондента.
