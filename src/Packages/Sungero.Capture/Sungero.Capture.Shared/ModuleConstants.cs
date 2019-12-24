@@ -1,5 +1,6 @@
 ﻿using System;
 using Sungero.Core;
+using System.Collections.Generic;
 
 namespace Sungero.Capture.Constants
 {
@@ -197,6 +198,9 @@ namespace Sungero.Capture.Constants
         
         [Sungero.Core.Public]
         public const string TIN = "TIN";
+        
+        [Sungero.Core.Public]
+        public const string TinIsValid = "TinIsValid";
         
         [Sungero.Core.Public]
         public const string TRRC = "TRRC";

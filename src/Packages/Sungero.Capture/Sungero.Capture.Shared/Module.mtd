@@ -1045,6 +1045,16 @@
       "Value": "\"TIN\""
     },
     {
+      "Name": "TinIsValid",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Counterparty"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"TinIsValid\""
+    },
+    {
       "Name": "TRRC",
       "ParentClasses": [
         "Module",

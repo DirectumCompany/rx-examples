@@ -3142,6 +3142,8 @@ namespace Sungero.Capture.Server
       var props = document.Info.Properties;
       var businessUnitPropertyName = props.BusinessUnit.Name;
       var counterpartyPropertyName = props.Counterparty.Name;
+      var signatoryFieldNames = this.GetSignatoryFieldNames();
+      var counterpartyFieldNames = this.GetCounterpartyFieldNames();
       
       // Заполнить данные нашей стороны.
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
@@ -3152,17 +3154,16 @@ namespace Sungero.Capture.Server
       if (businessUnitWithFact.BusinessUnit != null)
       {
         document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-        LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, businessUnitPropertyName,
-                            document.BusinessUnit, businessUnitWithFact.IsTrusted);
+        LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, counterpartyFieldNames,
+                            businessUnitPropertyName, document.BusinessUnit, businessUnitWithFact.IsTrusted);
       }
       
       // Заполнить подписанта.
       var ourSignatory = GetContractualDocumentSignatory(recognitionResult, document, businessUnitWithFact, true);
       document.OurSignatory = ourSignatory.Employee;
-      var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatory.Fact,
-                                                                           FieldNames.Counterparty.SignatorySurname);
-      LinkFactAndProperty(recognitionResult, ourSignatory.Fact, null, props.OurSignatory.Name,
-                          document.OurSignatory, isTrustedOurSignatory);
+      var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatory.Fact, FieldNames.Counterparty.SignatorySurname);
+      LinkFactAndProperty(recognitionResult, ourSignatory.Fact, signatoryFieldNames,
+                          props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
       
       // Если НОР не заполнена, она подставляется из подписанта и результату не доверяем.
       if (document.BusinessUnit == null && ourSignatory.Employee != null)
@@ -3192,20 +3193,21 @@ namespace Sungero.Capture.Server
       if (сounterparty != null)
       {
         document.Counterparty = сounterparty.Counterparty;
-        LinkFactAndProperty(recognitionResult, сounterparty.Fact, null, counterpartyPropertyName,
-                            document.Counterparty, сounterparty.IsTrusted);
+        LinkFactFieldsAndProperty(recognitionResult, сounterparty.Fact, counterpartyFieldNames,
+                                  counterpartyPropertyName, document.Counterparty, сounterparty.IsTrusted);
       }
       
       // Заполнить подписанта.
       var signedBy = GetContractualDocumentSignatory(recognitionResult, document, сounterparty);
-      document.CounterpartySignatory = signedBy.Contact;
-      var isTrustedSignatory = signedBy.IsTrusted && IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname);
-      LinkFactAndProperty(recognitionResult, signedBy.Fact, null, props.CounterpartySignatory.Name,
-                          document.CounterpartySignatory, isTrustedSignatory);
       
       // Если контрагент не заполнен, он подставляется из подписанта и результату не доверяем.
       if (document.Counterparty == null && signedBy.Contact != null)
-        LinkFactAndProperty(recognitionResult, null, null, props.Counterparty.Name, signedBy.Contact.Company, false);
+        LinkFactFieldsAndProperty(recognitionResult, null, null, props.Counterparty.Name, signedBy.Contact.Company, false);
+      
+      document.CounterpartySignatory = signedBy.Contact;
+      var isTrustedSignatory = signedBy.IsTrusted && IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname);
+      LinkFactFieldsAndProperty(recognitionResult, signedBy.Fact, signatoryFieldNames,
+                                props.CounterpartySignatory.Name, document.CounterpartySignatory, isTrustedSignatory);
     }
     
     #endregion
@@ -4002,9 +4004,8 @@ namespace Sungero.Capture.Server
       var props = document.Info.Properties;
       var signatoryFacts = GetFacts(recognitionResult.Facts, FactNames.Counterparty);
       var signedBy = Structures.Module.SignatoryFactMatching.Create(null, null, null, false);
-      var signatoryFieldNames = new List<string> {FieldNames.Counterparty.SignatorySurname,
-        FieldNames.Counterparty.SignatoryName,
-        FieldNames.Counterparty.SignatoryPatrn};
+      var signatoryFieldNames = this.GetSignatoryFieldNames();
+      var isBusinessUnit = false;
       
       if (!signatoryFacts.Any())
         return signedBy;
@@ -4212,6 +4213,37 @@ namespace Sungero.Capture.Server
       signedBy.IsTrusted = (filteredEmloyees.Count() == 1);
       
       return signedBy;
+    }
+    
+    /// <summary>
+    /// Получить наименования полей для подписывающего.
+    /// </summary>
+    /// <returns>Наимнования полей для подписывающего.</returns>
+    public virtual List<string> GetSignatoryFieldNames()
+    {
+      return new List<string>
+      {
+        FieldNames.Counterparty.SignatorySurname,
+        FieldNames.Counterparty.SignatoryName,
+        FieldNames.Counterparty.SignatoryPatrn
+      };
+    }
+    
+    /// <summary>
+    /// Получить наименования полей для контрагента.
+    /// </summary>
+    /// <returns>Наименования полей для контрагента.</returns>
+    public virtual List<string> GetCounterpartyFieldNames()
+    {
+      return new List<string>
+      {
+        FieldNames.Counterparty.Name,
+        FieldNames.Counterparty.LegalForm,
+        FieldNames.Counterparty.CounterpartyType,
+        FieldNames.Counterparty.TIN,
+        FieldNames.Counterparty.TinIsValid,
+        FieldNames.Counterparty.TRRC
+      };
     }
     
     #endregion
