@@ -3144,6 +3144,8 @@ namespace Sungero.Capture.Server
       var counterpartyPropertyName = props.Counterparty.Name;
       var signatoryFieldNames = this.GetSignatoryFieldNames();
       var counterpartyFieldNames = this.GetCounterpartyFieldNames();
+      Sungero.Capture.Structures.Module.IFact businessUnitFact = null;
+      Sungero.Capture.Structures.Module.IFact ourSignatoryFact = null;
       
       // Заполнить данные нашей стороны.
       var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
@@ -3154,8 +3156,9 @@ namespace Sungero.Capture.Server
       if (businessUnitWithFact.BusinessUnit != null)
       {
         document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-        LinkFactFieldsAndProperty(recognitionResult, businessUnitWithFact.Fact, counterpartyFieldNames,
-                            businessUnitPropertyName, document.BusinessUnit, businessUnitWithFact.IsTrusted);
+        businessUnitFact = businessUnitWithFact.Fact;
+        LinkFactFieldsAndProperty(recognitionResult, businessUnitFact, counterpartyFieldNames,
+                                  businessUnitPropertyName, document.BusinessUnit, businessUnitWithFact.IsTrusted);
       }
       
       // Заполнить подписанта.
@@ -3166,8 +3169,9 @@ namespace Sungero.Capture.Server
         LinkFactAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, ourSignatory.Employee.Department.BusinessUnit, false);
       
       document.OurSignatory = ourSignatory.Employee;
-      var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatory.Fact, FieldNames.Counterparty.SignatorySurname);
-      LinkFactFieldsAndProperty(recognitionResult, ourSignatory.Fact, signatoryFieldNames,
+      ourSignatoryFact = ourSignatory.Fact;
+      var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatoryFact, FieldNames.Counterparty.SignatorySurname);
+      LinkFactFieldsAndProperty(recognitionResult, ourSignatoryFact, signatoryFieldNames,
                           props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
       
       // Если НОР по фактам не нашли, то взять ее из персональных настроек, или от ответственного.
@@ -3188,11 +3192,13 @@ namespace Sungero.Capture.Server
         LinkFactFieldsAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
       }
       
-      // Заполнить данные корреспондента.
-      // Убираем уже использованный факт для подбора НОР, чтобы организация не искалась по тем же реквизитам что и НОР.
-      if (document.BusinessUnit != null)
-        recognitionResult.Facts.Remove(businessUnitWithFact.Fact);
+      // Убрать использованные факты подбора НОР и подписывающего с нашей стороны.
+      if (businessUnitFact != null)
+        recognitionResult.Facts.Remove(businessUnitFact);
+      if (ourSignatoryFact != null && ourSignatoryFact.Id != businessUnitFact.Id)
+        recognitionResult.Facts.Remove(ourSignatoryFact);
       
+      // Заполнить данные контрагента.
       var сounterparty = GetCounterparty(recognitionResult, counterpartyPropertyName);
       if (сounterparty != null)
       {
