@@ -3160,14 +3160,15 @@ namespace Sungero.Capture.Server
       
       // Заполнить подписанта.
       var ourSignatory = GetContractualDocumentSignatory(recognitionResult, document, businessUnitWithFact, true);
+      
+      // Если НОР не заполнена, она подставляется из подписанта и результату не доверяем.
+      if (document.BusinessUnit == null && ourSignatory.Employee != null)
+        LinkFactAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, ourSignatory.Employee.Department.BusinessUnit, false);
+      
       document.OurSignatory = ourSignatory.Employee;
       var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatory.Fact, FieldNames.Counterparty.SignatorySurname);
       LinkFactFieldsAndProperty(recognitionResult, ourSignatory.Fact, signatoryFieldNames,
                           props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
-      
-      // Если НОР не заполнена, она подставляется из подписанта и результату не доверяем.
-      if (document.BusinessUnit == null && ourSignatory.Employee != null)
-        LinkFactFieldsAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, ourSignatory.Employee.Department.BusinessUnit, false);
       
       // Если НОР по фактам не нашли, то взять ее из персональных настроек, или от ответственного.
       if (document.BusinessUnit == null)
