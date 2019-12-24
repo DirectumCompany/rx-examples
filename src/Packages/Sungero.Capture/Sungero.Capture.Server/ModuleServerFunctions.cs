@@ -3190,6 +3190,7 @@ namespace Sungero.Capture.Server
       // Убираем уже использованный факт для подбора НОР, чтобы организация не искалась по тем же реквизитам что и НОР.
       if (document.BusinessUnit != null)
         recognitionResult.Facts.Remove(businessUnitWithFact.Fact);
+      
       var сounterparty = GetCounterparty(recognitionResult, counterpartyPropertyName);
       if (сounterparty != null)
       {
@@ -3922,8 +3923,12 @@ namespace Sungero.Capture.Server
       if (!filteredContacts.Any())
         return signedBy;
       
+      var contactFullName = GetFullNameByFact(predictedClass, fact);
       signedBy.Contact = filteredContacts.FirstOrDefault();
-      signedBy.IsTrusted = filteredContacts.Count() == 1;
+      
+      // Если контакт подобран по короткому имени персоны, то значение заведомо недоверенное.
+      signedBy.IsTrusted = filteredContacts.Count() == 1 &&
+                           string.Equals(signedBy.Contact.Name, contactFullName, StringComparison.InvariantCultureIgnoreCase);
       
       return signedBy;
     }
@@ -4006,7 +4011,6 @@ namespace Sungero.Capture.Server
       var signatoryFacts = GetFacts(recognitionResult.Facts, FactNames.Counterparty);
       var signedBy = Structures.Module.SignatoryFactMatching.Create(null, null, null, false);
       var signatoryFieldNames = this.GetSignatoryFieldNames();
-      var isBusinessUnit = false;
       
       if (!signatoryFacts.Any())
         return signedBy;
