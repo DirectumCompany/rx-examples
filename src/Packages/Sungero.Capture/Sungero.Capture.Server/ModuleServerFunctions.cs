@@ -3919,13 +3919,10 @@ namespace Sungero.Capture.Server
       if ((fact == null) || (predictedClass == string.Empty))
         return signedBy;
 
-      if (counterparty != null)
-      {
-        // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
-        signedBy = GetContactByVerifiedData(fact, propertyName, counterparty.Id.ToString(), counterpartyPropertyName);
-        if (signedBy.Contact != null)
-          return signedBy;
-      }
+      // Если для свойства propertyName по факту существует верифицированное ранее значение, то вернуть его.
+      signedBy = GetContactByVerifiedData(fact, propertyName, counterparty, counterpartyPropertyName);
+      if (signedBy.Contact != null)
+        return signedBy;
       
       var filteredContacts = GetContactsByFact(predictedClass, fact, counterparty);
       if (!filteredContacts.Any())
@@ -3951,12 +3948,14 @@ namespace Sungero.Capture.Server
     /// <returns>Контактное лицо.</returns>
     public virtual Structures.Module.ISignatoryFactMatching GetContactByVerifiedData(Structures.Module.IFact fact,
                                                                                      string propertyName,
-                                                                                     string counterpartyPropertyValue,
+                                                                                     ICounterparty counterparty,
                                                                                      string counterpartyPropertyName)
     {
       var result = Structures.Module.SignatoryFactMatching.Create(null, Contacts.Null, fact, false);
       
-      var contactField = GetFieldByVerifiedData(fact, propertyName, counterpartyPropertyValue, counterpartyPropertyName);
+      var contactField = counterparty != null ?
+        GetFieldByVerifiedData(fact, propertyName, counterparty.Id.ToString(), counterpartyPropertyName) :
+        GetFieldByVerifiedData(fact, propertyName);
       if (contactField == null)
         return result;
       int contactId;
