@@ -4084,16 +4084,20 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <param name="counterpartyPropertyValue">Ид НОР.</param>
+    /// <param name="counterpartyPropertyValue">НОР.</param>
     /// <param name="counterpartyPropertyName">Имя связанного свойства НОР.</param>
     /// <returns>Сотрудник.</returns>
     public virtual Structures.Module.ISignatoryFactMatching GetEmployeeByVerifiedData(Structures.Module.IFact fact,
                                                                                       string propertyName,
-                                                                                      string businessUnitPropertyValue,
+                                                                                      IBusinessUnit businessUnit,
                                                                                       string businessUnitPropertyName)
     {
       var result = Structures.Module.SignatoryFactMatching.Create(null, null, fact, false);
-      var employeeField = GetFieldByVerifiedData(fact, propertyName, businessUnitPropertyValue, businessUnitPropertyName);
+      
+      var employeeField = businessUnit != null 
+        ? GetFieldByVerifiedData(fact, propertyName, businessUnit.Id.ToString(), businessUnitPropertyName) 
+        : GetFieldByVerifiedData(fact, propertyName);
+      
       if (employeeField == null)
         return result;
       int employeeId;
@@ -4206,16 +4210,13 @@ namespace Sungero.Capture.Server
       if (fact == null || string.IsNullOrWhiteSpace(predictedClass))
         return signedBy;
 
-      if (businessUnit != null)
-      {
-        // Если для свойства Подписал по факту существует верифицированное ранее значение, то вернуть его.
-        signedBy = GetEmployeeByVerifiedData(fact,
-                                             document.Info.Properties.OurSignatory.Name,
-                                             businessUnit.Id.ToString(),
-                                             document.Info.Properties.BusinessUnit.Name);
-        if (signedBy.Employee != null)
-          return signedBy;
-      }
+      // Если для свойства Подписал по факту существует верифицированное ранее значение, то вернуть его.
+      signedBy = GetEmployeeByVerifiedData(fact,
+                                           document.Info.Properties.OurSignatory.Name,
+                                           businessUnit,
+                                           document.Info.Properties.BusinessUnit.Name);
+      if (signedBy.Employee != null)
+        return signedBy;
       
       var filteredEmloyees = GetOurEmployeeByFact(fact, businessUnit, predictedClass);
       if (!filteredEmloyees.Any())
