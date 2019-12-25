@@ -234,4 +234,7 @@
   <data name="SelectedSameClassifiers" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="InvalidSenderLineName" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

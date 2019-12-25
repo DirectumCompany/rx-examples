@@ -27,23 +27,23 @@ namespace Sungero.Capture.Client
     public virtual void ProcessCapturedPackage(string senderLineName, string instanceInfo, string deviceInfo,
                                                string filesInfo, string folder)
     {
-      // Найти ответственного.
       Logger.Debug("Begin of captured package processing...");
       Logger.DebugFormat("Captured Package Process. Sender line name: {0}", senderLineName);
+      
+      // Найти ответственного.
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       var responsible = PublicFunctions.SmartProcessingSetting.GetResponsibleBySenderLineName(smartProcessingSettings, senderLineName);
-      
       if (responsible == null)
-        throw new ApplicationException(Resources.InvalidResponsibleId);
+        throw new ApplicationException(Resources.InvalidSenderLineNameFormat(senderLineName));
       
       // Захват с почты.
       var source = GetSourceType(deviceInfo);
       if (source == Constants.Module.CaptureSourceType.Mail)
-        ProcessEmailPackage(filesInfo, folder, instanceInfo, responsible);
+        ProcessEmailPackage(filesInfo, folder, instanceInfo, responsible, senderLineName);
       
       // Захват с папки (сканера).
       if (source == Constants.Module.CaptureSourceType.Folder)
-        ProcessScanPackage(filesInfo, folder, responsible);
+        ProcessScanPackage(filesInfo, folder, responsible, senderLineName);
     }
     
     /// <summary>
@@ -74,7 +74,7 @@ namespace Sungero.Capture.Client
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    public virtual void ProcessEmailPackage(string filesInfo, string folder, string instanceInfo, Sungero.Company.IEmployee responsible)
+    public virtual void ProcessEmailPackage(string filesInfo, string folder, string instanceInfo, Sungero.Company.IEmployee responsible, string senderLineName = "")
     {
       Logger.Debug("Captured Package Process. Captured package type is MAIL.");
       var mailFiles = GetCapturedMailFiles(filesInfo, folder);
@@ -109,7 +109,7 @@ namespace Sungero.Capture.Client
         attachment.Data = System.IO.File.ReadAllBytes(attachment.Path);
         
         Logger.DebugFormat("Captured Package Process. Try classify and extract facts. {0}", fileName);
-        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(attachment.Path, false);
+        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(attachment.Path, false, senderLineName);
         if (string.IsNullOrWhiteSpace(classificationAndExtractionResponse.Error))
         {
           Logger.DebugFormat("Captured Package Process. Create documents by recognition results. {0}", fileName);
@@ -324,7 +324,7 @@ namespace Sungero.Capture.Client
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
-    public virtual void ProcessScanPackage(string filesInfo, string folder, Sungero.Company.IEmployee responsible)
+    public virtual void ProcessScanPackage(string filesInfo, string folder, Sungero.Company.IEmployee responsible, string senderLineName = "")
     {
       var packagesPaths = GetScannedPackagesPaths(filesInfo, folder);
       if (!packagesPaths.Any())
@@ -332,7 +332,7 @@ namespace Sungero.Capture.Client
       
       foreach (var packagePath in packagesPaths)
       {
-        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(packagePath);
+        var classificationAndExtractionResponse = TryClassifyAndExtractFacts(filePath: packagePath, senderLineName: senderLineName);
         Logger.DebugFormat("Begin package processing. Path: {0}", packagePath);
         var originalFile = new Structures.Module.FileDto();
         originalFile.Path = packagePath;
@@ -393,7 +393,7 @@ namespace Sungero.Capture.Client
     /// <param name="filePath">Путь к классифицируемому файлу.</param>
     /// <param name="throwOnError">Выбросить исключение, если возникла ошибка при классификации и распозновании.</param>
     /// <returns>Структура, содержащая json с результатами классификации и распознавания и сообщение об ошибке при наличии.</returns>
-    public virtual Structures.Module.IArioResponse TryClassifyAndExtractFacts(string filePath, bool throwOnError = true)
+    public virtual Structures.Module.IArioResponse TryClassifyAndExtractFacts(string filePath, bool throwOnError = true, string senderLineName = "")
     {
       var classificationAndExtractionResponse = Structures.Module.ArioResponse.Create();
       if (!CanArioProcessFile(filePath))
@@ -402,7 +402,7 @@ namespace Sungero.Capture.Client
         return classificationAndExtractionResponse;
       }
       
-      var processResult = ProcessPackage(filePath);
+      var processResult = ProcessPackage(filePath, senderLineName);
       var nativeError = ArioExtensions.ArioConnector.GetErrorMessageFromClassifyAndExtractFactsResult(processResult);
       classificationAndExtractionResponse.Response = processResult;
       if (nativeError == null || string.IsNullOrWhiteSpace(nativeError.Message))
@@ -421,7 +421,7 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="filePath">Путь к пакету.</param>
     /// <returns>Json с результатом классификации и извлечения фактов.</returns>
-    public virtual string ProcessPackage(string filePath)
+    public virtual string ProcessPackage(string filePath, string senderLineName = "")
     {
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
       if (smartProcessingSettings == null)

@@ -1786,7 +1786,8 @@
     "SmartProcessingSettingsNotFound",
     "EmptyClassifiersOrArioUrl",
     "ClassifiersNotFound",
-    "SelectedSameClassifiers"
+    "SelectedSameClassifiers",
+    "InvalidSenderLineName"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
