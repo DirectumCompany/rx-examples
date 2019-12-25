@@ -19,18 +19,20 @@ namespace Sungero.Capture.Client
     /// <summary>
     /// Обработать пакет документов со сканера или почты.
     /// </summary>
-    /// <param name="senderLine">Наименование линии.</param>
+    /// <param name="senderLineName">Наименование линии.</param>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <param name="deviceInfo">Путь к xml файлу DCS c информацией об устройствах ввода.</param>
     /// <param name="filesInfo">Путь к xml файлу DCS c информацией об импортируемых файлах.</param>
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
-    /// <param name="responsibleId">ИД сотрудника, ответственного за обработку захваченных документов.</param>
-    public virtual void ProcessCapturedPackage(string senderLine, string instanceInfo, string deviceInfo,
-                                               string filesInfo, string folder, string responsibleId)
+    public virtual void ProcessCapturedPackage(string senderLineName, string instanceInfo, string deviceInfo,
+                                               string filesInfo, string folder)
     {
       // Найти ответственного.
       Logger.Debug("Begin of captured package processing...");
-      var responsible = Company.PublicFunctions.Module.Remote.GetEmployeeById(int.Parse(responsibleId));
+      Logger.DebugFormat("Captured Package Process. Sender line name: {0}", senderLineName);
+      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
+      var responsible = PublicFunctions.SmartProcessingSetting.GetResponsibleBySenderLineName(smartProcessingSettings, senderLineName);
+      
       if (responsible == null)
         throw new ApplicationException(Resources.InvalidResponsibleId);
       

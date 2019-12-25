@@ -38,6 +38,20 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
+    /// Получить ответственного по имени линии.
+    /// </summary>
+    /// <param name="senderLineName">Наименование линии.</param>
+    /// <returns>Ответственный.</returns>
+    [Public]
+    public virtual Sungero.Company.IEmployee GetResponsibleBySenderLineName(string senderLineName)
+    {
+      return _obj.CaptureSources
+        .Where(x => x.SenderLineName.Trim() == senderLineName.Trim())
+        .Select(x => x.Responsible)
+        .FirstOrDefault();
+    }
+    
+    /// <summary>
     /// Проверить классификаторы.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>
