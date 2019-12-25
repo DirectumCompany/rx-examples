@@ -3170,7 +3170,9 @@ namespace Sungero.Capture.Server
       
       document.OurSignatory = ourSignatory.Employee;
       ourSignatoryFact = ourSignatory.Fact;
-      var isTrustedOurSignatory = ourSignatory.IsTrusted && IsTrustedField(ourSignatoryFact, FieldNames.Counterparty.SignatorySurname);
+      var isTrustedOurSignatory = businessUnitFact != null &&
+        ourSignatory.IsTrusted &&
+        IsTrustedField(ourSignatoryFact, FieldNames.Counterparty.SignatorySurname);
       LinkFactFieldsAndProperty(recognitionResult, ourSignatoryFact, signatoryFieldNames,
                           props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
       
