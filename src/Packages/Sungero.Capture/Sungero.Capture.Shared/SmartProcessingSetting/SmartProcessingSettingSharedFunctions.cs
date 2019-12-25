@@ -43,7 +43,7 @@ namespace Sungero.Capture.Shared
     /// <param name="senderLineName">Наименование линии.</param>
     /// <returns>Ответственный.</returns>
     [Public]
-    public virtual Sungero.Company.IEmployee GetResponsibleBySenderLineName(string senderLineName)
+    public virtual Sungero.Company.IEmployee GetDocumentProcessingResponsible(string senderLineName)
     {
       return _obj.CaptureSources
         .Where(x => x.SenderLineName.Trim() == senderLineName.Trim())

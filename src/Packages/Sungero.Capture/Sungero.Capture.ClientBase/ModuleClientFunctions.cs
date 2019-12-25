@@ -32,7 +32,7 @@ namespace Sungero.Capture.Client
       
       // Найти ответственного.
       var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
-      var responsible = PublicFunctions.SmartProcessingSetting.GetResponsibleBySenderLineName(smartProcessingSettings, senderLineName);
+      var responsible = PublicFunctions.SmartProcessingSetting.GetDocumentProcessingResponsible(smartProcessingSettings, senderLineName);
       if (responsible == null)
         throw new ApplicationException(Resources.InvalidSenderLineNameFormat(senderLineName));
       

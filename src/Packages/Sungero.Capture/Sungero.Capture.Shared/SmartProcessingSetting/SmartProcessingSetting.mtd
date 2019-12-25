@@ -412,7 +412,7 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
-      "Name": "GetResponsibleBySenderLineName",
+      "Name": "GetDocumentProcessingResponsible",
       "Parameters": [
         {
           "Name": "smartProcessingSetting",
