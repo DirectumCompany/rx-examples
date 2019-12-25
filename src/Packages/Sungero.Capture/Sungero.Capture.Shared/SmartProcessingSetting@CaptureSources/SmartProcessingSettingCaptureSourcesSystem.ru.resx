@@ -117,79 +117,10 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Property_Name" xml:space="preserve">
-    <value>Имя</value>
+  <data name="Property_SenderLineName" xml:space="preserve">
+    <value>Имя линии</value>
   </data>
-  <data name="DisplayName" xml:space="preserve">
-    <value>Настройки интеллектуальной обработки</value>
-  </data>
-  <data name="AccusativeDisplayName" xml:space="preserve">
-    <value>Настройки интеллектуальной обработки</value>
-  </data>
-  <data name="CollectionDisplayName" xml:space="preserve">
-    <value>Настройки интеллектуальной обработки</value>
-  </data>
-  <data name="Property_ArioUrl" xml:space="preserve">
-    <value>Адрес сервиса Ario</value>
-  </data>
-  <data name="Property_LowerConfidenceLimit" xml:space="preserve">
-    <value>Нижняя</value>
-  </data>
-  <data name="Property_UpperConfidenceLimit" xml:space="preserve">
-    <value>Верхняя</value>
-  </data>
-  <data name="ControlGroup_e6f622ba0dbc4e149a1465ce781200d1" xml:space="preserve">
-    <value>Границы доверия к извлеченным фактам</value>
-  </data>
-  <data name="Property_LimitsDescription" xml:space="preserve">
-    <value>Описание/подсказка</value>
-  </data>
-  <data name="Property_PercentLabel" xml:space="preserve">
-    <value>%</value>
-  </data>
-  <data name="Action_CheckConnectionDescription" xml:space="preserve">
-    <value>Проверить подключение к сервису Ario</value>
-  </data>
-  <data name="Action_CheckConnectionHint" xml:space="preserve">
-    <value>Проверить подключение к сервису Ario</value>
-  </data>
-  <data name="Action_CheckConnection" xml:space="preserve">
-    <value>Проверить подключение</value>
-  </data>
-  <data name="Ribbon_ArioService_9e628784160545898b4be1dda07f0f0b" xml:space="preserve">
-    <value>Сервис Ario</value>
-  </data>
-  <data name="ControlGroup_1065954c74624c9583bfd3edbff942f3" xml:space="preserve">
-    <value>Классификаторы</value>
-  </data>
-  <data name="Property_TypeClassifierName" xml:space="preserve">
-    <value>По типам документов</value>
-  </data>
-  <data name="Property_TypeClassifierId" xml:space="preserve">
-    <value>ИД классификатора по типу</value>
-  </data>
-  <data name="Property_Id" xml:space="preserve">
-    <value>ИД</value>
-  </data>
-  <data name="Property_FirstPageClassifierName" xml:space="preserve">
-    <value>Первых страниц</value>
-  </data>
-  <data name="Property_FirstPageClassifierId" xml:space="preserve">
-    <value>ИД классификатора первых страниц</value>
-  </data>
-  <data name="Control_31a2b47397434c10878a2d920dc69169_DisplayValue" xml:space="preserve">
-    <value>Выбрать</value>
-  </data>
-  <data name="Control_1c24ff9555f54df9a3d56cd15f081e65_DisplayValue" xml:space="preserve">
-    <value>Выбрать</value>
-  </data>
-  <data name="Action_ForceSave" xml:space="preserve">
-    <value>Сохранить настройки</value>
-  </data>
-  <data name="Property_CaptureSources" xml:space="preserve">
-    <value>Источники поступления документов</value>
-  </data>
-  <data name="ControlGroup_72ca00b847c14768aee1ec9c964d84f6" xml:space="preserve">
-    <value>Источники поступления документов</value>
+  <data name="Property_Responsible" xml:space="preserve">
+    <value>Ответственный</value>
   </data>
 </root>

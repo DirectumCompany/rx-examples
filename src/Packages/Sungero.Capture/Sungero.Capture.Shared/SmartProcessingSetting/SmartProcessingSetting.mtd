@@ -234,6 +234,32 @@
               "Value": 150
             }
           ]
+        },
+        {
+          "$type": "Sungero.Metadata.ControlGroupMetadata, Sungero.Metadata",
+          "NameGuid": "72ca00b8-47c1-4768-aee1-ec9c964d84f6",
+          "Name": "CaptureSourcesGroup",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "GroupType": "WithTitleNoBorder",
+          "ParentGuid": "0a3f87c2-34a9-41f2-9bcb-dee7fd2493b9",
+          "RowNumber": 3,
+          "RowSpan": 1,
+          "SharedNestedGroupsAlignment": true
+        },
+        {
+          "$type": "Sungero.Metadata.ControlMetadata, Sungero.Metadata",
+          "NameGuid": "db27fd9b-573e-4cc1-83dd-4473724869ac",
+          "Name": "CaptureSources",
+          "ColumnNumber": 0,
+          "ColumnSpan": 1,
+          "DataBinderTypeName": "Sungero.Presentation.CommonDataBinders.GridControlToChildCollectionBinder",
+          "HeaderLocation": "None",
+          "ParentGuid": "72ca00b8-47c1-4768-aee1-ec9c964d84f6",
+          "PropertyGuid": "12781132-f43c-486b-a253-c6f806f0ab02",
+          "RowNumber": 0,
+          "RowSpan": 1,
+          "Settings": []
         }
       ]
     }
@@ -366,6 +392,15 @@
       "IsVisibility": false,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
       "PreviousPropertyGuid": "a271fc1e-f213-41dc-aacd-ea7cd143b59e"
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "12781132-f43c-486b-a253-c6f806f0ab02",
+      "Name": "CaptureSources",
+      "Code": "CaptureSources",
+      "EntityGuid": "5486dcf1-7c00-414a-87dc-671199963ba2",
+      "IsShowedInList": false,
+      "PreviousPropertyGuid": "1000bab1-bd8c-44a3-bf5b-3a2e46968371"
     }
   ],
   "PublicFunctions": [
@@ -375,6 +410,24 @@
       "Placement": "Shared",
       "ReturnType": "void",
       "ReturnTypeFullName": "System.Void"
+    },
+    {
+      "Name": "GetResponsibleBySenderLineName",
+      "Parameters": [
+        {
+          "Name": "smartProcessingSetting",
+          "ParameterType": "global::Sungero.Capture.ISmartProcessingSetting",
+          "ParameterTypeFullName": "Sungero.Capture.ISmartProcessingSetting, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "senderLineName",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::Sungero.Company.IEmployee",
+      "ReturnTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
     },
     {
       "Name": "GetSmartProcessingSettings",

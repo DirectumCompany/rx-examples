@@ -1,4 +1,62 @@
 ﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <settings>
   <ViewName>Default</ViewName>
+  <Collectiondb27fd9b573e4cc183dd4473724869ac FormGuid="2da6eb6d-46e0-4720-8478-68f212e45fb4">
+    <XtraSerializer version="1.0" application="GridControl">
+      <property name="#LayoutVersion" isnull="true" />
+      <property name="$GridControl" iskey="true" value="GridControl">
+        <property name="GroupSummary" iskey="true" value="0" />
+        <property name="View" isnull="true" iskey="true">
+          <property name="ShowTotalSummary">false</property>
+          <property name="AllowMoveColumnToDropArea">false</property>
+          <property name="AllowColumnMoving">true</property>
+          <property name="ColumnChooserState" isnull="true" iskey="true">
+            <property name="Location">771,-2</property>
+            <property name="Size">220,250</property>
+          </property>
+          <property name="AutoWidth">false</property>
+          <property name="AllowGrouping">false</property>
+          <property name="AllowSorting">true</property>
+          <property name="ShowGroupPanel">false</property>
+          <property name="LinesPerRowMode">None</property>
+          <property name="IsRowCellMenuEnabled">false</property>
+        </property>
+        <property name="GroupCount">0</property>
+        <property name="TotalSummary" iskey="true" value="0" />
+        <property name="Columns" iskey="true" value="3">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">SenderLineName</property>
+            <property name="Visible">true</property>
+            <property name="Name">SmartProcessingSetting_CaptureSources_SenderLineName</property>
+            <property name="VisibleIndex">0</property>
+            <property name="Width">126</property>
+            <property name="ActualWidth">17*</property>
+          </property>
+          <property name="Item2" isnull="true" iskey="true">
+            <property name="FieldName">Responsible</property>
+            <property name="Visible">true</property>
+            <property name="Name">SmartProcessingSetting_CaptureSources_Responsible</property>
+            <property name="VisibleIndex">1</property>
+            <property name="Width">214</property>
+            <property name="ActualWidth">22*</property>
+          </property>
+          <property name="Item3" isnull="true" iskey="true">
+            <property name="FieldName">Note</property>
+            <property name="Visible">true</property>
+            <property name="Name">SmartProcessingSetting_CaptureSources_Note</property>
+            <property name="VisibleIndex">2</property>
+            <property name="Width">107</property>
+            <property name="ActualWidth">61*</property>
+          </property>
+        </property>
+        <property name="SortInfo" iskey="true" value="1">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">SenderLineName</property>
+            <property name="SortOrder">Ascending</property>
+          </property>
+        </property>
+        <property name="GroupSummarySortInfo" iskey="true" value="0" />
+      </property>
+    </XtraSerializer>
+  </Collectiondb27fd9b573e4cc183dd4473724869ac>
 </settings>

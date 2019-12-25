@@ -204,4 +204,10 @@
   <data name="Action_ForceSaveConfirmationDescription" xml:space="preserve">
     <value />
   </data>
+  <data name="Property_CaptureSources" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="ControlGroup_72ca00b847c14768aee1ec9c964d84f6" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
