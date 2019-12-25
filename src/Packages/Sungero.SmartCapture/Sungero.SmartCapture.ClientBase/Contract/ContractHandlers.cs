@@ -10,6 +10,20 @@ namespace Sungero.SmartCapture
   partial class ContractClientHandlers
   {
 
+    public override void CounterpartySignatoryValueInput(Sungero.Docflow.Client.ContractualDocumentBaseCounterpartySignatoryValueInputEventArgs e)
+    {
+      base.CounterpartySignatoryValueInput(e);
+      
+      this._obj.State.Properties.CounterpartySignatory.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public override void OurSignatoryValueInput(Sungero.Docflow.Client.OfficialDocumentOurSignatoryValueInputEventArgs e)
+    {
+      base.OurSignatoryValueInput(e);
+      
+      this._obj.State.Properties.OurSignatory.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
     public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
     {
       base.Closing(e);
