@@ -3195,7 +3195,8 @@ namespace Sungero.Capture.Server
       // Убрать использованные факты подбора НОР и подписывающего с нашей стороны.
       if (businessUnitFact != null)
         recognitionResult.Facts.Remove(businessUnitFact);
-      if (ourSignatoryFact != null && ourSignatoryFact.Id != businessUnitFact.Id)
+      if (ourSignatoryFact != null &&
+          (businessUnitFact == null || ourSignatoryFact.Id != businessUnitFact.Id))
         recognitionResult.Facts.Remove(ourSignatoryFact);
       
       // Заполнить данные контрагента.
