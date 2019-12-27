@@ -2470,29 +2470,25 @@ namespace Sungero.Capture.Server
     /// <param name="document">Доп. соглашения.</param>
     public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.ISupAgreement document)
     {
-      var facts = recognitionResult.Facts;
-      
       string number = null;
       DateTime? date = null;
       string contractNumber = null;
       DateTime? contractDate = null;
+      var facts = recognitionResult.Facts;
       
       Sungero.Capture.Structures.Module.IFact numberFact = null;
       Sungero.Capture.Structures.Module.IFact dateFact = null;
       Sungero.Capture.Structures.Module.IFact contractNumberFact = null;
       Sungero.Capture.Structures.Module.IFact contractDateFact = null;
       
-      var isTrustedNumber = false;
-      var isTrustedDate = false;
-      
       // Номер доп. соглашения.
       numberFact = GetOrderedFacts(facts, FactNames.SupAgreement, FieldNames.Document.Number).FirstOrDefault();
       number = GetFieldValue(numberFact, FieldNames.Document.Number);
-      isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
+      var isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
       
       // Факт SupAgreement может содержать поля Number и Date одновременно.
       date = GetFieldDateTimeValue(numberFact, FieldNames.Document.Date);
-      isTrustedDate = IsTrustedField(numberFact, FieldNames.Document.Date);
+      var isTrustedDate = IsTrustedField(numberFact, FieldNames.Document.Date);
       
       // Если Date доп. соглашения распознается отдельно от Number.
       if (date == null)
