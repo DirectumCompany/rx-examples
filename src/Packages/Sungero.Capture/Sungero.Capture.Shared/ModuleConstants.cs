@@ -225,6 +225,12 @@ namespace Sungero.Capture.Constants
         
         [Sungero.Core.Public]
         public const string Number = "Number";
+        
+        [Sungero.Core.Public]
+        public const string DocumentBaseDate = "DocumentBaseDate";
+        
+        [Sungero.Core.Public]
+        public const string DocumentBaseNumber = "DocumentBaseNumber";
       }
       
       public static class DocumentAmount
@@ -311,6 +317,9 @@ namespace Sungero.Capture.Constants
       
       [Sungero.Core.Public]
       public const string Document = "Document";
+      
+      [Sungero.Core.Public]
+      public const string SupAgreement = "SupAgreement";
       
       [Sungero.Core.Public]
       public const string DocumentAmount = "DocumentAmount";

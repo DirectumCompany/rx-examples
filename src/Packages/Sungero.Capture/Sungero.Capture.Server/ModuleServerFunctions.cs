@@ -2136,6 +2136,9 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
       
+      // Занести номер и дату в примечание.
+      FillNumberAndDate(recognitionResult, document);
+      
       return document;
     }
     #endregion
@@ -2398,7 +2401,7 @@ namespace Sungero.Capture.Server
       result = string.Format("{0}{1}",
                              Sungero.Docflow.OfficialDocuments.Resources.Number,
                              number)
-                     .Trim();
+        .Trim();
       
       if (date.HasValue)
         result = string.Format("{0}{1}{2}",
@@ -2410,7 +2413,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить номер и дату в примечании договорного документа.
+    /// Заполнить номер и дату в примечании договора.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="document">Договор.</param>
@@ -2451,6 +2454,87 @@ namespace Sungero.Capture.Server
       var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
       
       var areNumberAndDateTrusted = isTrustedNumber && isTrustedDate;
+      
+      if (numberFact != null)
+        LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
+      
+      if (dateFact != null &&
+          (numberFact == null || dateFact.Id != numberFact.Id))
+        LinkFactFieldsAndProperty(recognitionResult, dateFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
+    }
+    
+    /// <summary>
+    /// Заполнить номер и дату в примечании доп. соглашения.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    /// <param name="document">Доп. соглашения.</param>
+    public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.ISupAgreement document)
+    {
+      var facts = recognitionResult.Facts;
+      
+      string number = null;
+      DateTime? date = null;
+      string contractNumber = null;
+      DateTime? contractDate = null;
+      
+      Sungero.Capture.Structures.Module.IFact numberFact = null;
+      Sungero.Capture.Structures.Module.IFact dateFact = null;
+      Sungero.Capture.Structures.Module.IFact contractNumberFact = null;
+      Sungero.Capture.Structures.Module.IFact contractDateFact = null;
+      
+      var isTrustedNumber = false;
+      var isTrustedDate = false;
+      
+      // Номер доп. соглашения.
+      numberFact = GetOrderedFacts(facts, FactNames.SupAgreement, FieldNames.Document.Number).FirstOrDefault();
+      number = GetFieldValue(numberFact, FieldNames.Document.Number);
+      isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
+      
+      // Факт SupAgreement может содержать поля Number и Date одновременно.
+      date = GetFieldDateTimeValue(numberFact, FieldNames.Document.Date);
+      isTrustedDate = IsTrustedField(numberFact, FieldNames.Document.Date);
+      
+      // Если Date доп. соглашения распознается отдельно от Number.
+      if (date == null)
+      {
+        dateFact = GetOrderedFacts(facts, FactNames.SupAgreement, FieldNames.Document.Date).FirstOrDefault();
+        date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
+        isTrustedDate = date != null && IsTrustedField(dateFact, FieldNames.Document.Date);
+      }
+      
+      // Номер договора.
+      contractNumberFact = GetOrderedFacts(facts, FactNames.SupAgreement, FieldNames.Document.DocumentBaseNumber).FirstOrDefault();
+      contractNumber = GetFieldValue(contractNumberFact, FieldNames.Document.DocumentBaseNumber);
+      
+      // Факт SupAgreement может содержать поля DocumentBaseNumber и DocumentBaseDate одновременно.
+      contractDate = GetFieldDateTimeValue(contractNumberFact, FieldNames.Document.DocumentBaseDate);
+      
+      // Если DocumentBaseDate доп. соглашения распознается отдельно от DocumentBaseNumber.
+      if (contractDate == null)
+      {
+        contractDateFact = GetOrderedFacts(facts, FactNames.SupAgreement, FieldNames.Document.DocumentBaseDate).FirstOrDefault();
+        contractDate = GetFieldDateTimeValue(contractDateFact, FieldNames.Document.DocumentBaseDate);
+      }
+      
+      var numberAndDateNote = this.GetNumberAndDateAsString(number, date);
+      if (document.DocumentKind != null)
+        numberAndDateNote = string.Format("{0} {1}",
+                                          document.DocumentKind.ShortName,
+                                          numberAndDateNote);
+      
+      var contractNumberAndContractDateNote = this.GetNumberAndDateAsString(contractNumber, contractDate);
+        contractNumberAndContractDateNote = string.Format("{0} {1}",
+                                          Capture.Resources.OfContract,
+                                          contractNumberAndContractDateNote);
+      
+      document.Note = string.Format("{0} {1}", numberAndDateNote, contractNumberAndContractDateNote);
+      
+      // Раскраска.
+      var props = document.Info.Properties;
+      var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
+      
+      var areNumberAndDateTrusted = isTrustedNumber &&
+        (dateFact == null || dateFact != null && isTrustedDate);
       
       if (numberFact != null)
         LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);

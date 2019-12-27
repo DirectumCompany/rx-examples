@@ -369,6 +369,16 @@
       "ParentClasses": [
         "Module",
         "FieldNames",
+        "Document"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentBaseDate\""
+    },
+    {
+      "Name": "DocumentBaseDate",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
         "FinancialDocument"
       ],
       "TypeName": "System.String",
@@ -383,6 +393,16 @@
       ],
       "TypeName": "System.String",
       "Value": "\"DocumentBaseName\""
+    },
+    {
+      "Name": "DocumentBaseNumber",
+      "ParentClasses": [
+        "Module",
+        "FieldNames",
+        "Document"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"DocumentBaseNumber\""
     },
     {
       "Name": "DocumentBaseNumber",
@@ -965,6 +985,15 @@
       "ParentClasses": [
         "Module",
         "ArioGrammarNames"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SupAgreement\""
+    },
+    {
+      "Name": "SupAgreement",
+      "ParentClasses": [
+        "Module",
+        "FactNames"
       ],
       "TypeName": "System.String",
       "Value": "\"SupAgreement\""
@@ -1788,7 +1817,8 @@
     "ClassifiersNotFound",
     "SelectedSameClassifiers",
     "InvalidSenderLineName",
-    "WithoutNumber"
+    "WithoutNumber",
+    "OfContract"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
