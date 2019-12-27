@@ -242,4 +242,7 @@
   <data name="InvalidSenderLineName" xml:space="preserve">
     <value>Не найдены настройки для линии {0}. Настройте источники поступления документов корректно.</value>
   </data>
+  <data name="WithoutNumber" xml:space="preserve">
+    <value>б/н</value>
+  </data>
 </root>

@@ -1787,7 +1787,8 @@
     "EmptyClassifiersOrArioUrl",
     "ClassifiersNotFound",
     "SelectedSameClassifiers",
-    "InvalidSenderLineName"
+    "InvalidSenderLineName",
+    "WithoutNumber"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

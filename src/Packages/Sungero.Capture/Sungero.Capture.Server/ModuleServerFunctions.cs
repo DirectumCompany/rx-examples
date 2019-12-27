@@ -2104,6 +2104,9 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
       
+      // Занести номер и дату в примечание.
+      FillNumberAndDate(recognitionResult, document);
+      
       return document;
     }
     
@@ -2373,6 +2376,62 @@ namespace Sungero.Capture.Server
       LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, isTrustedDate);
       LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                           document.RegistrationNumber, isTrustedNumber);
+    }
+    
+    /// <summary>
+    /// Заполнить номер и дату в примечании договорного документа.
+    /// </summary>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    /// <param name="document">Документ.</param>
+    public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, IContractualDocumentBase document)
+    {
+      var facts = recognitionResult.Facts;
+      
+      // Номер.
+      var numberFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Number).FirstOrDefault();
+      var dateFact = numberFact;
+      var date = GetFieldDateTimeValue(numberFact, FieldNames.Document.Date);
+      var isTrustedDate = IsTrustedField(numberFact, FieldNames.Document.Date);
+      
+      var number = GetFieldValue(numberFact, FieldNames.Document.Number);
+      var isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
+      number = string.IsNullOrWhiteSpace(number) ? Resources.WithoutNumber : number;
+      
+      // Дата.
+      if (date == null)
+      {
+        dateFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Date).FirstOrDefault();
+        date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
+        isTrustedDate = (date != null) && IsTrustedField(dateFact, FieldNames.Document.Date);
+      }
+
+      if (numberFact != null || dateFact != null)
+      {
+        var numberAndDate = string.Empty;
+        
+        // Имя в формате: <Вид документа> №<номер> от <дата>.
+        using (TenantInfo.Culture.SwitchTo())
+        {
+          numberAndDate += OfficialDocuments.Resources.Number + number;
+          
+          if (date != null)
+            numberAndDate += OfficialDocuments.Resources.DateFrom + date.Value.ToString("d");
+        }
+        
+        if ((!string.IsNullOrWhiteSpace(numberAndDate)) && (document.DocumentKind != null))
+          numberAndDate = document.DocumentKind.ShortName + numberAndDate;
+        
+        document.Note = numberAndDate;
+        
+        var props = document.Info.Properties;
+        var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
+        
+        // Если нашелся факт с номером, то проложить связь с ним, иначе с фактом с датой.
+        if (isTrustedNumber)
+          LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, isTrustedDate && isTrustedDate);
+        else
+          LinkFactFieldsAndProperty(recognitionResult, dateFact, numberAndDateNames, props.Note.Name, document.Note, isTrustedDate && isTrustedDate);
+      }
     }
     
     /// <summary>
@@ -3174,7 +3233,7 @@ namespace Sungero.Capture.Server
         ourSignatory.IsTrusted &&
         IsTrustedField(ourSignatoryFact, FieldNames.Counterparty.SignatorySurname);
       LinkFactFieldsAndProperty(recognitionResult, ourSignatoryFact, signatoryFieldNames,
-                          props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
+                                props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
       
       // Если НОР по фактам не нашли, то взять ее из персональных настроек, или от ответственного.
       if (document.BusinessUnit == null)
@@ -3936,7 +3995,7 @@ namespace Sungero.Capture.Server
       
       // Если контакт подобран по короткому имени персоны, то значение заведомо недоверенное.
       signedBy.IsTrusted = filteredContacts.Count() == 1 &&
-                           string.Equals(signedBy.Contact.Name, contactFullName, StringComparison.InvariantCultureIgnoreCase);
+        string.Equals(signedBy.Contact.Name, contactFullName, StringComparison.InvariantCultureIgnoreCase);
       
       return signedBy;
     }
@@ -4097,8 +4156,8 @@ namespace Sungero.Capture.Server
     {
       var result = Structures.Module.SignatoryFactMatching.Create(null, null, fact, false);
       
-      var employeeField = businessUnit != null 
-        ? GetFieldByVerifiedData(fact, propertyName, businessUnit.Id.ToString(), businessUnitPropertyName) 
+      var employeeField = businessUnit != null
+        ? GetFieldByVerifiedData(fact, propertyName, businessUnit.Id.ToString(), businessUnitPropertyName)
         : GetFieldByVerifiedData(fact, propertyName);
       
       if (employeeField == null)
@@ -4230,7 +4289,7 @@ namespace Sungero.Capture.Server
       
       // Если сотрудник подобран по короткому имени персоны, то значение заведомо недоверенное.
       signedBy.IsTrusted = filteredEmloyees.Count() == 1 &&
-                           string.Equals(signedBy.Employee.Name, fullName, StringComparison.InvariantCultureIgnoreCase);
+        string.Equals(signedBy.Employee.Name, fullName, StringComparison.InvariantCultureIgnoreCase);
       
       return signedBy;
     }
