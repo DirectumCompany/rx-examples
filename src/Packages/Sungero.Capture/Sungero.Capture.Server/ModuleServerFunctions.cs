@@ -2379,59 +2379,87 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Получить номер и дату в виде строки.
+    /// </summary>
+    /// <param name="number">Номер.</param>
+    /// <param name="date">Дата.</param>
+    /// <returns>Строка вида "№[number] от [date]".</returns>
+    public virtual string GetNumberAndDateAsString(string number, DateTime? date)
+    {
+      var result = string.Empty;
+      
+      // Список аналогичен синхронизации с 1С.
+      var emptyNumberSymbols = new List<string> { "б/н", "бн", "б-н", string.Empty };
+      
+      if (string.IsNullOrWhiteSpace(number) || emptyNumberSymbols.Contains(number.ToLower()))
+        number = "б/н";
+      
+      // Sungero.Docflow.OfficialDocuments.Resources.Number имеет в начале пробел.
+      result = string.Format("{0}{1}",
+                             Sungero.Docflow.OfficialDocuments.Resources.Number,
+                             number)
+                     .Trim();
+      
+      if (date.HasValue)
+        result = string.Format("{0}{1}{2}",
+                               result,
+                               Sungero.Docflow.OfficialDocuments.Resources.DateFrom,
+                               date.Value.ToString("d"));
+      
+      return result;
+    }
+    
+    /// <summary>
     /// Заполнить номер и дату в примечании договорного документа.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    /// <param name="document">Документ.</param>
-    public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, IContractualDocumentBase document)
+    /// <param name="document">Договор.</param>
+    public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.IContractBase document)
     {
       var facts = recognitionResult.Facts;
+      string number = null;
+      DateTime? date = null;
+      Sungero.Capture.Structures.Module.IFact numberFact = null;
+      Sungero.Capture.Structures.Module.IFact dateFact = null;
       
       // Номер.
-      var numberFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Number).FirstOrDefault();
-      var dateFact = numberFact;
-      var date = GetFieldDateTimeValue(numberFact, FieldNames.Document.Date);
+      numberFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Number).FirstOrDefault();
+      number = GetFieldValue(numberFact, FieldNames.Document.Number);
+      var isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
+      
+      // Факт Document может содержать поля Number и Date одновременно.
+      date = GetFieldDateTimeValue(numberFact, FieldNames.Document.Date);
       var isTrustedDate = IsTrustedField(numberFact, FieldNames.Document.Date);
       
-      var number = GetFieldValue(numberFact, FieldNames.Document.Number);
-      var isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
-      number = string.IsNullOrWhiteSpace(number) ? Resources.WithoutNumber : number;
-      
-      // Дата.
+      // Если Date распознается отдельно от Number.
       if (date == null)
       {
         dateFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Date).FirstOrDefault();
         date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-        isTrustedDate = (date != null) && IsTrustedField(dateFact, FieldNames.Document.Date);
+        isTrustedDate = date != null && IsTrustedField(dateFact, FieldNames.Document.Date);
       }
-
-      if (numberFact != null || dateFact != null)
-      {
-        var numberAndDate = string.Empty;
-        
-        // Имя в формате: <Вид документа> №<номер> от <дата>.
-        using (TenantInfo.Culture.SwitchTo())
-        {
-          numberAndDate += OfficialDocuments.Resources.Number + number;
-          
-          if (date != null)
-            numberAndDate += OfficialDocuments.Resources.DateFrom + date.Value.ToString("d");
-        }
-        
-        if ((!string.IsNullOrWhiteSpace(numberAndDate)) && (document.DocumentKind != null))
-          numberAndDate = document.DocumentKind.ShortName + numberAndDate;
-        
-        document.Note = numberAndDate;
-        
-        var props = document.Info.Properties;
-        var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
-        
-        // Если нашелся факт с номером, то проложить связь с ним, иначе с фактом с датой.
-        if (isTrustedNumber)
-          LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, isTrustedDate && isTrustedDate);
-        else
-          LinkFactFieldsAndProperty(recognitionResult, dateFact, numberAndDateNames, props.Note.Name, document.Note, isTrustedDate && isTrustedDate);
-      }
+      
+      var numberAndDateNote = this.GetNumberAndDateAsString(number, date);
+      if (document.DocumentKind != null)
+        numberAndDateNote = string.Format("{0} {1}",
+                                          document.DocumentKind.ShortName,
+                                          numberAndDateNote);
+      
+      document.Note = numberAndDateNote;
+      
+      // Раскраска.
+      var props = document.Info.Properties;
+      var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
+      
+      var areNumberAndDateTrusted = isTrustedNumber &&
+                                    (dateFact == null || dateFact != null && isTrustedDate);
+      
+      if (numberFact != null)
+        LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
+      
+      if (dateFact != null &&
+          (numberFact == null || dateFact.Id != numberFact.Id))
+        LinkFactFieldsAndProperty(recognitionResult, dateFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
     }
     
     /// <summary>
