@@ -2416,11 +2416,11 @@ namespace Sungero.Capture.Server
     /// <param name="document">Договор.</param>
     public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.IContractBase document)
     {
-      var facts = recognitionResult.Facts;
       string number = null;
       DateTime? date = null;
       Sungero.Capture.Structures.Module.IFact numberFact = null;
       Sungero.Capture.Structures.Module.IFact dateFact = null;
+      var facts = recognitionResult.Facts;
       
       // Номер.
       numberFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Number).FirstOrDefault();
@@ -2444,15 +2444,13 @@ namespace Sungero.Capture.Server
         numberAndDateNote = string.Format("{0} {1}",
                                           document.DocumentKind.ShortName,
                                           numberAndDateNote);
-      
       document.Note = numberAndDateNote;
       
       // Раскраска.
       var props = document.Info.Properties;
       var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
       
-      var areNumberAndDateTrusted = isTrustedNumber &&
-                                    (dateFact == null || dateFact != null && isTrustedDate);
+      var areNumberAndDateTrusted = isTrustedNumber && isTrustedDate;
       
       if (numberFact != null)
         LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
