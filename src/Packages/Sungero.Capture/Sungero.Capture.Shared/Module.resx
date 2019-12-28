@@ -240,7 +240,7 @@
   <data name="WithoutNumber" xml:space="preserve">
     <value>TODO</value>
   </data>
-  <data name="OfContract" xml:space="preserve">
+  <data name="ToLeadingContract" xml:space="preserve">
     <value>TODO</value>
   </data>
 </root>

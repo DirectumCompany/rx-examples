@@ -245,7 +245,7 @@
   <data name="WithoutNumber" xml:space="preserve">
     <value>б/н</value>
   </data>
-  <data name="OfContract" xml:space="preserve">
+  <data name="ToLeadingContract" xml:space="preserve">
     <value>к договору</value>
   </data>
 </root>

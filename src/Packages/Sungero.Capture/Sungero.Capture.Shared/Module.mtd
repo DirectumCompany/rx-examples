@@ -1860,7 +1860,7 @@
     "SelectedSameClassifiers",
     "InvalidSenderLineName",
     "WithoutNumber",
-    "OfContract"
+    "ToLeadingContract"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
