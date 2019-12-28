@@ -36,7 +36,10 @@
       "Name": "Responsible",
       "CanBeSearch": false,
       "Code": "Responsible",
-      "EntityGuid": "b7905516-2be5-4931-961c-cb38d5677565",
+      "EntityGuid": "c612fc41-44a3-428b-a97c-433c333d78e9",
+      "HandledEvents": [
+        "LookupServer"
+      ],
       "IsRequired": true,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.DropDownEditorToNavigationBinder",
       "PreviousPropertyGuid": "5a862012-f7c2-4ce2-8deb-bf3149a87ff1"

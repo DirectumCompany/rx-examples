@@ -8,6 +8,16 @@ using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsVa
 
 namespace Sungero.Capture
 {
+  partial class SmartProcessingSettingCaptureSourcesResponsiblePropertyFilteringServerHandler<T>
+  {
+
+    public virtual IQueryable<T> CaptureSourcesResponsibleFiltering(IQueryable<T> query, Sungero.Domain.PropertyFilteringEventArgs e)
+    {
+      return query.Where(x => Sungero.Company.Employees.Is(x) ||
+                         Sungero.CoreEntities.Roles.Is(x) && Sungero.CoreEntities.Roles.As(x).IsSingleUser.Value);
+    }
+  }
+
   partial class SmartProcessingSettingServerHandlers
   {
 

@@ -45,10 +45,16 @@ namespace Sungero.Capture.Shared
     [Public]
     public virtual Sungero.Company.IEmployee GetDocumentProcessingResponsible(string senderLineName)
     {
-      return _obj.CaptureSources
-        .Where(x => x.SenderLineName.Trim() == senderLineName.Trim())
-        .Select(x => x.Responsible)
-        .FirstOrDefault();
+      var recipient = _obj.CaptureSources.Where(x => x.SenderLineName.Trim() == senderLineName.Trim()).Select(x => x.Responsible).FirstOrDefault();
+      var responsible = Company.Employees.Null;
+      if (Company.Employees.Is(recipient))
+        responsible = Company.Employees.As(recipient);
+      
+      if (CoreEntities.Roles.Is(recipient))
+        responsible = Groups.GetAllUsersInGroup(Groups.As(recipient))
+          .Where(r => Company.Employees.Is(r)).Select(r => Company.Employees.As(r)).FirstOrDefault();
+      
+      return responsible;
     }
     
     /// <summary>
