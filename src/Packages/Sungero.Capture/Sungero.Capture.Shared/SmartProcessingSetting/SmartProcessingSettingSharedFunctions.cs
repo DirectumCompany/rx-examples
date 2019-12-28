@@ -50,9 +50,8 @@ namespace Sungero.Capture.Shared
       if (Company.Employees.Is(recipient))
         responsible = Company.Employees.As(recipient);
       
-      if (CoreEntities.Roles.Is(recipient))
-        responsible = Groups.GetAllUsersInGroup(Groups.As(recipient))
-          .Where(r => Company.Employees.Is(r)).Select(r => Company.Employees.As(r)).FirstOrDefault();
+      if (Roles.Is(recipient))
+        responsible = Company.Employees.As(Roles.As(recipient).RecipientLinks.FirstOrDefault().Member);
       
       return responsible;
     }
