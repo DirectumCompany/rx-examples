@@ -434,6 +434,18 @@
   "OperationsClass": "",
   "Properties": [
     {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "f72f5dba-0004-4b1b-ad6b-8d6ba20f0145",
+      "Name": "Note",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "a8cc5c2a-cf89-4611-a4f4-524975ad6abb",
       "Name": "OurSignatory",

@@ -302,8 +302,8 @@ namespace Sungero.Capture.Structures.Module
   partial class RecognizedCurrency
   {
     // Валюта.
-    public Commons.ICurrency Currency { get; set; }   
-
+    public Commons.ICurrency Currency { get; set; }
+    
     // Признак - есть значение.
     public bool HasValue { get; set; }
     
@@ -312,5 +312,31 @@ namespace Sungero.Capture.Structures.Module
     
     // Факт
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
-  }    
+  }
+  
+  /// <summary>
+  /// Результат распознавания номера документа.
+  /// </summary>
+  [Public]
+  partial class RecognizedDocumentNumber
+  {
+    public string Number { get; set; }
+    
+    public bool IsTrusted { get; set; }
+    
+    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+  }
+  
+  /// <summary>
+  /// Результат распознавания даты документа.
+  /// </summary>
+  [Public]
+  partial class RecognizedDocumentDate
+  {
+    public DateTime? Date { get; set; }
+    
+    public bool IsTrusted { get; set; }
+    
+    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+  }
 }

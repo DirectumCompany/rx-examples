@@ -2382,85 +2382,28 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить номер и дату в виде строки.
-    /// </summary>
-    /// <param name="number">Номер.</param>
-    /// <param name="date">Дата.</param>
-    /// <returns>Строка вида "№[number] от [date]".</returns>
-    public virtual string GetNumberAndDateAsString(string number, DateTime? date)
-    {
-      var result = string.Empty;
-      
-      // Список аналогичен синхронизации с 1С.
-      var emptyNumberSymbols = new List<string> { "б/н", "бн", "б-н", string.Empty };
-      
-      if (string.IsNullOrWhiteSpace(number) || emptyNumberSymbols.Contains(number.ToLower()))
-        number = "б/н";
-      
-      // Sungero.Docflow.OfficialDocuments.Resources.Number имеет в начале пробел.
-      result = string.Format("{0}{1}",
-                             Sungero.Docflow.OfficialDocuments.Resources.Number,
-                             number)
-        .Trim();
-      
-      if (date.HasValue)
-        result = string.Format("{0}{1}{2}",
-                               result,
-                               Sungero.Docflow.OfficialDocuments.Resources.DateFrom,
-                               date.Value.ToString("d"));
-      
-      return result;
-    }
-    
-    /// <summary>
     /// Заполнить номер и дату в примечании договора.
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="document">Договор.</param>
     public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.IContractBase document)
     {
-      string number = null;
-      DateTime? date = null;
-      Sungero.Capture.Structures.Module.IFact numberFact = null;
-      Sungero.Capture.Structures.Module.IFact dateFact = null;
-      var facts = recognitionResult.Facts;
+      var recognizedNumber = this.GetRecognizedNumber(recognitionResult, FactNames.Document, FieldNames.Document.Number);
+      var recognizedDate = this.GetRecognizedDate(recognitionResult, FactNames.Document, FieldNames.Document.Date);
       
-      // Номер.
-      numberFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Number).FirstOrDefault();
-      number = GetFieldValue(numberFact, FieldNames.Document.Number);
-      var isTrustedNumber = !string.IsNullOrWhiteSpace(number) && IsTrustedField(numberFact, FieldNames.Document.Number);
-      
-      // Факт Document может содержать поля Number и Date одновременно.
-      date = GetFieldDateTimeValue(numberFact, FieldNames.Document.Date);
-      var isTrustedDate = IsTrustedField(numberFact, FieldNames.Document.Date);
-      
-      // Если Date распознается отдельно от Number.
-      if (date == null)
-      {
-        dateFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Date).FirstOrDefault();
-        date = GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-        isTrustedDate = date != null && IsTrustedField(dateFact, FieldNames.Document.Date);
-      }
-      
-      var numberAndDateNote = this.GetNumberAndDateAsString(number, date);
+      var numberAndDateNote = this.GetNumberAndDateAsString(recognizedNumber.Number, recognizedDate.Date);
       if (document.DocumentKind != null)
         numberAndDateNote = string.Format("{0} {1}",
                                           document.DocumentKind.ShortName,
                                           numberAndDateNote);
       document.Note = numberAndDateNote;
       
-      // Раскраска.
-      var props = document.Info.Properties;
-      var numberAndDateNames = new List<string> {FieldNames.Document.Number, FieldNames.Document.Date};
-      
-      var areNumberAndDateTrusted = isTrustedNumber && isTrustedDate;
-      
-      if (numberFact != null)
-        LinkFactFieldsAndProperty(recognitionResult, numberFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
-      
-      if (dateFact != null &&
-          (numberFact == null || dateFact.Id != numberFact.Id))
-        LinkFactFieldsAndProperty(recognitionResult, dateFact, numberAndDateNames, props.Note.Name, document.Note, areNumberAndDateTrusted);
+      /* Dmitriev_IA
+       * Номера и даты распознаются криво даже со 100% вероятностью.
+       * Раскрашивать поле "Примечание" всегда желтым с целью привлечения внимания.
+       * Факты с примечанием не связываем.
+       */
+      LinkFactFieldsAndProperty(recognitionResult, null, null, document.Info.Properties.Note.Name, document.Note, false);
     }
     
     /// <summary>
@@ -2667,6 +2610,73 @@ namespace Sungero.Capture.Server
         recognizedCurrency.Currency = currency;
       
       return recognizedCurrency;
+    }
+    
+    /// <summary>
+    /// Получить распознанный номер.
+    /// </summary>
+    /// <param name="recognitionResult">Результаты распознавания.</param>
+    /// <param name="numberFactName">Наименование факта, содержащего номер.</param>
+    /// <param name="numberFieldName">Наименование поля, содержащего номер.</param>
+    /// <returns>Распознанный номер с фактом.</returns>
+    public virtual Sungero.Capture.Structures.Module.IRecognizedDocumentNumber GetRecognizedNumber(Sungero.Capture.Structures.Module.IRecognitionResult recognitionResult,
+                                                                                                   string numberFactName,
+                                                                                                   string numberFieldName)
+    {
+      var fact = GetOrderedFacts(recognitionResult.Facts, numberFactName, numberFieldName).FirstOrDefault();
+      var number = GetFieldValue(fact, numberFieldName);
+      var isTrusted = !string.IsNullOrWhiteSpace(number) && IsTrustedField(fact, numberFieldName);
+      
+      return Sungero.Capture.Structures.Module.RecognizedDocumentNumber.Create(number, isTrusted, fact);
+    }
+    
+    /// <summary>
+    /// Получить распознанную дату.
+    /// </summary>
+    /// <param name="recognitionResult">Результаты распознавания.</param>
+    /// <param name="dateFactName">Наименование факта, содержащего дату.</param>
+    /// <param name="dateFieldName">Наименование поля, содержащего дату.</param>
+    /// <returns>Распознанная дата с фактом.</returns>
+    public virtual Sungero.Capture.Structures.Module.IRecognizedDocumentDate GetRecognizedDate(Sungero.Capture.Structures.Module.IRecognitionResult recognitionResult,
+                                                                                               string dateFactName,
+                                                                                               string dateFieldName)
+    {
+      var fact = GetOrderedFacts(recognitionResult.Facts, dateFactName, dateFieldName).FirstOrDefault();
+      var date = GetFieldDateTimeValue(fact, dateFieldName);
+      var isTrusted = date != null && IsTrustedField(fact, dateFieldName);
+      
+      return Sungero.Capture.Structures.Module.RecognizedDocumentDate.Create(date, isTrusted, fact);
+    }
+    
+    /// <summary>
+    /// Получить номер и дату в виде строки.
+    /// </summary>
+    /// <param name="number">Номер.</param>
+    /// <param name="date">Дата.</param>
+    /// <returns>Строка вида "№[number] от [date]".</returns>
+    public virtual string GetNumberAndDateAsString(string number, DateTime? date)
+    {
+      var result = string.Empty;
+      
+      // Список аналогичен синхронизации с 1С.
+      var emptyNumberSymbols = new List<string> { "б/н", "бн", "б-н", string.Empty };
+      
+      if (string.IsNullOrWhiteSpace(number) || emptyNumberSymbols.Contains(number.ToLower()))
+        number = "б/н";
+      
+      // Sungero.Docflow.OfficialDocuments.Resources.Number имеет в начале пробел.
+      result = string.Format("{0}{1}",
+                             Sungero.Docflow.OfficialDocuments.Resources.Number,
+                             number)
+        .Trim();
+      
+      if (date.HasValue)
+        result = string.Format("{0}{1}{2}",
+                               result,
+                               Sungero.Docflow.OfficialDocuments.Resources.DateFrom,
+                               date.Value.ToString("d"));
+      
+      return result;
     }
     
     /// <summary>

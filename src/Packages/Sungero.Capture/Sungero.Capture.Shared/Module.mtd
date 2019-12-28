@@ -1746,6 +1746,48 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
+      "Name": "RecognizedDocumentDate",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Date",
+          "IsNullable": true,
+          "TypeFullName": "global::System.Nullable<global::System.DateTime>"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
+      "Name": "RecognizedDocumentNumber",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Number",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "IsTrusted",
+          "TypeFullName": "global::System.Boolean"
+        },
+        {
+          "Name": "Fact",
+          "IsNullable": true,
+          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+        }
+      ],
+      "StructureNamespace": "Sungero.Capture.Structures.Module"
+    },
+    {
       "Name": "SignatoryFactMatching",
       "IsPublic": true,
       "Properties": [
