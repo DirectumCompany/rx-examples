@@ -449,8 +449,17 @@ namespace Sungero.Capture.Server
               fieldInfo.FieldId = factField.Id;
               fieldInfo.FactName = fact.Name;
               fieldInfo.FieldName = factField.Name;
-              fieldInfo.FieldValue = factField.Value;
               fieldInfo.FieldProbability = factField.Probability;
+              var fieldValue = factField.Value;
+              if (factField.Value.Length > 1000)
+              {
+                fieldValue = factField.Value.Substring(0, 1000);
+                Logger.DebugFormat("WARN. Value truncated. Length is over 1000 characters. GetRecognitionResults. FactID({0}). FieldID({1}).",
+                                   fact.Id,
+                                   factField.Id);
+              }
+              fieldInfo.FieldValue = fieldValue;
+              
               
               // Позиция подсветки фактов в теле документа.
               if (factField.Positions != null)
@@ -2396,7 +2405,8 @@ namespace Sungero.Capture.Server
         numberAndDateNote = string.Format("{0} {1}",
                                           document.DocumentKind.ShortName,
                                           numberAndDateNote);
-      document.Note = numberAndDateNote;
+      
+      this.SetDocumentNote(document, numberAndDateNote);
       
       /* Dmitriev_IA
        * Номера и даты распознаются криво даже со 100% вероятностью.
@@ -2436,7 +2446,7 @@ namespace Sungero.Capture.Server
         
       }
       
-      document.Note = numberAndDateNote;
+      this.SetDocumentNote(document, numberAndDateNote);
       
       /* Dmitriev_IA
        * Номера и даты распознаются криво даже со 100% вероятностью.
@@ -2643,7 +2653,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    ////Проверка даты на валидность.
+    /// Проверка даты на валидность.
     /// </summary>
     /// <param name="date">проверяемая дата.</param>
     /// <returns>Признак - дата валидна/невалидна.</returns>
@@ -2651,6 +2661,20 @@ namespace Sungero.Capture.Server
     {
       return date == null ||
         date != null && date.HasValue && date >= Calendar.SqlMinValue ;
+    }
+    
+    /// <summary>
+    /// Заполнить примечание документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="note">Примечание.</param>
+    public virtual void SetDocumentNote(IOfficialDocument document, string note)
+    {
+      var notePropertyLength = document.Info.Properties.Note.Length;
+      
+      document.Note = note.Length < notePropertyLength
+        ? note
+        : note.Substring(0, notePropertyLength);
     }
     
     #endregion
