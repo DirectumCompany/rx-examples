@@ -451,9 +451,9 @@ namespace Sungero.Capture.Server
               fieldInfo.FieldName = factField.Name;
               fieldInfo.FieldProbability = factField.Probability;
               var fieldValue = factField.Value;
-              if (factField.Value.Length > 1000)
+              if (fieldValue != null && fieldValue.Length > 1000)
               {
-                fieldValue = factField.Value.Substring(0, 1000);
+                fieldValue = fieldValue.Substring(0, 1000);
                 Logger.DebugFormat("WARN. Value truncated. Length is over 1000 characters. GetRecognitionResults. FactID({0}). FieldID({1}).",
                                    fact.Id,
                                    factField.Id);
