@@ -4061,6 +4061,9 @@ namespace Sungero.Capture.Server
       if (!contacts.Any())
         contacts = Parties.PublicFunctions.Contact.GetContactsByName(shortName, shortName, counterparty);
       
+      if (contacts.Any())
+        contacts = contacts.Where(x => x.Status == CoreEntities.DatabookEntry.Status.Active);
+      
       return contacts;
     }
     
@@ -4127,7 +4130,8 @@ namespace Sungero.Capture.Server
       if (!int.TryParse(contactField.VerifiedValue, out contactId))
         return result;
       
-      var filteredContact = Contacts.GetAll(x => x.Id == contactId).FirstOrDefault();
+      var filteredContact = Contacts.GetAll(x => x.Id == contactId)
+        .Where(x => x.Status == CoreEntities.DatabookEntry.Status.Active).FirstOrDefault();;
       if (filteredContact != null)
       {
         result.Contact = filteredContact;
@@ -4269,10 +4273,11 @@ namespace Sungero.Capture.Server
       if (!int.TryParse(employeeField.VerifiedValue, out employeeId))
         return result;
       
-      var filteredEmloyee = Employees.GetAll(x => x.Id == employeeId).FirstOrDefault();
-      if (filteredEmloyee != null)
+      var filteredEmployee = Employees.GetAll(x => x.Id == employeeId)
+        .Where(x => x.Status == CoreEntities.DatabookEntry.Status.Active).FirstOrDefault();
+      if (filteredEmployee != null)
       {
-        result.Employee = filteredEmloyee;
+        result.Employee = filteredEmployee;
         result.IsTrusted = employeeField.IsTrusted == true;
       }
       return result;
