@@ -719,15 +719,19 @@ namespace Sungero.Capture.Client
     {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
-        previewControl.HighlightAreas.Add(color,
-                                          int.Parse(positions[0]),
-                                          double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          propertyInfo);
+      {
+        var area = previewControl.HighlightAreas.Add(int.Parse(positions[0]),
+                                                     double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        area.SetRelatedProperty(propertyInfo);
+        area.Style.Color = color;
+        area.ActivationStyle.BorderColor = Colors.Common.Red;
+        area.ActivationStyle.BorderWidth = 10;
+      }
     }
     
     /// <summary>
@@ -744,15 +748,18 @@ namespace Sungero.Capture.Client
     {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
-        previewControl.HighlightAreas.Add(color,
-                                          int.Parse(positions[0]),
-                                          double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                          childEntity, childpropertyInfo);
+      {
+        var area = previewControl.HighlightAreas.Add(int.Parse(positions[0]),
+                                                     double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        area.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
+        area.Style.Color = color;
+        area.ActivationStyle.Color = Colors.Common.Blue;
+      }
     }
     
     /// <summary>
