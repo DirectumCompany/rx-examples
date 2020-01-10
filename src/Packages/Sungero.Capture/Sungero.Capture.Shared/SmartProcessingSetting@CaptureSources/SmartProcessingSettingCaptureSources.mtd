@@ -25,6 +25,9 @@
       "Name": "SenderLineName",
       "CanBeSearch": false,
       "Code": "SenderLineName",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
       "IsRequired": true,
       "Length": 25,
       "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.StringEditorToStringBinder",

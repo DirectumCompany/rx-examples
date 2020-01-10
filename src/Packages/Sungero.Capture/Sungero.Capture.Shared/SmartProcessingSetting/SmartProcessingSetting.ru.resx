@@ -164,4 +164,7 @@
   <data name="SetCorrectClassifiers" xml:space="preserve">
     <value>Настройте классификаторы корректно.</value>
   </data>
+  <data name="InvalidSenderLineName" xml:space="preserve">
+    <value>Для ввода имени линии используйте латинские буквы и/или цифры.</value>
+  </data>
 </root>

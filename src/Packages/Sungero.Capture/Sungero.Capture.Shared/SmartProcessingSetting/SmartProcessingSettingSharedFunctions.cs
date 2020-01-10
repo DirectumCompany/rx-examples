@@ -22,6 +22,21 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
+    /// Проверить наименование линии.
+    /// </summary>
+    /// <param name="senderLineName">Имя линии.</param>
+    /// <returns>Пустая строка, если имя линии в порядке.
+    /// Иначе текст ошибки.</returns>
+    [Public]
+    public static string ValidateSenderLineName(string senderLineName)
+    {
+      if (!System.Text.RegularExpressions.Regex.IsMatch(senderLineName.Trim(), @"(^[0-9a-zA-Z]{0,}$)"))
+        return SmartProcessingSettings.Resources.InvalidSenderLineName;
+      
+      return null;
+    }
+    
+    /// <summary>
     /// Проверить адрес сервиса Ario.
     /// </summary>
     /// <returns>Тип и текст ошибки, если она была обнаружена.</returns>

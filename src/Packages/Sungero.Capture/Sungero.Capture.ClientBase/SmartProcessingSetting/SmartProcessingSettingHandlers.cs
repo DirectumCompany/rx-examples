@@ -7,6 +7,17 @@ using Sungero.Capture.SmartProcessingSetting;
 
 namespace Sungero.Capture
 {
+  partial class SmartProcessingSettingCaptureSourcesClientHandlers
+  {
+
+    public virtual void CaptureSourcesSenderLineNameValueInput(Sungero.Presentation.StringValueInputEventArgs e)
+    {
+      var errorMessage = PublicFunctions.SmartProcessingSetting.ValidateSenderLineName(e.NewValue);
+      if (errorMessage != null)
+        e.AddError(errorMessage);
+    }
+  }
+
   partial class SmartProcessingSettingClientHandlers
   {
 

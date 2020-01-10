@@ -434,6 +434,19 @@
       "Placement": "Shared",
       "ReturnType": "global::Sungero.Capture.ISmartProcessingSetting",
       "ReturnTypeFullName": "Sungero.Capture.ISmartProcessingSetting, Sungero.Domain.Interfaces"
+    },
+    {
+      "Name": "ValidateSenderLineName",
+      "Parameters": [
+        {
+          "Name": "senderLineName",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
     }
   ],
   "PublicStructures": [],
@@ -452,7 +465,8 @@
     "InvalidArioUrl",
     "SmartProcessingSettings",
     "SetCorrectConfidenceLimits",
-    "SetCorrectClassifiers"
+    "SetCorrectClassifiers",
+    "InvalidSenderLineName"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "364df7b8-8bc0-4230-9936-88878a5fda09",
