@@ -22,6 +22,19 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
+    /// Получить источники с неуникальными именами.
+    /// </summary>
+    /// <returns>Список источников.</returns>
+    public virtual List<ISmartProcessingSettingCaptureSources> GetNotUniqueNameSources()
+    {
+      var captureSources = _obj.CaptureSources;
+      var notUniqueSenderLineNames = captureSources.GroupBy(x => x.SenderLineName).Where(s => s.Count() > 1).Select(x => x.Key);
+      var notUnique = _obj.CaptureSources.Where(n => notUniqueSenderLineNames.Contains(n.SenderLineName));
+      
+      return notUnique.Any() ? notUnique.ToList() : null;
+    }
+    
+    /// <summary>
     /// Проверить наименование линии.
     /// </summary>
     /// <param name="senderLineName">Имя линии.</param>
@@ -45,7 +58,7 @@ namespace Sungero.Capture.Shared
       // Проверка что адрес Ario не "кривой".
       if (!System.Uri.IsWellFormedUriString(_obj.ArioUrl, UriKind.Absolute))
         return SettingsValidationMessageStructure.Create(MessageTypes.Error, SmartProcessingSettings.Resources.InvalidArioUrl);
-        
+      
       if (!Functions.SmartProcessingSetting.Remote.CheckConnection(_obj))
         return SettingsValidationMessageStructure.Create(MessageTypes.SoftError, SmartProcessingSettings.Resources.ArioConnectionError);
       

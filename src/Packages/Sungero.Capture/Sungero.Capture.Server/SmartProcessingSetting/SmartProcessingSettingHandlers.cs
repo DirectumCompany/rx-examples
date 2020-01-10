@@ -42,8 +42,17 @@ namespace Sungero.Capture
         e.AddError(_obj.Info.Properties.UpperConfidenceLimit, confidenceLimitsValidationMessage.Text, _obj.Info.Properties.LowerConfidenceLimit);
       }
       
+      // "Жёсткая" проверка источников поступления.
+      var notUniqueNameSources = Functions.SmartProcessingSetting.GetNotUniqueNameSources(_obj);
+      var isNotUniqueNameSourcesError = notUniqueNameSources != null;
+      if (isNotUniqueNameSourcesError)
+      {
+        foreach (var source in notUniqueNameSources)
+          e.AddError(source, source.Info.Properties.SenderLineName, SmartProcessingSettings.Resources.NotUniqueSenderLineNames);
+      }
+      
       // При наличии "Жёстких" ошибок не переходить к ForceSave.
-      if (isArioUrlValidationMessageError || isConfidenceLimitsValidationMessageError)
+      if (isArioUrlValidationMessageError || isConfidenceLimitsValidationMessageError || isNotUniqueNameSourcesError)
         return;
       
       var isForceSave = e.Params.Contains(Constants.SmartProcessingSetting.ForceSaveParamName);
@@ -51,7 +60,10 @@ namespace Sungero.Capture
       {
         // "Мягкая" проверка адреса сервиса Ario.
         if (arioUrlValidationMessage != null && arioUrlValidationMessage.Type == MessageTypes.SoftError)
+        {
           e.AddError(arioUrlValidationMessage.Text, _obj.Info.Actions.ForceSave);
+          return;
+        }
         
         // "Мягкая" проверка классификаторов.
         var classifierValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(_obj);

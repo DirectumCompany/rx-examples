@@ -165,6 +165,9 @@
     <value>Настройте классификаторы корректно.</value>
   </data>
   <data name="InvalidSenderLineName" xml:space="preserve">
-    <value>Для ввода имени линии используйте латинские буквы и/или цифры.</value>
+    <value>Имя линии должно состоять из латинских букв и/или цифр и не содержать пробелы.</value>
+  </data>
+  <data name="NotUniqueSenderLineNames" xml:space="preserve">
+    <value>Имена линий должны быть уникальны.</value>
   </data>
 </root>

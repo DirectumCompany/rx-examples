@@ -167,4 +167,7 @@ The blank field means that the fact reliability is below the lower confidence in
   <data name="InvalidSenderLineName" xml:space="preserve">
     <value>TODO</value>
   </data>
+  <data name="NotUniqueSenderLineNames" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>
