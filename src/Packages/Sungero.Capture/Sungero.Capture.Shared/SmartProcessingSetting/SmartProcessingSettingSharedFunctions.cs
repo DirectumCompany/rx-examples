@@ -43,7 +43,7 @@ namespace Sungero.Capture.Shared
     [Public]
     public static string ValidateSenderLineName(string senderLineName)
     {
-      if (!System.Text.RegularExpressions.Regex.IsMatch(senderLineName.Trim(), @"(^[0-9a-zA-Z]{0,}$)"))
+      if (!string.IsNullOrEmpty(senderLineName) && !System.Text.RegularExpressions.Regex.IsMatch(senderLineName.Trim(), @"(^[0-9a-zA-Z]{0,}$)"))
         return SmartProcessingSettings.Resources.InvalidSenderLineName;
       
       return null;

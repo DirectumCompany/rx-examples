@@ -12,8 +12,10 @@ namespace Sungero.Capture
 
     public virtual void CaptureSourcesSenderLineNameValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
-      if (!string.IsNullOrEmpty(e.NewValue))
-        e.NewValue = e.NewValue.Trim();
+      if (string.IsNullOrEmpty(e.NewValue))
+        return;
+      
+      e.NewValue = e.NewValue.Trim();
       
       var errorMessage = PublicFunctions.SmartProcessingSetting.ValidateSenderLineName(e.NewValue);
       if (errorMessage != null)
