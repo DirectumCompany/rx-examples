@@ -659,6 +659,7 @@ namespace Sungero.Capture.Client
         var recognizedRecordFacts = recognizedFacts.Where(x => x.CollectionRecordId == record.Id &&
                                                           !string.IsNullOrEmpty(x.PropertyName) &&
                                                           x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
+        var positionWithSameFactId = recognizedRecordFacts.Select(x => x.Position).ToList();
         foreach (var recognizedRecordFact in recognizedRecordFacts)
         {
           var propertyName = recognizedRecordFact.PropertyName.Split('.').LastOrDefault();
@@ -680,7 +681,7 @@ namespace Sungero.Capture.Client
               var propertyInfo = record.Info.Properties.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
               var propertyInfoValue = (Sungero.Domain.Shared.IInternalPropertyInfo)propertyInfo.GetReflectionPropertyValue(record.Info.Properties);
               HighlightFactInPreview(previewControl, recognizedRecordFact.Position, recordPreviewColor,
-                                     record, (Sungero.Domain.Shared.IPropertyInfo)propertyInfoValue);
+                                     record, (Sungero.Domain.Shared.IPropertyInfo)propertyInfoValue, positionWithSameFactId);
             }
           }
         }
@@ -727,10 +728,27 @@ namespace Sungero.Capture.Client
                                                      double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                                      double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                                      double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        
+        // Установть подсветку согласно вероятности.
         area.SetRelatedProperty(propertyInfo);
         area.Style.Color = color;
-        area.ActivationStyle.BorderColor = Colors.Common.Red;
-        area.ActivationStyle.BorderWidth = 10;
+        
+        // Установить поведение при активации.
+        var activationHighlightColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("ActivationHighlightColor");
+        var isHighlightWithBorderParam = Docflow.PublicFunctions.Module.GetDocflowParamsValue("IsHighlightWithBorder");
+        var activationHighlightBorderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue("ActivationHighlightBorderWidth");
+        var activationHighlightBorderColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("ActivationHighlightBorderColor");
+        if (isHighlightWithBorderParam != null)
+        {
+          area.ActivationStyle.BorderColor = activationHighlightBorderColor != null && !string.IsNullOrWhiteSpace(activationHighlightBorderColor.ToString())
+            ? Sungero.Core.Colors.Parse(activationHighlightBorderColor.ToString())
+            : Colors.Common.Red;
+          area.ActivationStyle.BorderWidth = activationHighlightBorderWidth != 0 ? (int) activationHighlightBorderWidth : 10;
+        }
+        else
+          area.ActivationStyle.Color = activationHighlightColor != null && !string.IsNullOrWhiteSpace(activationHighlightColor.ToString())
+            ? Sungero.Core.Colors.Parse(activationHighlightColor.ToString())
+            : Colors.Common.Blue;
       }
     }
     
@@ -756,9 +774,103 @@ namespace Sungero.Capture.Client
                                                      double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                                      double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                                      double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        // Установть подсветку согласно вероятности.
         area.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
         area.Style.Color = color;
-        area.ActivationStyle.Color = Colors.Common.Blue;
+        
+        // Установить поведение при активации.
+        var activationHighlightColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("ActivationHighlightColor");
+        var isHighlightWithBorderParam = Docflow.PublicFunctions.Module.GetDocflowParamsValue("IsHighlightWithBorder");
+        var activationHighlightBorderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue("ActivationHighlightBorderWidth");
+        var activationHighlightBorderColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("ActivationHighlightBorderColor");
+        if (isHighlightWithBorderParam != null)
+        {
+          area.ActivationStyle.BorderColor = activationHighlightBorderColor != null && !string.IsNullOrWhiteSpace(activationHighlightBorderColor.ToString())
+            ? Sungero.Core.Colors.Parse(activationHighlightBorderColor.ToString())
+            : Colors.Common.Red;
+          area.ActivationStyle.BorderWidth = activationHighlightBorderWidth != 0 ? (int) activationHighlightBorderWidth : 10;
+        }
+        else
+          area.ActivationStyle.Color = activationHighlightColor != null && !string.IsNullOrWhiteSpace(activationHighlightColor.ToString())
+            ? Sungero.Core.Colors.Parse(activationHighlightColor.ToString())
+            : Colors.Common.Blue;
+      }
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре с фокусировской по нажатию на свойство в табличной части.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    /// <param name="childEntity">Свойство-коллекция.</param>
+    /// <param name="childpropertyInfo">Информация о свойстве в коллекции.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity,
+                                               Sungero.Domain.Shared.IPropertyInfo childpropertyInfo, List<string> positionWithSameFactId)
+    {
+      var positions = position.Split(Constants.Module.PositionElementDelimiter);
+      
+      var activationHighlightColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("ActivationHighlightColor");
+      var isHighlightWithBorderParam = Docflow.PublicFunctions.Module.GetDocflowParamsValue("IsHighlightWithBorder");
+      var activationHighlightBorderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue("ActivationHighlightBorderWidth");
+      var activationHighlightBorderColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("ActivationHighlightBorderColor");
+      
+      if (positions.Count() >= 7)
+      {
+        var area = previewControl.HighlightAreas.Add(int.Parse(positions[0]),
+                                                     double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        // Установить подсветку согласно вероятности.
+        area.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
+        area.Style.Color = color;
+        
+        // Установить поведение при активации.
+        if (isHighlightWithBorderParam != null)
+        {
+          area.ActivationStyle.BorderColor = activationHighlightBorderColor != null && !string.IsNullOrWhiteSpace(activationHighlightBorderColor.ToString())
+            ? Sungero.Core.Colors.Parse(activationHighlightBorderColor.ToString())
+            : Colors.Common.Red;
+          area.ActivationStyle.BorderWidth = activationHighlightBorderWidth != 0 ? (int) activationHighlightBorderWidth : 10;
+        }
+        else
+          area.ActivationStyle.Color = activationHighlightColor != null && !string.IsNullOrWhiteSpace(activationHighlightColor.ToString())
+            ? Sungero.Core.Colors.Parse(activationHighlightColor.ToString())
+            : Colors.Common.Blue;
+      }
+      
+      var isBorderAndColor = Docflow.PublicFunctions.Module.GetDocflowParamsValue("BorderAndColor");
+      if (isBorderAndColor != null)
+      {
+        var positionTop = positionWithSameFactId.FirstOrDefault().Split(Constants.Module.PositionElementDelimiter)[1];
+        var positionLeft = positionWithSameFactId.Min(x => int.Parse(x.Split(Constants.Module.PositionElementDelimiter)[2]));
+        
+        var positionWidth = -1*positionLeft
+          + positionWithSameFactId.Max(x => int.Parse(x.Split(Constants.Module.PositionElementDelimiter)[2]))
+          + double.Parse(positionWithSameFactId
+                         .Where(x => int.Parse(x.Split(Constants.Module.PositionElementDelimiter)[2]) ==
+                                positionWithSameFactId.Max(d => int.Parse(d.Split(Constants.Module.PositionElementDelimiter)[2])))
+                         .First()
+                         .Split(Constants.Module.PositionElementDelimiter)[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture);
+        
+        var borderArea = previewControl.HighlightAreas.Add(int.Parse(positions[0]),
+                                                           double.Parse(positionTop.Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                           positionLeft,
+                                                           positionWidth,
+                                                           double.Parse(positionWithSameFactId.FirstOrDefault().Split(Constants.Module.PositionElementDelimiter)[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                           double.Parse(positionWithSameFactId.FirstOrDefault().Split(Constants.Module.PositionElementDelimiter)[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                           double.Parse(positionWithSameFactId.FirstOrDefault().Split(Constants.Module.PositionElementDelimiter)[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        
+        borderArea.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
+        
+        borderArea.ActivationStyle.BorderColor = activationHighlightBorderColor != null && !string.IsNullOrWhiteSpace(activationHighlightBorderColor.ToString())
+          ? Sungero.Core.Colors.Parse(activationHighlightBorderColor.ToString())
+          : Colors.Common.Blue;
+        borderArea.ActivationStyle.BorderWidth = activationHighlightBorderWidth != 0 ? (int) activationHighlightBorderWidth : 10;
       }
     }
     

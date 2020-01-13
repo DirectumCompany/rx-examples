@@ -3603,6 +3603,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="paramName">Наименование параметра.</param>
     /// <returns>Значение параметра.</returns>
+    [Remote]
     public static double GetDocflowParamsNumbericValue(string paramName)
     {
       double result = 0;
