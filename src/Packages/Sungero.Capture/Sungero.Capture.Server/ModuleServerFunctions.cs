@@ -4061,8 +4061,7 @@ namespace Sungero.Capture.Server
       if (!contacts.Any())
         contacts = Parties.PublicFunctions.Contact.GetContactsByName(shortName, shortName, counterparty);
       
-      if (contacts.Any())
-        contacts = contacts.Where(x => x.Status == CoreEntities.DatabookEntry.Status.Active);
+      contacts = contacts.Where(x => x.Status == CoreEntities.DatabookEntry.Status.Active);
       
       return contacts;
     }
