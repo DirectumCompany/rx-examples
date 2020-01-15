@@ -610,6 +610,10 @@ namespace Sungero.Capture.Server
         : package.Where(d => Contracts.Contracts.Is(d)).FirstOrDefault();
       if (contract != null)
         return contract;
+
+      var supAgreement = package.Where(d => Contracts.SupAgreements.Is(d)).FirstOrDefault();
+      if (supAgreement != null)
+        return supAgreement;
       
       var contractStatement = isMockMode
         ? package.Where(d => MockContractStatements.Is(d)).FirstOrDefault()
@@ -628,6 +632,12 @@ namespace Sungero.Capture.Server
         : package.Where(d => FinancialArchive.IncomingTaxInvoices.Is(d)).FirstOrDefault();
       if (incTaxInvoice != null)
         return incTaxInvoice;
+
+      var incInvoice = isMockMode
+        ? package.Where(d => MockIncomingInvoices.Is(d)).FirstOrDefault()
+        : package.Where(d => Contracts.IncomingInvoices.Is(d)).FirstOrDefault();
+      if (incInvoice != null)
+        return incInvoice;
       
       return leadingDocument;
     }
