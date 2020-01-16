@@ -3613,6 +3613,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="paramName">Наименование параметра.</param>
     /// <returns>Значение параметра.</returns>
+    [Public, Remote(IsPure = true)]
     public static double GetDocflowParamsNumbericValue(string paramName)
     {
       double result = 0;
@@ -3620,6 +3621,18 @@ namespace Sungero.Capture.Server
       if (!(paramValue is DBNull) && paramValue != null)
         double.TryParse(paramValue.ToString(), out result);
       return result;
+    }
+    
+    /// <summary>
+    /// Получить значение из параметра в docflow_params.
+    /// </summary>
+    /// <param name="paramName">Наименование параметра.</param>
+    /// <returns>Значение параметра.</returns>
+    [Public, Remote(IsPure = true)]
+    public static string GetDocflowParamsStringValue(string paramName)
+    {
+      var paramValue = Docflow.PublicFunctions.Module.GetDocflowParamsValue(paramName);
+      return !(paramValue is DBNull) && paramValue != null ? paramValue.ToString() : null;
     }
     
     /// <summary>

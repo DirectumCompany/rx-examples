@@ -1291,6 +1291,34 @@
       "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
     },
     {
+      "Name": "GetDocflowParamsNumbericValue",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "paramName",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::System.Double",
+      "ReturnTypeFullName": "System.Double"
+    },
+    {
+      "Name": "GetDocflowParamsStringValue",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "paramName",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
+    },
+    {
       "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [

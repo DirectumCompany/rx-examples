@@ -717,21 +717,12 @@ namespace Sungero.Capture.Client
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
                                                string position, Sungero.Core.Color color, Sungero.Domain.Shared.IPropertyInfo propertyInfo)
     {
-      var positions = position.Split(Constants.Module.PositionElementDelimiter);
-      if (positions.Count() >= 7)
-      {
-        var area = previewControl.HighlightAreas.Add(int.Parse(positions[0]),
-                                                     double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                                     double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                                     double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                                     double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                                     double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
-                                                     double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
-        area.SetRelatedProperty(propertyInfo);
-        area.Style.Color = color;
-        area.ActivationStyle.BorderColor = Colors.Common.Red;
-        area.ActivationStyle.BorderWidth = 10;
-      }
+
+      var area = AddHighlightArea(previewControl, position, color);
+      if (area == null)
+        return;
+      
+      area.SetRelatedProperty(propertyInfo);
     }
     
     /// <summary>
@@ -746,6 +737,23 @@ namespace Sungero.Capture.Client
                                                string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity,
                                                Sungero.Domain.Shared.IPropertyInfo childpropertyInfo)
     {
+      var area = AddHighlightArea(previewControl, position, color);
+      if (area == null)
+        return;
+      
+      area.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
+    }
+    
+    /// <summary>
+    /// Добавить область выделения в предпросмотре.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиции.</param>
+    /// <param name="color">Цвет.</param>
+    /// <returns>Область выделения в предпросмотре.</returns>
+    public virtual Sungero.Domain.Shared.IPreviewHighlight AddHighlightArea(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                                                            string position, Sungero.Core.Color color)
+    {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
       {
@@ -756,10 +764,51 @@ namespace Sungero.Capture.Client
                                                      double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                                      double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
                                                      double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
-        area.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
+        // Установить подсветку согласно вероятности.
         area.Style.Color = color;
-        area.ActivationStyle.Color = Colors.Common.Blue;
+        
+        // Установить поведение при активации.
+        // Рамка.
+        var isBorder = Functions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsBorder");
+        var borderColor = GetDocflowParamsColorValue("ActivationHighlight_BorderColor");
+        var borderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue("ActivationHighlight_BorderWidth");
+        if (isBorder != null)
+        {
+          area.ActivationStyle.BorderColor = borderColor != Sungero.Core.Colors.Empty ? borderColor : Colors.Common.Red;
+          area.ActivationStyle.BorderWidth = borderWidth > 0 ? (int) borderWidth : 10;
+        }
+        // Заливка цветом.
+        var isFillColor = Functions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsFillColor");
+        var fillColor = GetDocflowParamsColorValue("ActivationHighlight_FillColor");
+        if (isFillColor != null || isBorder == null)
+          area.ActivationStyle.Color = fillColor != Sungero.Core.Colors.Empty ? fillColor : Colors.Common.Blue;
+        
+        return area;
       }
+      
+      return null;
+    }
+    
+    /// <summary>
+    /// Получить цвет из параметра в docflow_params.
+    /// </summary>
+    /// <param name="paramName">Наименование параметра.</param>
+    /// <returns>Значение параметра.</returns>
+    public static Sungero.Core.Color GetDocflowParamsColorValue(string paramName)
+    {
+      var color = Sungero.Core.Colors.Empty;
+      
+      var colorCode = Functions.Module.Remote.GetDocflowParamsStringValue(paramName);
+      if (!string.IsNullOrWhiteSpace(colorCode))
+      {
+        try
+        {
+          color = Sungero.Core.Colors.Parse(colorCode);
+        }
+        catch {}
+      }
+      
+      return color;
     }
     
     /// <summary>
