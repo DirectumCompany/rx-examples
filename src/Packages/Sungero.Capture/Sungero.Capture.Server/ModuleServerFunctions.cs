@@ -2114,7 +2114,40 @@ namespace Sungero.Capture.Server
       FillAmountAndCurrency(document, recognitionResult);
       
       // Занести номер и дату в примечание.
-      FillNumberAndDate(recognitionResult, document);
+      //FillNumberAndDate(recognitionResult, document);
+      
+      // Дата.
+      var facts = recognitionResult.Facts;
+      var regDateFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Date).FirstOrDefault();
+      var regDate = GetFieldDateTimeValue(regDateFact, FieldNames.Document.Date);
+      Nullable<bool> isTrustedDate = null;
+      if (regDate == null || !regDate.HasValue || regDate < Calendar.SqlMinValue)
+      {
+        regDate = Calendar.SqlMinValue;
+        isTrustedDate = false;
+      }
+      document.RegistrationDate = regDate;
+      
+      // Номер.
+      var regNumberFact = GetOrderedFacts(facts, FactNames.Document, FieldNames.Document.Number).FirstOrDefault();
+      var regNumber = GetFieldValue(regNumberFact, FieldNames.Document.Number);
+      Nullable<bool> isTrustedNumber = null;
+      if (string.IsNullOrWhiteSpace(regNumber))
+      {
+        regNumber = Resources.UnknownNumber;
+        isTrustedNumber = false;
+      }
+      else if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
+      {
+        regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
+        isTrustedNumber = false;
+      }   
+      document.RegistrationNumber = regNumber;
+      
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognitionResult, regDateFact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
+      LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
+                          document.RegistrationNumber, isTrustedNumber);
       
       return document;
     }
