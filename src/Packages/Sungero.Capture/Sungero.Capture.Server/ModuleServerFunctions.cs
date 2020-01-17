@@ -2123,9 +2123,6 @@ namespace Sungero.Capture.Server
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
       
-      // Занести номер и дату в примечание.
-      FillNumberAndDate(recognitionResult, document);
-      
       return document;
     }
     
@@ -2154,9 +2151,6 @@ namespace Sungero.Capture.Server
 
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
-      
-      // Занести номер и дату в примечание.
-      FillNumberAndDate(recognitionResult, document);
       
       return document;
     }
@@ -2401,72 +2395,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить номер и дату в примечании договора.
-    /// </summary>
-    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    /// <param name="document">Договор.</param>
-    public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.IContractBase document)
-    {
-      var recognizedNumber = this.GetRecognizedNumber(recognitionResult, FactNames.Document, FieldNames.Document.Number);
-      var recognizedDate = this.GetRecognizedDate(recognitionResult, FactNames.Document, FieldNames.Document.Date);
-      
-      var numberAndDateNote = this.GetNumberAndDateAsString(recognizedNumber.Number, recognizedDate.Date);
-      if (document.DocumentKind != null)
-        numberAndDateNote = string.Format("{0} {1}",
-                                          document.DocumentKind.ShortName,
-                                          numberAndDateNote);
-      
-      this.SetDocumentNote(document, numberAndDateNote);
-      
-      /* Dmitriev_IA
-       * Номера и даты распознаются криво даже со 100% вероятностью.
-       * Раскрашивать поле "Примечание" всегда желтым с целью привлечения внимания.
-       * Факты с примечанием не связываем.
-       */
-      LinkFactFieldsAndProperty(recognitionResult, null, null, document.Info.Properties.Note.Name, document.Note, false);
-    }
-    
-    /// <summary>
-    /// Заполнить номер и дату в примечании доп. соглашения.
-    /// </summary>
-    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    /// <param name="document">Доп. соглашения.</param>
-    public virtual void FillNumberAndDate(Structures.Module.IRecognitionResult recognitionResult, Sungero.Contracts.ISupAgreement document)
-    {
-      var recognizedNumber = this.GetRecognizedNumber(recognitionResult, FactNames.SupAgreement, FieldNames.Document.Number);
-      var recognizedDate = this.GetRecognizedDate(recognitionResult, FactNames.SupAgreement, FieldNames.Document.Date);
-      var recognizedBaseNumber = this.GetRecognizedNumber(recognitionResult, FactNames.SupAgreement, FieldNames.Document.DocumentBaseNumber);
-      var recognizedBaseDate = this.GetRecognizedDate(recognitionResult, FactNames.SupAgreement, FieldNames.Document.DocumentBaseDate);
-      
-      var numberAndDateNote = this.GetNumberAndDateAsString(recognizedNumber.Number, recognizedDate.Date);
-      if (document.DocumentKind != null)
-        numberAndDateNote = string.Format("{0} {1}",
-                                          document.DocumentKind.ShortName,
-                                          numberAndDateNote);
-      
-      // Дополнить примечание номерм/датой договора если найден хотя бы один факт,
-      // указывающий на связь с договором.
-      if (recognizedBaseNumber.Fact != null || recognizedBaseDate.Fact != null)
-      {
-        var contractNumberAndContractDateNote = this.GetNumberAndDateAsString(recognizedBaseNumber.Number, recognizedBaseDate.Date);
-        numberAndDateNote = string.Format("{0} {1} {2}",
-                                          numberAndDateNote,
-                                          Capture.Resources.ToLeadingContract,
-                                          contractNumberAndContractDateNote);
-        
-      }
-      
-      this.SetDocumentNote(document, numberAndDateNote);
-      
-      /* Dmitriev_IA
-       * Номера и даты распознаются криво даже со 100% вероятностью.
-       * Раскрашивать поле "Примечание" всегда желтым с целью привлечения внимания.
-       * Факты с примечанием не связываем.
-       */
-      LinkFactFieldsAndProperty(recognitionResult, null, null, document.Info.Properties.Note.Name, document.Note, false);
-    }
-    
-    /// <summary>
     /// Заполнить корректируемый документ.
     /// </summary>
     /// <param name="document">Документ.</param>
@@ -2632,37 +2560,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Получить номер и дату в виде строки.
-    /// </summary>
-    /// <param name="number">Номер.</param>
-    /// <param name="date">Дата.</param>
-    /// <returns>Строка вида "№[number] от [date]".</returns>
-    public virtual string GetNumberAndDateAsString(string number, DateTime? date)
-    {
-      var result = string.Empty;
-      
-      // Список аналогичен синхронизации с 1С.
-      var emptyNumberSymbols = new List<string> { "б/н", "бн", "б-н", string.Empty };
-      
-      if (string.IsNullOrWhiteSpace(number) || emptyNumberSymbols.Contains(number.ToLower()))
-        number = "б/н";
-      
-      // Sungero.Docflow.OfficialDocuments.Resources.Number имеет в начале пробел.
-      result = string.Format("{0}{1}",
-                             Sungero.Docflow.OfficialDocuments.Resources.Number,
-                             number)
-        .Trim();
-      
-      if (date.HasValue)
-        result = string.Format("{0}{1}{2}",
-                               result,
-                               Sungero.Docflow.OfficialDocuments.Resources.DateFrom,
-                               date.Value.ToString("d"));
-      
-      return result;
-    }
-    
-    /// <summary>
     /// Проверка даты на валидность.
     /// </summary>
     /// <param name="date">проверяемая дата.</param>
@@ -2671,20 +2568,6 @@ namespace Sungero.Capture.Server
     {
       return date == null ||
         date != null && date.HasValue && date >= Calendar.SqlMinValue ;
-    }
-    
-    /// <summary>
-    /// Заполнить примечание документа.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="note">Примечание.</param>
-    public virtual void SetDocumentNote(IOfficialDocument document, string note)
-    {
-      var notePropertyLength = document.Info.Properties.Note.Length;
-      
-      document.Note = note.Length < notePropertyLength
-        ? note
-        : note.Substring(0, notePropertyLength);
     }
     
     #endregion
