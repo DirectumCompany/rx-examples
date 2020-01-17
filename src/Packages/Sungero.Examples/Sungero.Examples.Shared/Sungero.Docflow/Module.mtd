@@ -3,7 +3,24 @@
   "NameGuid": "c5b4dd07-c302-45de-833c-0c1b22b535d0",
   "Name": "Docflow",
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
-  "AsyncHandlers": [],
+  "AsyncHandlers": [
+    {
+      "NameGuid": "767ae28b-d043-48b3-9e31-e54c288bde75",
+      "Name": "GrantAccessRightsToDocument",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": []
+    },
+    {
+      "NameGuid": "c4352760-6439-484b-9e00-6c878427d64e",
+      "Name": "GrantAccessRightsToDocumentsByRule",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": []
+    }
+  ],
   "BaseGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.Docflow.ClientBase",
