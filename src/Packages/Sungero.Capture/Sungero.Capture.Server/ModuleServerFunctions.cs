@@ -2298,12 +2298,12 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Пронумеровать документ.
+    /// Пронумеровать финансовый документ.
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
-    public virtual void NumberDocument(IOfficialDocument document,
+    public virtual void NumberDocument(IAccountingDocumentBase document,
                                        Structures.Module.IRecognitionResult recognitionResult,
                                        string factName)
     {
