@@ -2120,6 +2120,9 @@ namespace Sungero.Capture.Server
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
       
+      // Дата и номер.
+      FillNumberAndDate(document, recognitionResult, FactNames.Document);
+      
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
       
@@ -2148,6 +2151,9 @@ namespace Sungero.Capture.Server
       
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
       document.ResponsibleEmployee = responsible;
+      
+      // Дата и номер.
+      FillNumberAndDate(document, recognitionResult, FactNames.SupAgreement);
 
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
@@ -2358,6 +2364,45 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Пронумеровать договорной документ.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
+    /// <param name="factName">Наименование факта с датой и номером документа.</param>
+    public virtual void FillNumberAndDate(IContractualDocumentBase document,
+                                       Structures.Module.IRecognitionResult recognitionResult,
+                                       string factName)
+    {
+      // Дата.
+      var recognizedDate = GetRecognizedDate(recognitionResult, factName, FieldNames.Document.Date);
+      
+      // Номер.
+      var recognizedNumber = GetRecognizedNumber(recognitionResult, factName, FieldNames.Document.Number);
+      if (recognizedNumber.Number == null)
+        recognizedNumber.Number = string.Empty;
+      
+      // Список аналогичен синхронизации с 1С.
+      var emptyNumberSymbols = new List<string> { "б/н", "бн", "б-н", string.Empty };
+      
+      if (string.IsNullOrWhiteSpace(recognizedNumber.Number) || emptyNumberSymbols.Contains(recognizedNumber.Number.ToLower()))
+        recognizedNumber.Number = "б/н";
+      
+      if (recognizedNumber.Number.Length > document.Info.Properties.RegistrationNumber.Length)
+      {
+        recognizedNumber.Number = recognizedNumber.Number.Substring(0, document.Info.Properties.RegistrationNumber.Length);
+        recognizedNumber.IsTrusted = false;
+      }
+      
+      document.RegistrationDate = recognizedDate.Date;
+      document.RegistrationNumber = recognizedNumber.Number;
+      
+      var props = document.Info.Properties;
+      LinkFactAndProperty(recognitionResult, recognizedDate.Fact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate, recognizedDate.IsTrusted);
+      LinkFactAndProperty(recognitionResult, recognizedNumber.Fact, FieldNames.Document.Number, props.RegistrationNumber.Name,
+                          document.RegistrationNumber, recognizedNumber.IsTrusted);
+    }
+    
+    /// <summary>
     /// Заполнить номер и дату для Mock-документов.
     /// </summary>
     /// <param name="document">Документ.</param>
@@ -2555,6 +2600,11 @@ namespace Sungero.Capture.Server
       var fact = GetOrderedFacts(recognitionResult.Facts, dateFactName, dateFieldName).FirstOrDefault();
       var date = GetFieldDateTimeValue(fact, dateFieldName);
       var isTrusted = date != null && IsTrustedField(fact, dateFieldName);
+      if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
+      {
+        date = Calendar.SqlMinValue;
+        isTrusted = false;
+      }
       
       return Sungero.Capture.Structures.Module.RecognizedDocumentDate.Create(date, isTrusted, fact);
     }
