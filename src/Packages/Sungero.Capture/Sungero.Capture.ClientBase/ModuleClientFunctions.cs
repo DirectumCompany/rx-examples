@@ -769,7 +769,7 @@ namespace Sungero.Capture.Client
         
         // Установить поведение при активации.
         // Рамка.
-        var isBorder = Functions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsBorder");
+        var isBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsBorder");
         var borderColor = GetDocflowParamsColorValue("ActivationHighlight_BorderColor");
         var borderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue("ActivationHighlight_BorderWidth");
         if (isBorder != null)
@@ -778,7 +778,7 @@ namespace Sungero.Capture.Client
           area.ActivationStyle.BorderWidth = borderWidth > 0 ? (int) borderWidth : 10;
         }
         // Заливка цветом.
-        var isFillColor = Functions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsFillColor");
+        var isFillColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsFillColor");
         var fillColor = GetDocflowParamsColorValue("ActivationHighlight_FillColor");
         if (isFillColor != null || isBorder == null)
           area.ActivationStyle.Color = fillColor != Sungero.Core.Colors.Empty ? fillColor : Colors.Common.Blue;
@@ -798,7 +798,7 @@ namespace Sungero.Capture.Client
     {
       var color = Sungero.Core.Colors.Empty;
       
-      var colorCode = Functions.Module.Remote.GetDocflowParamsStringValue(paramName);
+      var colorCode = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(paramName);
       if (!string.IsNullOrWhiteSpace(colorCode))
       {
         try
