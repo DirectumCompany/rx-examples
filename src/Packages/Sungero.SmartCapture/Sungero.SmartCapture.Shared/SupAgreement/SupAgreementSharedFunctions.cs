@@ -24,6 +24,13 @@ namespace Sungero.SmartCapture.Shared
       _obj.State.Properties.LeadingDocument.IsRequired = isVisualMode;
     }
     
+    public override void ChangeDocumentPropertiesAccess(bool isEnabled, bool repeatRegister)
+    {
+      base.ChangeDocumentPropertiesAccess(isEnabled, repeatRegister);
+      
+      Capture.PublicFunctions.Module.EnableRegistrationNumberAndDate(_obj);
+    }
+    
     public override void FillName()
     {
       base.FillName();

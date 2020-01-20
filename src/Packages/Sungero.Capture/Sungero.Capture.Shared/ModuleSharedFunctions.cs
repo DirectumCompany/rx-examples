@@ -54,5 +54,23 @@ namespace Sungero.Capture.Shared
         propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
       return propertyStringValue;
     }
+    
+    /// <summary>
+    /// Сделать доступными рег. номер и рег. дату незарегистрированного договорного документа в процессе верификации.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    [Public]
+    public static void EnableRegistrationNumberAndDate(Docflow.IContractualDocumentBase document)
+    {      
+      if (document.VerificationState == Docflow.OfficialDocument.VerificationState.Completed)
+        return;
+      
+      var properties = document.State.Properties;
+      if (document.RegistrationState != Docflow.OfficialDocument.RegistrationState.Registered)
+      {
+        properties.RegistrationNumber.IsEnabled = true;
+        properties.RegistrationDate.IsEnabled = true;
+      }      
+    }
   }
 }
