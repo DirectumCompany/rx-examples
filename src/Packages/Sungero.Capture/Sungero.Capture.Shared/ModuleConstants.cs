@@ -31,6 +31,25 @@ namespace Sungero.Capture.Constants
     [Sungero.Core.Public]
     public const string IsVisualModeParamName = "IsVisualMode";
     
+    // Параметры фокусировки подсветки в предпросмотре.
+    public static class HighlightActivationStyle
+    {
+      // Признак фокусировки поля с помощью рамки.
+      public const string ShowBorder = "HighlightActivationStyleShowBorder";
+      
+      // Цвет рамки.
+      public const string BorderColor = "HighlightActivationStyleBorderColor";
+      
+      // Толщина рамки.
+      public const string BorderWidth = "HighlightActivationStyleBorderWidth";
+      
+      // Признак фокусировки поля с помощью заливки.
+      public const string ShowFillColor = "HighlightActivationStyleShowFillColor";
+      
+      // Цвет заливки.
+      public const string FillColor = "HighlightActivationStyleFillColor";
+    }
+    
     // Наименования классов из классификатора Ario.
     public static class ArioClassNames
     {

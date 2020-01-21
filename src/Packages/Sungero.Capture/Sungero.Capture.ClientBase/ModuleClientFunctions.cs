@@ -8,6 +8,7 @@ using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
 using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
 using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
+using HighlightActivationStyle = Sungero.Capture.Constants.Module.HighlightActivationStyle;
 using CommonLibrary;
 
 namespace Sungero.Capture.Client
@@ -767,19 +768,19 @@ namespace Sungero.Capture.Client
         // Установить подсветку согласно вероятности.
         area.Style.Color = color;
         
-        // Установить поведение при активации.
+        // Установить поведение при фокусировке.
         // Рамка.
-        var isBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsBorder");
-        var borderColor = GetDocflowParamsColorValue("ActivationHighlight_BorderColor");
-        var borderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue("ActivationHighlight_BorderWidth");
+        var isBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyle.ShowBorder);
+        var borderColor = GetDocflowParamsColorValue(HighlightActivationStyle.BorderColor);
+        var borderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue(HighlightActivationStyle.BorderWidth);
         if (isBorder != null)
         {
           area.ActivationStyle.BorderColor = borderColor != Sungero.Core.Colors.Empty ? borderColor : Colors.Common.Red;
           area.ActivationStyle.BorderWidth = borderWidth > 0 ? (int) borderWidth : 10;
         }
         // Заливка цветом.
-        var isFillColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue("ActivationHighlight_IsFillColor");
-        var fillColor = GetDocflowParamsColorValue("ActivationHighlight_FillColor");
+        var isFillColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyle.ShowFillColor);
+        var fillColor = GetDocflowParamsColorValue(HighlightActivationStyle.FillColor);
         if (isFillColor != null || isBorder == null)
           area.ActivationStyle.Color = fillColor != Sungero.Core.Colors.Empty ? fillColor : Colors.Common.Blue;
         
