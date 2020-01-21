@@ -35,7 +35,7 @@ namespace Sungero.Capture.Constants
     public static class HighlightActivationStyle
     {
       // Признак фокусировки поля с помощью рамки.
-      public const string ShowBorder = "HighlightActivationStyleShowBorder";
+      public const string UseBorder = "HighlightActivationStyleUseBorder";
       
       // Цвет рамки.
       public const string BorderColor = "HighlightActivationStyleBorderColor";
@@ -44,10 +44,10 @@ namespace Sungero.Capture.Constants
       public const string BorderWidth = "HighlightActivationStyleBorderWidth";
       
       // Признак фокусировки поля с помощью заливки.
-      public const string ShowFillColor = "HighlightActivationStyleShowFillColor";
+      public const string UseFilling = "HighlightActivationStyleUseFilling";
       
       // Цвет заливки.
-      public const string FillColor = "HighlightActivationStyleFillColor";
+      public const string FillingColor = "HighlightActivationStyleFillingColor";
     }
     
     // Наименования классов из классификатора Ario.

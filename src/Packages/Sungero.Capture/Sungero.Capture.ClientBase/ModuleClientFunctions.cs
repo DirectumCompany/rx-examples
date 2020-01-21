@@ -770,19 +770,19 @@ namespace Sungero.Capture.Client
         
         // Установить поведение при фокусировке.
         // Рамка.
-        var isBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyle.ShowBorder);
+        var useBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyle.UseBorder);
         var borderColor = GetDocflowParamsColorValue(HighlightActivationStyle.BorderColor);
         var borderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue(HighlightActivationStyle.BorderWidth);
-        if (isBorder != null)
+        if (useBorder != null)
         {
           area.ActivationStyle.BorderColor = borderColor != Sungero.Core.Colors.Empty ? borderColor : Colors.Common.Red;
           area.ActivationStyle.BorderWidth = borderWidth > 0 ? (int) borderWidth : 10;
         }
         // Заливка цветом.
-        var isFillColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyle.ShowFillColor);
-        var fillColor = GetDocflowParamsColorValue(HighlightActivationStyle.FillColor);
-        if (isFillColor != null || isBorder == null)
-          area.ActivationStyle.Color = fillColor != Sungero.Core.Colors.Empty ? fillColor : Colors.Common.Blue;
+        var useFilling = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyle.UseFilling);
+        var fillingColor = GetDocflowParamsColorValue(HighlightActivationStyle.FillingColor);
+        if (useFilling != null || useBorder == null)
+          area.ActivationStyle.Color = fillingColor != Sungero.Core.Colors.Empty ? fillingColor : Colors.Common.Blue;
         
         return area;
       }
