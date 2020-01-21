@@ -590,55 +590,54 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
+    /// Определить приоритеты типов документов для ведущего документа.
+    /// </summary>
+    /// <returns>Словарь с приоритетами типов.</returns>
+    public virtual System.Collections.Generic.IDictionary<System.Type, int> GetLeadingDocumentPriority()
+    {
+      var leadingDocumentPriority = new Dictionary<System.Type, int>();
+      
+      if (Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null)
+      {
+      	leadingDocumentPriority.Add(MockIncomingLetters.Info.GetType().GetFinalType(), 6);
+      	leadingDocumentPriority.Add(MockContracts.Info.GetType().GetFinalType(), 5);
+      	leadingDocumentPriority.Add(MockContractStatements.Info.GetType().GetFinalType(), 4);
+      	leadingDocumentPriority.Add(MockWaybills.Info.GetType().GetFinalType(), 3);
+      	leadingDocumentPriority.Add(MockIncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
+      	leadingDocumentPriority.Add(MockIncomingInvoices.Info.GetType().GetFinalType(), 1);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
+      }
+      else
+      {
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingLetters.Info.GetType().GetFinalType(), 7);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.Contracts.Info.GetType().GetFinalType(), 6);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.SupAgreements.Info.GetType().GetFinalType(), 5);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.ContractStatements.Info.GetType().GetFinalType(), 4);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.Waybills.Info.GetType().GetFinalType(), 3);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingInvoices.Info.GetType().GetFinalType(), 1);
+      	leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
+      }
+      return leadingDocumentPriority;
+    }
+    
+    /// <summary>
     /// Определить ведущий документ распознанного комплекта.
     /// </summary>
     /// <param name="package">Комплект документов.</param>
     /// <returns>Ведущий документ.</returns>
     public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
     {
-      var leadingDocument = package.FirstOrDefault();
-      var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
+    	var packagePriority = new Dictionary<IOfficialDocument, int>();
+    	var LeadingDocumentPriority = GetLeadingDocumentPriority();
+    	int priority;
+    	foreach (var document in package)
+    	{
+    		LeadingDocumentPriority.TryGetValue(document.Info.GetType().GetFinalType(), out priority);
+    		packagePriority.Add(document, priority);
+    	}
       
-      var incLetter = isMockMode
-        ? package.Where(d => MockIncomingLetters.Is(d)).FirstOrDefault()
-        : package.Where(d => IncomingLetters.Is(d)).FirstOrDefault();
-      if (incLetter != null)
-        return incLetter;
-      
-      var contract = isMockMode
-        ? package.Where(d => MockContracts.Is(d)).FirstOrDefault()
-        : package.Where(d => Contracts.Contracts.Is(d)).FirstOrDefault();
-      if (contract != null)
-        return contract;
-
-      var supAgreement = package.Where(d => Contracts.SupAgreements.Is(d)).FirstOrDefault();
-      if (supAgreement != null)
-        return supAgreement;
-      
-      var contractStatement = isMockMode
-        ? package.Where(d => MockContractStatements.Is(d)).FirstOrDefault()
-        : package.Where(d => FinancialArchive.ContractStatements.Is(d)).FirstOrDefault();
-      if (contractStatement != null)
-        return contractStatement;
-      
-      var waybill = isMockMode
-        ? package.Where(d => MockWaybills.Is(d)).FirstOrDefault()
-        : package.Where(d => FinancialArchive.Waybills.Is(d)).FirstOrDefault();
-      if (waybill != null)
-        return waybill;
-      
-      var incTaxInvoice = isMockMode
-        ? package.Where(d => MockIncomingTaxInvoices.Is(d)).FirstOrDefault()
-        : package.Where(d => FinancialArchive.IncomingTaxInvoices.Is(d)).FirstOrDefault();
-      if (incTaxInvoice != null)
-        return incTaxInvoice;
-
-      var incInvoice = isMockMode
-        ? package.Where(d => MockIncomingInvoices.Is(d)).FirstOrDefault()
-        : package.Where(d => Contracts.IncomingInvoices.Is(d)).FirstOrDefault();
-      if (incInvoice != null)
-        return incInvoice;
-      
+    	var leadingDocument = packagePriority.OrderByDescending(p => p.Value).FirstOrDefault().Key;
       return leadingDocument;
     }
     
