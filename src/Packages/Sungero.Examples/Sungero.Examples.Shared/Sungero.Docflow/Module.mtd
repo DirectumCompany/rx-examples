@@ -5,6 +5,14 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "432b9f16-13d3-4eff-8920-301d8412d802",
+      "Name": "AsyncHandler",
+      "DelayPeriod": 15,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": []
+    },
+    {
       "NameGuid": "767ae28b-d043-48b3-9e31-e54c288bde75",
       "Name": "GrantAccessRightsToDocument",
       "DelayPeriod": 15,
