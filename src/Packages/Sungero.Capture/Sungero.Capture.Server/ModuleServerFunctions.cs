@@ -590,10 +590,10 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Определить приоритеты типов документов для ведущего документа.
+    /// Получить приоритеты типов документов для определения ведущего документа в комплекте.
     /// </summary>
     /// <returns>Словарь с приоритетами типов.</returns>
-    public virtual System.Collections.Generic.IDictionary<System.Type, int> GetLeadingDocumentPriority()
+    public virtual System.Collections.Generic.IDictionary<System.Type, int> GetPackageDocumentTypePriorities()
     {
       var leadingDocumentPriority = new Dictionary<System.Type, int>();
       
@@ -629,11 +629,11 @@ namespace Sungero.Capture.Server
     public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
     {
     	var packagePriority = new Dictionary<IOfficialDocument, int>();
-    	var LeadingDocumentPriority = GetLeadingDocumentPriority();
+    	var leadingDocumentPriority = GetPackageDocumentTypePriorities();
     	int priority;
     	foreach (var document in package)
     	{
-    		LeadingDocumentPriority.TryGetValue(document.Info.GetType().GetFinalType(), out priority);
+    		leadingDocumentPriority.TryGetValue(document.Info.GetType().GetFinalType(), out priority);
     		packagePriority.Add(document, priority);
     	}
       
