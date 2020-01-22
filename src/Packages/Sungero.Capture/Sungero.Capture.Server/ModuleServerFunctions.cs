@@ -20,6 +20,7 @@ using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
 using SettingsValidationMessageStructure = Sungero.Capture.Structures.SmartProcessingSetting.SettingsValidationMessage;
+using HighlightActivationStyleParamNames = Sungero.Capture.Constants.Module.HighlightActivationStyleParamNames;
 
 namespace Sungero.Capture.Server
 {
@@ -3549,6 +3550,22 @@ namespace Sungero.Capture.Server
     public static double GetDocflowParamsNumbericValue(string paramName)
     {
       return Docflow.PublicFunctions.Module.Remote.GetDocflowParamsNumbericValue(paramName);
+    }
+    
+    /// <summary>
+    /// Получить параметры отображения фокусировки подсветки.
+    /// </summary>
+    /// <returns>Параметры.</returns>
+    [Remote]
+    public virtual Structures.Module.IHighlightActivationStyle GetHighlightActivationStyle()
+    {
+      var highlightActivationStyle = Structures.Module.HighlightActivationStyle.Create();
+      highlightActivationStyle.UseBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseBorder);
+      highlightActivationStyle.BorderColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.BorderColor);
+      highlightActivationStyle.BorderWidth = GetDocflowParamsNumbericValue(HighlightActivationStyleParamNames.BorderWidth);
+      highlightActivationStyle.UseFilling = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseFilling);
+      highlightActivationStyle.FillingColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.FillingColor);
+      return highlightActivationStyle;
     }
     
     /// <summary>

@@ -343,6 +343,7 @@ namespace Sungero.Capture.Structures.Module
   /// <summary>
   /// Параметры отображения фокусировки подстветки в предпросмотре.
   /// </summary>
+  [Public]
   partial class HighlightActivationStyle
   {
     public string UseBorder { get; set; }

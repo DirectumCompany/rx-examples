@@ -8,7 +8,6 @@ using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
 using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
 using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
-using HighlightActivationStyleParamNames = Sungero.Capture.Constants.Module.HighlightActivationStyleParamNames;
 using CommonLibrary;
 
 namespace Sungero.Capture.Client
@@ -530,7 +529,7 @@ namespace Sungero.Capture.Client
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
       var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
-      var highlightActivationStyle = GetHighlightActivationStyle();
+      var highlightActivationStyle = Functions.Module.Remote.GetHighlightActivationStyle();
       var exactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, true);
       HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Green), highlightActivationStyle);
       
@@ -587,21 +586,6 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Получить параметры отображения фокусировки подсветки.
-    /// </summary>
-    /// <returns>Параметры.</returns>
-    public virtual Structures.Module.HighlightActivationStyle GetHighlightActivationStyle()
-    {
-      var highlightActivationStyle = Structures.Module.HighlightActivationStyle.Create();
-      highlightActivationStyle.UseBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseBorder);
-      highlightActivationStyle.BorderColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.BorderColor);
-      highlightActivationStyle.BorderWidth = Functions.Module.Remote.GetDocflowParamsNumbericValue(HighlightActivationStyleParamNames.BorderWidth);
-      highlightActivationStyle.UseFilling = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseFilling);
-      highlightActivationStyle.FillingColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.FillingColor);
-      return highlightActivationStyle;
-    }
-    
-    /// <summary>
     /// Подсветить указанные свойства в карточке документа и факты в теле.
     /// </summary>
     /// <param name="document">Документ.</param>
@@ -609,7 +593,7 @@ namespace Sungero.Capture.Client
     /// <param name="color">Цвет.</param>
     /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
     public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color,
-                                                    Sungero.Capture.Structures.Module.HighlightActivationStyle highlightActivationStyle)
+                                                    Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
       var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Yellow)
         ? Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Yellow)
@@ -646,7 +630,7 @@ namespace Sungero.Capture.Client
     /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
     public virtual void HighlightGoodsInMockMode(Sungero.Docflow.IOfficialDocument document,
                                                  IDocumentRecognitionInfo documentRecognitionInfo,
-                                                 Sungero.Capture.Structures.Module.HighlightActivationStyle highlightActivationStyle)
+                                                 Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
       if (MockIncomingTaxInvoices.Is(document))
       {
@@ -678,7 +662,7 @@ namespace Sungero.Capture.Client
     public virtual void HighlightCollection(IDocumentRecognitionInfo documentRecognitionInfo,
                                             Sungero.Domain.Shared.IChildEntityCollection<Sungero.Domain.Shared.IChildEntity> collection,
                                             Sungero.Domain.Shared.IPreviewControlState previewControl,
-                                            Sungero.Capture.Structures.Module.HighlightActivationStyle highlightActivationStyle)
+                                            Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
       var recognizedFacts = documentRecognitionInfo.Facts;
       foreach (var record in collection)
@@ -745,7 +729,7 @@ namespace Sungero.Capture.Client
     /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
                                                string position, Sungero.Core.Color color, Sungero.Domain.Shared.IPropertyInfo propertyInfo,
-                                               Sungero.Capture.Structures.Module.HighlightActivationStyle highlightActivationStyle)
+                                               Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
 
       var area = AddHighlightArea(previewControl, position, color, highlightActivationStyle);
@@ -767,7 +751,7 @@ namespace Sungero.Capture.Client
     public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
                                                string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity,
                                                Sungero.Domain.Shared.IPropertyInfo childpropertyInfo,
-                                               Sungero.Capture.Structures.Module.HighlightActivationStyle highlightActivationStyle)
+                                               Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
       var area = AddHighlightArea(previewControl, position, color, highlightActivationStyle);
       if (area == null)
@@ -786,7 +770,7 @@ namespace Sungero.Capture.Client
     /// <returns>Область выделения в предпросмотре.</returns>
     public virtual Sungero.Domain.Shared.IPreviewHighlight AddHighlightArea(Sungero.Domain.Shared.IPreviewControlState previewControl,
                                                                             string position, Sungero.Core.Color color,
-                                                                            Sungero.Capture.Structures.Module.HighlightActivationStyle highlightActivationStyle)
+                                                                            Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
       var positions = position.Split(Constants.Module.PositionElementDelimiter);
       if (positions.Count() >= 7)
