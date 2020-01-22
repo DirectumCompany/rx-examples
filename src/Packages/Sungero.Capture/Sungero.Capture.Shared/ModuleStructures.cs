@@ -339,4 +339,20 @@ namespace Sungero.Capture.Structures.Module
     
     public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
   }
+  
+  /// <summary>
+  /// Параметры отображения фокусировки подстветки в предпросмотре.
+  /// </summary>
+  partial class HighlightActivationStyle
+  {
+    public string UseBorder { get; set; }
+    
+    public string BorderColor { get; set; }
+    
+    public double BorderWidth { get; set; }
+    
+    public string UseFilling { get; set; }
+    
+    public string FillingColor { get; set; }
+  }
 }
