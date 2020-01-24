@@ -433,6 +433,30 @@
   "OperationsClass": "",
   "Properties": [
     {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",
+      "Name": "RegistrationNumber",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "3e55f091-41a4-4e58-a9c5-dbe90782ccec",
+      "Name": "RegistrationDate",
+      "HandledEvents": [
+        "ValueInputClient"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "ca562f2d-d3c7-448f-a648-b858e8d2fb2a",
       "Name": "Currency",
