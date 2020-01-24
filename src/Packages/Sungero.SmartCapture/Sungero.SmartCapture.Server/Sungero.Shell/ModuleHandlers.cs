@@ -35,6 +35,21 @@ namespace Sungero.SmartCapture.Module.Shell.Server
       var showProcessPackage = !typeFilterEnabled || _filter.ProcessPackage;
       var showOther = !typeFilterEnabled || _filter.Other;
       
+      var checkPackageSubjectRu = string.Empty;
+      var checkDocumentSubjectRu = string.Empty;
+      var checkPackageSubjectEn = string.Empty;
+      var checkDocumentSubjectEn = string.Empty;
+      using (Sungero.Core.CultureInfoExtensions.SwitchTo(System.Globalization.CultureInfo.GetCultureInfo("ru-RU")))
+      {
+        checkPackageSubjectRu = Sungero.Capture.Resources.CheckPackage;
+        checkDocumentSubjectRu = Sungero.Capture.Resources.CheckDocument;
+      }
+      using (Sungero.Core.CultureInfoExtensions.SwitchTo(System.Globalization.CultureInfo.GetCultureInfo("en-US")))
+      {
+        checkPackageSubjectEn = Sungero.Capture.Resources.CheckPackage;
+        checkDocumentSubjectEn = Sungero.Capture.Resources.CheckDocument;
+      }
+      
       var result = query.Where(q =>
                                // Рассмотрение.
                                Sungero.Docflow.ApprovalReviewAssignments.Is(q) && Sungero.Docflow.ApprovalReviewAssignments.As(q).CollapsedStagesTypesRe.Any(s => stageTypes.Contains(s.StageType.Value)) ||
@@ -44,7 +59,7 @@ namespace Sungero.SmartCapture.Module.Shell.Server
                                (Sungero.Docflow.ApprovalExecutionAssignments.Is(q) && Sungero.Docflow.ApprovalExecutionAssignments.As(q).CollapsedStagesTypesExe.Any(s => stageTypes.Contains(s.StageType.Value)) ||
                                 showExecution && Sungero.RecordManagement.ReviewResolutionAssignments.Is(q)) ||
                                // Подготовка проекта резолюции
-                               Sungero.RecordManagement.PreparingDraftResolutionAssignments.Is(q) ||
+                               showExecution && Sungero.RecordManagement.PreparingDraftResolutionAssignments.Is(q) ||
                                // Регистрация.
                                Sungero.Docflow.ApprovalRegistrationAssignments.Is(q) && Sungero.Docflow.ApprovalRegistrationAssignments.As(q).CollapsedStagesTypesReg.Any(s => stageTypes.Contains(s.StageType.Value)) ||
                                // Печать.
@@ -54,8 +69,10 @@ namespace Sungero.SmartCapture.Module.Shell.Server
                                // Контроль возврата.
                                showCheckReturn && Sungero.Docflow.ApprovalCheckReturnAssignments.Is(q) ||
                                // Проверка комплектов документов.
-                               showProcessPackage && (q.Subject.Contains(Sungero.Capture.Resources.CheckPackage) || 
-                                                      q.Subject.Contains(Sungero.Capture.Resources.CheckDocument)) ||
+                               showProcessPackage && (q.Subject.Contains(checkPackageSubjectRu) ||
+                                                      q.Subject.Contains(checkDocumentSubjectRu) ||
+                                                      q.Subject.Contains(checkPackageSubjectEn) ||
+                                                      q.Subject.Contains(checkDocumentSubjectEn)) ||
                                // Прочие задания.
                                showOther && (Sungero.Docflow.ApprovalSimpleAssignments.Is(q) || Sungero.Docflow.ApprovalCheckingAssignments.Is(q)));
       

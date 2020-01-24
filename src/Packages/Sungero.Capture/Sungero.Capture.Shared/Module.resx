@@ -130,13 +130,13 @@
     <value>TODO</value>
   </data>
   <data name="CheckPackageTaskName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Check document package: {0}</value>
   </data>
   <data name="DocumentNotFound" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="CheckPackage" xml:space="preserve">
-    <value>TODO</value>
+    <value>Check document package:</value>
   </data>
   <data name="AttachmentName" xml:space="preserve">
     <value>TODO</value>
@@ -163,13 +163,13 @@
     <value>TODO</value>
   </data>
   <data name="CheckDocumentTaskName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Check document: {0}</value>
   </data>
   <data name="FailedClassifyDocumentsTaskText" xml:space="preserve">
     <value>TODO</value>
   </data>
   <data name="CheckDocument" xml:space="preserve">
-    <value>TODO</value>
+    <value>Check document:</value>
   </data>
   <data name="NeedToNumberDocument" xml:space="preserve">
     <value>TODO</value>

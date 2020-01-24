@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="FilterPanel_ProcessPackage_ff3e734412f64ff0bf8f5e962bc46d6a" xml:space="preserve">
-    <value>TODO</value>
+    <value>Check Package</value>
   </data>
 </root>
