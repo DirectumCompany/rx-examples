@@ -66,7 +66,7 @@ namespace Sungero.Capture.Shared
         return;
       
       var properties = document.State.Properties;
-      if (document.RegistrationState != Docflow.OfficialDocument.RegistrationState.Registered)
+      if (document.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered)
       {
         properties.RegistrationNumber.IsEnabled = true;
         properties.RegistrationDate.IsEnabled = true;
