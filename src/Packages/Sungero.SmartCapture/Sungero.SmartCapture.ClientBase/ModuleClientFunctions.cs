@@ -8,6 +8,13 @@ namespace Sungero.SmartCapture.Client
 {
   public class ModuleFunctions
   {
+    /* Dmitriev_IA:
+     * RemoveNeedValidateRegisterFormatParameter() расположена на уровне решения для использования в перекрытых типах.
+     * При размещении RemoveNeedValidateRegisterFormatParameter() в модуле Capture необходимо будет указывать атрибут [Public]
+     * для использования в перекрытых типах.
+     * Namespace Sungero.Domain.Client недоступен в g.cs при указании атрибута [Public]. Использование using не спасает.
+     */
+    
     /// <summary>
     /// Удалить параметр NeedValidateRegisterFormat.
     /// </summary>
