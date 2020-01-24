@@ -3,6 +3,26 @@
   "NameGuid": "ac821862-ecec-4df6-81a9-1ab3a9a42245",
   "Name": "Contract",
   "AccessRightsMode": "Both",
+  "Actions": [
+    {
+      "NameGuid": "14ecec8f-f34b-46af-b0b1-bc9ded6086f0",
+      "Name": "Register",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    },
+    {
+      "NameGuid": "2c489394-bdf9-4ff2-b85e-f16b836e9cc9",
+      "Name": "AssignNumber",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    }
+  ],
   "BaseGuid": "f37c7e63-b134-4446-9b5b-f8811f6c9666",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {
