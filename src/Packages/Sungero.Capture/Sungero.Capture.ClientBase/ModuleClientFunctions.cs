@@ -856,11 +856,8 @@ namespace Sungero.Capture.Client
         properties.Assignee.IsEnabled = true;
         
         properties.DeliveryMethod.IsEnabled = true;
-        properties.DocumentRegister.IsEnabled = true;
         properties.CaseFile.IsEnabled = true;
         properties.PlacedToCaseFileDate.IsEnabled = true;
-        properties.RegistrationNumber.IsEnabled = true;
-        properties.RegistrationDate.IsEnabled = true;
       }
     }
     

@@ -1260,19 +1260,6 @@
       "ReturnTypeFullName": "Sungero.Docflow.ISimpleDocument, Sungero.Domain.Interfaces"
     },
     {
-      "Name": "EnableRegistrationNumberAndDate",
-      "Parameters": [
-        {
-          "Name": "document",
-          "ParameterType": "global::Sungero.Docflow.IContractualDocumentBase",
-          "ParameterTypeFullName": "Sungero.Docflow.IContractualDocumentBase, Sungero.Domain.Interfaces"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    },
-    {
       "Name": "EnableRequisitesForVerification",
       "Parameters": [
         {

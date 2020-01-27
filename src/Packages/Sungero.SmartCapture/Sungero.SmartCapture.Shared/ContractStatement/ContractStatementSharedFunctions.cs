@@ -52,6 +52,8 @@ namespace Sungero.SmartCapture.Shared
         Sungero.Capture.PublicFunctions.Module.EnableRequisitesForVerification(_obj);
       else
         base.ChangeDocumentPropertiesAccess(isEnabled, repeatRegister);
+      
+      Sungero.SmartCapture.Functions.Module.EnableRegistrationNumberAndDate(_obj);
     }
     
   }
