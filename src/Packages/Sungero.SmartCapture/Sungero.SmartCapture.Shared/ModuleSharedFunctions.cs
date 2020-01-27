@@ -16,7 +16,7 @@ namespace Sungero.SmartCapture.Shared
     /// <param name="document">Документ.</param>
     public static void EnableRegistrationNumberAndDate(Docflow.IOfficialDocument document)
     {
-      if (document.DocumentKind.NumberingType != Sungero.Docflow.DocumentKind.NumberingType.Registrable)
+      if (document.DocumentKind == null || document.DocumentKind.NumberingType != Sungero.Docflow.DocumentKind.NumberingType.Registrable)
         return;
       
       var verificationInProcess = document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess;
