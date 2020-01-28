@@ -21,14 +21,16 @@ namespace Sungero.SmartCapture.Shared
       
       var isRegistrable = document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Registrable;
       var isNumerable = document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable;
-      var verificationInProcess = document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess;
+      var verificationCompleted = document.VerificationState == Docflow.OfficialDocument.VerificationState.Completed;
+      if (verificationCompleted)
+        return;
       
       var properties = document.State.Properties;
       if (isNumerable ||
           isRegistrable && document.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered)
       {
-        properties.RegistrationNumber.IsEnabled = isNumerable || verificationInProcess;
-        properties.RegistrationDate.IsEnabled = isNumerable || verificationInProcess;
+        properties.RegistrationNumber.IsEnabled = true;
+        properties.RegistrationDate.IsEnabled = true;
       }
     }
   }
