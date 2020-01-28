@@ -21,8 +21,8 @@ namespace Sungero.SmartCapture.Shared
       
       var isRegistrable = document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Registrable;
       var isNumerable = document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable;
-      var verificationCompleted = document.VerificationState == Docflow.OfficialDocument.VerificationState.Completed;
-      if (verificationCompleted)
+      var verificationInProcess = document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess;
+      if (!verificationInProcess)
         return;
       
       var properties = document.State.Properties;
