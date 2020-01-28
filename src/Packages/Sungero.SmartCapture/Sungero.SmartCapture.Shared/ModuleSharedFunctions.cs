@@ -27,8 +27,8 @@ namespace Sungero.SmartCapture.Shared
       if (isNumerable ||
           isRegistrable && document.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered)
       {
-        properties.RegistrationNumber.IsEnabled = verificationInProcess;
-        properties.RegistrationDate.IsEnabled = verificationInProcess;
+        properties.RegistrationNumber.IsEnabled = isNumerable || verificationInProcess;
+        properties.RegistrationDate.IsEnabled = isNumerable || verificationInProcess;
       }
     }
   }
