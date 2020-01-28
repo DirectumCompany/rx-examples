@@ -567,7 +567,7 @@ namespace Sungero.Capture.Server
       }
       
       // Доп.соглашение.
-      else if (predictedClass == ArioClassNames.SupAgreement)
+      else if (predictedClass == ArioClassNames.SupAgreement && !isMockMode)
       {
         document = CreateSupAgreement(recognitionResult, responsible);
       }
