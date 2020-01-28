@@ -133,40 +133,40 @@
     <value>No.</value>
   </data>
   <data name="Property_InResponseTo" xml:space="preserve">
-    <value>TODO</value>
+    <value>In response to</value>
   </data>
   <data name="Property_Correspondent" xml:space="preserve">
-    <value>TODO</value>
+    <value>Correspondent</value>
   </data>
   <data name="Property_Addressees" xml:space="preserve">
-    <value>TODO</value>
+    <value>Addressees</value>
   </data>
   <data name="Property_Signatory" xml:space="preserve">
-    <value>TODO</value>
+    <value>Signed by</value>
   </data>
   <data name="Property_Contact" xml:space="preserve">
-    <value>TODO</value>
+    <value>Contact</value>
   </data>
   <data name="Property_CorrespondentTin" xml:space="preserve">
-    <value>TODO</value>
+    <value>TIN</value>
   </data>
   <data name="Property_CorrespondentTrrc" xml:space="preserve">
-    <value>TODO</value>
+    <value>TRRC</value>
   </data>
   <data name="Property_RecipientTin" xml:space="preserve">
-    <value>TODO</value>
+    <value>TIN</value>
   </data>
   <data name="Property_RecipientTrrc" xml:space="preserve">
-    <value>TODO</value>
+    <value>TRRC</value>
   </data>
   <data name="Property_Recipient" xml:space="preserve">
-    <value>TODO</value>
+    <value>Recipient</value>
   </data>
   <data name="ControlGroup_2d2669c27abe4373a0c238ddec79a85d" xml:space="preserve">
     <value>To</value>
   </data>
   <data name="ControlGroup_c031df17352d4cca8d7dfb63a5739f43" xml:space="preserve">
-    <value>TODO</value>
+    <value>From</value>
   </data>
   <data name="Control_a915c070568d4f08a7365fbdabe9e559_EmptyText" xml:space="preserve">
     <value />
@@ -232,10 +232,10 @@
     <value />
   </data>
   <data name="ControlGroup_f8703a39a2f048718e38bb4fc123a0fb" xml:space="preserve">
-    <value>TODO</value>
+    <value>From</value>
   </data>
   <data name="ControlGroup_2d1845ca5c9a476bb777e212c7e58e1e" xml:space="preserve">
-    <value>TODO</value>
+    <value>To</value>
   </data>
   <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
     <value>Preview</value>

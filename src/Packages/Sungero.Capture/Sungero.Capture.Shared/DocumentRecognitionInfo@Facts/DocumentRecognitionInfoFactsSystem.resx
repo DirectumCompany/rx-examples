@@ -145,7 +145,7 @@
     <value>Position</value>
   </data>
   <data name="Property_IsTrusted" xml:space="preserve">
-    <value>TODO</value>
+    <value>Is Trusted</value>
   </data>
   <data name="Property_VerifiedValue" xml:space="preserve">
     <value>Verified Value</value>
@@ -154,6 +154,6 @@
     <value>Fact Label</value>
   </data>
   <data name="Property_CollectionRecordId" xml:space="preserve">
-    <value>TODO</value>
+    <value>Collection Record ID</value>
   </data>
 </root>

@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Smart Document Processing</value>
   </data>
   <data name="CoverTitle" xml:space="preserve">
     <value>Capture</value>
   </data>
   <data name="JobDisplayName_161f7d1d35924b71a998955b08437924" xml:space="preserve">
-    <value>TODO</value>
+    <value>Docflow. Finishing verification process</value>
   </data>
   <data name="JobDescription_161f7d1d35924b71a998955b08437924" xml:space="preserve">
-    <value>TODO</value>
+    <value>Changing verification status to “Completed” for documents whose verification tasks have been completed</value>
   </data>
 </root>

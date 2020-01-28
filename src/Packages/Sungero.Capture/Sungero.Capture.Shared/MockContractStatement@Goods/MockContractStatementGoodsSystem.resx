@@ -121,21 +121,21 @@
     <value>Name</value>
   </data>
   <data name="Property_UnitName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Unit name</value>
   </data>
   <data name="Property_Count" xml:space="preserve">
-    <value>TODO</value>
+    <value>Count</value>
   </data>
   <data name="Property_Price" xml:space="preserve">
-    <value>TODO</value>
+    <value>Price</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>VAT</value>
   </data>
   <data name="Property_TotalAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>Total amount, incl. VAT</value>
   </data>
   <data name="Property_Number" xml:space="preserve">
-    <value>TODO</value>
+    <value>Number</value>
   </data>
 </root>

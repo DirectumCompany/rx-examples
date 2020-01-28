@@ -142,7 +142,7 @@
     <value>Confidence interval for extracted facts</value>
   </data>
   <data name="Property_LimitsDescription" xml:space="preserve">
-    <value>TODO</value>
+    <value>Description/Hint</value>
   </data>
   <data name="Property_PercentLabel" xml:space="preserve">
     <value>%</value>
@@ -166,31 +166,31 @@
     <value>Ario Service</value>
   </data>
   <data name="ControlGroup_1065954c74624c9583bfd3edbff942f3" xml:space="preserve">
-    <value>TODO</value>
+    <value>Classifiers</value>
   </data>
   <data name="Property_TypeClassifierName" xml:space="preserve">
-    <value>TODO</value>
+    <value>By document types</value>
   </data>
   <data name="Property_TypeClassifierId" xml:space="preserve">
-    <value>TODO</value>
+    <value>Type classifier ID</value>
   </data>
   <data name="Property_FirstPageClassifierName" xml:space="preserve">
-    <value>TODO</value>
+    <value>First page</value>
   </data>
   <data name="Property_Id" xml:space="preserve">
     <value>ID</value>
   </data>
   <data name="Property_FirstPageClassifierId" xml:space="preserve">
-    <value>TODO</value>
+    <value>First page classifier ID</value>
   </data>
   <data name="Control_31a2b47397434c10878a2d920dc69169_DisplayValue" xml:space="preserve">
-    <value>TODO</value>
+    <value>Select</value>
   </data>
   <data name="Control_1c24ff9555f54df9a3d56cd15f081e65_DisplayValue" xml:space="preserve">
-    <value>TODO</value>
+    <value>Select</value>
   </data>
   <data name="Action_ForceSave" xml:space="preserve">
-    <value>TODO</value>
+    <value>Save settings</value>
   </data>
   <data name="Action_ForceSaveDescription" xml:space="preserve">
     <value>TODO</value>
@@ -205,9 +205,9 @@
     <value />
   </data>
   <data name="Property_CaptureSources" xml:space="preserve">
-    <value>TODO</value>
+    <value>Document capture sources</value>
   </data>
   <data name="ControlGroup_72ca00b847c14768aee1ec9c964d84f6" xml:space="preserve">
-    <value>TODO</value>
+    <value>Document capture sources</value>
   </data>
 </root>

@@ -127,7 +127,7 @@
     <value>Contract Statements</value>
   </data>
   <data name="Property_LeadDoc" xml:space="preserve">
-    <value>TODO</value>
+    <value>Contract</value>
   </data>
   <data name="Resource_a915c070568d4f08a7365fbdabe9e559" xml:space="preserve">
     <value />
@@ -178,7 +178,7 @@
     <value>TIN</value>
   </data>
   <data name="Property_CounterpartyTrrc" xml:space="preserve">
-    <value>TODO</value>
+    <value>TRRC</value>
   </data>
   <data name="ControlGroup_01dd99f5db49480eb69928488f2653fb" xml:space="preserve">
     <value />
@@ -277,16 +277,16 @@
     <value>Document number</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>incl. VAT</value>
   </data>
   <data name="Property_Goods" xml:space="preserve">
-    <value>TODO</value>
+    <value>Goods</value>
   </data>
   <data name="Form_7ef3674b48d045a88f006f1d5b27d560" xml:space="preserve">
     <value>Goods</value>
   </data>
   <data name="ControlGroup_e83f2a4fd95846a8accc58562b8d1172" xml:space="preserve">
-    <value>TODO</value>
+    <value>Items</value>
   </data>
   <data name="ControlGroup_9c0e981c710f4665bcbc2d8f5d8084d3" xml:space="preserve">
     <value />
@@ -310,6 +310,6 @@
     <value>Customer</value>
   </data>
   <data name="ControlGroup_6e4783341cb04325af6675c725f3bb23" xml:space="preserve">
-    <value>Предпросмотр</value>
+    <value>Preview</value>
   </data>
 </root>

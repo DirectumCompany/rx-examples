@@ -135,39 +135,39 @@ The blank field means that the fact reliability is below the lower confidence in
     <value>Classifier</value>
   </data>
   <data name="ClassifierSelectionError" xml:space="preserve">
-    <value>TODO</value>
+    <value>Failed to load the classifier list.</value>
   </data>
   <data name="SelectTypeClassifierDialogTitle" xml:space="preserve">
-    <value>TODO</value>
+    <value>Select document type classifier</value>
   </data>
   <data name="SelectFirstPageClassifierDialogTitle" xml:space="preserve">
-    <value>TODO</value>
+    <value>Select first page classifier</value>
   </data>
   <data name="SelectedSameClassifierWarning" xml:space="preserve">
-    <value>TODO</value>
+    <value>The classifier is already in use.</value>
   </data>
   <data name="ClassifierDisplayNameTemplate" xml:space="preserve">
     <value>{0} (ID {1})</value>
   </data>
   <data name="ClassifiersSelectionNotAvailable" xml:space="preserve">
-    <value>TODO</value>
+    <value>It is only available to the administrator to select classifiers.</value>
   </data>
   <data name="InvalidArioUrl" xml:space="preserve">
-    <value>TODO</value>
+    <value>Ario service address must be in URL format.</value>
   </data>
   <data name="SmartProcessingSettings" xml:space="preserve">
     <value>Smart Processing Settings</value>
   </data>
   <data name="SetCorrectConfidenceLimits" xml:space="preserve">
-    <value>TODO</value>
+    <value>Set up valid confidence limits.</value>
   </data>
   <data name="SetCorrectClassifiers" xml:space="preserve">
-    <value>TODO</value>
+    <value>Set up valid classifiers.</value>
   </data>
   <data name="InvalidSenderLineName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Line name must contain Latin letters and/or numbers only. No spaces are allowed.</value>
   </data>
   <data name="NotUniqueSenderLineNames" xml:space="preserve">
-    <value>TODO</value>
+    <value>Line names must be unique.</value>
   </data>
 </root>

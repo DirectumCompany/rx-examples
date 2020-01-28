@@ -118,13 +118,13 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="DisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Contract</value>
   </data>
   <data name="AccusativeDisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Contract</value>
   </data>
   <data name="CollectionDisplayName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Contracts</value>
   </data>
   <data name="Resource_fc50c88831554ff196e8ff7064894ead" xml:space="preserve">
     <value />
@@ -244,52 +244,52 @@
     <value />
   </data>
   <data name="Property_DocumentGroup" xml:space="preserve">
-    <value>TODO</value>
+    <value>Category</value>
   </data>
   <data name="Property_IsStandard" xml:space="preserve">
-    <value>TODO</value>
+    <value>Is Standard</value>
   </data>
   <data name="ControlGroup_17f79878c1124d278dff93306ebfd9df" xml:space="preserve">
-    <value>TODO</value>
+    <value>1st Party</value>
   </data>
   <data name="Property_FirstPartyName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Name</value>
   </data>
   <data name="Property_FirstPartyTin" xml:space="preserve">
-    <value>TODO</value>
+    <value>TIN</value>
   </data>
   <data name="Property_FirstPartyTrrc" xml:space="preserve">
-    <value>TODO</value>
+    <value>TRRC</value>
   </data>
   <data name="Property_FirstPartySignatory" xml:space="preserve">
-    <value>TODO</value>
+    <value>Signed by</value>
   </data>
   <data name="Property_SecondPartyName" xml:space="preserve">
-    <value>TODO</value>
+    <value>Name</value>
   </data>
   <data name="Property_SecondPartyTin" xml:space="preserve">
-    <value>TODO</value>
+    <value>TIN</value>
   </data>
   <data name="Property_SecondPartyTrrc" xml:space="preserve">
-    <value>TODO</value>
+    <value>TRRC</value>
   </data>
   <data name="Property_SecondPartySignatory" xml:space="preserve">
-    <value>TODO</value>
+    <value>Signed by</value>
   </data>
   <data name="ControlGroup_51cbc8866722491fb88ef84156cea259" xml:space="preserve">
-    <value>TODO</value>
+    <value>2nd Party</value>
   </data>
   <data name="ControlGroup_24ff8d3d22f747b78e92d4124cd92a04" xml:space="preserve">
-    <value>TODO</value>
+    <value>Terms</value>
   </data>
   <data name="Property_TotalAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>Total amount</value>
   </data>
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>incl. VAT</value>
   </data>
   <data name="ControlGroup_9c0e981c710f4665bcbc2d8f5d8084d3" xml:space="preserve">
     <value />
@@ -352,12 +352,12 @@
     <value />
   </data>
   <data name="ControlGroup_7317ade3210047ae9c890ff69313dbba" xml:space="preserve">
-    <value>TODO</value>
+    <value>1st Party</value>
   </data>
   <data name="ControlGroup_a799fd244fa84e3991cb7b6d17ad296d" xml:space="preserve">
-    <value>TODO</value>
+    <value>2nd Party</value>
   </data>
   <data name="ControlGroup_ebd6cef9f78b44c4aa4c1af7c1ecc72d" xml:space="preserve">
-    <value>Note</value>
+    <value>Terms</value>
   </data>
 </root>

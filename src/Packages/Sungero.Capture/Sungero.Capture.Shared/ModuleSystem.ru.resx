@@ -117,13 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="DisplayName" xml:space="preserve">
+    <value>Интеллектуальная обработка документов</value>
+  </data>
+  <data name="CoverTitle" xml:space="preserve">
+    <value>Захват</value>
+  </data>
   <data name="JobDisplayName_161f7d1d35924b71a998955b08437924" xml:space="preserve">
     <value>Документооборот. Завершение процесса верификации</value>
   </data>
   <data name="JobDescription_161f7d1d35924b71a998955b08437924" xml:space="preserve">
     <value>Изменение статуса верификации на "Завершена" у документов, задачи на проверку которых выполнены</value>
-  </data>
-  <data name="DisplayName" xml:space="preserve">
-    <value>Интеллектуальная обработка документов</value>
   </data>
 </root>

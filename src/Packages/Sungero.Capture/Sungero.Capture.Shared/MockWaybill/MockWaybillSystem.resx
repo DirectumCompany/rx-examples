@@ -190,7 +190,7 @@
     <value>TRRC</value>
   </data>
   <data name="Property_TotalAmount" xml:space="preserve">
-    <value>Amount</value>
+    <value>Total amount</value>
   </data>
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
@@ -199,22 +199,22 @@
     <value>Terms</value>
   </data>
   <data name="ControlGroup_653db9199b3c44b8ab8433124a31aa14" xml:space="preserve">
-    <value>Counterparty</value>
+    <value>Counterparties</value>
   </data>
   <data name="Property_RegistrationNumber" xml:space="preserve">
     <value>Document number</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>TODO</value>
+    <value>Incl. VAT</value>
   </data>
   <data name="Property_Goods" xml:space="preserve">
-    <value>TODO</value>
+    <value>Goods</value>
   </data>
   <data name="Form_2ab2b7e272aa417bb57f9e18ae7a3c26" xml:space="preserve">
     <value>Goods</value>
   </data>
   <data name="ControlGroup_efe68dd5b83a4ff3ad3c143b096f3397" xml:space="preserve">
-    <value>TODO</value>
+    <value>Items</value>
   </data>
   <data name="ControlGroup_fd86ec670272447fbe4580324ca8a699" xml:space="preserve">
     <value>Preview</value>
@@ -280,6 +280,6 @@
     <value>Terms</value>
   </data>
   <data name="ControlGroup_c2d6f302508e46a9a27161c234150ae4" xml:space="preserve">
-    <value>Предпросмотр</value>
+    <value>Preview</value>
   </data>
 </root>
