@@ -1894,7 +1894,8 @@
     "DocumentWasLockedTaskText",
     "SmartProcessingSettingsNotFound",
     "InvalidSenderLineName",
-    "ToLeadingContract"
+    "ToLeadingContract",
+	"DocumentWithoutNumber"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",

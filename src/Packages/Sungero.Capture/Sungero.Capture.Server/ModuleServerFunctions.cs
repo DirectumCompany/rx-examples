@@ -2121,7 +2121,10 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Дата и номер.
-      FillNumberAndDate(document, recognitionResult, FactNames.Document);
+      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable)
+        this.NumberDocument(document, recognitionResult, FactNames.Document, Resources.DocumentWithoutNumber);
+      else
+        this.FillNumberAndDate(document, recognitionResult, FactNames.Document);
       
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
@@ -2153,7 +2156,10 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Дата и номер.
-      FillNumberAndDate(document, recognitionResult, FactNames.SupAgreement);
+      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable)
+        this.NumberDocument(document, recognitionResult, FactNames.SupAgreement, Resources.DocumentWithoutNumber);
+      else
+        this.FillNumberAndDate(document, recognitionResult, FactNames.SupAgreement);
 
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
@@ -2309,9 +2315,11 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
-    public virtual void NumberDocument(IAccountingDocumentBase document,
+    /// <param name="unknownNumber">Номер, который будет присвоен документу, если он не был распознан. (необ.)</param>
+    public virtual void NumberDocument(IOfficialDocument document,
                                        Structures.Module.IRecognitionResult recognitionResult,
-                                       string factName)
+                                       string factName,
+                                       string unknownNumber = null)
     {
       // Проверить конфигурацию DirectumRX на возможность нумерации документа.
       // Можем нумеровать только тогда, когда однозначно подобран журнал.
@@ -2345,7 +2353,7 @@ namespace Sungero.Capture.Server
       Nullable<bool> isTrustedNumber = null;
       if (string.IsNullOrWhiteSpace(regNumber))
       {
-        regNumber = Resources.UnknownNumber;
+        regNumber = string.IsNullOrEmpty(unknownNumber) ? Resources.UnknownNumber : unknownNumber;
         isTrustedNumber = false;
       }
       else if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
@@ -2385,7 +2393,7 @@ namespace Sungero.Capture.Server
       var emptyNumberSymbols = new List<string> { "б/н", "бн", "б-н", string.Empty };
       
       if (string.IsNullOrWhiteSpace(recognizedNumber.Number) || emptyNumberSymbols.Contains(recognizedNumber.Number.ToLower()))
-        recognizedNumber.Number = "б/н";
+        recognizedNumber.Number = Sungero.Capture.Resources.DocumentWithoutNumber;
       
       if (recognizedNumber.Number.Length > document.Info.Properties.RegistrationNumber.Length)
       {

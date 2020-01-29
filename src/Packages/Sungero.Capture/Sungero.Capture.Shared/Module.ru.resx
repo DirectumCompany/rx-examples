@@ -215,4 +215,7 @@
   <data name="ToLeadingContract" xml:space="preserve">
     <value>к договору</value>
   </data>
+  <data name="DocumentWithoutNumber" xml:space="preserve">
+    <value>б/н</value>
+  </data>
 </root>

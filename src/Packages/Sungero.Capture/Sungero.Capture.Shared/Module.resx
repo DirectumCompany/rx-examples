@@ -215,4 +215,7 @@ If any document was captured by mistake, remove it.</value>
   <data name="ToLeadingContract" xml:space="preserve">
     <value>to leading contract</value>
   </data>
+  <data name="DocumentWithoutNumber" xml:space="preserve">
+    <value>w/n</value>
+  </data>
 </root>
