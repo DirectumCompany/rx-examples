@@ -1273,6 +1273,19 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
+      "Name": "EnableRequisitesForVerification",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IContractualDocumentBase",
+          "ParameterTypeFullName": "Sungero.Docflow.IContractualDocumentBase, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Client",
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    },
+    {
       "Name": "FillNameFromKindIfEmpty",
       "Parameters": [
         {

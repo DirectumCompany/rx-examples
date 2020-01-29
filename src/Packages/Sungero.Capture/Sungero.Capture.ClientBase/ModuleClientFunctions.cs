@@ -862,6 +862,40 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
+    /// Разблокировать реквизиты для верификации после нумерации.
+    /// </summary>
+    /// <param name="document">Документ для верификации.</param>
+    [Public]
+    public virtual void EnableRequisitesForVerification(Sungero.Docflow.IContractualDocumentBase document)
+    {
+      var smartCaptureNumerationSucceed = document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
+        document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+        (document.DocumentKind == null || document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
+        document.DocumentRegister != null;
+      
+      if (smartCaptureNumerationSucceed)
+      {
+        // Проверить возможность изменения реквизитов.
+        if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) ||
+            !document.AccessRights.CanUpdate())
+          return;
+        
+        var properties = document.State.Properties;
+        properties.Name.IsEnabled = document.DocumentKind == null || !document.DocumentKind.GenerateDocumentName.Value;
+        properties.DocumentKind.IsEnabled = true;
+        properties.Subject.IsEnabled = true;
+        properties.BusinessUnit.IsEnabled = true;
+        properties.Department.IsEnabled = true;
+        properties.Counterparty.IsEnabled = true;
+        properties.Assignee.IsEnabled = true;
+        
+        properties.DeliveryMethod.IsEnabled = true;
+        properties.CaseFile.IsEnabled = true;
+        properties.PlacedToCaseFileDate.IsEnabled = true;
+      }
+    }
+    
+    /// <summary>
     /// Проверить возможность проверки строк как чисел.
     /// </summary>
     /// <param name="firstString">Первая строка для сравнения.</param>
