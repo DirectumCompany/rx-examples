@@ -283,13 +283,13 @@
     <value>Terms</value>
   </data>
   <data name="Property_TotalAmount" xml:space="preserve">
-    <value>Total amount</value>
+    <value>Total Amount</value>
   </data>
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>incl. VAT</value>
+    <value>VAT</value>
   </data>
   <data name="ControlGroup_9c0e981c710f4665bcbc2d8f5d8084d3" xml:space="preserve">
     <value />

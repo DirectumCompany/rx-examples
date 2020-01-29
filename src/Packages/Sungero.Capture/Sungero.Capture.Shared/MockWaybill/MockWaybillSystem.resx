@@ -190,7 +190,7 @@
     <value>TRRC</value>
   </data>
   <data name="Property_TotalAmount" xml:space="preserve">
-    <value>Total amount</value>
+    <value>Total Amount</value>
   </data>
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
@@ -205,7 +205,7 @@
     <value>Document number</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>Incl. VAT</value>
+    <value>VAT</value>
   </data>
   <data name="Property_Goods" xml:space="preserve">
     <value>Goods</value>

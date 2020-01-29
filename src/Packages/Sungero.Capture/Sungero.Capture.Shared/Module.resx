@@ -132,9 +132,6 @@
   <data name="CheckPackageTaskName" xml:space="preserve">
     <value>Check the document package {0}</value>
   </data>
-  <data name="DocumentNotFound" xml:space="preserve">
-    <value>Cannot find document with ID {0}.</value>
-  </data>
   <data name="CheckPackage" xml:space="preserve">
     <value>Check the document package {0}</value>
   </data>
@@ -152,17 +149,8 @@ If any document was captured by mistake, remove it.</value>
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>Document</value>
   </data>
-  <data name="ClassifierNotFound" xml:space="preserve">
-    <value>Classifier {0} not found.</value>
-  </data>
-  <data name="EmptyArioUrl" xml:space="preserve">
-    <value>Ario service address not specified.</value>
-  </data>
   <data name="EmailBodyDocumentName" xml:space="preserve">
     <value>Email from {0}</value>
-  </data>
-  <data name="NoticeToAuthorSubject" xml:space="preserve">
-    <value>The document is signed by counterparty: {0}</value>
   </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
     <value>Capture service failed to classify document:</value>
@@ -175,15 +163,6 @@ If any document was captured by mistake, remove it.</value>
   </data>
   <data name="CheckDocument" xml:space="preserve">
     <value>Check the document</value>
-  </data>
-  <data name="NeedToNumberDocument" xml:space="preserve">
-    <value>Document number is required.</value>
-  </data>
-  <data name="SetDocumentNumber" xml:space="preserve">
-    <value>You need to specify document number.</value>
-  </data>
-  <data name="SetDocumentDate" xml:space="preserve">
-    <value>You need to specify document date.</value>
   </data>
   <data name="UnknownNumber" xml:space="preserve">
     <value>???</value>
@@ -230,20 +209,8 @@ If any document was captured by mistake, remove it.</value>
   <data name="SmartProcessingSettingsNotFound" xml:space="preserve">
     <value>Could not find Intellectual Document Processing settings</value>
   </data>
-  <data name="EmptyClassifiersOrArioUrl" xml:space="preserve">
-    <value>Ario classifiers or service address not specified.</value>
-  </data>
-  <data name="ClassifiersNotFound" xml:space="preserve">
-    <value>Classifiers {0}, {1} not found.</value>
-  </data>
-  <data name="SelectedSameClassifiers" xml:space="preserve">
-    <value>The currently chosen Type Document Classifier and Front Page Classifier are identical.</value>
-  </data>
   <data name="InvalidSenderLineName" xml:space="preserve">
     <value>No settings were found for line {0}. Set up valid document capture sources.</value>
-  </data>
-  <data name="WithoutNumber" xml:space="preserve">
-    <value>W/o number</value>
   </data>
   <data name="ToLeadingContract" xml:space="preserve">
     <value>to leading contract</value>

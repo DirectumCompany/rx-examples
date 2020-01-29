@@ -132,9 +132,6 @@
   <data name="CheckPackageTaskName" xml:space="preserve">
     <value>Проверьте комплект документов: {0}</value>
   </data>
-  <data name="DocumentNotFound" xml:space="preserve">
-    <value>Документ с ИД {0} не найден.</value>
-  </data>
   <data name="CheckPackage" xml:space="preserve">
     <value>Проверьте комплект документов:</value>
   </data>
@@ -152,17 +149,8 @@
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>Документ</value>
   </data>
-  <data name="ClassifierNotFound" xml:space="preserve">
-    <value>Не найден классификатор с именем {0}.</value>
-  </data>
-  <data name="EmptyArioUrl" xml:space="preserve">
-    <value>Не задан адрес сервиса Ario.</value>
-  </data>
   <data name="EmailBodyDocumentName" xml:space="preserve">
     <value>Эл. письмо от {0}</value>
-  </data>
-  <data name="NoticeToAuthorSubject" xml:space="preserve">
-    <value>Документ подписан контрагентом: {0}</value>
   </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
     <value>Службе ввода не удалось классифицировать документ:</value>
@@ -175,15 +163,6 @@
   </data>
   <data name="CheckDocument" xml:space="preserve">
     <value>Проверьте документ:</value>
-  </data>
-  <data name="NeedToNumberDocument" xml:space="preserve">
-    <value>Необходимо пронумеровать документ.</value>
-  </data>
-  <data name="SetDocumentNumber" xml:space="preserve">
-    <value>Необходимо заполнить номер документа.</value>
-  </data>
-  <data name="SetDocumentDate" xml:space="preserve">
-    <value>Необходимо заполнить дату документа.</value>
   </data>
   <data name="UnknownNumber" xml:space="preserve">
     <value>???</value>
@@ -230,20 +209,8 @@
   <data name="SmartProcessingSettingsNotFound" xml:space="preserve">
     <value>Настройки интеллектуальной обработки документов не найдены</value>
   </data>
-  <data name="EmptyClassifiersOrArioUrl" xml:space="preserve">
-    <value>Не заданы классификаторы или адрес Ario.</value>
-  </data>
-  <data name="ClassifiersNotFound" xml:space="preserve">
-    <value>Не найдены классификаторы с именами: {0}, {1}.</value>
-  </data>
-  <data name="SelectedSameClassifiers" xml:space="preserve">
-    <value>Выбран один и тот же классификатор в качестве классификаторов по типам документов и первых страниц.</value>
-  </data>
   <data name="InvalidSenderLineName" xml:space="preserve">
     <value>Не найдены настройки для линии {0}. Настройте источники поступления документов корректно.</value>
-  </data>
-  <data name="WithoutNumber" xml:space="preserve">
-    <value>б/н</value>
   </data>
   <data name="ToLeadingContract" xml:space="preserve">
     <value>к договору</value>

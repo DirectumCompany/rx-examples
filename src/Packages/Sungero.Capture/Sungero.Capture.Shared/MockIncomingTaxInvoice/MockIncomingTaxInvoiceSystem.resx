@@ -133,7 +133,7 @@
     <value>Date</value>
   </data>
   <data name="Property_IsAdjustment" xml:space="preserve">
-    <value>Is adjusting</value>
+    <value>Is Adjusting</value>
   </data>
   <data name="Property_SellerName" xml:space="preserve">
     <value>Seller</value>
@@ -172,13 +172,13 @@
     <value>TRRC</value>
   </data>
   <data name="Property_TotalAmount" xml:space="preserve">
-    <value>Total amount</value>
+    <value>Total Amount</value>
   </data>
   <data name="Property_Currency" xml:space="preserve">
     <value>Currency</value>
   </data>
   <data name="Property_VatAmount" xml:space="preserve">
-    <value>Incl. VAT</value>
+    <value>VAT</value>
   </data>
   <data name="ControlGroup_406e14dc17444a7f85d8f6eef8abaa3f" xml:space="preserve">
     <value>Main</value>
