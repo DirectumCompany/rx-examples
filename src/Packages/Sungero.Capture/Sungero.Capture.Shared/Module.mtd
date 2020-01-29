@@ -1895,7 +1895,7 @@
     "SmartProcessingSettingsNotFound",
     "InvalidSenderLineName",
     "ToLeadingContract",
-	"DocumentWithoutNumber"
+    "DocumentWithoutNumber"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
