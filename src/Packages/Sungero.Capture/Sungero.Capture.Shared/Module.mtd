@@ -1318,6 +1318,19 @@
       "ReturnTypeFullName": "System.Double"
     },
     {
+      "Name": "IsSmartCaptureNumerationSucceed",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Client",
+      "ReturnType": "global::System.Boolean",
+      "ReturnTypeFullName": "System.Boolean"
+    },
+    {
       "Name": "SendToResponsible",
       "IsRemote": true,
       "Parameters": [
