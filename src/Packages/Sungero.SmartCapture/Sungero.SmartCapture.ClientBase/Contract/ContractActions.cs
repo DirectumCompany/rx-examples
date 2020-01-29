@@ -9,6 +9,21 @@ namespace Sungero.SmartCapture.Client
 {
   partial class ContractActions
   {
+    public override void CancelRegistration(Sungero.Domain.Client.ExecuteActionArgs e)
+    {
+      base.CancelRegistration(e);
+      
+      // Отменить подсветку рег.номера и даты.
+      this._obj.State.Properties.RegistrationNumber.HighlightColor = Colors.Empty;
+      this._obj.State.Properties.RegistrationDate.HighlightColor = Colors.Empty;      
+    }
+
+    public override bool CanCancelRegistration(Sungero.Domain.Client.CanExecuteActionArgs e)
+    {
+      return base.CanCancelRegistration(e);
+    }
+
+
     public override void AssignNumber(Sungero.Domain.Client.ExecuteActionArgs e)
     {
       // Bug 96201

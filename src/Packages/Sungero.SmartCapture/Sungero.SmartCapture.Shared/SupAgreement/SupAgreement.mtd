@@ -5,6 +5,15 @@
   "AccessRightsMode": "Both",
   "Actions": [
     {
+      "NameGuid": "a452a737-4204-46e9-a1c6-d684a59697b4",
+      "Name": "CancelRegistration",
+      "GenerateHandler": true,
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "GenerateHandler"
+      ]
+    },
+    {
       "NameGuid": "14ecec8f-f34b-46af-b0b1-bc9ded6086f0",
       "Name": "Register",
       "GenerateHandler": true,
