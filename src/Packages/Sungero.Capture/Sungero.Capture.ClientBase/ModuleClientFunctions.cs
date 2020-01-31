@@ -834,7 +834,7 @@ namespace Sungero.Capture.Client
     [Public]
     public virtual void EnableRequisitesForVerification(Sungero.Docflow.IOfficialDocument document)
     {
-      if (this.IsSmartCaptureNumerationSucceed(document) &&
+      if (Sungero.Capture.PublicFunctions.Module.IsSmartCaptureNumerationSucceed(document) &&
           Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) &&
           document.AccessRights.CanUpdate())
       {
@@ -856,20 +856,6 @@ namespace Sungero.Capture.Client
         properties.CaseFile.IsEnabled = true;
         properties.PlacedToCaseFileDate.IsEnabled = true;
       }
-    }
-    
-    /// <summary>
-    /// Определить пронумерован ли документ при захвате.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>True - документ успешно пронумерован при захвате, False - иначе.</returns>
-    [Public]
-    public virtual bool IsSmartCaptureNumerationSucceed(Sungero.Docflow.IOfficialDocument document)
-    {
-      return document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
-             document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
-             (document.DocumentKind == null || document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
-             document.DocumentRegister != null;
     }
     
     /// <summary>

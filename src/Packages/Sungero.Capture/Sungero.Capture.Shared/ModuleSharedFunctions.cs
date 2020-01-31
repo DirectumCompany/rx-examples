@@ -54,5 +54,19 @@ namespace Sungero.Capture.Shared
         propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
       return propertyStringValue;
     }
+    
+    /// <summary>
+    /// Определить пронумерован ли документ при захвате.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <returns>True - документ успешно пронумерован при захвате, False - иначе.</returns>
+    [Public]
+    public virtual bool IsSmartCaptureNumerationSucceed(Sungero.Docflow.IOfficialDocument document)
+    {
+      return document.RegistrationState == Sungero.Docflow.OfficialDocument.RegistrationState.Registered &&
+             document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
+             (document.DocumentKind == null || document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
+             document.DocumentRegister != null;
+    }
   }
 }
