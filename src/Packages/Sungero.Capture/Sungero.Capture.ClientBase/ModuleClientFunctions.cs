@@ -832,51 +832,24 @@ namespace Sungero.Capture.Client
     /// </summary>
     /// <param name="document">Документ для верификации.</param>
     [Public]
-    public virtual void EnableRequisitesForVerification(Sungero.Docflow.IAccountingDocumentBase document)
+    public virtual void EnableRequisitesForVerification(Sungero.Docflow.IOfficialDocument document)
     {
-      if (this.IsSmartCaptureNumerationSucceed(document))
+      if (this.IsSmartCaptureNumerationSucceed(document) &&
+          Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) &&
+          document.AccessRights.CanUpdate())
       {
-        // Проверить возможность изменения реквизитов.
-        if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) ||
-            !document.AccessRights.CanUpdate())
-          return;
-        
         var properties = document.State.Properties;
         properties.Name.IsEnabled = document.DocumentKind == null || !document.DocumentKind.GenerateDocumentName.Value;
         properties.DocumentKind.IsEnabled = true;
         properties.Subject.IsEnabled = true;
         properties.BusinessUnit.IsEnabled = true;
         properties.Department.IsEnabled = true;
-        properties.Counterparty.IsEnabled = true;
-        properties.Assignee.IsEnabled = true;
         
-        properties.DeliveryMethod.IsEnabled = true;
-        properties.CaseFile.IsEnabled = true;
-        properties.PlacedToCaseFileDate.IsEnabled = true;
-      }
-    }
-    
-    /// <summary>
-    /// Разблокировать реквизиты для верификации после нумерации.
-    /// </summary>
-    /// <param name="document">Документ для верификации.</param>
-    [Public]
-    public virtual void EnableRequisitesForVerification(Sungero.Docflow.IContractualDocumentBase document)
-    {
-      if (this.IsSmartCaptureNumerationSucceed(document))
-      {
-        // Проверить возможность изменения реквизитов.
-        if (!Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) ||
-            !document.AccessRights.CanUpdate())
-          return;
+        if (Sungero.Docflow.AccountingDocumentBases.Is(document))
+          this.SetCounterpartyPropertyEnabled(Sungero.Docflow.AccountingDocumentBases.As(document), true);
+        if (Sungero.Docflow.ContractualDocumentBases.Is(document))
+          this.SetCounterpartyPropertyEnabled(Sungero.Docflow.ContractualDocumentBases.As(document), true);
         
-        var properties = document.State.Properties;
-        properties.Name.IsEnabled = document.DocumentKind == null || !document.DocumentKind.GenerateDocumentName.Value;
-        properties.DocumentKind.IsEnabled = true;
-        properties.Subject.IsEnabled = true;
-        properties.BusinessUnit.IsEnabled = true;
-        properties.Department.IsEnabled = true;
-        properties.Counterparty.IsEnabled = true;
         properties.Assignee.IsEnabled = true;
         
         properties.DeliveryMethod.IsEnabled = true;
@@ -897,6 +870,26 @@ namespace Sungero.Capture.Client
              document.VerificationState == Sungero.Docflow.OfficialDocument.VerificationState.InProcess &&
              (document.DocumentKind == null || document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable) &&
              document.DocumentRegister != null;
+    }
+    
+    /// <summary>
+    /// Установить доступность свойства "Контрагент".
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="isEnabled">Доступность.</param>
+    public virtual void SetCounterpartyPropertyEnabled(Sungero.Docflow.IAccountingDocumentBase document, bool isEnabled)
+    {
+      document.State.Properties.Counterparty.IsEnabled = isEnabled;
+    }
+    
+    /// <summary>
+    /// Установить доступность свойства "Контрагент".
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="isEnabled">Доступность.</param>
+    public virtual void SetCounterpartyPropertyEnabled(Sungero.Docflow.IContractualDocumentBase document, bool isEnabled)
+    {
+      document.State.Properties.Counterparty.IsEnabled = isEnabled;
     }
     
     /// <summary>
