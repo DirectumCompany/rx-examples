@@ -150,22 +150,22 @@ The blank field means that the fact reliability is below the lower confidence in
     <value>{0} (ID {1})</value>
   </data>
   <data name="ClassifiersSelectionNotAvailable" xml:space="preserve">
-    <value>It is only available to the administrator to select classifiers.</value>
+    <value>Only an administrator can select classifiers.</value>
   </data>
   <data name="InvalidArioUrl" xml:space="preserve">
-    <value>Ario service address must be in URL format.</value>
+    <value>Ario Service address must be a URL.</value>
   </data>
   <data name="SmartProcessingSettings" xml:space="preserve">
     <value>Smart Processing Settings</value>
   </data>
   <data name="SetCorrectConfidenceLimits" xml:space="preserve">
-    <value>Set up valid confidence limits.</value>
+    <value>Specify correct confidence interval bounds.</value>
   </data>
   <data name="SetCorrectClassifiers" xml:space="preserve">
-    <value>Set up valid classifiers.</value>
+    <value>Specify correct classifiers.</value>
   </data>
   <data name="InvalidSenderLineName" xml:space="preserve">
-    <value>Line name must contain Latin letters and/or numbers only. No spaces are allowed.</value>
+    <value>The line name can contain only Latin characters and/or digits with no spaces.</value>
   </data>
   <data name="NotUniqueSenderLineNames" xml:space="preserve">
     <value>Line names must be unique.</value>
