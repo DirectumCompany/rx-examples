@@ -1908,14 +1908,15 @@
     "SmartProcessingSettingsNotFound",
     "InvalidSenderLineName",
     "ToLeadingContract",
-    "DocumentWithoutNumber"
+    "DocumentWithoutNumber",
+    "EntityRequiredPropertyIsEmpty"
   ],
   "ServerAssemblyName": "Sungero.Capture.Server",
   "ServerNamespace": "Sungero.Capture.Server",
   "SharedAssemblyName": "Sungero.Capture.Shared",
   "SharedNamespace": "Sungero.Capture.Shared",
   "SpecialFolders": [],
-  "Version": "3.3.10.0",
+  "Version": "3.3.10.1",
   "Widgets": [],
   "Versions": [
     {

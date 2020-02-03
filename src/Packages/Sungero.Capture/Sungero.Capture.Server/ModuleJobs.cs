@@ -5,6 +5,8 @@ using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Docflow;
 using Sungero.Workflow;
+using Sungero.Domain.Shared;
+using Sungero.Metadata;
 
 namespace Sungero.Capture.Server
 {
@@ -63,8 +65,23 @@ namespace Sungero.Capture.Server
               continue;
             
             var document = OfficialDocuments.Get((int)id);
-            document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
-            document.Save();
+            var hasEmptyRequiredProperties = false;
+            var originalMetadata = document.GetEntityMetadata().GetOriginal();
+            foreach (var p in originalMetadata.Properties)
+            {
+              if (p.IsRequired && p.GetPropertyValue<object>(document) == null)
+              {
+                Logger.DebugFormat(Resources.EntityRequiredPropertyIsEmptyFormat(document.Id, p.Name));
+                hasEmptyRequiredProperties = true;
+                break;
+              }
+            }
+
+            if (!hasEmptyRequiredProperties)
+            {
+              document.VerificationState = Docflow.OfficialDocument.VerificationState.Completed;
+              document.Save();
+            }
           }
         }
       }

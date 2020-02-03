@@ -218,4 +218,7 @@
   <data name="DocumentWithoutNumber" xml:space="preserve">
     <value>б/н</value>
   </data>
+  <data name="EntityRequiredPropertyIsEmpty" xml:space="preserve">
+    <value>Job ChangeVerificationState. Doc ID = {0}. Property {1} is NULL.</value>
+  </data>
 </root>
