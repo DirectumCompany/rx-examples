@@ -2156,10 +2156,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Дата и номер.
-      if (document.DocumentKind != null && document.DocumentKind.NumberingType == Sungero.Docflow.DocumentKind.NumberingType.Numerable)
-        this.NumberDocument(document, recognitionResult, FactNames.SupAgreement, Resources.DocumentWithoutNumber);
-      else
-        this.FillNumberAndDate(document, recognitionResult, FactNames.SupAgreement);
+      this.FillNumberAndDate(document, recognitionResult, FactNames.SupAgreement);
 
       // Сумма и валюта.
       FillAmountAndCurrency(document, recognitionResult);
