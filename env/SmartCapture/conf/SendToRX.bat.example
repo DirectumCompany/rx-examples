@@ -1,1 +1,1 @@
-"<Полный путь до DrxUtil>" -n "Service user" -p 11111 -f Sungero.Capture.Module.ProcessCapturedPackage %1 %2 %3 %4 %5 <UserId> "<Имя классификатора первых страниц>" "<Имя классификатора по типам>"
+"<Полный путь до DrxUtil>" -n "Service user" -p 11111 -f Sungero.Capture.Module.ProcessCapturedPackage %1 %2 %3 %4 %5
