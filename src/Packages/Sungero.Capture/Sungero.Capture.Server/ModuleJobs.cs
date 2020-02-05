@@ -50,7 +50,14 @@ namespace Sungero.Capture.Server
         if (task.Status != Workflow.Task.Status.Completed)
           continue;
         
-        var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
+        // Дополнительно проверять вложения на возможность смены статуса верификации.
+        var attachmentIds = task.AttachmentDetails
+          .Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
+          .Where(d => d.RegistrationState == Docflow.OfficialDocument.RegistrationState.Registered ||
+                      d.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered &&
+                      d.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.NotNumerable)
+          .Select(att => att.EntityId).ToList();
+        
         processedIds.AddRange(attachmentIds);
         var subTasks = Tasks.GetAll()
           .Where(t => t.MainTaskId.HasValue &&
