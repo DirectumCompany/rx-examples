@@ -27,7 +27,7 @@ namespace Sungero.Capture.Server
       
       // processedIds - ид документов, статус которых уже был изменен. В одной задаче на верификацию может придти пакет документов,
       // для всех них сразу изменяем статус и сохраняем в этот список, чтобы в дальнейшем не обрабатывать их в цикле по documentIds.
-      var processedIds = new List<int?>();
+      var processedIds = new List<int>();
       var verificationTasks = SimpleTasks.GetAll()
         .Where(t => t.MainTaskId.HasValue && t.MainTaskId == t.Id &&
                (t.Subject.Contains(Resources.CheckPackage) ||
@@ -51,14 +51,15 @@ namespace Sungero.Capture.Server
           continue;
         
         // Дополнительно проверять вложения на возможность смены статуса верификации.
-        var attachmentIds = task.AttachmentDetails
+        var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
+        var attachedDocumentsVerificationEnabled = Docflow.OfficialDocuments.GetAll()
+          .Where(d => attachmentIds.Contains(d.Id))
           .Where(d => d.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
           .Where(d => d.RegistrationState == Docflow.OfficialDocument.RegistrationState.Registered ||
-                      d.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered &&
-                      d.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.NotNumerable)
-          .Select(att => att.EntityId).ToList();
-        
-        processedIds.AddRange(attachmentIds);
+               d.RegistrationState == Docflow.OfficialDocument.RegistrationState.NotRegistered &&
+               d.DocumentKind.NumberingType == Docflow.DocumentKind.NumberingType.NotNumerable);
+        var packageDocumentVerificationEnabledIds = attachedDocumentsVerificationEnabled.Select(d => d.Id).ToList();
+        processedIds.AddRange(packageDocumentVerificationEnabledIds);
         var subTasks = Tasks.GetAll()
           .Where(t => t.MainTaskId.HasValue &&
                  t.MainTaskId.Value == task.Id &&
@@ -66,7 +67,7 @@ namespace Sungero.Capture.Server
                  t.Status != Workflow.Task.Status.Aborted);
         if (!subTasks.Any())
         {
-          foreach (var id in attachmentIds)
+          foreach (var id in packageDocumentVerificationEnabledIds)
           {
             if (id == null)
               continue;
