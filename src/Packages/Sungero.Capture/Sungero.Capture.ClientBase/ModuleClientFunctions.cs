@@ -528,7 +528,7 @@ namespace Sungero.Capture.Client
       // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
       // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
       // данная функция используется за пределами модуля.
-      var documentRecognitionInfo = Functions.DocumentRecognitionInfo.Remote.GetDocumentRecognitionInfo(document);
+      var documentRecognitionInfo = Sungero.Commons.PublicFunctions.EntityRecognitionInfo.Remote.GetEntityRecognitionInfo(document);
       var highlightActivationStyle = Functions.Module.Remote.GetHighlightActivationStyle();
       var exactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, true);
       HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Green), highlightActivationStyle);
@@ -549,7 +549,7 @@ namespace Sungero.Capture.Client
     /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
     /// <returns>Список распознанных свойств документа.</returns>
     public virtual List<string> GetRecognizedProperties(Docflow.IOfficialDocument document,
-                                                        IDocumentRecognitionInfo documentRecognitionInfo,
+                                                        Commons.IEntityRecognitionInfo documentRecognitionInfo,
                                                         bool isTrusted)
     {
       var result = new List<string>();
@@ -629,7 +629,7 @@ namespace Sungero.Capture.Client
     /// <param name="document">Документ.</param>
     /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
     public virtual void HighlightGoodsInMockMode(Sungero.Docflow.IOfficialDocument document,
-                                                 IDocumentRecognitionInfo documentRecognitionInfo,
+                                                 Commons.IEntityRecognitionInfo documentRecognitionInfo,
                                                  Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
       if (MockIncomingTaxInvoices.Is(document))
@@ -659,7 +659,7 @@ namespace Sungero.Capture.Client
     /// <param name="collection">Коллекция.</param>
     /// <param name="previewControl">Контрол предпросмотра.</param>
     /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
-    public virtual void HighlightCollection(IDocumentRecognitionInfo documentRecognitionInfo,
+    public virtual void HighlightCollection(Commons.IEntityRecognitionInfo documentRecognitionInfo,
                                             Sungero.Domain.Shared.IChildEntityCollection<Sungero.Domain.Shared.IChildEntity> collection,
                                             Sungero.Domain.Shared.IPreviewControlState previewControl,
                                             Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)

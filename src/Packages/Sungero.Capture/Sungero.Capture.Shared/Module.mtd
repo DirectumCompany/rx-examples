@@ -1763,7 +1763,7 @@
           "Name": "Info",
           "IsEntity": true,
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.IDocumentRecognitionInfo"
+          "TypeFullName": "global::Sungero.Commons.IEntityRecognitionInfo"
         },
         {
           "Name": "File",

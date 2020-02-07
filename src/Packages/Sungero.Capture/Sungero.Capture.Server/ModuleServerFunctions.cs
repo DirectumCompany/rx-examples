@@ -263,7 +263,9 @@ namespace Sungero.Capture.Server
           document = CreateDocumentByRecognitionResult(recognitionResult, responsible);
         
         // Добавить ИД документа в запись справочника с результатами обработки Ario.
-        recognitionResult.Info.DocumentId = document.Id;
+        recognitionResult.Info.EntityId = document.Id;
+        // TODO Шкляев это пока не тот гуид, надо продумать, что именно будет храниться в поле с типом сущности, и доделать.
+        recognitionResult.Info.EntityType = document.GetEntityMetadata().NameGuid.ToString();
         recognitionResult.Info.Save();
         
         package.Add(document);
@@ -419,7 +421,7 @@ namespace Sungero.Capture.Server
         recognitionResult.Message = packageProcessResult.Message;
         recognitionResult.File = file;
         recognitionResult.SendedByEmail = sendedByEmail;
-        var docInfo = DocumentRecognitionInfos.Create();
+        var docInfo = Commons.EntityRecognitionInfos.Create();
         docInfo.Name = recognitionResult.PredictedClass;
         docInfo.RecognizedClass = recognitionResult.PredictedClass;
         if (clsResult.PredictedProbability != null)
@@ -3440,10 +3442,10 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт.</param>
     /// <param name="propertyName">Имя свойства документа связанное с фактом.</param>
     /// <returns>Связь факта с свойством.</returns>
-    public virtual IDocumentRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    public virtual Commons.IEntityRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName)
     {
       var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+      var recognitionInfo = Commons.EntityRecognitionInfos.GetAll()
         .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
         .OrderByDescending(d => d.Id)
         .FirstOrDefault();
@@ -3462,10 +3464,10 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя свойства документа, содержащее контрагента.</param>
     /// <returns>Связь факта с свойством.</returns>
-    public virtual IDocumentRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName, string counterpartyPropertyValue, string counterpartyPropertyName)
+    public virtual Commons.IEntityRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName, string counterpartyPropertyValue, string counterpartyPropertyName)
     {
       var factLabel = GetFactLabel(fact, propertyName);
-      var recognitionInfo = DocumentRecognitionInfos.GetAll()
+      var recognitionInfo = Commons.EntityRecognitionInfos.GetAll()
         .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
                d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
         .OrderByDescending(d => d.Id)
@@ -3789,8 +3791,8 @@ namespace Sungero.Capture.Server
       if (!documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName))
         return;
       
-      var recognitionInfo = Capture.DocumentRecognitionInfos
-        .GetAll(x => x.DocumentId == document.Id)
+      var recognitionInfo = Commons.EntityRecognitionInfos
+        .GetAll(x => x.EntityId == document.Id)
         .OrderByDescending(x => x.Id)
         .FirstOrDefault();
       if (recognitionInfo == null)

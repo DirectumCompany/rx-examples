@@ -28,7 +28,7 @@ namespace Sungero.Capture.Structures.Module
     public string Message { get; set; }
     
     // Запись в справочнике для сохранения результов распознования документа.
-    public IDocumentRecognitionInfo Info { get; set; }
+    public Commons.IEntityRecognitionInfo Info { get; set; }
     
     // Исходный документ.
     public Sungero.Capture.Structures.Module.IFileDto File { get; set; }
