@@ -39,6 +39,11 @@
       "Id": "ec7b606a-21ee-4f16-aba8-ab8c2af76d12",
       "MaxVersion": "",
       "MinVersion": "0.0.1.0"
+    },
+    {
+      "Id": "459fa497-ee5b-49a4-9980-de00cada9b7a",
+      "MaxVersion": "",
+      "MinVersion": "3.3.14.1"
     }
   ],
   "ExplorerTreeOrder": [
