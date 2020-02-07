@@ -264,7 +264,7 @@ namespace Sungero.Capture.Server
         
         // Добавить ИД документа в запись справочника с результатами обработки Ario.
         recognitionResult.Info.EntityId = document.Id;
-        // TODO Шкляев это пока не тот гуид, надо продумать, что именно будет храниться в поле с типом сущности, и доделать.
+        // Заполнить поле Тип сущности guid'ом конечного типа сущности.
         recognitionResult.Info.EntityType = document.GetEntityMetadata().NameGuid.ToString();
         recognitionResult.Info.Save();
         
