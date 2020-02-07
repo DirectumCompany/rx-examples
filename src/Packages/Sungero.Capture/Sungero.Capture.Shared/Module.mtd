@@ -1441,13 +1441,13 @@
         {
           "Name": "Body",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileDto"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFileDto"
         },
         {
           "Name": "Attachments",
           "IsList": true,
           "IsNullable": true,
-          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Capture.Structures.Module.IFileDto>"
+          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Docflow.Structures.Module.IFileDto>"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1514,7 +1514,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         },
         {
           "Name": "IsTrusted",
@@ -1542,7 +1542,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         },
         {
           "Name": "Type",
@@ -1637,74 +1637,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "Fact",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Id",
-          "TypeFullName": "global::System.Int32"
-        },
-        {
-          "Name": "Name",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Fields",
-          "IsList": true,
-          "IsNullable": true,
-          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Capture.Structures.Module.IFactField>"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "FactField",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Id",
-          "TypeFullName": "global::System.Int32"
-        },
-        {
-          "Name": "Name",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Value",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Probability",
-          "TypeFullName": "global::System.Double"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "FileDto",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Data",
-          "TypeFullName": "global::System.Byte[]"
-        },
-        {
-          "Name": "Path",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Description",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "HighlightActivationStyle",
       "IsPublic": true,
       "Properties": [
@@ -1736,53 +1668,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "RecognitionResult",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "ClassificationResultId",
-          "TypeFullName": "global::System.Int32"
-        },
-        {
-          "Name": "BodyGuid",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "PredictedClass",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Facts",
-          "IsList": true,
-          "IsNullable": true,
-          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Capture.Structures.Module.IFact>"
-        },
-        {
-          "Name": "Message",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Info",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Commons.IEntityRecognitionInfo"
-        },
-        {
-          "Name": "File",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFileDto"
-        },
-        {
-          "Name": "SendedByEmail",
-          "TypeFullName": "global::System.Boolean"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "RecognizedAmount",
       "IsPublic": true,
       "Properties": [
@@ -1801,7 +1686,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1827,7 +1712,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1848,7 +1733,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1869,7 +1754,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1893,7 +1778,7 @@
         {
           "Name": "Fact",
           "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.IFact"
+          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         },
         {
           "Name": "IsTrusted",

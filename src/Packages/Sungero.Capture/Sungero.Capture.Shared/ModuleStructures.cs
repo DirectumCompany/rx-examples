@@ -6,87 +6,6 @@ using Sungero.CoreEntities;
 
 namespace Sungero.Capture.Structures.Module
 {
-  /// <summary>
-  /// Распознанный в Ario документ.
-  /// </summary>
-  [Public]
-  partial class RecognitionResult
-  {
-    // ИД результата распознования документа в Арио.
-    public int ClassificationResultId { get; set; }
-    
-    // Guid pdf версии документа.
-    public string BodyGuid { get; set; }
-    
-    // Класс документа.
-    public string PredictedClass { get; set; }
-    
-    // Извлеченные из документа факты.
-    public List<Sungero.Capture.Structures.Module.IFact> Facts { get; set; }
-    
-    // Примечание от Арио.
-    public string Message { get; set; }
-    
-    // Запись в справочнике для сохранения результов распознования документа.
-    public Commons.IEntityRecognitionInfo Info { get; set; }
-    
-    // Исходный документ.
-    public Sungero.Capture.Structures.Module.IFileDto File { get; set; }
-    
-    // Признак того, что документ был получен службой захвата из электронной почты.
-    public bool SendedByEmail { get; set; }
-  }
-  
-  /// <summary>
-  /// Файл из службы захвата.
-  /// </summary>
-  [Public]
-  partial class FileDto
-  {
-    // Файл.
-    public byte[] Data { get; set; }
-    
-    // Путь к файлу.
-    public string Path { get; set; }
-    
-    // Имя исходного файла до обработки службой ввода документов.
-    public string Description { get; set; }
-  }
-  
-  /// <summary>
-  /// Факт.
-  /// </summary>
-  [Public]
-  partial class Fact
-  {
-    // ИД факта в Арио.
-    public int Id { get; set; }
-    
-    // Название факта.
-    public string Name { get; set; }
-    
-    // Список полей.
-    public List<Sungero.Capture.Structures.Module.IFactField> Fields { get; set; }
-  }
-  
-  /// <summary>
-  /// Поле факта.
-  /// </summary>
-  [Public]
-  partial class FactField
-  {
-    // ИД поля в Арио.
-    public int Id { get; set; }
-    
-    // Название поля.
-    public string Name { get; set; }
-    
-    // Значение поля.
-    public string Value { get; set; }
-    
-    // Вероятность.
-    public double Probability { get; set; }
-  }
   
   /// <summary>
   /// Контрагент для демо документов.
@@ -103,7 +22,7 @@ namespace Sungero.Capture.Structures.Module
     public string Trrc { get; set; }
     
     // Факт, из полей которого были излеченны данные контрагента.
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
   
     /// <summary>
@@ -154,7 +73,7 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Parties.IContact Contact { get; set; }
     
     // Факт, по полям которого было найдено контактное лицо.
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
     
     // Доверять ли найденному значению.
     public bool IsTrusted { get; set; }
@@ -170,7 +89,7 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Contracts.IContractualDocument Contract { get; set; }
     
     // Факт, по полям которого был найден договорной документ.
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
     
     // Доверять ли найденному значению.
     public bool IsTrusted { get; set; }
@@ -205,7 +124,7 @@ namespace Sungero.Capture.Structures.Module
     public Sungero.Parties.ICounterparty Counterparty { get; set; }
     
     // Факт с типом контрагент, по полям которого осуществлялся поиск.
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
     
     // Тип найденного значения (Buyer, Seller и т.д.).
     public string Type { get; set; }
@@ -221,10 +140,10 @@ namespace Sungero.Capture.Structures.Module
   partial class CapturedMailFiles
   {
     // Тело письма.
-    public Sungero.Capture.Structures.Module.IFileDto Body { get; set; }
+    public Sungero.Docflow.Structures.Module.IFileDto Body { get; set; }
     
     // Вложенные в письмо файлы.
-    public List<Sungero.Capture.Structures.Module.IFileDto> Attachments { get; set; }
+    public List<Sungero.Docflow.Structures.Module.IFileDto> Attachments { get; set; }
   }
   
   /// <summary>
@@ -292,7 +211,7 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
 
     // Факт
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }  
   
   /// <summary>
@@ -311,7 +230,7 @@ namespace Sungero.Capture.Structures.Module
     public bool IsTrusted { get; set; }
     
     // Факт
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
   
   /// <summary>
@@ -324,7 +243,7 @@ namespace Sungero.Capture.Structures.Module
     
     public bool IsTrusted { get; set; }
     
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
   
   /// <summary>
@@ -337,7 +256,7 @@ namespace Sungero.Capture.Structures.Module
     
     public bool IsTrusted { get; set; }
     
-    public Sungero.Capture.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
   
   /// <summary>

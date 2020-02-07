@@ -225,7 +225,7 @@ namespace Sungero.Capture.Server
     /// <param name="fromEmail">Адрес эл.почты отправителя.(Не используется, добавлен для перекрытия)</param>
     /// <returns>Ид созданных документов.</returns>
     [Remote]
-    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Structures.Module.IFileDto originalFile,
+    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Sungero.Docflow.Structures.Module.IFileDto originalFile,
                                                                                IEmployee responsible, bool sendedByEmail, string fromEmail)
     {
       var recognitionResults = GetRecognitionResults(recognitionResultsJson, originalFile, sendedByEmail);
@@ -401,8 +401,8 @@ namespace Sungero.Capture.Server
     /// <param name="file">Исходный файл.</param>
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
-    public virtual List<Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
-                                                                                    Structures.Module.IFileDto file,
+    public virtual List<Sungero.Docflow.Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
+                                                                                    Sungero.Docflow.Structures.Module.IFileDto file,
                                                                                     bool sendedByEmail)
     {
       var recognitionResults = new List<IRecognitionResult>();
@@ -496,7 +496,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат классификации в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
-    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Structures.Module.IRecognitionResult recognitionResult,
+    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                                        IEmployee responsible)
     {
       // Входящее письмо.
@@ -884,7 +884,7 @@ namespace Sungero.Capture.Server
     /// <returns>ИД созданного документа.</returns>
     [Remote]
     public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.ICapturedMailInfo mailInfo,
-                                                                                     Structures.Module.IFileDto bodyDto,
+                                                                                     Sungero.Docflow.Structures.Module.IFileDto bodyDto,
                                                                                      IEmployee responsible)
     {
       if (!System.IO.File.Exists(bodyDto.Path))
@@ -941,7 +941,7 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>Простой документ.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Structures.Module.IFileDto file,
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromFile(Sungero.Docflow.Structures.Module.IFileDto file,
                                                                                 bool sendedByEmail,
                                                                                 IEmployee responsible)
     {
@@ -973,7 +973,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       var props = document.Info.Properties;
@@ -1074,7 +1074,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public Docflow.IOfficialDocument CreateMockIncomingLetter(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockIncomingLetter(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
       var props = document.Info.Properties;
@@ -1188,7 +1188,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public Docflow.IOfficialDocument CreateMockContractStatement(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockContractStatement(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       var props = document.Info.Properties;
@@ -1320,7 +1320,7 @@ namespace Sungero.Capture.Server
     /// <param name="сlassificationResult">Результат обработки акта выполненных работ в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public virtual Docflow.IOfficialDocument CreateContractStatement(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateContractStatement(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var document = FinancialArchive.ContractStatements.Create();
@@ -1371,7 +1371,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки накладной в Ario.</param>
     /// <returns>Накладная.</returns>
-    public Docflow.IOfficialDocument CreateMockWaybill(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockWaybill(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockWaybills.Create();
       var props = document.Info.Properties;
@@ -1494,7 +1494,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки накладной в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Накладная.</returns>
-    public virtual Docflow.IOfficialDocument CreateWaybill(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var document = FinancialArchive.Waybills.Create();
@@ -1547,7 +1547,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Счет-фактура.</returns>
-    public Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var facts = recognitionResult.Facts;
       var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
@@ -1663,7 +1663,7 @@ namespace Sungero.Capture.Server
     /// <param name="isAdjustment">Корректировочная.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Счет-фактура.</returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
@@ -1801,7 +1801,7 @@ namespace Sungero.Capture.Server
     /// <param name="isAdjustment">Корректировочная.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>УПД.</returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, bool isAdjustment, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
@@ -1847,7 +1847,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Счет на оплату.</returns>
-    public Docflow.IOfficialDocument CreateMockIncomingInvoice(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockIncomingInvoice(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockIncomingInvoices.Create();
       var props = document.Info.Properties;
@@ -1961,7 +1961,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Счет на оплату.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
       var facts = recognitionResult.Facts;
       var document = Contracts.IncomingInvoices.Create();
@@ -2028,7 +2028,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <returns>Договор.</returns>
-    public Docflow.IOfficialDocument CreateMockContract(Structures.Module.IRecognitionResult recognitionResult)
+    public Docflow.IOfficialDocument CreateMockContract(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var document = Sungero.Capture.MockContracts.Create();
       
@@ -2108,7 +2108,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки договора в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Договор.</returns>
-    public Docflow.IOfficialDocument CreateContract(Structures.Module.IRecognitionResult recognitionResult,
+    public Docflow.IOfficialDocument CreateContract(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                     Sungero.Company.IEmployee responsible)
     {
       var document = Sungero.Contracts.Contracts.Create();
@@ -2144,7 +2144,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки доп.соглашения в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Доп.соглашение.</returns>
-    public Docflow.IOfficialDocument CreateSupAgreement(Structures.Module.IRecognitionResult recognitionResult, Sungero.Company.IEmployee responsible)
+    public Docflow.IOfficialDocument CreateSupAgreement(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, Sungero.Company.IEmployee responsible)
     {
       var document = Sungero.Contracts.SupAgreements.Create();
       
@@ -2225,7 +2225,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результаты обработки бухгалтерского документа в Ario.</param>
     /// <param name="documentParties">НОР и контрагент.</param>
-    public virtual void LinkAccountingDocumentParties(Structures.Module.IRecognitionResult recognitionResult,
+    public virtual void LinkAccountingDocumentParties(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                       Structures.Module.IDocumentParties documentParties)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
@@ -2253,7 +2253,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Бухгалтерский документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    public virtual void FillAmountAndCurrency(IAccountingDocumentBase document, Structures.Module.IRecognitionResult recognitionResult)
+    public virtual void FillAmountAndCurrency(IAccountingDocumentBase document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       if (!AccountingDocumentBases.Is(document))
         return;
@@ -2283,7 +2283,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="document">Договорной документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    public virtual void FillAmountAndCurrency(IContractualDocumentBase document, Structures.Module.IRecognitionResult recognitionResult)
+    public virtual void FillAmountAndCurrency(IContractualDocumentBase document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       if (!ContractualDocumentBases.Is(document))
         return;
@@ -2316,7 +2316,7 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     /// <param name="unknownNumber">Номер, который будет присвоен документу, если он не был распознан. (необ.)</param>
     public virtual void NumberDocument(IOfficialDocument document,
-                                       Structures.Module.IRecognitionResult recognitionResult,
+                                       Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                        string factName,
                                        string unknownNumber = null)
     {
@@ -2377,8 +2377,8 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public virtual void FillNumberAndDate(IContractualDocumentBase document,
-                                          Structures.Module.IRecognitionResult recognitionResult,
-                                          string factName)
+                                       Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
+                                       string factName)
     {
       // Дата.
       var recognizedDate = GetRecognizedDate(recognitionResult, factName, FieldNames.Document.Date);
@@ -2416,7 +2416,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public void FillMockRegistrationData(IOfficialDocument document,
-                                         Structures.Module.IRecognitionResult recognitionResult,
+                                         Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                          string factName)
     {
       // Дата.
@@ -2453,7 +2453,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="isAdjustment">Корректировочный.</param>
     public virtual void FillCorrectedDocument(IAccountingDocumentBase document,
-                                              Structures.Module.IRecognitionResult recognitionResult,
+                                              Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                               bool isAdjustment)
     {
       if (isAdjustment)
@@ -2497,7 +2497,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Результаты распознавания суммы.</returns>
-    public virtual Structures.Module.IRecognizedAmount GetRecognizedAmount(Structures.Module.IRecognitionResult recognitionResult)
+    public virtual Structures.Module.IRecognizedAmount GetRecognizedAmount(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedAmount = Structures.Module.RecognizedAmount.Create();
       var facts = recognitionResult.Facts;
@@ -2536,7 +2536,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Результаты распознавания валюты.</returns>
-    public virtual Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Structures.Module.IRecognitionResult recognitionResult)
+    public virtual Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
       
@@ -2582,7 +2582,7 @@ namespace Sungero.Capture.Server
     /// <param name="numberFactName">Наименование факта, содержащего номер.</param>
     /// <param name="numberFieldName">Наименование поля, содержащего номер.</param>
     /// <returns>Распознанный номер с фактом.</returns>
-    public virtual Sungero.Capture.Structures.Module.IRecognizedDocumentNumber GetRecognizedNumber(Sungero.Capture.Structures.Module.IRecognitionResult recognitionResult,
+    public virtual Sungero.Capture.Structures.Module.IRecognizedDocumentNumber GetRecognizedNumber(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                                                                    string numberFactName,
                                                                                                    string numberFieldName)
     {
@@ -2600,7 +2600,7 @@ namespace Sungero.Capture.Server
     /// <param name="dateFactName">Наименование факта, содержащего дату.</param>
     /// <param name="dateFieldName">Наименование поля, содержащего дату.</param>
     /// <returns>Распознанная дата с фактом.</returns>
-    public virtual Sungero.Capture.Structures.Module.IRecognizedDocumentDate GetRecognizedDate(Sungero.Capture.Structures.Module.IRecognitionResult recognitionResult,
+    public virtual Sungero.Capture.Structures.Module.IRecognizedDocumentDate GetRecognizedDate(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                                                                string dateFactName,
                                                                                                string dateFieldName)
     {
@@ -2637,7 +2637,7 @@ namespace Sungero.Capture.Server
     /// <param name="facts">Список фактов.</param>
     /// <param name="counterpartyType">Тип контрагента.</param>
     /// <returns></returns>
-    public virtual List<IFact> GetCounterpartyFacts(List<Structures.Module.IFact> facts, string counterpartyType)
+    public virtual List<Sungero.Docflow.Structures.Module.IFact> GetCounterpartyFacts(List<Sungero.Docflow.Structures.Module.IFact> facts, string counterpartyType)
     {
       var counterpartyFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.Name)
         .Where(f => GetFieldValue(f, FieldNames.Counterparty.CounterpartyType) == counterpartyType);
@@ -2655,7 +2655,7 @@ namespace Sungero.Capture.Server
     /// <param name="allFacts">Факты.</param>
     /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
-    public virtual List<Structures.Module.ICounterpartyFactMatching> MatchFactsWithBusinessUnitsAndCounterparties(List<Structures.Module.IFact> allFacts,
+    public virtual List<Structures.Module.ICounterpartyFactMatching> MatchFactsWithBusinessUnitsAndCounterparties(List<Sungero.Docflow.Structures.Module.IFact> allFacts,
                                                                                                                   List<string> counterpartyTypes)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
@@ -2856,7 +2856,7 @@ namespace Sungero.Capture.Server
     /// <param name="facts">Факты для поиска факта с контрагентом.</param>
     /// <param name="counterpartyType">Тип контрагента.</param>
     /// <returns>Контрагент.</returns>
-    public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Structures.Module.IFact> facts, string counterpartyType)
+    public static Structures.Module.MockCounterparty GetMostProbableMockCounterparty(List<Sungero.Docflow.Structures.Module.IFact> facts, string counterpartyType)
     {
       var counterpartyFacts = GetOrderedFacts(facts, FactNames.Counterparty, FieldNames.Counterparty.Name);
       var mostProbabilityFact = counterpartyFacts.Where(f =>  GetFieldValue(f, FieldNames.Counterparty.CounterpartyType) == counterpartyType).FirstOrDefault();
@@ -2905,7 +2905,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="propertyName">Имя свойства.</param>
     /// <returns>Корреспондент.</returns>
-    public virtual Structures.Module.ICounterpartyFactMatching GetCounterparty(Structures.Module.IRecognitionResult recognitionResult, string propertyName)
+    public virtual Structures.Module.ICounterpartyFactMatching GetCounterparty(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, string propertyName)
     {
       var actualCounterparties = Counterparties.GetAll()
         .Where(x => x.Status != Sungero.CoreEntities.DatabookEntry.Status.Closed);
@@ -3003,7 +3003,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Связка контрагент + факт.</returns>
-    public virtual Structures.Module.ICounterpartyFactMatching GetCounterpartyByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    public virtual Structures.Module.ICounterpartyFactMatching GetCounterpartyByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact, string propertyName)
     {
       var counterpartyUnitField = GetFieldByVerifiedData(fact, propertyName);
       if (counterpartyUnitField == null)
@@ -3029,7 +3029,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт Арио.</param>
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Связку контрагент + факт.</returns>
-    public virtual Structures.Module.ICounterpartyFactMatching GetBusinessUnitByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    public virtual Structures.Module.ICounterpartyFactMatching GetBusinessUnitByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact, string propertyName)
     {
       var businessUnitField = GetFieldByVerifiedData(fact, propertyName);
       if (businessUnitField == null)
@@ -3173,7 +3173,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <returns>Список НОР и соответствующих им фактов.</returns>
-    public virtual List<Capture.Structures.Module.ICounterpartyFactMatching> GetBusinessUnitsWithFacts(Structures.Module.IRecognitionResult recognitionResult)
+    public virtual List<Capture.Structures.Module.ICounterpartyFactMatching> GetBusinessUnitsWithFacts(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
     {
       var facts = recognitionResult.Facts;
       
@@ -3247,7 +3247,7 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="responsible">Ответственный за верификацию.</param>
     /// <param name="document">Договорной документ.</param>
-    public virtual void FillContractualDocumentParties(Structures.Module.IRecognitionResult recognitionResult,
+    public virtual void FillContractualDocumentParties(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                        Sungero.Company.IEmployee responsible,
                                                        Sungero.Contracts.IContractualDocument document)
     {
@@ -3345,7 +3345,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта.</param>
     /// <param name="fieldName">Имя поля.</param>
     /// <returns>Поле.</returns>
-    public static IFactField GetField(Structures.Module.IFact fact, string fieldName)
+    public static Sungero.Docflow.Structures.Module.IFactField GetField(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
     {
       if (fact == null)
         return null;
@@ -3358,7 +3358,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта.</param>
     /// <param name="fieldName">Список имен поля.</param>
     /// <returns>Список полей.</returns>
-    public static IQueryable<IFactField> GetFields(Structures.Module.IFact fact, List<string> fieldNames)
+    public static IQueryable<Sungero.Docflow.Structures.Module.IFactField> GetFields(Sungero.Docflow.Structures.Module.IFact fact, List<string> fieldNames)
     {
       if (fact == null)
         return null;
@@ -3371,7 +3371,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Значение поля.</returns>
-    public static string GetFieldValue(Structures.Module.IFact fact, string fieldName)
+    public static string GetFieldValue(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
     {
       if (fact == null)
         return string.Empty;
@@ -3390,7 +3390,7 @@ namespace Sungero.Capture.Server
     /// <param name="factName"> Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Значение поля, полученное из Ario с наибольшей вероятностью.</returns>
-    public static string GetFieldValue(List<Structures.Module.IFact> facts, string factName, string fieldName)
+    public static string GetFieldValue(List<Sungero.Docflow.Structures.Module.IFact> facts, string factName, string fieldName)
     {
       IEnumerable<IFactField> fields = facts
         .Where(f => f.Name == factName)
@@ -3411,7 +3411,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Числовое значение поля.</returns>
-    public static double? GetFieldNumericalValue(Structures.Module.IFact fact, string fieldName)
+    public static double? GetFieldNumericalValue(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
     {
       var field = GetFieldValue(fact, fieldName);
       return ConvertStringToDouble(field);
@@ -3423,7 +3423,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
     /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
     /// <returns>Значение поля типа DateTime.</returns>
-    public static DateTime? GetFieldDateTimeValue(Structures.Module.IFact fact, string fieldName)
+    public static DateTime? GetFieldDateTimeValue(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
     {
       var recognizedDate = GetFieldValue(fact, fieldName);
       if (string.IsNullOrWhiteSpace(recognizedDate))
@@ -3442,7 +3442,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт.</param>
     /// <param name="propertyName">Имя свойства документа связанное с фактом.</param>
     /// <returns>Связь факта с свойством.</returns>
-    public virtual Commons.IEntityRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName)
+    public virtual IDocumentRecognitionInfoFacts GetFieldByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact, string propertyName)
     {
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = Commons.EntityRecognitionInfos.GetAll()
@@ -3464,7 +3464,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя свойства документа, содержащее контрагента.</param>
     /// <returns>Связь факта с свойством.</returns>
-    public virtual Commons.IEntityRecognitionInfoFacts GetFieldByVerifiedData(Structures.Module.IFact fact, string propertyName, string counterpartyPropertyValue, string counterpartyPropertyName)
+    public virtual IDocumentRecognitionInfoFacts GetFieldByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact, string propertyName, string counterpartyPropertyValue, string counterpartyPropertyName)
     {
       var factLabel = GetFactLabel(fact, propertyName);
       var recognitionInfo = Commons.EntityRecognitionInfos.GetAll()
@@ -3485,7 +3485,7 @@ namespace Sungero.Capture.Server
     /// <param name="facts">Список фактов.</param>
     /// <param name="factName">Имя факта.</param>
     /// <returns>Список фактов.</returns>
-    public static List<Structures.Module.IFact> GetFacts(List<Structures.Module.IFact> facts, string factName)
+    public static List<Sungero.Docflow.Structures.Module.IFact> GetFacts(List<Sungero.Docflow.Structures.Module.IFact> facts, string factName)
     {
       return facts
         .Where(f => f.Name == factName)
@@ -3499,7 +3499,7 @@ namespace Sungero.Capture.Server
     /// <param name="factName">Имя факта.</param>
     /// <param name="fieldName">Имя поля.</param>
     /// <returns>Список фактов.</returns>
-    public static List<Structures.Module.IFact> GetFacts(List<Structures.Module.IFact> facts, string factName, string fieldName)
+    public static List<Sungero.Docflow.Structures.Module.IFact> GetFacts(List<Sungero.Docflow.Structures.Module.IFact> facts, string factName, string fieldName)
     {
       return facts
         .Where(f => f.Name == factName)
@@ -3515,7 +3515,7 @@ namespace Sungero.Capture.Server
     /// <param name="orderFieldName">Имя поля по вероятности которого будет произведена сортировка.</param>
     /// <returns>Отсортированный список фактов.</returns>
     /// <remarks>С учетом вероятности факта.</remarks>
-    public static List<Structures.Module.IFact> GetOrderedFacts(List<Structures.Module.IFact> facts, string factName, string orderFieldName)
+    public static List<Sungero.Docflow.Structures.Module.IFact> GetOrderedFacts(List<Sungero.Docflow.Structures.Module.IFact> facts, string factName, string orderFieldName)
     {
       return facts
         .Where(f => f.Name == factName)
@@ -3625,7 +3625,7 @@ namespace Sungero.Capture.Server
     /// <param name="nameFieldName">Наименование поля с наименованием контрагента.</param>
     /// <param name="legalFormFieldName">Наименование поля с организационо-правовой формой контрагента.</param>
     /// <returns>Наименование контрагента.</returns>
-    public static string GetCounterpartyName(Structures.Module.IFact fact, string nameFieldName, string legalFormFieldName)
+    public static string GetCounterpartyName(Sungero.Docflow.Structures.Module.IFact fact, string nameFieldName, string legalFormFieldName)
     {
       if (fact == null)
         return string.Empty;
@@ -3640,7 +3640,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Исходный факт, содержащий наименование ведущего документа.</param>
     /// <returns>Наименование ведущего документа с номером и датой.</returns>
-    private static string GetLeadingDocumentName(Structures.Module.IFact fact)
+    private static string GetLeadingDocumentName(Sungero.Docflow.Structures.Module.IFact fact)
     {
       if (fact == null)
         return string.Empty;
@@ -3686,8 +3686,8 @@ namespace Sungero.Capture.Server
     /// <param name="propertyValue">Значение свойства.</param>
     /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
     /// <param name="collectionRecordId">ИД записи свойства-коллекции.</param>
-    public static void LinkFactAndProperty(Structures.Module.IRecognitionResult recognitionResult,
-                                           Structures.Module.IFact fact,
+    public static void LinkFactAndProperty(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
+                                           Sungero.Docflow.Structures.Module.IFact fact,
                                            string fieldName,
                                            string propertyName,
                                            object propertyValue,
@@ -3710,8 +3710,8 @@ namespace Sungero.Capture.Server
     /// <param name="propertyValue">Значение свойства.</param>
     /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
     /// <param name="collectionRecordId">ИД записи свойства-коллекции.</param>
-    public static void LinkFactFieldsAndProperty(Structures.Module.IRecognitionResult recognitionResult,
-                                                 Structures.Module.IFact fact,
+    public static void LinkFactFieldsAndProperty(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
+                                                 Sungero.Docflow.Structures.Module.IFact fact,
                                                  List<string> fieldNames,
                                                  string propertyName,
                                                  object propertyValue,
@@ -3763,7 +3763,7 @@ namespace Sungero.Capture.Server
     /// <param name="propertyName">Имя связанного свойства.</param>
     /// <returns>Метка факта.</returns>
     /// <remarks>Используется для быстрого поиска факта в результатах извлечения фактов.</remarks>
-    public static string GetFactLabel(Structures.Module.IFact fact, string propertyName)
+    public static string GetFactLabel(Sungero.Docflow.Structures.Module.IFact fact, string propertyName)
     {
       string factInfo = fact.Name + propertyName;
       foreach (var field in fact.Fields)
@@ -3825,7 +3825,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт.</param>
     /// <param name="fieldName">Имя поля.</param>
     /// <returns>Признак, доверять извлеченному полю или нет.</returns>
-    public static bool IsTrustedField(Structures.Module.IFact fact, string fieldName)
+    public static bool IsTrustedField(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
     {
       var field = GetField(fact, fieldName);
       if (field == null)
@@ -3841,7 +3841,7 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ Rx.</param>
     /// <param name="recognitionResult">Результат обработки входящего документа в Арио.</param>
     /// <param name="versionNote">Примечание к версии.</param>
-    public virtual void CreateVersion(IOfficialDocument document, Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
+    public virtual void CreateVersion(IOfficialDocument document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
     {
       var needCreatePublicBody = recognitionResult.File != null && recognitionResult.File.Data != null;
       var pdfApp = Content.AssociatedApplications.GetByExtension(Constants.Module.PdfExtension);
@@ -3915,7 +3915,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Адресат.</returns>
-    public virtual Structures.Module.ISignatoryFactMatching GetAdresseeByFact(Sungero.Capture.Structures.Module.IFact fact)
+    public virtual Structures.Module.ISignatoryFactMatching GetAdresseeByFact(Sungero.Docflow.Structures.Module.IFact fact)
     {
       var result = Structures.Module.SignatoryFactMatching.Create(Sungero.Company.Employees.Null, null, fact, false);
       
@@ -3936,7 +3936,7 @@ namespace Sungero.Capture.Server
     /// <param name="predictedClass">НОР.</param>
     /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <returns>Сотрудник.</returns>
-    public virtual List<IEmployee> GetOurEmployeeByFact(Sungero.Capture.Structures.Module.IFact fact,
+    public virtual List<IEmployee> GetOurEmployeeByFact(Sungero.Docflow.Structures.Module.IFact fact,
                                                         IBusinessUnit businessUnit,
                                                         string predictedClass)
     {
@@ -3958,7 +3958,7 @@ namespace Sungero.Capture.Server
     /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <param name="fact">Факт.</param>
     /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
-    public static string GetFullNameByFact(string predictedClass, Sungero.Capture.Structures.Module.IFact fact)
+    public static string GetFullNameByFact(string predictedClass, Sungero.Docflow.Structures.Module.IFact fact)
     {
       if ((fact == null) || (predictedClass == string.Empty))
         return string.Empty;
@@ -3977,7 +3977,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="fact">Факт.</param>
     /// <returns>Имя в формате "Фамилия И.О." или "Фамилия Имя Отчество".</returns>
-    public static string GetFullNameByFactForContract(Sungero.Capture.Structures.Module.IFact fact)
+    public static string GetFullNameByFactForContract(Sungero.Docflow.Structures.Module.IFact fact)
     {
       if (fact == null)
         return string.Empty;
@@ -4017,7 +4017,7 @@ namespace Sungero.Capture.Server
     /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <param name="fact">Факт.</param>
     /// <returns>Имя в формате "Фамилия И.О.".</returns>
-    public virtual string GetShortNameByFact(string predictedClass, Sungero.Capture.Structures.Module.IFact fact)
+    public virtual string GetShortNameByFact(string predictedClass, Sungero.Docflow.Structures.Module.IFact fact)
     {
       if ((fact == null) || (predictedClass == string.Empty))
         return string.Empty;
@@ -4048,7 +4048,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт.</param>
     /// <param name="counterparty">Контрагент - владелец контактного лица.</param>
     /// <returns>Список контактных лиц.</returns>
-    public virtual IQueryable<IContact> GetContactsByFact(string predictedClass, Sungero.Capture.Structures.Module.IFact fact, ICounterparty counterparty)
+    public virtual IQueryable<IContact> GetContactsByFact(string predictedClass, Sungero.Docflow.Structures.Module.IFact fact, ICounterparty counterparty)
     {
       if ((fact == null) || (predictedClass == string.Empty))
         return new List<IContact>().AsQueryable();
@@ -4081,7 +4081,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
     /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <returns>Структура, содержащая факт, контактное лицо и признак доверия.</returns>
-    public virtual Structures.Module.ISignatoryFactMatching GetContactByFact(Sungero.Capture.Structures.Module.IFact fact,
+    public virtual Structures.Module.ISignatoryFactMatching GetContactByFact(Sungero.Docflow.Structures.Module.IFact fact,
                                                                              string propertyName,
                                                                              ICounterparty counterparty,
                                                                              string counterpartyPropertyName,
@@ -4119,7 +4119,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
     /// <returns>Контактное лицо.</returns>
-    public virtual Structures.Module.ISignatoryFactMatching GetContactByVerifiedData(Structures.Module.IFact fact,
+    public virtual Structures.Module.ISignatoryFactMatching GetContactByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact,
                                                                                      string propertyName,
                                                                                      ICounterparty counterparty,
                                                                                      string counterpartyPropertyName)
@@ -4183,7 +4183,7 @@ namespace Sungero.Capture.Server
     /// <param name="сounterparty">Структура с НОР, КА, фактом и признаком доверия.</param>
     /// <param name="isOurSignatory">Признак поиска нашего подписанта (true) или подписанта КА (false).</param>
     /// <returns>Сотрудник.</returns>
-    public virtual Structures.Module.ISignatoryFactMatching GetContractualDocumentSignatory(IRecognitionResult recognitionResult,
+    public virtual Structures.Module.ISignatoryFactMatching GetContractualDocumentSignatory(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
                                                                                             IContractualDocumentBase document,
                                                                                             ICounterpartyFactMatching organizationFactMatching,
                                                                                             bool isOurSignatory = false)
@@ -4261,7 +4261,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">НОР.</param>
     /// <param name="counterpartyPropertyName">Имя связанного свойства НОР.</param>
     /// <returns>Сотрудник.</returns>
-    public virtual Structures.Module.ISignatoryFactMatching GetEmployeeByVerifiedData(Structures.Module.IFact fact,
+    public virtual Structures.Module.ISignatoryFactMatching GetEmployeeByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact,
                                                                                       string propertyName,
                                                                                       IBusinessUnit businessUnit,
                                                                                       string businessUnitPropertyName)
@@ -4294,7 +4294,7 @@ namespace Sungero.Capture.Server
     /// <param name="fact">Факт.</param>
     /// <param name="counterparty">Контрагент.</param>
     /// <returns>Список документов с подходящими номером и датой.</returns>
-    public virtual IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Structures.Module.IFact fact, ICounterparty counterparty)
+    public virtual IQueryable<Sungero.Contracts.IContractualDocument> GetLeadingDocuments(Sungero.Docflow.Structures.Module.IFact fact, ICounterparty counterparty)
     {
       if (fact == null)
         return new List<Sungero.Contracts.IContractualDocument>().AsQueryable();
@@ -4318,7 +4318,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterparty">Контрагент.</param>
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns>Структура, содержащая ведущий документ, факт и признак доверия.</returns>
-    public virtual IContractFactMatching GetLeadingDocument(IFact fact, string leadingDocPropertyName,
+    public virtual IContractFactMatching GetLeadingDocument(Sungero.Docflow.Structures.Module.IFact fact, string leadingDocPropertyName,
                                                             ICounterparty counterparty, string counterpartyPropertyName)
     {
       var result = Structures.Module.ContractFactMatching.Create(Contracts.ContractualDocuments.Null, fact, false);
@@ -4345,7 +4345,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyValue">Ид контрагента.</param>
     /// <param name="counterpartyPropertyName">Имя свойства, связанного с контрагентом.</param>
     /// <returns></returns>
-    public virtual Structures.Module.IContractFactMatching GetContractByVerifiedData(Structures.Module.IFact fact,
+    public virtual Structures.Module.IContractFactMatching GetContractByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact,
                                                                                      string propertyName,
                                                                                      string counterpartyPropertyValue,
                                                                                      string counterpartyPropertyName)
@@ -4375,7 +4375,7 @@ namespace Sungero.Capture.Server
     /// <param name="document">Документ.</param>
     /// <param name="predictedClass">Результат обработки договора в Ario.</param>
     /// <returns>Структура, содержащая сотрудника, факт и признак доверия.</returns>
-    public virtual ISignatoryFactMatching GetContractualDocumentOurSignatoryByFact(Structures.Module.IFact fact,
+    public virtual ISignatoryFactMatching GetContractualDocumentOurSignatoryByFact(Sungero.Docflow.Structures.Module.IFact fact,
                                                                                    IContractualDocumentBase document,
                                                                                    string predictedClass)
     {
