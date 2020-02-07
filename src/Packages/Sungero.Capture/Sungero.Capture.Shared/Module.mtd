@@ -1243,6 +1243,18 @@
   ],
   "PublicFunctions": [
     {
+      "Name": "CheckConnection",
+      "Parameters": [
+        {
+          "Name": "arioUrl",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "ReturnType": "global::System.Boolean",
+      "ReturnTypeFullName": "System.Boolean"
+    },
+    {
       "Name": "CreateSimpleDocument",
       "Parameters": [
         {
@@ -1284,6 +1296,18 @@
       "Placement": "Shared",
       "ReturnType": "void",
       "ReturnTypeFullName": "System.Void"
+    },
+    {
+      "Name": "GetArioClassifiers",
+      "Parameters": [
+        {
+          "Name": "arioUrl",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "ReturnType": "global::System.Collections.Generic.List<global::Sungero.Docflow.Structures.SmartProcessingSetting.IClassifier>",
+      "ReturnTypeFullName": "System.Collections.Generic.List"
     },
     {
       "Name": "GetClassRuleMapping",

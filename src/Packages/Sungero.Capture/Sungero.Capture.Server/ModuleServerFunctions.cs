@@ -600,24 +600,24 @@ namespace Sungero.Capture.Server
       
       if (Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null)
       {
-      	leadingDocumentPriority.Add(MockIncomingLetters.Info.GetType().GetFinalType(), 6);
-      	leadingDocumentPriority.Add(MockContracts.Info.GetType().GetFinalType(), 5);
-      	leadingDocumentPriority.Add(MockContractStatements.Info.GetType().GetFinalType(), 4);
-      	leadingDocumentPriority.Add(MockWaybills.Info.GetType().GetFinalType(), 3);
-      	leadingDocumentPriority.Add(MockIncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
-      	leadingDocumentPriority.Add(MockIncomingInvoices.Info.GetType().GetFinalType(), 1);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
+        leadingDocumentPriority.Add(MockIncomingLetters.Info.GetType().GetFinalType(), 6);
+        leadingDocumentPriority.Add(MockContracts.Info.GetType().GetFinalType(), 5);
+        leadingDocumentPriority.Add(MockContractStatements.Info.GetType().GetFinalType(), 4);
+        leadingDocumentPriority.Add(MockWaybills.Info.GetType().GetFinalType(), 3);
+        leadingDocumentPriority.Add(MockIncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
+        leadingDocumentPriority.Add(MockIncomingInvoices.Info.GetType().GetFinalType(), 1);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
       }
       else
       {
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingLetters.Info.GetType().GetFinalType(), 7);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.Contracts.Info.GetType().GetFinalType(), 6);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.SupAgreements.Info.GetType().GetFinalType(), 5);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.ContractStatements.Info.GetType().GetFinalType(), 4);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.Waybills.Info.GetType().GetFinalType(), 3);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingInvoices.Info.GetType().GetFinalType(), 1);
-      	leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingLetters.Info.GetType().GetFinalType(), 7);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.Contracts.Info.GetType().GetFinalType(), 6);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.SupAgreements.Info.GetType().GetFinalType(), 5);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.ContractStatements.Info.GetType().GetFinalType(), 4);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.Waybills.Info.GetType().GetFinalType(), 3);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingInvoices.Info.GetType().GetFinalType(), 1);
+        leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
       }
       return leadingDocumentPriority;
     }
@@ -629,16 +629,16 @@ namespace Sungero.Capture.Server
     /// <returns>Ведущий документ.</returns>
     public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
     {
-    	var packagePriority = new Dictionary<IOfficialDocument, int>();
-    	var leadingDocumentPriority = GetPackageDocumentTypePriorities();
-    	int priority;
-    	foreach (var document in package)
-    	{
-    		leadingDocumentPriority.TryGetValue(document.Info.GetType().GetFinalType(), out priority);
-    		packagePriority.Add(document, priority);
-    	}
+      var packagePriority = new Dictionary<IOfficialDocument, int>();
+      var leadingDocumentPriority = GetPackageDocumentTypePriorities();
+      int priority;
+      foreach (var document in package)
+      {
+        leadingDocumentPriority.TryGetValue(document.Info.GetType().GetFinalType(), out priority);
+        packagePriority.Add(document, priority);
+      }
       
-    	var leadingDocument = packagePriority.OrderByDescending(p => p.Value).FirstOrDefault().Key;
+      var leadingDocument = packagePriority.OrderByDescending(p => p.Value).FirstOrDefault().Key;
       return leadingDocument;
     }
     
@@ -2375,8 +2375,8 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public virtual void FillNumberAndDate(IContractualDocumentBase document,
-                                       Structures.Module.IRecognitionResult recognitionResult,
-                                       string factName)
+                                          Structures.Module.IRecognitionResult recognitionResult,
+                                          string factName)
     {
       // Дата.
       var recognizedDate = GetRecognizedDate(recognitionResult, factName, FieldNames.Document.Date);
@@ -3532,6 +3532,49 @@ namespace Sungero.Capture.Server
       var arioUrl = Functions.Module.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
+    }
+    
+    /// <summary>
+    /// Проверить подключение к Ario.
+    /// </summary>
+    /// <returns>True, если сервис работает, иначе - False.</returns>
+    /// <remarks>Проверка должна обязательно быть на сервере, т.к. с клиента может быть залочен доступ.</remarks>
+    [Public]
+    public virtual bool CheckConnection(string arioUrl)
+    {
+      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+      ArioExtensions.Models.ArioInfo serviceInfo = null;
+      
+      try
+      {
+        serviceInfo = arioConnector.GetInfo();
+      }
+      catch (Exception e)
+      {
+        Logger.Error(e.Message);
+      }
+      
+      return serviceInfo != null && serviceInfo.State == Constants.SmartProcessingSetting.ArioConnectionSuccessMessage;
+    }
+    
+    /// <summary>
+    /// Получить список классификаторов из Арио.
+    /// </summary>
+    /// <returns>Список классификаторов.</returns>
+    [Public]
+    public virtual List<Docflow.Structures.SmartProcessingSetting.IClassifier> GetArioClassifiers(string arioUrl)
+    {
+      var classifiers = new List<Docflow.Structures.SmartProcessingSetting.IClassifier>();
+      try
+      {
+        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
+        classifiers = arioConnector.GetClassifiers().Select(x => Docflow.Structures.SmartProcessingSetting.Classifier.Create(x.Id, x.Name)).ToList();
+      }
+      catch (Exception e)
+      {
+        Logger.Error(e.Message);
+      }
+      return classifiers;
     }
     
     /// <summary>
