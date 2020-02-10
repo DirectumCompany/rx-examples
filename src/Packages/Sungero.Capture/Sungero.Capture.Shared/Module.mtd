@@ -134,36 +134,6 @@
       "Value": "\"Address\""
     },
     {
-      "Name": "Addressee",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Addressee\""
-    },
-    {
-      "Name": "Amount",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "DocumentAmount"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Amount\""
-    },
-    {
-      "Name": "Amount",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Goods"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Amount\""
-    },
-    {
       "Name": "ArioUrlKey",
       "ParentClasses": [
         "Module"
@@ -243,197 +213,12 @@
       "Value": "\"ContractStatement\""
     },
     {
-      "Name": "CorrectionDate",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"CorrectionDate\""
-    },
-    {
-      "Name": "CorrectionNumber",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"CorrectionNumber\""
-    },
-    {
-      "Name": "CorrespondentLegalForm",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"CorrespondentLegalForm\""
-    },
-    {
-      "Name": "CorrespondentName",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"CorrespondentName\""
-    },
-    {
-      "Name": "Count",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Goods"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Count\""
-    },
-    {
-      "Name": "Counterparty",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Counterparty\""
-    },
-    {
-      "Name": "CounterpartyType",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"CounterpartyType\""
-    },
-    {
-      "Name": "Currency",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "DocumentAmount"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Currency\""
-    },
-    {
-      "Name": "Date",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Date\""
-    },
-    {
-      "Name": "Date",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Document"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Date\""
-    },
-    {
-      "Name": "Date",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Date\""
-    },
-    {
-      "Name": "Document",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Document\""
-    },
-    {
-      "Name": "DocumentAmount",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentAmount\""
-    },
-    {
-      "Name": "DocumentBaseDate",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Document"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentBaseDate\""
-    },
-    {
-      "Name": "DocumentBaseDate",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentBaseDate\""
-    },
-    {
-      "Name": "DocumentBaseName",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentBaseName\""
-    },
-    {
-      "Name": "DocumentBaseNumber",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Document"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentBaseNumber\""
-    },
-    {
-      "Name": "DocumentBaseNumber",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentBaseNumber\""
-    },
-    {
       "Name": "DocumentIsLockedParamName",
       "ParentClasses": [
         "Module"
       ],
       "TypeName": "System.String",
       "Value": "\"DocumentIsLocked\""
-    },
-    {
-      "Name": "DocumentNumberingBySmartCaptureResultParamName",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"DocumentNumberingBySmartCaptureResult\""
     },
     {
       "Name": "EndTag",
@@ -499,15 +284,6 @@
       "Value": "\"Files\""
     },
     {
-      "Name": "FinancialDocument",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"FinancialDocument\""
-    },
-    {
       "Name": "Folder",
       "ParentClasses": [
         "Module",
@@ -524,15 +300,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"From\""
-    },
-    {
-      "Name": "Goods",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Goods\""
     },
     {
       "Name": "Green",
@@ -597,16 +364,6 @@
       "Value": "\"IsVisualMode\""
     },
     {
-      "Name": "LegalForm",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"LegalForm\""
-    },
-    {
       "Name": "Letter",
       "ParentClasses": [
         "Module",
@@ -623,24 +380,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"Letter\""
-    },
-    {
-      "Name": "Letter",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Letter\""
-    },
-    {
-      "Name": "LetterPerson",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"LetterPerson\""
     },
     {
       "Name": "Mail",
@@ -690,101 +429,11 @@
       "Name": "Name",
       "ParentClasses": [
         "Module",
-        "FieldNames",
-        "LetterPerson"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Name\""
-    },
-    {
-      "Name": "Name",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Name\""
-    },
-    {
-      "Name": "Name",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Goods"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Name\""
-    },
-    {
-      "Name": "Name",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Person"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Name\""
-    },
-    {
-      "Name": "Name",
-      "ParentClasses": [
-        "Module",
         "InstanceInfosTagNames",
         "FromTags"
       ],
       "TypeName": "System.String",
       "Value": "\"Name\""
-    },
-    {
-      "Name": "Number",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Number\""
-    },
-    {
-      "Name": "Number",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Document"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Number\""
-    },
-    {
-      "Name": "Number",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "FinancialDocument"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Number\""
-    },
-    {
-      "Name": "Patrn",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "LetterPerson"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Patrn\""
-    },
-    {
-      "Name": "Patrn",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Person"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Patrn\""
     },
     {
       "Name": "Payer",
@@ -820,16 +469,6 @@
       "Value": "'#'"
     },
     {
-      "Name": "Price",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Goods"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Price\""
-    },
-    {
       "Name": "PropertiesAlreadyColoredParamName",
       "ParentClasses": [
         "Module"
@@ -853,26 +492,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"#FAC6B6\""
-    },
-    {
-      "Name": "ResponseToDate",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"ResponseToDate\""
-    },
-    {
-      "Name": "ResponseToNumber",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"ResponseToNumber\""
     },
     {
       "Name": "Responsible",
@@ -911,36 +530,6 @@
       "Value": "\"SIGNATORY\""
     },
     {
-      "Name": "SignatoryName",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SignatoryName\""
-    },
-    {
-      "Name": "SignatoryPatrn",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SignatoryPatrn\""
-    },
-    {
-      "Name": "SignatorySurname",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SignatorySurname\""
-    },
-    {
       "Name": "SimpleRelationRelationName",
       "ParentClasses": [
         "Module"
@@ -956,16 +545,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"<html>\""
-    },
-    {
-      "Name": "Subject",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Letter"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Subject\""
     },
     {
       "Name": "Subject",
@@ -995,15 +574,6 @@
       "Value": "\"SupAgreement\""
     },
     {
-      "Name": "SupAgreement",
-      "ParentClasses": [
-        "Module",
-        "FactNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SupAgreement\""
-    },
-    {
       "Name": "Supplier",
       "ParentClasses": [
         "Module",
@@ -1011,26 +581,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"SUPPLIER\""
-    },
-    {
-      "Name": "Surname",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "LetterPerson"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Surname\""
-    },
-    {
-      "Name": "Surname",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Person"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Surname\""
     },
     {
       "Name": "TaxInvoice",
@@ -1069,36 +619,6 @@
       "Value": "\"TaxinvoiceCorrection\""
     },
     {
-      "Name": "TIN",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"TIN\""
-    },
-    {
-      "Name": "TinIsValid",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"TinIsValid\""
-    },
-    {
-      "Name": "TRRC",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Counterparty"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"TRRC\""
-    },
-    {
       "Name": "TrustedFactProbabilityKey",
       "ParentClasses": [
         "Module"
@@ -1114,26 +634,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"body.txt\""
-    },
-    {
-      "Name": "Type",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "LetterPerson"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Type\""
-    },
-    {
-      "Name": "UnitName",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Goods"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"UnitName\""
     },
     {
       "Name": "UniversalTransferCorrectionDocument",
@@ -1170,26 +670,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"GeneralTransferDocument\""
-    },
-    {
-      "Name": "VatAmount",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "DocumentAmount"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"VatAmount\""
-    },
-    {
-      "Name": "VatAmount",
-      "ParentClasses": [
-        "Module",
-        "FieldNames",
-        "Goods"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"VatAmount\""
     },
     {
       "Name": "Waybill",
@@ -1524,39 +1004,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "CounterpartyFactMatching",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "BusinessUnit",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Company.IBusinessUnit"
-        },
-        {
-          "Name": "Counterparty",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Parties.ICounterparty"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
-        },
-        {
-          "Name": "Type",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "CounterpartyFactNames",
       "IsPublic": true,
       "Properties": [
@@ -1574,29 +1021,6 @@
           "Name": "LegalFormField",
           "IsNullable": true,
           "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "DocumentParties",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "BusinessUnit",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.ICounterpartyFactMatching"
-        },
-        {
-          "Name": "Counterparty",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Capture.Structures.Module.ICounterpartyFactMatching"
-        },
-        {
-          "Name": "ResponsibleEmployeeBusinessUnit",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Company.IBusinessUnit"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -1663,30 +1087,6 @@
           "Name": "FillingColor",
           "IsNullable": true,
           "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "RecognizedAmount",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Amount",
-          "TypeFullName": "global::System.Double"
-        },
-        {
-          "Name": "HasValue",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"

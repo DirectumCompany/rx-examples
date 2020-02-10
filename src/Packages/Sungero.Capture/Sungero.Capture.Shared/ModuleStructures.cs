@@ -24,8 +24,8 @@ namespace Sungero.Capture.Structures.Module
     // Факт, из полей которого были излеченны данные контрагента.
     public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
-  
-    /// <summary>
+    
+  /// <summary>
   /// Наименования факта и полей для организаций.
   /// </summary>
   [Public]
@@ -96,44 +96,6 @@ namespace Sungero.Capture.Structures.Module
   }
   
   /// <summary>
-  /// Результат подбора сторон сделки для документа.
-  /// </summary>  
-  [Public]
-  partial class DocumentParties
-  {
-    // НОР.
-    public Sungero.Capture.Structures.Module.ICounterpartyFactMatching BusinessUnit { get; set; }
-    
-    // Контрагент.
-    public Sungero.Capture.Structures.Module.ICounterpartyFactMatching Counterparty { get; set; }
-    
-    // НОР подобранная из ответственного сотрудника.
-    public Sungero.Company.IBusinessUnit ResponsibleEmployeeBusinessUnit { get; set; }
-  }
-
-  /// <summary>
-  /// Контрагент, НОР и сопоставленный с ними факт с типом "Контрагент".
-  /// </summary>
-  [Public]
-  partial class CounterpartyFactMatching
-  {
-    // НОР.
-    public Sungero.Company.IBusinessUnit BusinessUnit { get; set; }
-    
-    // Контрагент.
-    public Sungero.Parties.ICounterparty Counterparty { get; set; }
-    
-    // Факт с типом контрагент, по полям которого осуществлялся поиск.
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
-    
-    // Тип найденного значения (Buyer, Seller и т.д.).
-    public string Type { get; set; }
-    
-    // Доверять ли найденному значению.
-    public bool IsTrusted { get; set; }
-  }
-
-  /// <summary>
   /// Файлы захваченного письма.
   /// </summary>
   [Public]
@@ -194,25 +156,6 @@ namespace Sungero.Capture.Structures.Module
     public List<int> DocumentFoundByBarcodeIds { get; set; }
     public List<int> LockedDocumentIds { get; set; }
   }
-  
-  /// <summary>
-  /// Результат распознавания суммы.
-  /// </summary>
-  [Public]
-  partial class RecognizedAmount
-  {
-    // Сумма.
-    public double Amount { get; set; }
-    
-    // Признак - есть значение.
-    public bool HasValue { get; set; }
-    
-    // Признак - можно доверять.
-    public bool IsTrusted { get; set; }
-
-    // Факт
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
-  }  
   
   /// <summary>
   /// Результат распознавания валюты.
