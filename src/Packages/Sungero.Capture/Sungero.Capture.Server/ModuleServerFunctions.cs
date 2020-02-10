@@ -3722,10 +3722,7 @@ namespace Sungero.Capture.Server
       if (!documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName))
         return;
       
-      var recognitionInfo = Commons.EntityRecognitionInfos
-        .GetAll(x => x.EntityId == document.Id)
-        .OrderByDescending(x => x.Id)
-        .FirstOrDefault();
+      var recognitionInfo = Commons.PublicFunctions.EntityRecognitionInfo.Remote.GetEntityRecognitionInfo(document);
       if (recognitionInfo == null)
         return;
       
