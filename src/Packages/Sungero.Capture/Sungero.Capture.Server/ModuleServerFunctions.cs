@@ -402,8 +402,8 @@ namespace Sungero.Capture.Server
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
     public virtual List<Sungero.Docflow.Structures.Module.IRecognitionResult> GetRecognitionResults(string jsonClassificationResults,
-                                                                                    Sungero.Docflow.Structures.Module.IFileDto file,
-                                                                                    bool sendedByEmail)
+                                                                                                    Sungero.Docflow.Structures.Module.IFileDto file,
+                                                                                                    bool sendedByEmail)
     {
       var recognitionResults = new List<Sungero.Docflow.Structures.Module.IRecognitionResult>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
@@ -2377,8 +2377,8 @@ namespace Sungero.Capture.Server
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public virtual void FillNumberAndDate(IContractualDocumentBase document,
-                                       Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                       string factName)
+                                          Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
+                                          string factName)
     {
       // Дата.
       var recognizedDate = GetRecognizedDate(recognitionResult, factName, FieldNames.Document.Date);
@@ -2656,7 +2656,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
     public virtual List<Sungero.Docflow.Structures.Module.ICounterpartyFactMatching> MatchFactsWithBusinessUnitsAndCounterparties(List<Sungero.Docflow.Structures.Module.IFact> allFacts,
-                                                                                                                  List<string> counterpartyTypes)
+                                                                                                                                  List<string> counterpartyTypes)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
       var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
@@ -2731,8 +2731,8 @@ namespace Sungero.Capture.Server
         if (counterparty != null || businessUnit != null)
         {
           var counterpartyFactMatching = Sungero.Docflow.Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact,
-                                                                                                    GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
-                                                                                                    false);
+                                                                                                           GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                           false);
           matchings.Add(counterpartyFactMatching);
         }
       }
@@ -2749,9 +2749,9 @@ namespace Sungero.Capture.Server
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагент.</returns>
     public virtual Sungero.Docflow.Structures.Module.IDocumentParties GetDocumentParties(Sungero.Docflow.Structures.Module.ICounterpartyFactMatching buyer,
-                                                                         Sungero.Docflow.Structures.Module.ICounterpartyFactMatching seller,
-                                                                         List<Sungero.Docflow.Structures.Module.ICounterpartyFactMatching> nonType,
-                                                                         IEmployee responsibleEmployee)
+                                                                                         Sungero.Docflow.Structures.Module.ICounterpartyFactMatching seller,
+                                                                                         List<Sungero.Docflow.Structures.Module.ICounterpartyFactMatching> nonType,
+                                                                                         IEmployee responsibleEmployee)
     {
       Sungero.Docflow.Structures.Module.ICounterpartyFactMatching counterparty = null;
       Sungero.Docflow.Structures.Module.ICounterpartyFactMatching businessUnit = null;
@@ -2831,8 +2831,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагент.</returns>
     public virtual Sungero.Docflow.Structures.Module.IDocumentParties GetDocumentParties(Sungero.Docflow.Structures.Module.ICounterpartyFactMatching buyer,
-                                                                         Sungero.Docflow.Structures.Module.ICounterpartyFactMatching seller,
-                                                                         IEmployee responsibleEmployee)
+                                                                                         Sungero.Docflow.Structures.Module.ICounterpartyFactMatching seller,
+                                                                                         IEmployee responsibleEmployee)
     {
       Sungero.Docflow.Structures.Module.ICounterpartyFactMatching counterparty = null;
       Sungero.Docflow.Structures.Module.ICounterpartyFactMatching businessUnit = null;
@@ -3058,8 +3058,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
     public virtual Sungero.Docflow.Structures.Module.ICounterpartyFactMatching GetMostProbableBusinessUnitMatching(List<Sungero.Docflow.Structures.Module.ICounterpartyFactMatching> businessUnitsWithFacts,
-                                                                                 string businessUnitPropertyName, IEmployee addressee,
-                                                                                 IEmployee responsible)
+                                                                                                                   string businessUnitPropertyName, IEmployee addressee,
+                                                                                                                   IEmployee responsible)
     {
       // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
       foreach(var record in businessUnitsWithFacts)
@@ -3112,8 +3112,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
     public virtual Sungero.Docflow.Structures.Module.ICounterpartyFactMatching GetMostProbableBusinessUnitMatching(List<Sungero.Docflow.Structures.Module.ICounterpartyFactMatching> businessUnitsWithFacts,
-                                                                                 string businessUnitPropertyName,
-                                                                                 IEmployee responsible)
+                                                                                                                   string businessUnitPropertyName,
+                                                                                                                   IEmployee responsible)
     {
       var businessUnit = Sungero.Docflow.Structures.Module.CounterpartyFactMatching.Create();
       
