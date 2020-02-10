@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
+using ArioClassNames = Sungero.Capture.PublicConstants.Module.ArioClassNames;
 using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
 using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
-using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
+using MessageTypes = Sungero.Docflow.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
 using CommonLibrary;
 
 namespace Sungero.Capture.Client
@@ -31,8 +31,8 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Captured Package Process. Sender line name: {0}", senderLineName);
       
       // Найти ответственного.
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
-      var responsible = PublicFunctions.SmartProcessingSetting.GetDocumentProcessingResponsible(smartProcessingSettings, senderLineName);
+      var smartProcessingSettings = Sungero.Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
+      var responsible = Sungero.Docflow.PublicFunctions.SmartProcessingSetting.GetDocumentProcessingResponsible(smartProcessingSettings, senderLineName);
       if (responsible == null)
         throw new ApplicationException(Resources.InvalidSenderLineNameFormat(senderLineName));
       
@@ -423,22 +423,11 @@ namespace Sungero.Capture.Client
     /// <returns>Json с результатом классификации и извлечения фактов.</returns>
     public virtual string ProcessPackage(string filePath, string senderLineName = "")
     {
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
+      var smartProcessingSettings = Sungero.Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
       if (smartProcessingSettings == null)
         throw new ApplicationException(Resources.SmartProcessingSettingsNotFound);
       
-      var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
-      if (arioUrlValidationMessage != null)
-        throw new ApplicationException(arioUrlValidationMessage.Text);
-      
-      var classifiersValidationMessage = Functions.SmartProcessingSetting.ValidateClassifiers(smartProcessingSettings);
-      if (classifiersValidationMessage != null)
-      {
-        if (classifiersValidationMessage.Type == MessageTypes.Warning)
-          Logger.Debug(classifiersValidationMessage.Text);
-        else
-          throw new ApplicationException(classifiersValidationMessage.Text);
-      }
+      Sungero.Docflow.PublicFunctions.SmartProcessingSetting.ValidateSettings(smartProcessingSettings);
       
       var arioConnector = new ArioExtensions.ArioConnector(smartProcessingSettings.ArioUrl);
       var typeClassifierId = smartProcessingSettings.TypeClassifierId.ToString();
@@ -920,31 +909,7 @@ namespace Sungero.Capture.Client
     
     #region Настройка и тесты
     
-    /// <summary>
-    /// Задать основные настройки захвата.
-    /// </summary>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
-    /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
-    public static void SetCaptureMainSettings(string arioUrl, string lowerConfidenceLimit, string upperConfidenceLimit,
-                                              string firstPageClassifierName, string typeClassifierName)
-    {
-      var message = Sungero.Capture.Functions.Module.Remote.SetCaptureMainSettings(arioUrl,
-                                                                                   lowerConfidenceLimit,
-                                                                                   upperConfidenceLimit,
-                                                                                   firstPageClassifierName,
-                                                                                   typeClassifierName);
-      if (message != null)
-      {
-        if (message.Type == MessageTypes.Warning)
-          Logger.Debug(message.Text);
-        
-        if (message.Type == MessageTypes.Error || message.Type == MessageTypes.SoftError)
-          throw new ApplicationException(message.Text);
-      }
-    }
+
     
     /// <summary>
     /// Включить демо-режим.
@@ -995,7 +960,7 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Begin create classifier with name \"{0}\".", classifierName);
       try
       {
-        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier != null)
@@ -1023,7 +988,7 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Begin import classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       try
       {
-        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
@@ -1054,7 +1019,7 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Begin export classifier with name \"{0}\" into file {1}.", classifierName, filePath);
       try
       {
-        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
@@ -1101,7 +1066,7 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Begin publish model with Id {0} for classifier with name \"{1}\".", modelId, classifierName);
       try
       {
-        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
@@ -1136,7 +1101,7 @@ namespace Sungero.Capture.Client
       Logger.DebugFormat("Begin train classifier with name \"{0}\" from folder {1}.", classifierName, filePath);
       try
       {
-        var arioUrl = Functions.Module.Remote.GetArioUrl();
+        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
         var classifier = arioConnector.GetClassifierByName(classifierName);
         if (classifier == null)
@@ -1191,7 +1156,7 @@ namespace Sungero.Capture.Client
     /// <returns>True, при успешном отображении.</returns>
     private static bool ShowModelsInfo(string classifierName)
     {
-      var arioUrl = Functions.Module.Remote.GetArioUrl();
+      var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       var classifier = arioConnector.GetClassifierByName(classifierName);
       if (classifier == null)

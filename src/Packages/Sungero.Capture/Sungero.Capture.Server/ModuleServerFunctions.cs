@@ -18,8 +18,6 @@ using FactNames = Sungero.Docflow.Constants.Module.FactNames;
 using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
 using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
-using MessageTypes = Sungero.Capture.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;
-using SettingsValidationMessageStructure = Sungero.Capture.Structures.SmartProcessingSetting.SettingsValidationMessage;
 using HighlightActivationStyleParamNames = Sungero.Capture.Constants.Module.HighlightActivationStyleParamNames;
 
 namespace Sungero.Capture.Server
@@ -105,62 +103,6 @@ namespace Sungero.Capture.Server
       
       // Добавить параметр признака активации демо-режима.
       Sungero.Docflow.PublicFunctions.Module.InsertOrUpdateDocflowParam(Sungero.Capture.Constants.Module.CaptureMockModeKey, string.Empty);
-    }
-    
-    /// <summary>
-    /// Установить основные параметры захвата.
-    /// </summary>
-    /// <param name="arioUrl">Адрес Арио.</param>
-    /// <param name="lowerConfidenceLimit">Нижняя граница доверия извлеченным фактам.</param>
-    /// <param name="upperConfidenceLimit">Верхняя граница доверия извлеченным фактам.</param>
-    /// <param name="firstPageClassifierName">Имя классификатора первых страниц.</param>
-    /// <param name="typeClassifierName">Имя классификатора по типам документов.</param>
-    /// <returns>Ошибка, если заполнить настройки не удалось.</returns>
-    [Remote]
-    public static Structures.SmartProcessingSetting.SettingsValidationMessage SetCaptureMainSettings(string arioUrl,
-                                                                                                     string lowerConfidenceLimit,
-                                                                                                     string upperConfidenceLimit,
-                                                                                                     string firstPageClassifierName,
-                                                                                                     string typeClassifierName)
-    {
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
-      
-      // Адрес.
-      smartProcessingSettings.ArioUrl = arioUrl;
-      var arioUrlValidationMessage = Functions.SmartProcessingSetting.ValidateArioUrl(smartProcessingSettings);
-      if (arioUrlValidationMessage != null)
-        return arioUrlValidationMessage;
-      
-      // Границы.
-      int lowerLimit;
-      int upperLimit;
-      smartProcessingSettings.LowerConfidenceLimit = int.TryParse(lowerConfidenceLimit, out lowerLimit) ? lowerLimit : -1;
-      smartProcessingSettings.UpperConfidenceLimit = int.TryParse(upperConfidenceLimit, out upperLimit) ? upperLimit : -1;
-      var confidenceLimitsValidationMessage = Functions.SmartProcessingSetting.ValidateConfidenceLimits(smartProcessingSettings);
-      if (confidenceLimitsValidationMessage != null)
-        return confidenceLimitsValidationMessage;
-      
-      // Классификаторы.
-      var classifiers = Functions.SmartProcessingSetting.GetArioClassifiers(smartProcessingSettings);
-      var firstPageClassifier = classifiers.Where(a => a.Name == firstPageClassifierName).FirstOrDefault();
-      var typeClassifier = classifiers.Where(a => a.Name == typeClassifierName).FirstOrDefault();
-      
-      if (firstPageClassifier == null || typeClassifier == null)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Error,
-                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
-      
-      smartProcessingSettings.FirstPageClassifierName = firstPageClassifier.Name;
-      smartProcessingSettings.FirstPageClassifierId = firstPageClassifier.Id;
-      smartProcessingSettings.TypeClassifierName = typeClassifier.Name;
-      smartProcessingSettings.TypeClassifierId = typeClassifier.Id;
-      
-      smartProcessingSettings.Save();
-      
-      // Предупредить, что выбраны одинаковые классификаторы.
-      if (firstPageClassifierName == typeClassifierName)
-        return SettingsValidationMessageStructure.Create(MessageTypes.Warning,
-                                                         SmartProcessingSettings.Resources.SetCorrectClassifiers);
-      return null;
     }
     
     #endregion
@@ -429,7 +371,7 @@ namespace Sungero.Capture.Server
         
         // Факты и поля фактов.
         recognitionResult.Facts = new List<Sungero.Docflow.Structures.Module.IFact>();
-        var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
+        var smartProcessingSettings = Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
         //var minFactProbability = smartProcessingSettings.LowerConfidenceLimit;
         if (packageProcessResult.ExtractionResult.Facts != null)
         {
@@ -3531,7 +3473,7 @@ namespace Sungero.Capture.Server
     /// <returns>Тело документа.</returns>
     public virtual System.IO.Stream GetDocumentBody(string documentGuid)
     {
-      var arioUrl = Functions.Module.GetArioUrl();
+      var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
       var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
       return arioConnector.GetDocumentByGuid(documentGuid);
     }
@@ -3556,7 +3498,8 @@ namespace Sungero.Capture.Server
         Logger.Error(e.Message);
       }
       
-      return serviceInfo != null && serviceInfo.State == Constants.SmartProcessingSetting.ArioConnectionSuccessMessage;
+      return serviceInfo != null &&
+        serviceInfo.State == Sungero.Capture.PublicConstants.Module.ArioConnectionSuccessMessage;
     }
     
     /// <summary>
@@ -3577,18 +3520,6 @@ namespace Sungero.Capture.Server
         Logger.Error(e.Message);
       }
       return classifiers;
-    }
-    
-    /// <summary>
-    /// Получить адрес сервиса Арио.
-    /// </summary>
-    /// <returns>Адрес Арио.</returns>
-    [Remote]
-    public virtual string GetArioUrl()
-    {
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
-      var arioUrl = smartProcessingSettings.ArioUrl;
-      return arioUrl;
     }
     
     /// <summary>
@@ -3831,7 +3762,7 @@ namespace Sungero.Capture.Server
       if (field == null)
         return false;
       
-      var smartProcessingSettings = PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
+      var smartProcessingSettings = Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
       return field.Probability >= smartProcessingSettings.UpperConfidenceLimit;
     }
     

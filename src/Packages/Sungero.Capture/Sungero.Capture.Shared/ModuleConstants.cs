@@ -31,6 +31,10 @@ namespace Sungero.Capture.Constants
     [Sungero.Core.Public]
     public const string IsVisualModeParamName = "IsVisualMode";
     
+    // Сообщение при успешном подключении к Ario.
+    [Sungero.Core.Public]
+    public const string ArioConnectionSuccessMessage = "SmartService is running";
+    
     // Названия параметров отображения фокусировки подсветки в предпросмотре.
     public static class HighlightActivationStyleParamNames
     {
@@ -50,7 +54,7 @@ namespace Sungero.Capture.Constants
       public const string FillingColor = "HighlightActivationStyleFillingColor";
     }
     
-    public const int HighlightActivationBorderDefaultWidth = 10; 
+    public const int HighlightActivationBorderDefaultWidth = 10;
     
     // Наименования классов из классификатора Ario.
     public static class ArioClassNames

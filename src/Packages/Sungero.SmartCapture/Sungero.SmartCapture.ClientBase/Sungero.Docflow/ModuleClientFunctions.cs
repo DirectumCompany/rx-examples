@@ -13,7 +13,7 @@ namespace Sungero.SmartCapture.Module.Docflow.Client
     /// </summary>
     public virtual void ShowSmartProcessingSettings()
     {
-      var smartProcessingSettings = Capture.PublicFunctions.SmartProcessingSetting.GetSmartProcessingSettings();
+      var smartProcessingSettings = Sungero.Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
       smartProcessingSettings.Show();
     }
 
