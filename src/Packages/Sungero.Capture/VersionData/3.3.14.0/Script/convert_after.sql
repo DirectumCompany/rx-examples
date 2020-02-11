@@ -1,5 +1,5 @@
-﻿delete from sungero_commons_facts
-delete from sungero_commons_entityrecogn
+﻿delete from sungero_commons_facts;
+delete from sungero_commons_entityrecogn;
 
 insert into sungero_commons_entityrecogn
 select 	drr.id
