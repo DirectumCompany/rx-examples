@@ -1282,8 +1282,8 @@ namespace Sungero.Capture.Server
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
       var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
       var documentParties = GetDocumentParties(buyer, seller, nonType, responsible);
-      FillAccountingDocumentParties(document, documentParties);
-      LinkAccountingDocumentParties(recognitionResult, documentParties);
+      DocflowPublicFunctions.FillAccountingDocumentParties(document, documentParties);
+      DocflowPublicFunctions.LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Дата, номер и регистрация.
       DocflowPublicFunctions.NumberDocument(document, recognitionResult, FactNames.Document, null);
@@ -1459,8 +1459,8 @@ namespace Sungero.Capture.Server
         factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
       var documentParties = GetDocumentParties(buyer, seller, responsible);
       
-      FillAccountingDocumentParties(document, documentParties);
-      LinkAccountingDocumentParties(recognitionResult, documentParties);
+      DocflowPublicFunctions.FillAccountingDocumentParties(document, documentParties);
+      DocflowPublicFunctions.LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Дата, номер и регистрация.
       DocflowPublicFunctions.NumberDocument(document, recognitionResult, FactNames.FinancialDocument, null);
@@ -1687,16 +1687,13 @@ namespace Sungero.Capture.Server
       
       if (FinancialArchive.IncomingTaxInvoices.Is(document))
       {
-        var overrideStructure = Structures.Module.OverrideStructure.Create();
-        overrideStructure.Parties = documentParties;
-        overrideStructure.Note = "test";
-        Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, overrideStructure);
+        Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, documentParties);
       }
       else
       {
         // НОР и КА.
-        FillAccountingDocumentParties(document, documentParties);
-        LinkAccountingDocumentParties(recognitionResult, documentParties);
+        DocflowPublicFunctions.FillAccountingDocumentParties(document, documentParties);
+        DocflowPublicFunctions.LinkAccountingDocumentParties(recognitionResult, documentParties);
         
         // Вид документа.
         FillDocumentKind(document);
@@ -1773,8 +1770,8 @@ namespace Sungero.Capture.Server
       var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
       var documentParties = GetDocumentParties(buyer, seller, responsible);
-      FillAccountingDocumentParties(document, documentParties);
-      LinkAccountingDocumentParties(recognitionResult, documentParties);
+      DocflowPublicFunctions.FillAccountingDocumentParties(document, documentParties);
+      DocflowPublicFunctions.LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
@@ -1932,8 +1929,8 @@ namespace Sungero.Capture.Server
       var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
       var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
       var documentParties = GetDocumentParties(buyer, seller, nonType, responsible);
-      FillAccountingDocumentParties(document, documentParties);
-      LinkAccountingDocumentParties(recognitionResult, documentParties);
+      DocflowPublicFunctions.FillAccountingDocumentParties(document, documentParties);
+      DocflowPublicFunctions.LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       // Договор.
       var contractFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
@@ -2156,50 +2153,6 @@ namespace Sungero.Capture.Server
       var entityFinalType = entity.GetType().GetFinalType();
       var entityTypeMetadata = Sungero.Metadata.Services.MetadataSearcher.FindEntityMetadata(entityFinalType);
       return entityTypeMetadata.GetDisplayName();
-    }
-    
-    /// <summary>
-    /// Заполнить НОР и контрагента в бухгалтерском документе.
-    /// </summary>
-    /// <param name="document">Бухгалтерский документ.</param>
-    /// <param name="documentParties">НОР и контрагент.</param>
-    public virtual void FillAccountingDocumentParties(IAccountingDocumentBase document,
-                                                      Sungero.Docflow.Structures.Module.IDocumentParties documentParties)
-    {
-      var counterparty = documentParties.Counterparty;
-      var businessUnit = documentParties.BusinessUnit;
-      var businessUnitMatched = businessUnit != null && businessUnit.BusinessUnit != null;
-      
-      document.Counterparty = counterparty != null ? counterparty.Counterparty : null;
-      document.BusinessUnit = businessUnitMatched ? businessUnit.BusinessUnit : documentParties.ResponsibleEmployeeBusinessUnit;
-    }
-    
-    /// <summary>
-    /// Связать факты для НОР и контрагента с подобранными значениями.
-    /// </summary>
-    /// <param name="recognitionResult">Результаты обработки бухгалтерского документа в Ario.</param>
-    /// <param name="documentParties">НОР и контрагент.</param>
-    public virtual void LinkAccountingDocumentParties(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                                      Sungero.Docflow.Structures.Module.IDocumentParties documentParties)
-    {
-      var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
-      var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
-      
-      var counterpartyMatched = documentParties.Counterparty != null &&
-        documentParties.Counterparty.Counterparty != null;
-      var businessUnitMatched = documentParties.BusinessUnit != null &&
-        documentParties.BusinessUnit.BusinessUnit != null;
-      
-      if (counterpartyMatched)
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentParties.Counterparty.Fact, null,
-                            counterpartyPropertyName, documentParties.Counterparty.Counterparty, documentParties.Counterparty.IsTrusted);
-
-      if (businessUnitMatched)
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentParties.BusinessUnit.Fact, null,
-                            businessUnitPropertyName, documentParties.BusinessUnit.BusinessUnit, documentParties.BusinessUnit.IsTrusted);
-      else
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null,
-                            businessUnitPropertyName, documentParties.ResponsibleEmployeeBusinessUnit, false);
     }
     
     /// <summary>

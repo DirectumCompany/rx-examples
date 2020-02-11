@@ -959,23 +959,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "OverrideStructure",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Parties",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IDocumentParties"
-        },
-        {
-          "Name": "Note",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "RecognizedDocumentDate",
       "IsPublic": true,
       "Properties": [
