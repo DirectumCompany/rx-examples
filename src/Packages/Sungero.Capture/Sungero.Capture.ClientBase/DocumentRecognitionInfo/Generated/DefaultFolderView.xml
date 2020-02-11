@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <ViewName>Default</ViewName>
+  <Folder FormGuid="8dbb6507-6d7b-4ef2-9247-a64a15eb5dbb">
+    <XtraSerializer version="1.0" application="GridControl">
+      <property name="#LayoutVersion" isnull="true" />
+      <property name="$GridControl" iskey="true" value="GridControl">
+        <property name="GroupSummary" iskey="true" value="0" />
+        <property name="View" isnull="true" iskey="true">
+          <property name="ColumnChooserState" isnull="true" iskey="true">
+            <property name="Location">881,-194</property>
+            <property name="Size">220,250</property>
+          </property>
+          <property name="AutoWidth">true</property>
+          <property name="AllowGrouping">true</property>
+          <property name="AllowSorting">true</property>
+          <property name="LinesPerRowMode">OneLineMode</property>
+          <property name="IsRowCellMenuEnabled">false</property>
+        </property>
+        <property name="TotalSummary" iskey="true" value="0" />
+        <property name="GroupCount">0</property>
+        <property name="Columns" iskey="true" value="6">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="MinWidth">32</property>
+            <property name="FieldName">T</property>
+            <property name="FixedWidth">true</property>
+            <property name="Visible">true</property>
+            <property name="ExtendedVisibleIndex">3</property>
+            <property name="VisibleIndex">0</property>
+            <property name="Width">32</property>
+            <property name="ActualWidth">3*</property>
+          </property>
+          <property name="Item2" isnull="true" iskey="true">
+            <property name="FieldName">Id</property>
+            <property name="Visible">true</property>
+            <property name="Name">DocumentRecognitionInfo_Id</property>
+            <property name="ExtendedVisibleIndex">5</property>
+            <property name="VisibleIndex">2</property>
+            <property name="ActualWidth">6*</property>
+          </property>
+          <property name="Item3" isnull="true" iskey="true">
+            <property name="FieldName">Name</property>
+            <property name="Visible">true</property>
+            <property name="Name">DocumentRecognitionInfo_Name</property>
+            <property name="ExtendedVisibleIndex">4</property>
+            <property name="VisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item4" isnull="true" iskey="true">
+            <property name="FieldName">RecognizedClass</property>
+            <property name="Visible">false</property>
+            <property name="Name">DocumentRecognitionInfo_RecognizedClass</property>
+            <property name="ExtendedVisibleIndex">0</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item5" isnull="true" iskey="true">
+            <property name="FieldName">ClassProbability</property>
+            <property name="Visible">false</property>
+            <property name="Name">DocumentRecognitionInfo_ClassProbability</property>
+            <property name="ExtendedVisibleIndex">1</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+          <property name="Item6" isnull="true" iskey="true">
+            <property name="FieldName">DocumentId</property>
+            <property name="Visible">false</property>
+            <property name="Name">DocumentRecognitionInfo_DocumentId</property>
+            <property name="ExtendedVisibleIndex">2</property>
+            <property name="ActualWidth">NaN</property>
+          </property>
+        </property>
+        <property name="SortInfo" iskey="true" value="1">
+          <property name="Item1" isnull="true" iskey="true">
+            <property name="FieldName">Id</property>
+            <property name="SortOrder">Descending</property>
+          </property>
+        </property>
+        <property name="GroupSummarySortInfo" iskey="true" value="0" />
+      </property>
+    </XtraSerializer>
+  </Folder>
+</settings>
