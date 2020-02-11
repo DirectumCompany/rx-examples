@@ -173,28 +173,10 @@
       "Name": "Contract",
       "ParentClasses": [
         "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Договор\""
-    },
-    {
-      "Name": "Contract",
-      "ParentClasses": [
-        "Module",
         "ArioGrammarNames"
       ],
       "TypeName": "System.String",
       "Value": "\"Contract\""
-    },
-    {
-      "Name": "ContractStatement",
-      "ParentClasses": [
-        "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Акт выполненных работ\""
     },
     {
       "Name": "ContractStatement",
@@ -325,15 +307,6 @@
       "Name": "IncomingInvoice",
       "ParentClasses": [
         "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Входящий счет на оплату\""
-    },
-    {
-      "Name": "IncomingInvoice",
-      "ParentClasses": [
-        "Module",
         "ArioGrammarNames"
       ],
       "TypeName": "System.String",
@@ -355,15 +328,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"IsVisualMode\""
-    },
-    {
-      "Name": "Letter",
-      "ParentClasses": [
-        "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Письмо\""
     },
     {
       "Name": "Letter",
@@ -544,15 +508,6 @@
       "Name": "SupAgreement",
       "ParentClasses": [
         "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Дополнительное соглашение\""
-    },
-    {
-      "Name": "SupAgreement",
-      "ParentClasses": [
-        "Module",
         "ArioGrammarNames"
       ],
       "TypeName": "System.String",
@@ -571,28 +526,10 @@
       "Name": "TaxInvoice",
       "ParentClasses": [
         "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Счет-фактура\""
-    },
-    {
-      "Name": "TaxInvoice",
-      "ParentClasses": [
-        "Module",
         "ArioGrammarNames"
       ],
       "TypeName": "System.String",
       "Value": "\"TaxInvoice\""
-    },
-    {
-      "Name": "TaxinvoiceCorrection",
-      "ParentClasses": [
-        "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Корректировочный счет-фактура\""
     },
     {
       "Name": "TaxinvoiceCorrection",
@@ -616,15 +553,6 @@
       "Name": "UniversalTransferCorrectionDocument",
       "ParentClasses": [
         "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Универсальный корректировочный документ\""
-    },
-    {
-      "Name": "UniversalTransferCorrectionDocument",
-      "ParentClasses": [
-        "Module",
         "ArioGrammarNames"
       ],
       "TypeName": "System.String",
@@ -634,28 +562,10 @@
       "Name": "UniversalTransferDocument",
       "ParentClasses": [
         "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Универсальный передаточный документ\""
-    },
-    {
-      "Name": "UniversalTransferDocument",
-      "ParentClasses": [
-        "Module",
         "ArioGrammarNames"
       ],
       "TypeName": "System.String",
       "Value": "\"GeneralTransferDocument\""
-    },
-    {
-      "Name": "Waybill",
-      "ParentClasses": [
-        "Module",
-        "ArioClassNames"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Товарная накладная\""
     },
     {
       "Name": "Waybill",

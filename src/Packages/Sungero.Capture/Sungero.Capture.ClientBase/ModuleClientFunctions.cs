@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using ArioClassNames = Sungero.Capture.PublicConstants.Module.ArioClassNames;
+using ArioClassNames = Sungero.Docflow.PublicConstants.Module.ArioClassNames;
 using ArioGrammarNames = Sungero.Capture.Constants.Module.ArioGrammarNames;
 using InstanceInfosTagNames = Sungero.Capture.Constants.Module.InstanceInfosTagNames;
 using MessageTypes = Sungero.Docflow.Constants.SmartProcessingSetting.SettingsValidationMessageTypes;

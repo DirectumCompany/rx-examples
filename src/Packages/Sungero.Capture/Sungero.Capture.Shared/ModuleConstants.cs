@@ -43,40 +43,6 @@ namespace Sungero.Capture.Constants
     
     public const int HighlightActivationBorderDefaultWidth = 10;
     
-    // Наименования классов из классификатора Ario.
-    public static class ArioClassNames
-    {
-      [Sungero.Core.Public]
-      public const string Letter = "Письмо";
-      
-      [Sungero.Core.Public]
-      public const string ContractStatement = "Акт выполненных работ";
-      
-      [Sungero.Core.Public]
-      public const string Waybill = "Товарная накладная";
-      
-      [Sungero.Core.Public]
-      public const string TaxInvoice = "Счет-фактура";
-      
-      [Sungero.Core.Public]
-      public const string TaxinvoiceCorrection = "Корректировочный счет-фактура";
-      
-      [Sungero.Core.Public]
-      public const string UniversalTransferDocument = "Универсальный передаточный документ";
-      
-      [Sungero.Core.Public]
-      public const string UniversalTransferCorrectionDocument = "Универсальный корректировочный документ";
-      
-      [Sungero.Core.Public]
-      public const string IncomingInvoice = "Входящий счет на оплату";
-      
-      [Sungero.Core.Public]
-      public const string Contract = "Договор";
-      
-      [Sungero.Core.Public]
-      public const string SupAgreement = "Дополнительное соглашение";
-    }
-    
     // Наименование правил для извлечения фактов Ario.
     public static class ArioGrammarNames
     {
