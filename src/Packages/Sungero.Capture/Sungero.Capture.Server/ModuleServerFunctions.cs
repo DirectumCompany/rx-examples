@@ -19,6 +19,7 @@ using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
 using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Capture.Constants.Module.ArioClassNames;
 using HighlightActivationStyleParamNames = Sungero.Capture.Constants.Module.HighlightActivationStyleParamNames;
+using DocflowPublicFunctions = Sungero.Docflow.PublicFunctions.Module;
 
 namespace Sungero.Capture.Server
 {
@@ -32,6 +33,7 @@ namespace Sungero.Capture.Server
     [Remote]
     public static void InitCaptureMockMode()
     {
+      
       // Создать типы документов.
       Sungero.Docflow.PublicInitializationFunctions.Module.CreateDocumentType(RecordManagement.Resources.IncomingLetterTypeName,
                                                                               Capture.Server.MockIncomingLetter.ClassTypeGuid,
@@ -928,21 +930,21 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
       }
       
       // Адресат.
       var addresseeFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Addressee).FirstOrDefault();
       var addressee = GetAdresseeByFact(addresseeFact);
       document.Addressee = addressee.Employee;
-      LinkFactAndProperty(recognitionResult, addresseeFact, FieldNames.Letter.Addressee, props.Addressee.Name, document.Addressee, addressee.IsTrusted);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, addresseeFact, FieldNames.Letter.Addressee, props.Addressee.Name, document.Addressee, addressee.IsTrusted);
       
       // Заполнить данные корреспондента.
       var correspondent = GetCounterparty(recognitionResult, props.Correspondent.Name);
       if (correspondent != null)
       {
         document.Correspondent = correspondent.Counterparty;
-        LinkFactAndProperty(recognitionResult, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
       }
       
       // Дата, номер.
@@ -951,13 +953,13 @@ namespace Sungero.Capture.Server
       var isDateValid = IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
       document.Dated = date;
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, date, isTrustedDate);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
       document.InNumber = GetFieldValue(numberFact, FieldNames.Letter.Number);
-      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
       
       // Заполнить данные нашей стороны.
       // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
@@ -970,7 +972,7 @@ namespace Sungero.Capture.Server
                                                                      document.Addressee,
                                                                      responsible);
       document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name,
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name,
                           document.BusinessUnit, businessUnitWithFact.IsTrusted);
       
       document.Department = document.Addressee != null
@@ -987,11 +989,11 @@ namespace Sungero.Capture.Server
       if (document.Correspondent == null && signedBy.Contact != null)
       {
         // Если контрагент определился из подписанта, то результату не доверяем.
-        LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, signedBy.Contact.Company, false);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, signedBy.Contact.Company, false);
       }
       document.SignedBy = signedBy.Contact;
-      var isTrustedSignatory = signedBy.IsTrusted ? IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type) : signedBy.IsTrusted;
-      LinkFactAndProperty(recognitionResult, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
+      var isTrustedSignatory = signedBy.IsTrusted ? DocflowPublicFunctions.IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type) : signedBy.IsTrusted;
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
       
       // Заполнить контакт.
       var responsibleFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
@@ -1002,11 +1004,11 @@ namespace Sungero.Capture.Server
       if (document.Correspondent == null && contact.Contact != null)
       {
         // Если контрагент определился из контакта, то результату не доверяем.
-        LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, contact.Contact.Company, false);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, contact.Contact.Company, false);
       }
       document.Contact = contact.Contact;
-      var isTrustedContact = contact.IsTrusted && IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
-      LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
+      var isTrustedContact = contact.IsTrusted && DocflowPublicFunctions.IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
       
       return document;
     }
@@ -1030,8 +1032,8 @@ namespace Sungero.Capture.Server
       var numberFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
       document.InNumber = GetFieldValue(numberFact, FieldNames.Letter.Number);
       document.Dated = Functions.Module.GetShortDate(GetFieldValue(dateFact, FieldNames.Letter.Date));
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
-      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
       
       // Заполнить данные корреспондента.
       var correspondentNameFacts = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName);
@@ -1039,13 +1041,13 @@ namespace Sungero.Capture.Server
       {
         var fact = correspondentNameFacts.First();
         document.Correspondent = GetCounterpartyName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Letter.CorrespondentName, props.Correspondent.Name, document.Correspondent);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Letter.CorrespondentName, props.Correspondent.Name, document.Correspondent);
       }
       if (correspondentNameFacts.Count() > 1)
       {
         var fact = correspondentNameFacts.Last();
         document.Recipient = GetCounterpartyName(fact, FieldNames.Letter.CorrespondentName, FieldNames.Letter.CorrespondentLegalForm);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Letter.CorrespondentName, props.Recipient.Name, document.Recipient);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Letter.CorrespondentName, props.Recipient.Name, document.Recipient);
       }
       
       // Заполнить ИНН/КПП для КА и НОР.
@@ -1055,8 +1057,8 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.First();
         document.CorrespondentTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
         document.CorrespondentTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.CorrespondentTin.Name, document.CorrespondentTin);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.CorrespondentTin.Name, document.CorrespondentTin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.CorrespondentTrrc.Name, document.CorrespondentTrrc);
       }
       
       if (tinTrrcFacts.Count() > 1)
@@ -1064,8 +1066,8 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.Last();
         document.RecipientTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
         document.RecipientTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.RecipientTin.Name, document.RecipientTin);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.RecipientTrrc.Name, document.RecipientTrrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.RecipientTin.Name, document.RecipientTin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.RecipientTrrc.Name, document.RecipientTrrc);
       }
       
       // В ответ на.
@@ -1076,8 +1078,8 @@ namespace Sungero.Capture.Server
       document.InResponseTo = string.IsNullOrEmpty(responseToDate)
         ? responseToNumber
         : string.Format("{0} {1} {2}", responseToNumber, Sungero.Docflow.Resources.From, responseToDate);
-      LinkFactAndProperty(recognitionResult, responseToNumberFact, FieldNames.Letter.ResponseToNumber, props.InResponseTo.Name, document.InResponseTo);
-      LinkFactAndProperty(recognitionResult, responseToDateFact, FieldNames.Letter.ResponseToDate, props.InResponseTo.Name, document.InResponseTo);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, responseToNumberFact, FieldNames.Letter.ResponseToNumber, props.InResponseTo.Name, document.InResponseTo);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, responseToDateFact, FieldNames.Letter.ResponseToDate, props.InResponseTo.Name, document.InResponseTo);
       
       // Заполнить подписанта.
       var personFacts = GetOrderedFacts(facts, FactNames.LetterPerson, FieldNames.LetterPerson.Surname);
@@ -1086,8 +1088,8 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Signatory).FirstOrDefault();
         document.Signatory = GetFullNameByFact(predictedClass, signatoryFact);
-        var isTrusted = IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type);
-        LinkFactAndProperty(recognitionResult, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
+        var isTrusted = DocflowPublicFunctions.IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
       }
       
       // Заполнить контакт.
@@ -1095,8 +1097,8 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
         document.Contact = GetFullNameByFact(predictedClass, responsibleFact);
-        var isTrusted = IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
-        LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
+        var isTrusted = DocflowPublicFunctions.IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
       }
       
       // Заполнить данные нашей стороны.
@@ -1107,7 +1109,7 @@ namespace Sungero.Capture.Server
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
       }
       foreach (var fact in addresseeFacts)
-        LinkFactAndProperty(recognitionResult, fact, null, props.Addressees.Name, document.Addressees, true);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, null, props.Addressees.Name, document.Addressees, true);
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
       var subjectFact = GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Subject).FirstOrDefault();
@@ -1115,7 +1117,7 @@ namespace Sungero.Capture.Server
       if (!string.IsNullOrEmpty(subject))
       {
         document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
       }
       
       return document;
@@ -1142,7 +1144,7 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.LeadDoc = GetLeadingDocumentName(leadingDocFact);
-      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
       
       // Дата и номер.
       FillMockRegistrationData(document, recognitionResult, FactNames.Document);
@@ -1154,10 +1156,10 @@ namespace Sungero.Capture.Server
         document.CounterpartyName = seller.Name;
         document.CounterpartyTin = seller.Tin;
         document.CounterpartyTrrc = seller.Trrc;
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.CounterpartyName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.CounterpartyName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.CounterpartyTin.Name, seller.Tin);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.CounterpartyTrrc.Name, seller.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.CounterpartyName.Name, seller.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.CounterpartyName.Name, seller.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.CounterpartyTin.Name, seller.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.CounterpartyTrrc.Name, seller.Trrc);
       }
       var buyer = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Buyer);
       if (buyer != null)
@@ -1165,10 +1167,10 @@ namespace Sungero.Capture.Server
         document.BusinessUnitName = buyer.Name;
         document.BusinessUnitTin = buyer.Tin;
         document.BusinessUnitTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BusinessUnitName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BusinessUnitName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BusinessUnitTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BusinessUnitTrrc.Name, buyer.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BusinessUnitName.Name, buyer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BusinessUnitName.Name, buyer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BusinessUnitTin.Name, buyer.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BusinessUnitTrrc.Name, buyer.Trrc);
       }
       
       // В актах могут прийти контрагенты без типа. Заполнить контрагентами без типа.
@@ -1190,10 +1192,10 @@ namespace Sungero.Capture.Server
             document.CounterpartyName = name;
             document.CounterpartyTin = tin;
             document.CounterpartyTrrc = trrc;
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.CounterpartyName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.CounterpartyName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.CounterpartyTin.Name, tin);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.CounterpartyTrrc.Name, trrc);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.CounterpartyName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.CounterpartyName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.CounterpartyTin.Name, tin);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.CounterpartyTrrc.Name, trrc);
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
           else if (string.IsNullOrWhiteSpace(document.BusinessUnitName))
@@ -1201,10 +1203,10 @@ namespace Sungero.Capture.Server
             document.BusinessUnitName = name;
             document.BusinessUnitTin = tin;
             document.BusinessUnitTrrc = trrc;
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.BusinessUnitName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.BusinessUnitName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.BusinessUnitTin.Name, tin);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.BusinessUnitTrrc.Name, trrc);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.BusinessUnitName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.BusinessUnitName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.BusinessUnitTin.Name, tin);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.BusinessUnitTrrc.Name, trrc);
           }
         }
       }
@@ -1213,14 +1215,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, FactNames.Goods, FieldNames.Goods.Name))
@@ -1240,18 +1242,18 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
-                            good.Name, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
-                            good.UnitName, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
-                            good.Count, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
-                            good.Price, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
-                            good.VatAmount, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
-                            good.TotalAmount, collectionRecordId : good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
+                            good.Name, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
+                            good.UnitName, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
+                            good.Count, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
+                            good.Price, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
+                            good.VatAmount, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
+                            good.TotalAmount, null, good.Id);
       }
       return document;
     }
@@ -1292,7 +1294,7 @@ namespace Sungero.Capture.Server
                                                document.Info.Properties.LeadingDocument.Name,
                                                document.Counterparty, document.Info.Properties.Counterparty.Name);
       document.LeadingDocument = leadingDocument.Contract;
-      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, leadingDocument.IsTrusted);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
@@ -1325,8 +1327,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isTrusted = IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
-      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      var isTrusted = DocflowPublicFunctions.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -1336,10 +1338,10 @@ namespace Sungero.Capture.Server
         document.Shipper = shipper.Name;
         document.ShipperTin = shipper.Tin;
         document.ShipperTrrc = shipper.Trrc;
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.Name, props.Shipper.Name, shipper.Name);
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.LegalForm, props.Shipper.Name, shipper.Name);
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TIN, props.ShipperTin.Name, shipper.Tin);
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TRRC, props.ShipperTrrc.Name, shipper.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.Name, props.Shipper.Name, shipper.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.LegalForm, props.Shipper.Name, shipper.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TIN, props.ShipperTin.Name, shipper.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TRRC, props.ShipperTrrc.Name, shipper.Trrc);
       }
       
       var consignee = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Consignee);
@@ -1348,10 +1350,10 @@ namespace Sungero.Capture.Server
         document.Consignee = consignee.Name;
         document.ConsigneeTin = consignee.Tin;
         document.ConsigneeTrrc = consignee.Trrc;
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.Name, props.Consignee.Name, consignee.Name);
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.LegalForm, props.Consignee.Name, consignee.Name);
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TIN, props.ConsigneeTin.Name, consignee.Tin);
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TRRC, props.ConsigneeTrrc.Name, consignee.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.Name, props.Consignee.Name, consignee.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.LegalForm, props.Consignee.Name, consignee.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TIN, props.ConsigneeTin.Name, consignee.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TRRC, props.ConsigneeTrrc.Name, consignee.Trrc);
       }
       
       var supplier = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Supplier);
@@ -1360,10 +1362,10 @@ namespace Sungero.Capture.Server
         document.Supplier = supplier.Name;
         document.SupplierTin = supplier.Tin;
         document.SupplierTrrc = supplier.Trrc;
-        LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.Name, props.Supplier.Name, supplier.Name);
-        LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.LegalForm, props.Supplier.Name, supplier.Name);
-        LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.TIN, props.SupplierTin.Name, supplier.Tin);
-        LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.TRRC, props.SupplierTrrc.Name, supplier.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.Name, props.Supplier.Name, supplier.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.LegalForm, props.Supplier.Name, supplier.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.TIN, props.SupplierTin.Name, supplier.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, supplier.Fact, FieldNames.Counterparty.TRRC, props.SupplierTrrc.Name, supplier.Trrc);
       }
       
       var payer = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Payer);
@@ -1372,10 +1374,10 @@ namespace Sungero.Capture.Server
         document.Payer = payer.Name;
         document.PayerTin = payer.Tin;
         document.PayerTrrc = payer.Trrc;
-        LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.Name, props.Payer.Name, payer.Name);
-        LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.LegalForm, props.Payer.Name, payer.Name);
-        LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.TIN, props.PayerTin.Name, payer.Tin);
-        LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.TRRC, props.PayerTrrc.Name, payer.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.Name, props.Payer.Name, payer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.LegalForm, props.Payer.Name, payer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.TIN, props.PayerTin.Name, payer.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, payer.Fact, FieldNames.Counterparty.TRRC, props.PayerTrrc.Name, payer.Trrc);
       }
       
       // Дата и номер.
@@ -1385,14 +1387,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, FactNames.Goods, FieldNames.Goods.Name))
@@ -1413,18 +1415,18 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
-                            good.Name, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
-                            good.UnitName, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
-                            good.Count, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
-                            good.Price, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
-                            good.VatAmount, collectionRecordId : good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
-                            good.TotalAmount, collectionRecordId : good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
+                            good.Name, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
+                            good.UnitName, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
+                            good.Count, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
+                            good.Price, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
+                            good.VatAmount, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
+                            good.TotalAmount, null, good.Id);
       }
       
       return document;
@@ -1467,8 +1469,8 @@ namespace Sungero.Capture.Server
       var leadingDocFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       var contractualDocuments = GetLeadingDocuments(leadingDocFact, document.Counterparty);
       document.LeadingDocument = contractualDocuments.FirstOrDefault();
-      var isTrusted = (contractualDocuments.Count() == 1) ? IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName) : false;
-      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
+      var isTrusted = (contractualDocuments.Count() == 1) ? DocflowPublicFunctions.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName) : false;
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
@@ -1504,10 +1506,10 @@ namespace Sungero.Capture.Server
         document.ShipperName = shipper.Name;
         document.ShipperTin = shipper.Tin;
         document.ShipperTrrc = shipper.Trrc;
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.Name, props.ShipperName.Name, shipper.Name);
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.LegalForm, props.ShipperName.Name, shipper.Name);
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TIN, props.ShipperTin.Name, shipper.Tin);
-        LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TRRC, props.ShipperTrrc.Name, shipper.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.Name, props.ShipperName.Name, shipper.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.LegalForm, props.ShipperName.Name, shipper.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TIN, props.ShipperTin.Name, shipper.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, shipper.Fact, FieldNames.Counterparty.TRRC, props.ShipperTrrc.Name, shipper.Trrc);
       }
       
       var consignee = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Consignee);
@@ -1516,10 +1518,10 @@ namespace Sungero.Capture.Server
         document.ConsigneeName = consignee.Name;
         document.ConsigneeTin = consignee.Tin;
         document.ConsigneeTrrc = consignee.Trrc;
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.Name, props.ConsigneeName.Name, consignee.Name);
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.LegalForm, props.ConsigneeName.Name, consignee.Name);
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TIN, props.ConsigneeTin.Name, consignee.Tin);
-        LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TRRC, props.ConsigneeTrrc.Name, consignee.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.Name, props.ConsigneeName.Name, consignee.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.LegalForm, props.ConsigneeName.Name, consignee.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TIN, props.ConsigneeTin.Name, consignee.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, consignee.Fact, FieldNames.Counterparty.TRRC, props.ConsigneeTrrc.Name, consignee.Trrc);
       }
       
       var seller = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Seller);
@@ -1528,10 +1530,10 @@ namespace Sungero.Capture.Server
         document.SellerName = seller.Name;
         document.SellerTin = seller.Tin;
         document.SellerTrrc = seller.Trrc;
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, seller.Tin);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, seller.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.SellerName.Name, seller.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, seller.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, seller.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, seller.Trrc);
       }
       
       var buyer = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Buyer);
@@ -1540,10 +1542,10 @@ namespace Sungero.Capture.Server
         document.BuyerName = buyer.Name;
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, buyer.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BuyerName.Name, buyer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, buyer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, buyer.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, buyer.Trrc);
       }
       
       // Дата и номер.
@@ -1554,14 +1556,14 @@ namespace Sungero.Capture.Server
       var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       // Номенклатура.
       foreach (var fact in GetFacts(facts, FactNames.Goods, FieldNames.Goods.Name))
@@ -1581,18 +1583,18 @@ namespace Sungero.Capture.Server
         good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
-                            good.Name, collectionRecordId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
-                            good.UnitName, collectionRecordId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
-                            good.Count, collectionRecordId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
-                            good.Price, collectionRecordId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
-                            good.VatAmount, collectionRecordId: good.Id);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
-                            good.TotalAmount, collectionRecordId: good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
+                            good.Name, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.UnitName, string.Format(formatter, props.Goods.Properties.UnitName.Name),
+                            good.UnitName, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Count, string.Format(formatter, props.Goods.Properties.Count.Name),
+                            good.Count, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Price, string.Format(formatter, props.Goods.Properties.Price.Name),
+                            good.Price, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.VatAmount, string.Format(formatter, props.Goods.Properties.VatAmount.Name),
+                            good.VatAmount, null, good.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Amount, string.Format(formatter, props.Goods.Properties.TotalAmount.Name),
+                            good.TotalAmount, null, good.Id);
       }
       
       return document;
@@ -1680,55 +1682,62 @@ namespace Sungero.Capture.Server
           documentParties.Counterparty = seller;
         }
       }
+
       documentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      
+        
       // НОР и КА.
       FillAccountingDocumentParties(document, documentParties);
       LinkAccountingDocumentParties(recognitionResult, documentParties);
       
-      // Вид документа.
-      FillDocumentKind(document);
-      
-      // Дата, номер и регистрация.
-      NumberDocument(document, recognitionResult, FactNames.FinancialDocument);
-      
-      // Корректировочный документ.
-      if (isAdjustment)
+      if (FinancialArchive.IncomingTaxInvoices.Is(document))
       {
-        document.IsAdjustment = true;
-        var correctionDateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.CorrectionDate).FirstOrDefault();
-        var correctionNumberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.CorrectionNumber).FirstOrDefault();
-        var correctionDate = GetFieldDateTimeValue(correctionDateFact, FieldNames.FinancialDocument.CorrectionDate);
-        var correctionNumber = GetFieldValue(correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber);
-        var isTrusted = false;
-        if (correctionDate != null && !string.IsNullOrEmpty(correctionNumber))
-        {
-          if (FinancialArchive.IncomingTaxInvoices.Is(document))
-          {
-            var documents = FinancialArchive.IncomingTaxInvoices.GetAll()
-              .Where(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
-            document.Corrected = documents.FirstOrDefault();
-            isTrusted = documents.Count() == 1;
-          }
-          else
-          {
-            var documents = FinancialArchive.OutgoingTaxInvoices.GetAll()
-              .Where(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
-            document.Corrected = documents.FirstOrDefault();
-            isTrusted = documents.Count() == 1;
-          }
-          LinkFactAndProperty(recognitionResult, correctionDateFact, FieldNames.FinancialDocument.CorrectionDate, props.Corrected.Name, document.Corrected, isTrusted);
-          LinkFactAndProperty(recognitionResult, correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber, props.Corrected.Name, document.Corrected, isTrusted);
-        }
+        Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible);
       }
-      
-      // Подразделение и ответственный.
-      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      document.ResponsibleEmployee = responsible;
-      
-      // Сумма и валюта.
-      FillAmountAndCurrency(document, recognitionResult);
-      
+      else
+      {        
+        // Вид документа.
+        FillDocumentKind(document);
+        
+        // Дата, номер и регистрация.
+        NumberDocument(document, recognitionResult, FactNames.FinancialDocument);
+        
+        // Корректировочный документ.
+        if (isAdjustment)
+        {
+          document.IsAdjustment = true;
+          var correctionDateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.CorrectionDate).FirstOrDefault();
+          var correctionNumberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.CorrectionNumber).FirstOrDefault();
+          var correctionDate = GetFieldDateTimeValue(correctionDateFact, FieldNames.FinancialDocument.CorrectionDate);
+          var correctionNumber = GetFieldValue(correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber);
+          var isTrusted = false;
+          if (correctionDate != null && !string.IsNullOrEmpty(correctionNumber))
+          {
+            if (FinancialArchive.IncomingTaxInvoices.Is(document))
+            {
+              var documents = FinancialArchive.IncomingTaxInvoices.GetAll()
+                .Where(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
+              document.Corrected = documents.FirstOrDefault();
+              isTrusted = documents.Count() == 1;
+            }
+            else
+            {
+              var documents = FinancialArchive.OutgoingTaxInvoices.GetAll()
+                .Where(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
+              document.Corrected = documents.FirstOrDefault();
+              isTrusted = documents.Count() == 1;
+            }
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correctionDateFact, FieldNames.FinancialDocument.CorrectionDate, props.Corrected.Name, document.Corrected, isTrusted);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber, props.Corrected.Name, document.Corrected, isTrusted);
+          }
+        }
+        
+        // Подразделение и ответственный.
+        document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
+        document.ResponsibleEmployee = responsible;
+        
+        // Сумма и валюта.
+        FillAmountAndCurrency(document, recognitionResult);
+      }
       return document;
     }
     
@@ -1801,8 +1810,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isTrusted = IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
-      LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      var isTrusted = DocflowPublicFunctions.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Seller);
@@ -1811,10 +1820,10 @@ namespace Sungero.Capture.Server
         document.SellerName = seller.Name;
         document.SellerTin = seller.Tin;
         document.SellerTrrc = seller.Trrc;
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, seller.Name);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, seller.Tin);
-        LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, seller.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.Name, props.SellerName.Name, seller.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, seller.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, seller.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, seller.Fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, seller.Trrc);
       }
       
       var buyer = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Buyer);
@@ -1823,10 +1832,10 @@ namespace Sungero.Capture.Server
         document.BuyerName = buyer.Name;
         document.BuyerTin = buyer.Tin;
         document.BuyerTrrc = buyer.Trrc;
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, buyer.Name);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, buyer.Tin);
-        LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, buyer.Trrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.Name, props.BuyerName.Name, buyer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, buyer.Name);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, buyer.Tin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, buyer.Fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, buyer.Trrc);
       }
       
       // Могут прийти контрагенты без типа. Заполнить контрагентами без типа.
@@ -1848,10 +1857,10 @@ namespace Sungero.Capture.Server
             document.SellerName = name;
             document.SellerTin = tin;
             document.SellerTrrc = trrc;
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.SellerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, tin);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, trrc);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.SellerName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.SellerName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.SellerTin.Name, tin);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.SellerTrrc.Name, trrc);
           }
           // Если контрагент уже заполнен, то занести наименование, ИНН/КПП для нашей стороны.
           else if (string.IsNullOrWhiteSpace(document.BuyerName))
@@ -1859,10 +1868,10 @@ namespace Sungero.Capture.Server
             document.BuyerName = name;
             document.BuyerTin = tin;
             document.BuyerTrrc = trrc;
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.BuyerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, name);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, tin);
-            LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, trrc);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.BuyerName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.LegalForm, props.BuyerName.Name, name);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.BuyerTin.Name, tin);
+            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.BuyerTrrc.Name, trrc);
           }
         }
       }
@@ -1873,26 +1882,26 @@ namespace Sungero.Capture.Server
       var isDateValid = IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
       document.Date = date;
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
       document.Number = GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
-      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number);
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
       document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       return document;
     }
@@ -1927,7 +1936,7 @@ namespace Sungero.Capture.Server
       var contractFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       var contract = GetLeadingDocument(contractFact, document.Info.Properties.Contract.Name, document.Counterparty, document.Info.Properties.Counterparty.Name);
       document.Contract = contract.Contract;
-      LinkFactAndProperty(recognitionResult, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
       
       // Дата.
       var dateFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
@@ -1935,9 +1944,9 @@ namespace Sungero.Capture.Server
       var isDateValid = IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
       document.Date = date;
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
       
       // Номер.
       var numberFact = GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
@@ -1949,7 +1958,7 @@ namespace Sungero.Capture.Server
         isTrustedNumber = false;
       }
       document.Number = number;
-      LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number, isTrustedNumber);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number, isTrustedNumber);
       
       // Подразделение и ответственный.
       document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
@@ -1990,20 +1999,20 @@ namespace Sungero.Capture.Server
         var fact = partyNameFacts.First();
         document.FirstPartyName = GetCounterpartyName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
         document.FirstPartySignatory = GetFullNameByFactForContract(fact);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.FirstPartyName.Name, document.FirstPartyName);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatorySurname, props.FirstPartySignatory.Name, document.FirstPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryName, props.FirstPartySignatory.Name, document.FirstPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryPatrn, props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.FirstPartyName.Name, document.FirstPartyName);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatorySurname, props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryName, props.FirstPartySignatory.Name, document.FirstPartySignatory);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryPatrn, props.FirstPartySignatory.Name, document.FirstPartySignatory);
       }
       if (partyNameFacts.Count() > 1)
       {
         var fact = partyNameFacts.Last();
         document.SecondPartyName = GetCounterpartyName(fact, FieldNames.Counterparty.Name, FieldNames.Counterparty.LegalForm);
         document.SecondPartySignatory = GetFullNameByFactForContract(fact);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.SecondPartyName.Name, document.SecondPartyName);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatorySurname, props.SecondPartySignatory.Name, document.SecondPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryName, props.SecondPartySignatory.Name, document.SecondPartySignatory);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryPatrn, props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.Name, props.SecondPartyName.Name, document.SecondPartyName);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatorySurname, props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryName, props.SecondPartySignatory.Name, document.SecondPartySignatory);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.SignatoryPatrn, props.SecondPartySignatory.Name, document.SecondPartySignatory);
       }
       
       // Заполнить ИНН/КПП сторон.
@@ -2013,8 +2022,8 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.First();
         document.FirstPartyTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
         document.FirstPartyTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.FirstPartyTin.Name, document.FirstPartyTin);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.FirstPartyTin.Name, document.FirstPartyTin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.FirstPartyTrrc.Name, document.FirstPartyTrrc);
       }
       
       if (tinTrrcFacts.Count() > 1)
@@ -2022,24 +2031,24 @@ namespace Sungero.Capture.Server
         var fact = tinTrrcFacts.Last();
         document.SecondPartyTin = GetFieldValue(fact, FieldNames.Counterparty.TIN);
         document.SecondPartyTrrc = GetFieldValue(fact, FieldNames.Counterparty.TRRC);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.SecondPartyTin.Name, document.SecondPartyTin);
-        LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TIN, props.SecondPartyTin.Name, document.SecondPartyTin);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Counterparty.TRRC, props.SecondPartyTrrc.Name, document.SecondPartyTrrc);
       }
       
       // Сумма и валюта.
       var documentAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
       document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
-      LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       
       var documentVatAmountFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.VatAmount).FirstOrDefault();
       document.VatAmount = GetFieldNumericalValue(documentVatAmountFact, FieldNames.DocumentAmount.VatAmount);
-      LinkFactAndProperty(recognitionResult, documentVatAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentVatAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
       var currencyCode = GetFieldValue(documentCurrencyFact, FieldNames.DocumentAmount.Currency);
       document.Currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).FirstOrDefault();
       if (document.Currency != null)
-        LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentCurrencyFact, FieldNames.DocumentAmount.Currency, props.Currency.Name, document.Currency.Id);
       
       return document;
     }
@@ -2179,14 +2188,14 @@ namespace Sungero.Capture.Server
         documentParties.BusinessUnit.BusinessUnit != null;
       
       if (counterpartyMatched)
-        LinkFactAndProperty(recognitionResult, documentParties.Counterparty.Fact, null,
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentParties.Counterparty.Fact, null,
                             counterpartyPropertyName, documentParties.Counterparty.Counterparty, documentParties.Counterparty.IsTrusted);
 
       if (businessUnitMatched)
-        LinkFactAndProperty(recognitionResult, documentParties.BusinessUnit.Fact, null,
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentParties.BusinessUnit.Fact, null,
                             businessUnitPropertyName, documentParties.BusinessUnit.BusinessUnit, documentParties.BusinessUnit.IsTrusted);
       else
-        LinkFactAndProperty(recognitionResult, null, null,
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null,
                             businessUnitPropertyName, documentParties.ResponsibleEmployeeBusinessUnit, false);
     }
     
@@ -2205,7 +2214,7 @@ namespace Sungero.Capture.Server
       {
         var amount = recognizedAmount.Amount;
         document.TotalAmount = amount;
-        LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
       }
 
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
@@ -2216,7 +2225,7 @@ namespace Sungero.Capture.Server
       {
         var currency = recognizedCurrency.Currency;
         document.Currency = currency;
-        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
       }
     }
     
@@ -2235,7 +2244,7 @@ namespace Sungero.Capture.Server
       {
         var amount = recognizedAmount.Amount;
         document.TotalAmount = amount;
-        LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
       }
       
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
@@ -2246,7 +2255,7 @@ namespace Sungero.Capture.Server
       {
         var currency = recognizedCurrency.Currency;
         document.Currency = currency;
-        LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
       }
     }
     
@@ -2307,8 +2316,8 @@ namespace Sungero.Capture.Server
       Sungero.Docflow.PublicFunctions.OfficialDocument.RegisterDocument(document, registers.First(), regDate, regNumber, false, false);
       
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognitionResult, regDateFact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
-      LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, regDateFact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate, isTrustedDate);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                           document.RegistrationNumber, isTrustedNumber);
     }
     
@@ -2346,8 +2355,8 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = recognizedNumber.Number;
       
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognitionResult, recognizedDate.Fact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate, recognizedDate.IsTrusted);
-      LinkFactAndProperty(recognitionResult, recognizedNumber.Fact, FieldNames.Document.Number, props.RegistrationNumber.Name,
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedDate.Fact, FieldNames.Document.Date, props.RegistrationDate.Name, document.RegistrationDate, recognizedDate.IsTrusted);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedNumber.Fact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                           document.RegistrationNumber, recognizedNumber.IsTrusted);
     }
     
@@ -2368,7 +2377,7 @@ namespace Sungero.Capture.Server
       var isDateValid = IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && IsTrustedField(dateFact, FieldNames.Document.Date);
+      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
       document.RegistrationDate = date;
 
       // Номер.
@@ -2383,8 +2392,8 @@ namespace Sungero.Capture.Server
       document.RegistrationNumber = regNumber;
       
       var props = document.Info.Properties;
-      LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, isTrustedDate);
-      LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, isTrustedDate);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                           document.RegistrationNumber, isTrustedNumber);
     }
     
@@ -2411,9 +2420,9 @@ namespace Sungero.Capture.Server
         document.Corrected = FinancialArchive.UniversalTransferDocuments.GetAll()
           .FirstOrDefault(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
         var props = document.Info.Properties;
-        LinkFactAndProperty(recognitionResult, correctionDateFact, FieldNames.FinancialDocument.CorrectionDate,
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correctionDateFact, FieldNames.FinancialDocument.CorrectionDate,
                             props.Corrected.Name, document.Corrected, true);
-        LinkFactAndProperty(recognitionResult, correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber,
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber,
                             props.Corrected.Name, document.Corrected, true);
       }
     }
@@ -2457,7 +2466,7 @@ namespace Sungero.Capture.Server
       
       recognizedAmount.HasValue = true;
       recognizedAmount.Amount = totalAmount.Value;
-      recognizedAmount.IsTrusted = IsTrustedField(amountFact, FieldNames.DocumentAmount.Amount);
+      recognizedAmount.IsTrusted = DocflowPublicFunctions.IsTrustedField(amountFact, FieldNames.DocumentAmount.Amount);
       
       // Если в сумме больше 2 знаков после запятой,
       // то обрезать лишние разряды,
@@ -2530,7 +2539,7 @@ namespace Sungero.Capture.Server
     {
       var fact = GetOrderedFacts(recognitionResult.Facts, numberFactName, numberFieldName).FirstOrDefault();
       var number = GetFieldValue(fact, numberFieldName);
-      var isTrusted = !string.IsNullOrWhiteSpace(number) && IsTrustedField(fact, numberFieldName);
+      var isTrusted = !string.IsNullOrWhiteSpace(number) && DocflowPublicFunctions.IsTrustedField(fact, numberFieldName);
       
       return Sungero.Capture.Structures.Module.RecognizedDocumentNumber.Create(number, isTrusted, fact);
     }
@@ -2548,7 +2557,7 @@ namespace Sungero.Capture.Server
     {
       var fact = GetOrderedFacts(recognitionResult.Facts, dateFactName, dateFieldName).FirstOrDefault();
       var date = GetFieldDateTimeValue(fact, dateFieldName);
-      var isTrusted = date != null && IsTrustedField(fact, dateFieldName);
+      var isTrusted = date != null && DocflowPublicFunctions.IsTrustedField(fact, dateFieldName);
       if (date == null || !date.HasValue || date < Calendar.SqlMinValue)
       {
         date = Calendar.SqlMinValue;
@@ -3211,8 +3220,8 @@ namespace Sungero.Capture.Server
       {
         document.BusinessUnit = businessUnitWithFact.BusinessUnit;
         businessUnitFact = businessUnitWithFact.Fact;
-        LinkFactFieldsAndProperty(recognitionResult, businessUnitFact, counterpartyFieldNames,
-                                  businessUnitPropertyName, document.BusinessUnit, businessUnitWithFact.IsTrusted);
+        DocflowPublicFunctions.LinkFactFieldsAndProperty(recognitionResult, businessUnitFact, counterpartyFieldNames,
+                                  businessUnitPropertyName, document.BusinessUnit, businessUnitWithFact.IsTrusted, null);
       }
       
       // Заполнить подписанта.
@@ -3220,15 +3229,15 @@ namespace Sungero.Capture.Server
       
       // Если НОР не заполнена, она подставляется из подписанта и результату не доверяем.
       if (document.BusinessUnit == null && ourSignatory.Employee != null)
-        LinkFactAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, ourSignatory.Employee.Department.BusinessUnit, false);
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, ourSignatory.Employee.Department.BusinessUnit, false);
       
       document.OurSignatory = ourSignatory.Employee;
       ourSignatoryFact = ourSignatory.Fact;
       var isTrustedOurSignatory = businessUnitFact != null &&
         ourSignatory.IsTrusted &&
-        IsTrustedField(ourSignatoryFact, FieldNames.Counterparty.SignatorySurname);
-      LinkFactFieldsAndProperty(recognitionResult, ourSignatoryFact, signatoryFieldNames,
-                                props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory);
+        DocflowPublicFunctions.IsTrustedField(ourSignatoryFact, FieldNames.Counterparty.SignatorySurname);
+      DocflowPublicFunctions.LinkFactFieldsAndProperty(recognitionResult, ourSignatoryFact, signatoryFieldNames,
+                                props.OurSignatory.Name, document.OurSignatory, isTrustedOurSignatory, null);
       
       // Если НОР по фактам не нашли, то взять ее из персональных настроек, или от ответственного.
       if (document.BusinessUnit == null)
@@ -3245,7 +3254,7 @@ namespace Sungero.Capture.Server
         else
           document.BusinessUnit = responsibleEmployeeBusinessUnit;
         
-        LinkFactFieldsAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, document.BusinessUnit, false);
+        DocflowPublicFunctions.LinkFactFieldsAndProperty(recognitionResult, null, null, props.BusinessUnit.Name, document.BusinessUnit, false, null);
       }
       
       // Убрать использованные факты подбора НОР и подписывающего с нашей стороны.
@@ -3260,8 +3269,8 @@ namespace Sungero.Capture.Server
       if (сounterparty != null)
       {
         document.Counterparty = сounterparty.Counterparty;
-        LinkFactFieldsAndProperty(recognitionResult, сounterparty.Fact, counterpartyFieldNames,
-                                  counterpartyPropertyName, document.Counterparty, сounterparty.IsTrusted);
+        DocflowPublicFunctions.LinkFactFieldsAndProperty(recognitionResult, сounterparty.Fact, counterpartyFieldNames,
+                                  counterpartyPropertyName, document.Counterparty, сounterparty.IsTrusted, null);
       }
       
       // Заполнить подписанта.
@@ -3269,30 +3278,17 @@ namespace Sungero.Capture.Server
       
       // Если контрагент не заполнен, он подставляется из подписанта и результату не доверяем.
       if (document.Counterparty == null && signedBy.Contact != null)
-        LinkFactFieldsAndProperty(recognitionResult, null, null, props.Counterparty.Name, signedBy.Contact.Company, false);
+        DocflowPublicFunctions.LinkFactFieldsAndProperty(recognitionResult, null, null, props.Counterparty.Name, signedBy.Contact.Company, false, null);
       
       document.CounterpartySignatory = signedBy.Contact;
-      var isTrustedSignatory = signedBy.IsTrusted && IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname);
-      LinkFactFieldsAndProperty(recognitionResult, signedBy.Fact, signatoryFieldNames,
-                                props.CounterpartySignatory.Name, document.CounterpartySignatory, isTrustedSignatory);
+      var isTrustedSignatory = signedBy.IsTrusted && DocflowPublicFunctions.IsTrustedField(signedBy.Fact, FieldNames.Counterparty.SignatorySurname);
+      DocflowPublicFunctions.LinkFactFieldsAndProperty(recognitionResult, signedBy.Fact, signatoryFieldNames,
+                                props.CounterpartySignatory.Name, document.CounterpartySignatory, isTrustedSignatory, null);
     }
     
     #endregion
     
     #region Работа с полями/фактами
-    
-    /// <summary>
-    /// Получить поле из факта.
-    /// </summary>
-    /// <param name="fact">Имя факта.</param>
-    /// <param name="fieldName">Имя поля.</param>
-    /// <returns>Поле.</returns>
-    public static Sungero.Docflow.Structures.Module.IFactField GetField(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
-    {
-      if (fact == null)
-        return null;
-      return fact.Fields.FirstOrDefault(f => f.Name == fieldName);
-    }
     
     /// <summary>
     /// Получить список полей из факта.
@@ -3386,7 +3382,7 @@ namespace Sungero.Capture.Server
     /// <returns>Связь факта с свойством.</returns>
     public virtual Sungero.Commons.IEntityRecognitionInfoFacts GetFieldByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact, string propertyName)
     {
-      var factLabel = GetFactLabel(fact, propertyName);
+      var factLabel = DocflowPublicFunctions.GetFactLabel(fact, propertyName);
       var recognitionInfo = Commons.EntityRecognitionInfos.GetAll()
         .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty))
         .OrderByDescending(d => d.Id)
@@ -3408,7 +3404,7 @@ namespace Sungero.Capture.Server
     /// <returns>Связь факта с свойством.</returns>
     public virtual Sungero.Commons.IEntityRecognitionInfoFacts GetFieldByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact, string propertyName, string counterpartyPropertyValue, string counterpartyPropertyName)
     {
-      var factLabel = GetFactLabel(fact, propertyName);
+      var factLabel = DocflowPublicFunctions.GetFactLabel(fact, propertyName);
       var recognitionInfo = Commons.EntityRecognitionInfos.GetAll()
         .Where(d => d.Facts.Any(f => f.FactLabel == factLabel && f.VerifiedValue != null && f.VerifiedValue != string.Empty) &&
                d.Facts.Any(f => f.PropertyName == counterpartyPropertyName && f.PropertyValue == counterpartyPropertyValue))
@@ -3608,109 +3604,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Проложить связь между фактом и свойством документа.
-    /// </summary>
-    /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
-    /// <param name="fact">Факт, который будет связан со свойством документа.</param>
-    /// <param name="fieldName">Поле, которое будет связано со свойством документа. Если не указано, то будут связаны все поля факта.</param>
-    /// <param name="propertyName">Имя свойства документа.</param>
-    /// <param name="propertyValue">Значение свойства.</param>
-    /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
-    /// <param name="collectionRecordId">ИД записи свойства-коллекции.</param>
-    public static void LinkFactAndProperty(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                           Sungero.Docflow.Structures.Module.IFact fact,
-                                           string fieldName,
-                                           string propertyName,
-                                           object propertyValue,
-                                           bool? isTrusted = null,
-                                           int? collectionRecordId = null)
-    {
-      var fieldNames = new List<string>() { fieldName };
-      if (fieldName == null)
-        fieldNames = null;
-      LinkFactFieldsAndProperty(recognitionResult, fact, fieldNames, propertyName, propertyValue, isTrusted, collectionRecordId);
-    }
-    
-    /// <summary>
-    /// Проложить связь между полями факта и свойством документа.
-    /// </summary>
-    /// <param name="recognitionResult">Результат обработки документа в Арио.</param>
-    /// <param name="fact">Факт, который будет связан со свойством документа.</param>
-    /// <param name="fieldNames">Поля, которые будут связаны со свойством документа. Если не указано, то будут связаны все поля факта.</param>
-    /// <param name="propertyName">Имя свойства документа.</param>
-    /// <param name="propertyValue">Значение свойства.</param>
-    /// <param name="isTrusted">Признак, доверять результату извлечения из Арио или нет.</param>
-    /// <param name="collectionRecordId">ИД записи свойства-коллекции.</param>
-    public static void LinkFactFieldsAndProperty(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                                 Sungero.Docflow.Structures.Module.IFact fact,
-                                                 List<string> fieldNames,
-                                                 string propertyName,
-                                                 object propertyValue,
-                                                 bool? isTrusted = null,
-                                                 int? collectionRecordId = null)
-    {
-      var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
-      if (string.IsNullOrWhiteSpace(propertyStringValue))
-        return;
-      
-      var hasFieldNames = fieldNames != null;
-      if (hasFieldNames && !fieldNames.Any())
-        return;
-      
-      // Если значение определилось не из фактов,
-      // для подсветки заносим это свойство и результату не доверяем.
-      if (fact == null)
-      {
-        var calculatedFact = recognitionResult.Info.Facts.AddNew();
-        calculatedFact.PropertyName = propertyName;
-        calculatedFact.PropertyValue = propertyStringValue;
-        calculatedFact.IsTrusted = false;
-      }
-      else
-      {
-        var documentRecognitionInfoByFact = recognitionResult.Info.Facts.Where(f => f.FactId == fact.Id);
-        var documentRecognitionInfoByFields = documentRecognitionInfoByFact.Where(f => !hasFieldNames || fieldNames.Contains(f.FieldName));
-        
-        foreach (var field in documentRecognitionInfoByFields)
-        {
-          if (isTrusted == null)
-            isTrusted = IsTrustedField(fact, field.FieldName);
-          
-          var factLabel = GetFactLabel(fact, propertyName);
-          
-          field.PropertyName = propertyName;
-          field.PropertyValue = propertyStringValue;
-          field.IsTrusted = isTrusted;
-          field.FactLabel = factLabel;
-          field.CollectionRecordId = collectionRecordId;
-        }
-      }
-    }
-    
-    /// <summary>
-    /// Получить метку факта.
-    /// </summary>
-    /// <param name="fact">Факт из Арио.</param>
-    /// <param name="propertyName">Имя связанного свойства.</param>
-    /// <returns>Метка факта.</returns>
-    /// <remarks>Используется для быстрого поиска факта в результатах извлечения фактов.</remarks>
-    public static string GetFactLabel(Sungero.Docflow.Structures.Module.IFact fact, string propertyName)
-    {
-      string factInfo = fact.Name + propertyName;
-      foreach (var field in fact.Fields)
-        factInfo += field.Name + field.Value;
-      
-      var factHash = string.Empty;
-      using (MD5 md5Hash = MD5.Create())
-      {
-        byte[] data = md5Hash.ComputeHash(Encoding.UTF8.GetBytes(factInfo));
-        for (int i = 0; i < data.Length; i++)
-          factHash += data[i].ToString("x2");
-      }
-      return factHash;
-    }
-
-    /// <summary>
     /// Сохранить результат верификации заполнения свойств.
     /// </summary>
     /// <param name="document">Документ.</param>
@@ -3739,7 +3632,7 @@ namespace Sungero.Capture.Server
         if (property != null)
         {
           object propertyValue = property.GetValue(document);
-          var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
+          var propertyStringValue = Docflow.PublicFunctions.Module.GetPropertyValueAsString(propertyValue);
           if (!string.IsNullOrWhiteSpace(propertyStringValue) && !Equals(propertyStringValue, linkedFact.PropertyValue))
             linkedFact.VerifiedValue = propertyStringValue;
         }
@@ -3747,21 +3640,6 @@ namespace Sungero.Capture.Server
       documentParams.Remove(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName);
     }
     
-    /// <summary>
-    /// Получить признак - доверять извлеченному полю или нет.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <param name="fieldName">Имя поля.</param>
-    /// <returns>Признак, доверять извлеченному полю или нет.</returns>
-    public static bool IsTrustedField(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
-    {
-      var field = GetField(fact, fieldName);
-      if (field == null)
-        return false;
-      
-      var smartProcessingSettings = Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
-      return field.Probability >= smartProcessingSettings.UpperConfidenceLimit;
-    }
     
     /// <summary>
     /// Создать тело документа.
@@ -3853,7 +3731,7 @@ namespace Sungero.Capture.Server
       var addressee = GetFieldValue(fact, FieldNames.Letter.Addressee);
       var employees =  Company.PublicFunctions.Employee.Remote.GetEmployeesByName(addressee);
       result.Employee = employees.FirstOrDefault();
-      result.IsTrusted = (employees.Count() == 1) ? IsTrustedField(fact, FieldNames.Letter.Addressee) : false;
+      result.IsTrusted = (employees.Count() == 1) ? DocflowPublicFunctions.IsTrustedField(fact, FieldNames.Letter.Addressee) : false;
       return result;
     }
     
@@ -4261,7 +4139,7 @@ namespace Sungero.Capture.Server
       }
       var contracts = GetLeadingDocuments(fact, counterparty);
       result.Contract = contracts.FirstOrDefault();
-      result.IsTrusted = (contracts.Count() == 1) ? IsTrustedField(fact, FieldNames.FinancialDocument.DocumentBaseNumber) : false;
+      result.IsTrusted = (contracts.Count() == 1) ? DocflowPublicFunctions.IsTrustedField(fact, FieldNames.FinancialDocument.DocumentBaseNumber) : false;
       return result;
     }
     

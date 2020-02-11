@@ -39,23 +39,6 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
-    /// Получить строковое значение свойства.
-    /// </summary>
-    /// <param name="propertyValue">Значение свойства.</param>
-    /// <returns></returns>
-    /// <remarks>Для свойств типа сущность будет возвращена строка с Ид сущности.</remarks>
-    public static string GetPropertyValueAsString(object propertyValue)
-    {
-      if (propertyValue == null)
-        return string.Empty;
-      
-      var propertyStringValue = propertyValue.ToString();
-      if (propertyValue is Sungero.Domain.Shared.IEntity)
-        propertyStringValue = ((Sungero.Domain.Shared.IEntity)propertyValue).Id.ToString();
-      return propertyStringValue;
-    }
-    
-    /// <summary>
     /// Определить пронумерован ли документ при захвате.
     /// </summary>
     /// <param name="document">Документ.</param>

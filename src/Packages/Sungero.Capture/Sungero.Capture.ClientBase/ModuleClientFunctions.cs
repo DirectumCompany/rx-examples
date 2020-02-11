@@ -560,7 +560,7 @@ namespace Sungero.Capture.Client
         if (property != null)
         {
           object propertyValue = property.GetValue(document);
-          var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
+          var propertyStringValue = Docflow.PublicFunctions.Module.GetPropertyValueAsString(propertyValue);
           if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue) ||
               this.CanCompareAsNumbers(propertyStringValue, linkedFact.PropertyValue) && this.CompareAsNumbers(propertyStringValue, linkedFact.PropertyValue) == 0)
           {
@@ -666,7 +666,7 @@ namespace Sungero.Capture.Client
           if (property != null)
           {
             object propertyValue = property.GetValue(record);
-            var propertyStringValue = Functions.Module.GetPropertyValueAsString(propertyValue);
+            var propertyStringValue = Docflow.PublicFunctions.Module.GetPropertyValueAsString(propertyValue);
             if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, recognizedRecordFact.PropertyValue))
             {
               record.State.Properties[propertyName].HighlightColor = recognizedRecordFact.IsTrusted.Value
