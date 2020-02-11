@@ -139,14 +139,6 @@
       "Value": "\"SmartService is running\""
     },
     {
-      "Name": "ArioUrlKey",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"ArioUrl\""
-    },
-    {
       "Name": "Buyer",
       "ParentClasses": [
         "Module",
@@ -423,14 +415,6 @@
       "Value": "\"<html\""
     },
     {
-      "Name": "MinFactProbabilityKey",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"MinFactProbability\""
-    },
-    {
       "Name": "Name",
       "ParentClasses": [
         "Module",
@@ -624,14 +608,6 @@
       "Value": "\"TaxinvoiceCorrection\""
     },
     {
-      "Name": "TrustedFactProbabilityKey",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"TrustedFactProbability\""
-    },
-    {
       "Name": "Txt",
       "ParentClasses": [
         "Module",
@@ -733,18 +709,6 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "CheckConnection",
-      "Parameters": [
-        {
-          "Name": "arioUrl",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "ReturnType": "global::System.Boolean",
-      "ReturnTypeFullName": "System.Boolean"
-    },
-    {
       "Name": "CreateSimpleDocument",
       "Parameters": [
         {
@@ -786,18 +750,6 @@
       "Placement": "Shared",
       "ReturnType": "void",
       "ReturnTypeFullName": "System.Void"
-    },
-    {
-      "Name": "GetArioClassifiers",
-      "Parameters": [
-        {
-          "Name": "arioUrl",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "ReturnType": "global::System.Collections.Generic.List<global::Sungero.Docflow.Structures.SmartProcessingSetting.IClassifier>",
-      "ReturnTypeFullName": "System.Collections.Generic.List"
     },
     {
       "Name": "GetClassRuleMapping",

@@ -3475,50 +3475,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Проверить подключение к Ario.
-    /// </summary>
-    /// <returns>True, если сервис работает, иначе - False.</returns>
-    /// <remarks>Проверка должна обязательно быть на сервере, т.к. с клиента может быть залочен доступ.</remarks>
-    [Public]
-    public virtual bool CheckConnection(string arioUrl)
-    {
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      ArioExtensions.Models.ArioInfo serviceInfo = null;
-      
-      try
-      {
-        serviceInfo = arioConnector.GetInfo();
-      }
-      catch (Exception e)
-      {
-        Logger.Error(e.Message);
-      }
-      
-      return serviceInfo != null &&
-        serviceInfo.State == Sungero.Capture.PublicConstants.Module.ArioConnectionSuccessMessage;
-    }
-    
-    /// <summary>
-    /// Получить список классификаторов из Арио.
-    /// </summary>
-    /// <returns>Список классификаторов.</returns>
-    [Public]
-    public virtual List<Docflow.Structures.SmartProcessingSetting.IClassifier> GetArioClassifiers(string arioUrl)
-    {
-      var classifiers = new List<Docflow.Structures.SmartProcessingSetting.IClassifier>();
-      try
-      {
-        var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-        classifiers = arioConnector.GetClassifiers().Select(x => Docflow.Structures.SmartProcessingSetting.Classifier.Create(x.Id, x.Name)).ToList();
-      }
-      catch (Exception e)
-      {
-        Logger.Error(e.Message);
-      }
-      return classifiers;
-    }
-    
-    /// <summary>
     /// Получить значение численного параметра из docflow_params.
     /// </summary>
     /// <param name="paramName">Наименование параметра.</param>

@@ -13,20 +13,7 @@ namespace Sungero.Capture.Constants
     // Ключ параметра демо-режима.
     [Sungero.Core.Public]
     public const string CaptureMockModeKey = "CaptureMockMode";
-    
-    // Ключ параметра адреса сервиса Ario.
-    [Sungero.Core.Public]
-    public const string ArioUrlKey = "ArioUrl";
-    
-    // Ключ параметра минимально допустимой вероятности для поля факта, извлеченного Ario.
-    // Факт с полем, вероятность которого ниже минимально допустимой, отбрасывается как недостоверный.
-    [Sungero.Core.Public]
-    public const string MinFactProbabilityKey = "MinFactProbability";
-    
-    // Ключ параметра вероятности для поля факта, извлеченного Ario, выше которой факт считается достоверным.
-    [Sungero.Core.Public]
-    public const string TrustedFactProbabilityKey = "TrustedFactProbability";
-    
+
     // Параметр "Визуальный режим".
     [Sungero.Core.Public]
     public const string IsVisualModeParamName = "IsVisualMode";
