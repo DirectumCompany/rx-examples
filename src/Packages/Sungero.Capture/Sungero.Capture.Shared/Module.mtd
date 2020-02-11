@@ -955,32 +955,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "RecognizedCurrency",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Currency",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Commons.ICurrency"
-        },
-        {
-          "Name": "HasValue",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "RecognizedDocumentDate",
       "IsPublic": true,
       "Properties": [

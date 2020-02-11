@@ -1213,8 +1213,8 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
-      document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
+      document.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      document.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
@@ -1236,10 +1236,10 @@ namespace Sungero.Capture.Server
         good.Name = goodName;
         
         good.UnitName = DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Goods.UnitName);
-        good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
-        good.Price = GetFieldNumericalValue(fact, FieldNames.Goods.Price);
-        good.VatAmount = GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
-        good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
+        good.Count = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Count);
+        good.Price = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Price);
+        good.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
+        good.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
         DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
@@ -1301,7 +1301,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmountAndCurrency(document, recognitionResult);
+      DocflowPublicFunctions.FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -1385,8 +1385,8 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
-      document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
+      document.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      document.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
@@ -1409,10 +1409,10 @@ namespace Sungero.Capture.Server
         
         good.UnitName = DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Goods.UnitName);
         
-        good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
-        good.Price = GetFieldNumericalValue(fact, FieldNames.Goods.Price);
-        good.VatAmount = GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
-        good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
+        good.Count = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Count);
+        good.Price = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Price);
+        good.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
+        good.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
         DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
@@ -1477,7 +1477,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmountAndCurrency(document, recognitionResult);
+      DocflowPublicFunctions.FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -1554,8 +1554,8 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
-      document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
+      document.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      document.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
@@ -1577,10 +1577,10 @@ namespace Sungero.Capture.Server
         good.Name = goodName;
         
         good.UnitName = DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Goods.UnitName);
-        good.Count = GetFieldNumericalValue(fact, FieldNames.Goods.Count);
-        good.Price = GetFieldNumericalValue(fact, FieldNames.Goods.Price);
-        good.VatAmount = GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
-        good.TotalAmount = GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
+        good.Count = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Count);
+        good.Price = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Price);
+        good.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.VatAmount);
+        good.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(fact, FieldNames.Goods.Amount);
         
         var formatter = string.Format("{0}.{1}", props.Goods.Name, "{0}");
         DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, fact, FieldNames.Goods.Name, string.Format(formatter, props.Goods.Properties.Name.Name),
@@ -1736,7 +1736,7 @@ namespace Sungero.Capture.Server
         document.ResponsibleEmployee = responsible;
         
         // Сумма и валюта.
-        FillAmountAndCurrency(document, recognitionResult);
+        DocflowPublicFunctions.FillAmountAndCurrency(document, recognitionResult);
       }
       return document;
     }
@@ -1784,7 +1784,7 @@ namespace Sungero.Capture.Server
       FillCorrectedDocument(document, recognitionResult, isAdjustment);
       
       // Сумма и валюта.
-      FillAmountAndCurrency(document, recognitionResult);
+      DocflowPublicFunctions.FillAmountAndCurrency(document, recognitionResult);
 
       return document;
     }
@@ -1892,8 +1892,8 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
-      document.VatAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
+      document.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      document.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.VatAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
@@ -1965,7 +1965,7 @@ namespace Sungero.Capture.Server
       document.ResponsibleEmployee = responsible;
       
       // Сумма и валюта.
-      FillAmountAndCurrency(document, recognitionResult);
+      DocflowPublicFunctions.FillAmountAndCurrency(document, recognitionResult);
       
       return document;
     }
@@ -2037,11 +2037,11 @@ namespace Sungero.Capture.Server
       
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
-      document.TotalAmount = GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
+      document.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentAmountFact, FieldNames.DocumentAmount.Amount, props.TotalAmount.Name, document.TotalAmount);
       
       var documentVatAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.VatAmount).FirstOrDefault();
-      document.VatAmount = GetFieldNumericalValue(documentVatAmountFact, FieldNames.DocumentAmount.VatAmount);
+      document.VatAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentVatAmountFact, FieldNames.DocumentAmount.VatAmount);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, documentVatAmountFact, FieldNames.DocumentAmount.VatAmount, props.VatAmount.Name, document.VatAmount);
       
       var documentCurrencyFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency).FirstOrDefault();
@@ -2202,36 +2202,6 @@ namespace Sungero.Capture.Server
     /// <summary>
     /// Заполнить сумму и валюту.
     /// </summary>
-    /// <param name="document">Бухгалтерский документ.</param>
-    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    public virtual void FillAmountAndCurrency(IAccountingDocumentBase document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
-    {
-      if (!AccountingDocumentBases.Is(document))
-        return;
-      
-      var recognizedAmount = GetRecognizedAmount(recognitionResult);
-      if (recognizedAmount.HasValue)
-      {
-        var amount = recognizedAmount.Amount;
-        document.TotalAmount = amount;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
-      }
-
-      // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
-      // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
-      // а в них все расчеты ведутся в одной валюте.
-      var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
-      if (recognizedCurrency.HasValue)
-      {
-        var currency = recognizedCurrency.Currency;
-        document.Currency = currency;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
-      }
-    }
-    
-    /// <summary>
-    /// Заполнить сумму и валюту.
-    /// </summary>
     /// <param name="document">Договорной документ.</param>
     /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
     public virtual void FillAmountAndCurrency(IContractualDocumentBase document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
@@ -2239,7 +2209,7 @@ namespace Sungero.Capture.Server
       if (!ContractualDocumentBases.Is(document))
         return;
       
-      var recognizedAmount = GetRecognizedAmount(recognitionResult);
+      var recognizedAmount = DocflowPublicFunctions.GetRecognizedAmount(recognitionResult);
       if (recognizedAmount.HasValue)
       {
         var amount = recognizedAmount.Amount;
@@ -2250,7 +2220,7 @@ namespace Sungero.Capture.Server
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
       // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
       // а в них все расчеты ведутся в одной валюте.
-      var recognizedCurrency = GetRecognizedCurrency(recognitionResult);
+      var recognizedCurrency = DocflowPublicFunctions.GetRecognizedCurrency(recognitionResult);
       if (recognizedCurrency.HasValue)
       {
         var currency = recognizedCurrency.Currency;
@@ -2379,89 +2349,6 @@ namespace Sungero.Capture.Server
       document.DeliveryMethod = MailDeliveryMethods.GetAll()
         .Where(m => m.Name.Equals(methodName, StringComparison.InvariantCultureIgnoreCase))
         .FirstOrDefault();
-    }
-
-    /// <summary>
-    /// Распознать сумму.
-    /// </summary>
-    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    /// <returns>Результаты распознавания суммы.</returns>
-    public virtual Sungero.Docflow.Structures.Module.IRecognizedAmount GetRecognizedAmount(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
-    {
-      var recognizedAmount = Sungero.Docflow.Structures.Module.RecognizedAmount.Create();
-      var facts = recognitionResult.Facts;
-      var amountFacts = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount);
-      
-      var amountFact = amountFacts.FirstOrDefault();
-      if (amountFact == null)
-        return recognizedAmount;
-      
-      recognizedAmount.Fact = amountFact;
-      
-      var totalAmount = GetFieldNumericalValue(amountFact, FieldNames.DocumentAmount.Amount);
-      if (!totalAmount.HasValue || totalAmount.Value <= 0)
-        return recognizedAmount;
-      
-      recognizedAmount.HasValue = true;
-      recognizedAmount.Amount = totalAmount.Value;
-      recognizedAmount.IsTrusted = DocflowPublicFunctions.IsTrustedField(amountFact, FieldNames.DocumentAmount.Amount);
-      
-      // Если в сумме больше 2 знаков после запятой,
-      // то обрезать лишние разряды,
-      // иначе пометить, что результату извлечения можно доверять
-      var roundedAmount = Math.Round(totalAmount.Value, 2);
-      var amountClipping = roundedAmount - totalAmount.Value != 0.0;
-      if (amountClipping)
-      {
-        recognizedAmount.Amount = roundedAmount;
-        recognizedAmount.IsTrusted = false;
-      }
-      
-      return recognizedAmount;
-    }
-
-    /// <summary>
-    /// Распознать валюту.
-    /// </summary>
-    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    /// <returns>Результаты распознавания валюты.</returns>
-    public virtual Structures.Module.IRecognizedCurrency GetRecognizedCurrency(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
-    {
-      var recognizedCurrency = Structures.Module.RecognizedCurrency.Create();
-      
-      var facts = recognitionResult.Facts;
-      var currencyFacts = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Currency);
-      var currencyFact = currencyFacts.FirstOrDefault();
-      if (currencyFact == null)
-        return recognizedCurrency;
-      
-      recognizedCurrency.Fact = currencyFact;
-      
-      var defaultCurrency = Commons.Currencies.GetAll(x => x.IsDefault == true).FirstOrDefault();
-      recognizedCurrency.Currency = defaultCurrency;
-      recognizedCurrency.HasValue = true;
-      
-      var currencyCode = DocflowPublicFunctions.GetFieldValue(currencyFact, FieldNames.DocumentAmount.Currency);
-      int resCurrencyCode;
-      if (!Int32.TryParse(currencyCode, out resCurrencyCode))
-        return recognizedCurrency;
-      
-      var currency = Commons.Currencies.GetAll(x => x.NumericCode == currencyCode).OrderBy(x => x.Status).FirstOrDefault();
-      if (currency == null)
-        return recognizedCurrency;
-      
-      recognizedCurrency.IsTrusted = true;
-      var currencyStatus = currency.Status;
-      if (currencyStatus == CoreEntities.DatabookEntry.Status.Closed)
-      {
-        currency = defaultCurrency;
-        recognizedCurrency.IsTrusted = false;
-      }
-      
-      if (currency != null)
-        recognizedCurrency.Currency = currency;
-      
-      return recognizedCurrency;
     }
     
     /// <summary>
@@ -3240,19 +3127,6 @@ namespace Sungero.Capture.Server
         return null;
       return fact.Fields.Where(f => fieldNames.Contains(f.Name)).AsQueryable();
     }
-
-    /// <summary>
-    /// Получить числовое значение поля из фактов.
-    /// </summary>
-    /// <param name="fact">Имя факта, поле которого будет извлечено.</param>
-    /// <param name="fieldName">Имя поля, значение которого нужно извлечь.</param>
-    /// <returns>Числовое значение поля.</returns>
-    public static double? GetFieldNumericalValue(Sungero.Docflow.Structures.Module.IFact fact, string fieldName)
-    {
-      var field = DocflowPublicFunctions.GetFieldValue(fact, fieldName);
-      return ConvertStringToDouble(field);
-    }
-    
     
     /// <summary>
     /// Получить запись, которая уже сопоставлялась с переданным фактом.
@@ -3406,21 +3280,6 @@ namespace Sungero.Capture.Server
         documentName = string.Format("{0} от {1}", documentName, date);
       
       return documentName;
-    }
-    
-    /// <summary>
-    /// Преобразовать строковое значение поля в числовое.
-    /// </summary>
-    /// <param name="field">Поле.</param>
-    /// <returns>Число.</returns>
-    public static double? ConvertStringToDouble(string field)
-    {
-      if (string.IsNullOrWhiteSpace(field))
-        return null;
-
-      double result;
-      double.TryParse(field, System.Globalization.NumberStyles.AllowDecimalPoint, System.Globalization.CultureInfo.InvariantCulture, out result);
-      return result;
     }
     
     /// <summary>

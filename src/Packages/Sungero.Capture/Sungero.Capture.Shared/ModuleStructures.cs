@@ -158,25 +158,6 @@ namespace Sungero.Capture.Structures.Module
   }
   
   /// <summary>
-  /// Результат распознавания валюты.
-  /// </summary>
-  [Public]
-  partial class RecognizedCurrency
-  {
-    // Валюта.
-    public Commons.ICurrency Currency { get; set; }
-    
-    // Признак - есть значение.
-    public bool HasValue { get; set; }
-    
-    // Признак - можно доверять.
-    public bool IsTrusted { get; set; }
-    
-    // Факт
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
-  }
-  
-  /// <summary>
   /// Результат распознавания номера документа.
   /// </summary>
   [Public]
