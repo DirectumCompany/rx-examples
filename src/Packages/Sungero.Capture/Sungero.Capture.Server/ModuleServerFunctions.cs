@@ -10,6 +10,7 @@ using Sungero.CoreEntities;
 using Sungero.Domain.Shared;
 using Sungero.Docflow;
 using Sungero.Capture.Structures.Module;
+using Sungero.Metadata;
 using Sungero.Parties;
 using Sungero.RecordManagement;
 using Sungero.Workflow;
@@ -209,7 +210,7 @@ namespace Sungero.Capture.Server
         // Добавить ИД документа в запись справочника с результатами обработки Ario.
         recognitionResult.Info.EntityId = document.Id;
         // Заполнить поле Тип сущности guid'ом конечного типа сущности.
-        recognitionResult.Info.EntityType = document.GetEntityMetadata().NameGuid.ToString();
+        recognitionResult.Info.EntityType = document.GetEntityMetadata().GetOriginal().NameGuid.ToString();
         recognitionResult.Info.Save();
         
         package.Add(document);
