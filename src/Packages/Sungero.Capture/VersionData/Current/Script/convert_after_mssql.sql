@@ -1,10 +1,10 @@
-﻿--Полностью очистить таблицы EntityRecognitionInfo, данные в них на момент конвертации не имеют ценности.
+﻿﻿--Полностью очистить таблицы EntityRecognitionInfo, данные в них на момент конвертации не имеют ценности.
 delete from sungero_commons_facts;
 delete from sungero_commons_entityrecogn;
 
 --Заполнить таблицы EntityRecognitionInfo на основе таблиц DocumentRecognitionInfo.
 insert into sungero_commons_entityrecogn
-select 	drr.id
+select drr.id
       , '32EA0857-ADF7-41C2-BC0C-188320E40786' as discriminator
       , drr.secureobject
       , drr.status

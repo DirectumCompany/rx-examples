@@ -1,4 +1,4 @@
-﻿DO $$
+﻿do $$
 BEGIN
 
 --Полностью очистить таблицы EntityRecognitionInfo, данные в них на момент конвертации не имеют ценности.
@@ -60,4 +60,4 @@ then
   values('Sungero_Commons_Facts', (select max(id) from sungero_commons_facts));
 end if;
 
-END $$
+END$$;
