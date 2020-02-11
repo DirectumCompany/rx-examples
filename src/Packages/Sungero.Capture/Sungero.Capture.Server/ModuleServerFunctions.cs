@@ -1684,17 +1684,20 @@ namespace Sungero.Capture.Server
       }
 
       documentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-        
-      // НОР и КА.
-      FillAccountingDocumentParties(document, documentParties);
-      LinkAccountingDocumentParties(recognitionResult, documentParties);
       
       if (FinancialArchive.IncomingTaxInvoices.Is(document))
       {
-        Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible);
+        var overrideStructure = Structures.Module.OverrideStructure.Create();
+        overrideStructure.Parties = documentParties;
+        overrideStructure.Note = "test";
+        Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, overrideStructure);
       }
       else
-      {        
+      {
+        // НОР и КА.
+        FillAccountingDocumentParties(document, documentParties);
+        LinkAccountingDocumentParties(recognitionResult, documentParties);
+        
         // Вид документа.
         FillDocumentKind(document);
         

@@ -199,4 +199,12 @@ namespace Sungero.Capture.Structures.Module
     
     public string FillingColor { get; set; }
   }
+  
+  [Public]
+  partial class OverrideStructure
+  {
+    public Sungero.Docflow.Structures.Module.IDocumentParties Parties { get; set; }
+    
+    public string Note { get; set; }
+  }
 }
