@@ -48,6 +48,9 @@ if
 then 
   insert into sungero_system_ids
   values('Sungero_Commons_EntityRecogn', (select max(id) from sungero_commons_entityrecogn));
+else 
+  insert into sungero_system_ids
+  values('Sungero_Commons_EntityRecogn', 0);
 end if;
   
 delete from sungero_system_ids
@@ -58,6 +61,9 @@ if
 then 
   insert into sungero_system_ids
   values('Sungero_Commons_Facts', (select max(id) from sungero_commons_facts));
+else
+  insert into sungero_system_ids
+  values('Sungero_Commons_Facts', 0);
 end if;
 
 END$$;
