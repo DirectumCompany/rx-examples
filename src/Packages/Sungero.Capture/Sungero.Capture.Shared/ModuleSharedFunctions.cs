@@ -25,20 +25,6 @@ namespace Sungero.Capture.Shared
     }
     
     /// <summary>
-    /// Заполнить имя документа из короткого имени вида документа при захвате.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <remarks>Если имя документа не сформировалось автоматически,
-    /// то заполнить его из короткого имени вида документа.</remarks>
-    [Public]
-    public static void FillNameFromKindIfEmpty(Sungero.Docflow.IOfficialDocument document)
-    {
-      if ((document.Name == Docflow.Resources.DocumentNameAutotext || string.IsNullOrEmpty(document.Name)) &&
-          document.VerificationState == Docflow.OfficialDocument.VerificationState.InProcess)
-        document.Name = document.DocumentKind.ShortName;
-    }
-    
-    /// <summary>
     /// Определить пронумерован ли документ при захвате.
     /// </summary>
     /// <param name="document">Документ.</param>

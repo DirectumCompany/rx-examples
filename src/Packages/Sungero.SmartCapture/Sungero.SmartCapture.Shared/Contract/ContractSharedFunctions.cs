@@ -43,7 +43,7 @@ namespace Sungero.SmartCapture.Shared
     {
       base.FillName();
       
-      Capture.PublicFunctions.Module.FillNameFromKindIfEmpty(_obj);
+      FillNameFromKindIfEmpty();
     }
     
     [Public]
