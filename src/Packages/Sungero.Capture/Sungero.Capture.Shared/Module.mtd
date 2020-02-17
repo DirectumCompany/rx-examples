@@ -818,33 +818,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "ContactFactNames",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "SurnameField",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "NameField",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "PatronymicField",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "ContractFactMatching",
       "IsPublic": true,
       "Properties": [
@@ -862,28 +835,6 @@
         {
           "Name": "IsTrusted",
           "TypeFullName": "global::System.Boolean"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "CounterpartyFactNames",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "NameField",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "LegalFormField",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"
@@ -950,76 +901,6 @@
           "Name": "FillingColor",
           "IsNullable": true,
           "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "RecognizedDocumentDate",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Date",
-          "IsNullable": true,
-          "TypeFullName": "global::System.Nullable<global::System.DateTime>"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "RecognizedDocumentNumber",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Number",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "SignatoryFactMatching",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Employee",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Company.IEmployee"
-        },
-        {
-          "Name": "Contact",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Parties.IContact"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"

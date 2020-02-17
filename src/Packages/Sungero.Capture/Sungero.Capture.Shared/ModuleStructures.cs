@@ -24,60 +24,6 @@ namespace Sungero.Capture.Structures.Module
     // Факт, из полей которого были излеченны данные контрагента.
     public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
-    
-  /// <summary>
-  /// Наименования факта и полей для организаций.
-  /// </summary>
-  [Public]
-  partial class CounterpartyFactNames
-  {
-    // Наименование факта с данными организации.
-    public string Fact { get; set; }
-    
-    // Наименование поля с наименованием организации.
-    public string NameField { get; set; }
-    
-    // Наименование поля с организационно-правовой формой организации.
-    public string LegalFormField { get; set; }
-  }
-  
-  /// <summary>
-  /// Наименования факта и полей для контактных лиц.
-  /// </summary>
-  [Public]
-  partial class ContactFactNames
-  {
-    // Наименование факта с данными контактного лица.
-    public string Fact { get; set; }
-    
-    // Наименование поля с фамилией контактного лица.
-    public string SurnameField { get; set; }
-    
-    // Наименование поля с именем контактного лица.
-    public string NameField { get; set; }
-    
-    // Наименование поля с отчетством контактного лица.
-    public string PatronymicField { get; set; }
-  }
- 
-  /// <summary>
-  /// Подписант (контакт или сотрудник) и сопоставленный с ним факт.
-  /// </summary>
-  [Public]
-  partial class SignatoryFactMatching
-  {
-    // Сотрудник.
-    public Sungero.Company.IEmployee Employee { get; set; }
-    
-    // Контактное лицо.
-    public Sungero.Parties.IContact Contact { get; set; }
-    
-    // Факт, по полям которого было найдено контактное лицо.
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
-    
-    // Доверять ли найденному значению.
-    public bool IsTrusted { get; set; }
-  }
  
   /// <summary>
   /// Договорной документ и сопоставленный с ним факт.
@@ -155,32 +101,6 @@ namespace Sungero.Capture.Structures.Module
     // Ид документов, которые были найдены по штрихкоду.
     public List<int> DocumentFoundByBarcodeIds { get; set; }
     public List<int> LockedDocumentIds { get; set; }
-  }
-  
-  /// <summary>
-  /// Результат распознавания номера документа.
-  /// </summary>
-  [Public]
-  partial class RecognizedDocumentNumber
-  {
-    public string Number { get; set; }
-    
-    public bool IsTrusted { get; set; }
-    
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
-  }
-  
-  /// <summary>
-  /// Результат распознавания даты документа.
-  /// </summary>
-  [Public]
-  partial class RecognizedDocumentDate
-  {
-    public DateTime? Date { get; set; }
-    
-    public bool IsTrusted { get; set; }
-    
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
   
   /// <summary>

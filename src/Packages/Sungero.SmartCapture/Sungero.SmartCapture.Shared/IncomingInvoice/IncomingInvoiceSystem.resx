@@ -252,4 +252,7 @@
   <data name="ControlGroup_c1c5e995c9f4434a8a750a95d223f1fa" xml:space="preserve">
     <value>Lifecycle</value>
   </data>
+  <data name="CollectionDisplayName" xml:space="preserve">
+    <value>Incoming Invoices</value>
+  </data>
 </root>

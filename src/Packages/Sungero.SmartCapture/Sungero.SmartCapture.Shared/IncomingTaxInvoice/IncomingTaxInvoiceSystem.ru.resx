@@ -144,4 +144,7 @@
   <data name="ControlGroup_69d4014bac0146f78a2db84ae7b2dd6c" xml:space="preserve">
     <value>Жизненный цикл</value>
   </data>
+  <data name="CollectionDisplayName" xml:space="preserve">
+    <value>Счета-фактуры полученные</value>
+  </data>
 </root>
