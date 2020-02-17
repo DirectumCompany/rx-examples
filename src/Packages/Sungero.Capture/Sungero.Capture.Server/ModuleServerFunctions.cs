@@ -179,8 +179,9 @@ namespace Sungero.Capture.Server
       
       foreach (var recognitionResult in recognitionResults)
       {
+        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var document = OfficialDocuments.Null;
-        using (var body = GetDocumentBody(recognitionResult.BodyGuid))
+        using (var body = Commons.PublicFunctions.Module.GetDocumentBody(arioUrl, recognitionResult.BodyGuid))
         {
           var docId = Functions.Module.SearchDocumentBarcodeIds(body).FirstOrDefault();
           // FOD на пустом List<int> вернет 0.
@@ -196,7 +197,7 @@ namespace Sungero.Capture.Server
               else
               {
                 documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
-                CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
+                Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
                 document.Save();
               }
             }
@@ -530,7 +531,7 @@ namespace Sungero.Capture.Server
       /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
          если его не из чего формировать.*/
       document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      CreateVersion(document, recognitionResult);
+      Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, string.Empty);
       // Принудительно заполняем имя документа, для случаев когда имя не автоформируемое, чтобы не падало при сохранении.
       Docflow.PublicFunctions.OfficialDocument.FillName(document);
       document.Save();
@@ -862,7 +863,7 @@ namespace Sungero.Capture.Server
             if (pdfDocumentStream != null)
             {
               version.Body.Write(pdfDocumentStream);
-              version.AssociatedApplication = Content.AssociatedApplications.GetByExtension(Constants.Module.PdfExtension);
+              version.AssociatedApplication = Content.AssociatedApplications.GetByExtension(Docflow.PublicConstants.OfficialDocument.PdfExtension);
             }
           }
         }
@@ -871,7 +872,7 @@ namespace Sungero.Capture.Server
         if (version.Body.Size == 0)
         {
           version.Body.Write(body);
-          version.AssociatedApplication = GetAssociatedApplicationByFileName(bodyDto.Path);
+          version.AssociatedApplication = Docflow.PublicFunctions.Module.GetAssociatedApplicationByFileName(bodyDto.Path);
         }
       }
       document.Save();
@@ -895,7 +896,7 @@ namespace Sungero.Capture.Server
       FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
-      var application = GetAssociatedApplicationByFileName(file.Path);
+      var application = Docflow.PublicFunctions.Module.GetAssociatedApplicationByFileName(file.Path);
       using (var body = new MemoryStream(file.Data))
       {
         document.CreateVersion();
@@ -3156,19 +3157,6 @@ namespace Sungero.Capture.Server
         .ToList();
     }
     
-    
-    /// <summary>
-    /// Получить тело документа из Арио.
-    /// </summary>
-    /// <param name="documentGuid">Гуид документа в Арио.</param>
-    /// <returns>Тело документа.</returns>
-    public virtual System.IO.Stream GetDocumentBody(string documentGuid)
-    {
-      var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
-      var arioConnector = new ArioExtensions.ArioConnector(arioUrl);
-      return arioConnector.GetDocumentByGuid(documentGuid);
-    }
-    
     /// <summary>
     /// Получить значение численного параметра из docflow_params.
     /// </summary>
@@ -3275,82 +3263,6 @@ namespace Sungero.Capture.Server
         }
       }
       documentParams.Remove(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName);
-    }
-    
-    
-    /// <summary>
-    /// Создать тело документа.
-    /// </summary>
-    /// <param name="document">Документ Rx.</param>
-    /// <param name="recognitionResult">Результат обработки входящего документа в Арио.</param>
-    /// <param name="versionNote">Примечание к версии.</param>
-    public virtual void CreateVersion(IOfficialDocument document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, string versionNote = "")
-    {
-      var needCreatePublicBody = recognitionResult.File != null && recognitionResult.File.Data != null;
-      var pdfApp = Content.AssociatedApplications.GetByExtension(Constants.Module.PdfExtension);
-      if (pdfApp == Content.AssociatedApplications.Null)
-        pdfApp = GetAssociatedApplicationByFileName(recognitionResult.File.Path);
-      
-      var originalFileApp = Content.AssociatedApplications.Null;
-      if (needCreatePublicBody)
-        originalFileApp = GetAssociatedApplicationByFileName(recognitionResult.File.Path);
-      
-      // При создании версии Subject не должен быть пустым, иначе задваивается имя документа.
-      var subjectIsEmpty = string.IsNullOrEmpty(document.Subject);
-      if (subjectIsEmpty)
-        document.Subject = "tmp_Subject";
-      
-      document.CreateVersion();
-      var version = document.LastVersion;
-      
-      if (needCreatePublicBody)
-      {
-        using (var publicBody = GetDocumentBody(recognitionResult.BodyGuid))
-          version.PublicBody.Write(publicBody);
-        using (var body = new MemoryStream(recognitionResult.File.Data))
-          version.Body.Write(body);
-        version.AssociatedApplication = pdfApp;
-        version.BodyAssociatedApplication = originalFileApp;
-      }
-      else
-      {
-        using (var body = GetDocumentBody(recognitionResult.BodyGuid))
-        {
-          version.Body.Write(body);
-        }
-        
-        version.AssociatedApplication = pdfApp;
-      }
-      
-      if (!string.IsNullOrEmpty(versionNote))
-        version.Note = versionNote;
-      
-      // Очистить Subject, если он был пуст до создания версии.
-      if (subjectIsEmpty)
-        document.Subject = string.Empty;
-      
-      // Заполнить статус верификации для документов, в которых поддерживается режим верификации.
-      if (Docflow.PublicFunctions.OfficialDocument.IsVerificationModeSupported(document))
-        document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-    }
-    
-    /// <summary>
-    /// Получить приложение-обработчик по имени файла.
-    /// </summary>
-    /// <param name="fileName">Имя или путь до файла.</param>
-    /// <returns>Приложение-обработчик</returns>
-    public virtual Sungero.Content.IAssociatedApplication GetAssociatedApplicationByFileName(string fileName)
-    {
-      var app = Sungero.Content.AssociatedApplications.Null;
-      var ext = System.IO.Path.GetExtension(fileName).TrimStart('.').ToLower();
-      app = Content.AssociatedApplications.GetByExtension(ext);
-      
-      // Взять приложение-обработчик unknown, если не смогли подобрать по расширению.
-      if (app == null)
-        app = Sungero.Content.AssociatedApplications.GetAll()
-          .SingleOrDefault(x => x.Sid == Sungero.Docflow.PublicConstants.Module.UnknownAppSid);
-      
-      return app;
     }
     
     /// <summary>

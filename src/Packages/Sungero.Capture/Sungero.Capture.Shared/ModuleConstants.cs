@@ -256,10 +256,6 @@ namespace Sungero.Capture.Constants
       public const string WithoutDot = "html";
     }
     
-    // Pdf расширение.
-    [Sungero.Core.Public]
-    public const string PdfExtension = "pdf";
-    
     // Html теги.
     public static class HtmlTags
     {
@@ -272,7 +268,6 @@ namespace Sungero.Capture.Constants
       [Sungero.Core.Public]
       public const string EndTag = "</html>";
     }
-    
     
   }
 }

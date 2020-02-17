@@ -382,14 +382,6 @@
       "Value": "\"PAYER\""
     },
     {
-      "Name": "PdfExtension",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"pdf\""
-    },
-    {
       "Name": "PositionElementDelimiter",
       "ParentClasses": [
         "Module"
