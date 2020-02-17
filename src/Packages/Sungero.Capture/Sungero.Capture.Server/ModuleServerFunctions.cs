@@ -1687,59 +1687,8 @@ namespace Sungero.Capture.Server
 
       documentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       
-      if (FinancialArchive.IncomingTaxInvoices.Is(document))
-      {
-        Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, documentParties);
-      }
-      else
-      {
-        // НОР и КА.
-        DocflowPublicFunctions.FillAccountingDocumentParties(document, documentParties);
-        DocflowPublicFunctions.LinkAccountingDocumentParties(recognitionResult, documentParties);
-        
-        // Вид документа.
-        FillDocumentKind(document);
-        
-        // Дата, номер и регистрация.
-        DocflowPublicFunctions.NumberDocument(document, recognitionResult, FactNames.FinancialDocument, null);
-        
-        // Корректировочный документ.
-        if (isAdjustment)
-        {
-          document.IsAdjustment = true;
-          var correctionDateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.CorrectionDate).FirstOrDefault();
-          var correctionNumberFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.CorrectionNumber).FirstOrDefault();
-          var correctionDate = DocflowPublicFunctions.GetFieldDateTimeValue(correctionDateFact, FieldNames.FinancialDocument.CorrectionDate);
-          var correctionNumber = DocflowPublicFunctions.GetFieldValue(correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber);
-          var isTrusted = false;
-          if (correctionDate != null && !string.IsNullOrEmpty(correctionNumber))
-          {
-            if (FinancialArchive.IncomingTaxInvoices.Is(document))
-            {
-              var documents = FinancialArchive.IncomingTaxInvoices.GetAll()
-                .Where(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
-              document.Corrected = documents.FirstOrDefault();
-              isTrusted = documents.Count() == 1;
-            }
-            else
-            {
-              var documents = FinancialArchive.OutgoingTaxInvoices.GetAll()
-                .Where(d => d.RegistrationNumber.Equals(correctionNumber, StringComparison.InvariantCultureIgnoreCase) && d.RegistrationDate == correctionDate);
-              document.Corrected = documents.FirstOrDefault();
-              isTrusted = documents.Count() == 1;
-            }
-            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correctionDateFact, FieldNames.FinancialDocument.CorrectionDate, props.Corrected.Name, document.Corrected, isTrusted);
-            DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correctionNumberFact, FieldNames.FinancialDocument.CorrectionNumber, props.Corrected.Name, document.Corrected, isTrusted);
-          }
-        }
-        
-        // Подразделение и ответственный.
-        document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-        document.ResponsibleEmployee = responsible;
-        
-        // Сумма и валюта.
-        DocflowPublicFunctions.FillAmountAndCurrency(document, recognitionResult);
-      }
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, documentParties);
+      
       return document;
     }
     
