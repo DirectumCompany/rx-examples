@@ -27,25 +27,6 @@ namespace Sungero.SmartCapture.Shared
         _obj.State.Properties.DocumentGroup.IsRequired = false;
     }
     
-    public override void ChangeDocumentPropertiesAccess(bool isEnabled, bool repeatRegister)
-    {
-      var smartCaptureNumerationSucceed = IsSmartCaptureNumerationSucceed();
-      
-      if (smartCaptureNumerationSucceed)
-        EnableRequisitesForVerification();
-      else
-        base.ChangeDocumentPropertiesAccess(isEnabled, repeatRegister);
-      
-      EnableRegistrationNumberAndDate();
-    }
-    
-    public override void FillName()
-    {
-      base.FillName();
-      
-      FillNameFromKindIfEmpty();
-    }
-    
     [Public]
     public override bool IsVerificationModeSupported()
     {

@@ -23,13 +23,5 @@ namespace Sungero.SmartCapture.Shared
       _obj.State.Properties.Correspondent.IsRequired = isVisualMode;
     }
     
-    public override void FillName()
-    {
-      base.FillName();
-      
-      FillNameFromKindIfEmpty();
-    }
-   
-    
   }
 }

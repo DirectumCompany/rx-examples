@@ -23,13 +23,6 @@ namespace Sungero.SmartCapture.Shared
         _obj.State.Properties.Subject.IsRequired = false;
     }
     
-    public override void FillName()
-    {
-      base.FillName();
-      
-      FillNameFromKindIfEmpty();
-    }
-    
     [Public]
     public override bool IsVerificationModeSupported()
     {
