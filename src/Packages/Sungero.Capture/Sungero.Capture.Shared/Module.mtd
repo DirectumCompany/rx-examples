@@ -318,14 +318,6 @@
       "Value": "\"InputFilesSection\""
     },
     {
-      "Name": "IsVisualModeParamName",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"IsVisualMode\""
-    },
-    {
       "Name": "Letter",
       "ParentClasses": [
         "Module",

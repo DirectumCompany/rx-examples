@@ -15,7 +15,7 @@ namespace Sungero.SmartCapture.Shared
       base.SetRequiredProperties();
       
       // Изменить обязательность полей в зависимости от того, программная или визуальная работа.
-      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
+      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Sungero.Docflow.PublicConstants.OfficialDocument.IsVisualModeParamName);
 
       // При визуальной работе обязательность содержания и контрагента как в Contract.
       // Обязательность категории вычисляется по стандартной логике.

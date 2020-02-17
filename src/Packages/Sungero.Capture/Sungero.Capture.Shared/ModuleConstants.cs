@@ -13,10 +13,6 @@ namespace Sungero.Capture.Constants
     // Ключ параметра демо-режима.
     [Sungero.Core.Public]
     public const string CaptureMockModeKey = "CaptureMockMode";
-
-    // Параметр "Визуальный режим".
-    [Sungero.Core.Public]
-    public const string IsVisualModeParamName = "IsVisualMode";
     
     // Сообщение при успешном подключении к Ario.
     [Sungero.Core.Public]

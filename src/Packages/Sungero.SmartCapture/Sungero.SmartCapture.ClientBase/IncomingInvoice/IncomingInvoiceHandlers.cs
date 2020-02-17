@@ -19,8 +19,6 @@ namespace Sungero.SmartCapture
       _obj.State.Properties.Date.IsRequired = false;
       _obj.State.Properties.TotalAmount.IsRequired = false;
       _obj.State.Properties.Currency.IsRequired = false;
-      
-      ((Domain.Shared.IExtendedEntity)_obj).Params.Remove(Capture.PublicConstants.Module.IsVisualModeParamName);
     }
 
     public override void ContractValueInput(Sungero.Contracts.Client.IncomingInvoiceContractValueInputEventArgs e)
@@ -81,12 +79,6 @@ namespace Sungero.SmartCapture
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
-      // В визуальном режиме поля контрагент, номер, дата, сумма, валюта обязательны, при программном изменении - нет.
-      // Чтобы в зависимости от режима изменять обязательность для возможности сохранять документ с незаполненными полями,
-      // используется этот параметр. Добавляется на Refresh до отрабатывания базового события,
-      // чтобы выполнились вычисления обязательности свойств, т.к. при отмене изменений параметры откатываются.
-      ((Domain.Shared.IExtendedEntity)_obj).Params[Capture.PublicConstants.Module.IsVisualModeParamName] = true;
-      
       base.Refresh(e);
       
       // Контрагент не дб задизейблен, если незаполнен.

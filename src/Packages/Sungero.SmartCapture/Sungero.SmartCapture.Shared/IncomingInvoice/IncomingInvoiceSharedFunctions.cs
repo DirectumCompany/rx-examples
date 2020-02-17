@@ -14,7 +14,7 @@ namespace Sungero.SmartCapture.Shared
       base.SetRequiredProperties();
       
       // Изменить обязательность полей в зависимости от того, программная или визульная работа.
-      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
+      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Sungero.Docflow.PublicConstants.OfficialDocument.IsVisualModeParamName);
 
       // При визуальной работе обязательность контрагента, номера, даты, суммы и валюты как в IncommingInvoice.
       // При программной работе контрагента, номер, дату, сумму и валюту делаем необязательными.

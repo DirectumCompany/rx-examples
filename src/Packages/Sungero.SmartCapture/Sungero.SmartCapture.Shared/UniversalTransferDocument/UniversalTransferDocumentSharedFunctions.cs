@@ -14,7 +14,7 @@ namespace Sungero.SmartCapture.Shared
       base.SetRequiredProperties();
       
       // Изменить обязательность полей в зависимости от того, программная или визульная работа.
-      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Capture.PublicConstants.Module.IsVisualModeParamName);
+      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Sungero.Docflow.PublicConstants.OfficialDocument.IsVisualModeParamName);
 
       // При визуальной работе обязательность контрагента как в UniversalTransferDocument.
       // При программной работе поля делаем необязательными, чтобы сбросить обязательность,
