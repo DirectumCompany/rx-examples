@@ -26,14 +26,13 @@ namespace Sungero.SmartCapture.Shared
     
     public override void ChangeDocumentPropertiesAccess(bool isEnabled, bool repeatRegister)
     {
-      var smartCaptureNumerationSucceed = Capture.PublicFunctions.Module.IsSmartCaptureNumerationSucceed(_obj);
-      
+      var smartCaptureNumerationSucceed = IsSmartCaptureNumerationSucceed();
       if (smartCaptureNumerationSucceed)
-        Sungero.Capture.PublicFunctions.Module.EnableRequisitesForVerification(_obj);
+        EnableRequisitesForVerification();
       else
         base.ChangeDocumentPropertiesAccess(isEnabled, repeatRegister);
       
-      Sungero.SmartCapture.Functions.Module.EnableRegistrationNumberAndDate(_obj);
+      EnableRegistrationNumberAndDate();
     }
     
     public override void FillName()

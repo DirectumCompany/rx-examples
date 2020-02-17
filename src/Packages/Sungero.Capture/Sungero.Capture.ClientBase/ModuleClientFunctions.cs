@@ -817,57 +817,6 @@ namespace Sungero.Capture.Client
     }
     
     /// <summary>
-    /// Разблокировать реквизиты для верификации после нумерации.
-    /// </summary>
-    /// <param name="document">Документ для верификации.</param>
-    [Public]
-    public virtual void EnableRequisitesForVerification(Sungero.Docflow.IOfficialDocument document)
-    {
-      if (Sungero.Capture.PublicFunctions.Module.IsSmartCaptureNumerationSucceed(document) &&
-          Sungero.Docflow.PublicFunctions.OfficialDocument.CanChangeRequisitesOrCancelRegistration(document) &&
-          document.AccessRights.CanUpdate())
-      {
-        var properties = document.State.Properties;
-        properties.Name.IsEnabled = document.DocumentKind == null || !document.DocumentKind.GenerateDocumentName.Value;
-        properties.DocumentKind.IsEnabled = true;
-        properties.Subject.IsEnabled = true;
-        properties.BusinessUnit.IsEnabled = true;
-        properties.Department.IsEnabled = true;
-        
-        if (Sungero.Docflow.AccountingDocumentBases.Is(document))
-          this.SetCounterpartyPropertyEnabled(Sungero.Docflow.AccountingDocumentBases.As(document), true);
-        if (Sungero.Docflow.ContractualDocumentBases.Is(document))
-          this.SetCounterpartyPropertyEnabled(Sungero.Docflow.ContractualDocumentBases.As(document), true);
-        
-        properties.Assignee.IsEnabled = true;
-        
-        properties.DeliveryMethod.IsEnabled = true;
-        properties.CaseFile.IsEnabled = true;
-        properties.PlacedToCaseFileDate.IsEnabled = true;
-      }
-    }
-    
-    /// <summary>
-    /// Установить доступность свойства "Контрагент".
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="isEnabled">Доступность.</param>
-    public virtual void SetCounterpartyPropertyEnabled(Sungero.Docflow.IAccountingDocumentBase document, bool isEnabled)
-    {
-      document.State.Properties.Counterparty.IsEnabled = isEnabled;
-    }
-    
-    /// <summary>
-    /// Установить доступность свойства "Контрагент".
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="isEnabled">Доступность.</param>
-    public virtual void SetCounterpartyPropertyEnabled(Sungero.Docflow.IContractualDocumentBase document, bool isEnabled)
-    {
-      document.State.Properties.Counterparty.IsEnabled = isEnabled;
-    }
-    
-    /// <summary>
     /// Проверить возможность проверки строк как чисел.
     /// </summary>
     /// <param name="firstString">Первая строка для сравнения.</param>

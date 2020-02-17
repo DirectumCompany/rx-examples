@@ -302,7 +302,7 @@ namespace Sungero.Capture.Server
     public virtual bool IsDocumentRegistrationFailed(IOfficialDocument document)
     {
       var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      return documentParams.ContainsKey(Sungero.Docflow.Constants.Module.DocumentNumberingBySmartCaptureResultParamName);
+      return documentParams.ContainsKey(Sungero.Docflow.Constants.OfficialDocument.DocumentNumberingBySmartCaptureResultParamName);
     }
     
     /// <summary>
