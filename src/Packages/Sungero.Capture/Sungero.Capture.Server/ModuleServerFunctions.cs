@@ -16,7 +16,7 @@ using Sungero.RecordManagement;
 using Sungero.Workflow;
 using FieldNames = Sungero.Docflow.Constants.Module.FieldNames;
 using FactNames = Sungero.Docflow.Constants.Module.FactNames;
-using LetterPersonTypes = Sungero.Capture.Constants.Module.LetterPersonTypes;
+using LetterPersonTypes = Sungero.RecordManagement.PublicConstants.IncomingLetter.LetterPersonTypes;
 using CounterpartyTypes = Sungero.Capture.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Docflow.PublicConstants.Module.ArioClassNames;
 using HighlightActivationStyleParamNames = Sungero.Capture.Constants.Module.HighlightActivationStyleParamNames;
@@ -922,95 +922,8 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateIncomingLetter(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
       var document = Sungero.RecordManagement.IncomingLetters.Create();
-      var props = document.Info.Properties;
       
-      // Заполнить основные свойства.
-      FillDocumentKind(document);
-      var facts = recognitionResult.Facts;
-      var subjectFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Subject).FirstOrDefault();
-      var subject = DocflowPublicFunctions.GetFieldValue(subjectFact, FieldNames.Letter.Subject);
-      if (!string.IsNullOrEmpty(subject))
-      {
-        document.Subject = string.Format("{0}{1}", subject.Substring(0, 1).ToUpper(), subject.Remove(0, 1).ToLower());
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, subjectFact, FieldNames.Letter.Subject, props.Subject.Name, document.Subject);
-      }
-      
-      // Адресат.
-      var addresseeFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Addressee).FirstOrDefault();
-      var addressee = GetAdresseeByFact(addresseeFact);
-      document.Addressee = addressee.Employee;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, addresseeFact, FieldNames.Letter.Addressee, props.Addressee.Name, document.Addressee, addressee.IsTrusted);
-      
-      // Заполнить данные корреспондента.
-      var correspondent = GetCounterparty(recognitionResult, props.Correspondent.Name);
-      if (correspondent != null)
-      {
-        document.Correspondent = correspondent.Counterparty;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, correspondent.Fact, null, props.Correspondent.Name, document.Correspondent, correspondent.IsTrusted);
-      }
-      
-      // Дата, номер.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
-      var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-      var isDateValid = IsDateValid(date);
-      if (!isDateValid)
-        date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
-      document.Dated = date;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.Letter.Date, props.Dated.Name, date, isTrustedDate);
-      
-      var numberFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
-      document.InNumber = DocflowPublicFunctions.GetFieldValue(numberFact, FieldNames.Letter.Number);
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
-      
-      // Заполнить данные нашей стороны.
-      // Убираем уже использованный факт для подбора контрагента, чтобы организация не искалась по тем же реквизитам что и контрагент.
-      if (correspondent != null)
-        facts.Remove(correspondent.Fact);
-      var businessUnitsWithFacts = GetBusinessUnitsWithFacts(recognitionResult);
-      
-      var businessUnitWithFact = GetMostProbableBusinessUnitMatching(businessUnitsWithFacts,
-                                                                     props.BusinessUnit.Name,
-                                                                     document.Addressee,
-                                                                     responsible);
-      document.BusinessUnit = businessUnitWithFact.BusinessUnit;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, businessUnitWithFact.Fact, null, props.BusinessUnit.Name,
-                                                 document.BusinessUnit, businessUnitWithFact.IsTrusted);
-      
-      document.Department = document.Addressee != null
-        ? Company.PublicFunctions.Department.GetDepartment(document.Addressee)
-        : Company.PublicFunctions.Department.GetDepartment(responsible);
-      
-      // Заполнить подписанта.
-      var personFacts = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.LetterPerson, FieldNames.LetterPerson.Surname);
-      var signatoryFact = personFacts.Where(x => DocflowPublicFunctions.GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Signatory).FirstOrDefault();
-      var signedBy = GetContactByFact(signatoryFact, props.SignedBy.Name,
-                                      document.Correspondent, props.Correspondent.Name, recognitionResult.PredictedClass);
-      
-      // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
-      if (document.Correspondent == null && signedBy.Contact != null)
-      {
-        // Если контрагент определился из подписанта, то результату не доверяем.
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, signedBy.Contact.Company, false);
-      }
-      document.SignedBy = signedBy.Contact;
-      var isTrustedSignatory = signedBy.IsTrusted ? DocflowPublicFunctions.IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type) : signedBy.IsTrusted;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, signatoryFact, null, props.SignedBy.Name, document.SignedBy, isTrustedSignatory);
-      
-      // Заполнить контакт.
-      var responsibleFact = personFacts.Where(x => DocflowPublicFunctions.GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
-      var contact = GetContactByFact(responsibleFact, props.Contact.Name,
-                                     document.Correspondent, props.Correspondent.Name, recognitionResult.PredictedClass);
-      
-      // При заполнении полей подписал и контакт, если контрагент не заполнен, он подставляется из подписанта/контакта.
-      if (document.Correspondent == null && contact.Contact != null)
-      {
-        // Если контрагент определился из контакта, то результату не доверяем.
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, null, null, props.Correspondent.Name, contact.Contact.Company, false);
-      }
-      document.Contact = contact.Contact;
-      var isTrustedContact = contact.IsTrusted && DocflowPublicFunctions.IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, responsibleFact, null, props.Contact.Name, document.Contact, isTrustedContact);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, null);
       
       return document;
     }
@@ -1830,7 +1743,7 @@ namespace Sungero.Capture.Server
       // Дата и номер.
       var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
       var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isDateValid = IsDateValid(date);
+      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
       var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
@@ -1892,7 +1805,7 @@ namespace Sungero.Capture.Server
       // Дата.
       var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
       var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isDateValid = IsDateValid(date);
+      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
       var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
@@ -2174,7 +2087,7 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
       var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-      var isDateValid = IsDateValid(date);
+      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
       var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
@@ -2252,8 +2165,8 @@ namespace Sungero.Capture.Server
     /// <param name="numberFieldName">Наименование поля, содержащего номер.</param>
     /// <returns>Распознанный номер с фактом.</returns>
     public virtual Docflow.Structures.Module.IRecognizedDocumentNumber GetRecognizedNumber(Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                                                                                   string numberFactName,
-                                                                                                   string numberFieldName)
+                                                                                           string numberFactName,
+                                                                                           string numberFieldName)
     {
       var fact = DocflowPublicFunctions.GetOrderedFacts(recognitionResult.Facts, numberFactName, numberFieldName).FirstOrDefault();
       var number = DocflowPublicFunctions.GetFieldValue(fact, numberFieldName);
@@ -2271,8 +2184,8 @@ namespace Sungero.Capture.Server
     /// <param name="dateFieldName">Наименование поля, содержащего дату.</param>
     /// <returns>Распознанная дата с фактом.</returns>
     public virtual Docflow.Structures.Module.IRecognizedDocumentDate GetRecognizedDate(Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                                                                               string dateFactName,
-                                                                                               string dateFieldName)
+                                                                                       string dateFactName,
+                                                                                       string dateFieldName)
     {
       var fact = DocflowPublicFunctions.GetOrderedFacts(recognitionResult.Facts, dateFactName, dateFieldName).FirstOrDefault();
       var date = DocflowPublicFunctions.GetFieldDateTimeValue(fact, dateFieldName);
@@ -2284,17 +2197,6 @@ namespace Sungero.Capture.Server
       }
       
       return Docflow.Structures.Module.RecognizedDocumentDate.Create(date, isTrusted, fact);
-    }
-    
-    /// <summary>
-    /// Проверка даты на валидность.
-    /// </summary>
-    /// <param name="date">проверяемая дата.</param>
-    /// <returns>Признак - дата валидна/невалидна.</returns>
-    public virtual bool IsDateValid(Nullable<DateTime> date)
-    {
-      return date == null ||
-        date != null && date.HasValue && date >= Calendar.SqlMinValue ;
     }
     
     #endregion
@@ -2326,7 +2228,7 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyTypes">Типы фактов контрагентов.</param>
     /// <returns>Наши организации и контрагенты, найденные по фактам.</returns>
     public virtual List<Docflow.Structures.Module.ICounterpartyFactMatching> MatchFactsWithBusinessUnitsAndCounterparties(List<Sungero.Docflow.Structures.Module.IFact> allFacts,
-                                                                                                                                  List<string> counterpartyTypes)
+                                                                                                                          List<string> counterpartyTypes)
     {
       var counterpartyPropertyName = AccountingDocumentBases.Info.Properties.Counterparty.Name;
       var businessUnitPropertyName = AccountingDocumentBases.Info.Properties.BusinessUnit.Name;
@@ -2386,8 +2288,8 @@ namespace Sungero.Capture.Server
         if (counterparty != null || businessUnit != null)
         {
           var counterpartyFactMatching = Docflow.Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact,
-                                                                                                           DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
-                                                                                                           isTrusted);
+                                                                                                   DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                   isTrusted);
           matchings.Add(counterpartyFactMatching);
           continue;
         }
@@ -2401,8 +2303,8 @@ namespace Sungero.Capture.Server
         if (counterparty != null || businessUnit != null)
         {
           var counterpartyFactMatching = Docflow.Structures.Module.CounterpartyFactMatching.Create(businessUnit, counterparty, fact,
-                                                                                                           DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
-                                                                                                           false);
+                                                                                                   DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Counterparty.CounterpartyType),
+                                                                                                   false);
           matchings.Add(counterpartyFactMatching);
         }
       }
@@ -2419,9 +2321,9 @@ namespace Sungero.Capture.Server
     /// <param name="responsibleEmployee">Ответственный сотрудник.</param>
     /// <returns>НОР и контрагент.</returns>
     public virtual Docflow.Structures.Module.IDocumentParties GetDocumentParties(Docflow.Structures.Module.ICounterpartyFactMatching buyer,
-                                                                                         Docflow.Structures.Module.ICounterpartyFactMatching seller,
-                                                                                         List<Docflow.Structures.Module.ICounterpartyFactMatching> nonType,
-                                                                                         IEmployee responsibleEmployee)
+                                                                                 Docflow.Structures.Module.ICounterpartyFactMatching seller,
+                                                                                 List<Docflow.Structures.Module.ICounterpartyFactMatching> nonType,
+                                                                                 IEmployee responsibleEmployee)
     {
       Sungero.Docflow.Structures.Module.ICounterpartyFactMatching counterparty = null;
       Sungero.Docflow.Structures.Module.ICounterpartyFactMatching businessUnit = null;
@@ -2733,8 +2635,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
     public virtual Docflow.Structures.Module.ICounterpartyFactMatching GetMostProbableBusinessUnitMatching(List<Docflow.Structures.Module.ICounterpartyFactMatching> businessUnitsWithFacts,
-                                                                                                                   string businessUnitPropertyName, IEmployee addressee,
-                                                                                                                   IEmployee responsible)
+                                                                                                           string businessUnitPropertyName, IEmployee addressee,
+                                                                                                           IEmployee responsible)
     {
       // Если для свойства businessUnitPropertyName по факту существует верифицированное ранее значение, то вернуть его.
       foreach(var record in businessUnitsWithFacts)
@@ -2788,8 +2690,8 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Ответственный.</param>
     /// <returns>НОР и соответствующий ей факт.</returns>
     public virtual Docflow.Structures.Module.ICounterpartyFactMatching GetMostProbableBusinessUnitMatching(List<Docflow.Structures.Module.ICounterpartyFactMatching> businessUnitsWithFacts,
-                                                                                                                   string businessUnitPropertyName,
-                                                                                                                   IEmployee responsible)
+                                                                                                           string businessUnitPropertyName,
+                                                                                                           IEmployee responsible)
     {
       var businessUnit = Docflow.Structures.Module.CounterpartyFactMatching.Create();
       
@@ -3214,25 +3116,6 @@ namespace Sungero.Capture.Server
       documentParams.Remove(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName);
     }
     
-    /// <summary>
-    /// Поиск адресата письма.
-    /// </summary>
-    /// <param name="fact">Факт.</param>
-    /// <returns>Адресат.</returns>
-    public virtual Docflow.Structures.Module.ISignatoryFactMatching GetAdresseeByFact(Sungero.Docflow.Structures.Module.IFact fact)
-    {
-      var result = Sungero.Docflow.Structures.Module.SignatoryFactMatching.Create(Sungero.Company.Employees.Null, null, fact, false);
-      
-      if (fact == null)
-        return result;
-      
-      var addressee = DocflowPublicFunctions.GetFieldValue(fact, FieldNames.Letter.Addressee);
-      var employees =  Company.PublicFunctions.Employee.Remote.GetEmployeesByName(addressee);
-      result.Employee = employees.FirstOrDefault();
-      result.IsTrusted = (employees.Count() == 1) ? DocflowPublicFunctions.IsTrustedField(fact, FieldNames.Letter.Addressee) : false;
-      return result;
-    }
-    
     /// TODO Suleymanov: Удалить после переноса договора, допника в коробку
     /// <summary>
     /// Поиск сотрудника по ФИО из фактов и НОР.
@@ -3276,7 +3159,7 @@ namespace Sungero.Capture.Server
       var patronymic = DocflowPublicFunctions.GetFieldValue(fact, сontactFactNames.PatronymicField);
       
       return GetFullNameByFact(surname, name, patronymic);
-    }    
+    }
     
     /// TODO Suleymanov: Удалить после переноса договора, допника, вход. письма в коробку
     /// <summary>
@@ -3301,7 +3184,7 @@ namespace Sungero.Capture.Server
       return string.Join(" ", parts);
     }
 
-    /// TODO Suleymanov: Удалить после переноса договора, допника, вход. письма в коробку    
+    /// TODO Suleymanov: Удалить после переноса договора, допника, вход. письма в коробку
     /// <summary>
     /// Получить сокращенное ФИО из факта.
     /// </summary>
@@ -3375,10 +3258,10 @@ namespace Sungero.Capture.Server
     /// <param name="predictedClass">Распознанный класс документа.</param>
     /// <returns>Структура, содержащая факт, контактное лицо и признак доверия.</returns>
     public virtual Docflow.Structures.Module.ISignatoryFactMatching GetContactByFact(Docflow.Structures.Module.IFact fact,
-                                                                             string propertyName,
-                                                                             ICounterparty counterparty,
-                                                                             string counterpartyPropertyName,
-                                                                             string predictedClass)
+                                                                                     string propertyName,
+                                                                                     ICounterparty counterparty,
+                                                                                     string counterpartyPropertyName,
+                                                                                     string predictedClass)
     {
       var signedBy = Sungero.Docflow.Structures.Module.SignatoryFactMatching.Create(null, Sungero.Parties.Contacts.Null, fact, false);
       
@@ -3414,9 +3297,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyName">Имя связанного свойства контрагента.</param>
     /// <returns>Контактное лицо.</returns>
     public virtual Docflow.Structures.Module.ISignatoryFactMatching GetContactByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact,
-                                                                                     string propertyName,
-                                                                                     ICounterparty counterparty,
-                                                                                     string counterpartyPropertyName)
+                                                                                             string propertyName,
+                                                                                             ICounterparty counterparty,
+                                                                                             string counterpartyPropertyName)
     {
       var result = Sungero.Docflow.Structures.Module.SignatoryFactMatching.Create(null, Contacts.Null, fact, false);
       
@@ -3480,9 +3363,9 @@ namespace Sungero.Capture.Server
     /// <param name="isOurSignatory">Признак поиска нашего подписанта (true) или подписанта КА (false).</param>
     /// <returns>Сотрудник.</returns>
     public virtual Docflow.Structures.Module.ISignatoryFactMatching GetContractualDocumentSignatory(Docflow.Structures.Module.IRecognitionResult recognitionResult,
-                                                                                            IContractualDocumentBase document,
-                                                                                            Docflow.Structures.Module.ICounterpartyFactMatching organizationFactMatching,
-                                                                                            bool isOurSignatory = false)
+                                                                                                    IContractualDocumentBase document,
+                                                                                                    Docflow.Structures.Module.ICounterpartyFactMatching organizationFactMatching,
+                                                                                                    bool isOurSignatory = false)
     {
       var props = document.Info.Properties;
       var signatoryFacts = GetFacts(recognitionResult.Facts, FactNames.Counterparty);
@@ -3559,9 +3442,9 @@ namespace Sungero.Capture.Server
     /// <param name="counterpartyPropertyName">Имя связанного свойства НОР.</param>
     /// <returns>Сотрудник.</returns>
     public virtual Docflow.Structures.Module.ISignatoryFactMatching GetEmployeeByVerifiedData(Sungero.Docflow.Structures.Module.IFact fact,
-                                                                                      string propertyName,
-                                                                                      IBusinessUnit businessUnit,
-                                                                                      string businessUnitPropertyName)
+                                                                                              string propertyName,
+                                                                                              IBusinessUnit businessUnit,
+                                                                                              string businessUnitPropertyName)
     {
       var result = Sungero.Docflow.Structures.Module.SignatoryFactMatching.Create(null, null, fact, false);
       
@@ -3674,8 +3557,8 @@ namespace Sungero.Capture.Server
     /// <param name="predictedClass">Результат обработки договора в Ario.</param>
     /// <returns>Структура, содержащая сотрудника, факт и признак доверия.</returns>
     public virtual Docflow.Structures.Module.ISignatoryFactMatching GetContractualDocumentOurSignatoryByFact(Sungero.Docflow.Structures.Module.IFact fact,
-                                                                                   IContractualDocumentBase document,
-                                                                                   string predictedClass)
+                                                                                                             IContractualDocumentBase document,
+                                                                                                             string predictedClass)
     {
       var signedBy = Sungero.Docflow.Structures.Module.SignatoryFactMatching.Create(null, null, fact, false);
       var businessUnit = document.BusinessUnit;

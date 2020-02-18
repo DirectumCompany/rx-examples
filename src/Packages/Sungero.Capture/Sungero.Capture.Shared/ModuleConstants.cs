@@ -113,16 +113,6 @@ namespace Sungero.Capture.Constants
       public const string Yellow = "#FFEA00";
     }
     
-    // Типы персоны: "Подписант", "Исполнитель".
-    public static class LetterPersonTypes
-    {
-      [Sungero.Core.Public]
-      public const string Signatory = "SIGNATORY";
-      
-      [Sungero.Core.Public]
-      public const string Responsible = "RESPONSIBLE";
-    }
-    
     // Типы контрагента.
     public static class CounterpartyTypes
     {

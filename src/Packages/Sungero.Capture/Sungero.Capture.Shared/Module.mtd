@@ -423,15 +423,6 @@
       "Value": "\"#FAC6B6\""
     },
     {
-      "Name": "Responsible",
-      "ParentClasses": [
-        "Module",
-        "LetterPersonTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"RESPONSIBLE\""
-    },
-    {
       "Name": "Seller",
       "ParentClasses": [
         "Module",
@@ -448,15 +439,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"SHIPPER\""
-    },
-    {
-      "Name": "Signatory",
-      "ParentClasses": [
-        "Module",
-        "LetterPersonTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SIGNATORY\""
     },
     {
       "Name": "SimpleRelationRelationName",
