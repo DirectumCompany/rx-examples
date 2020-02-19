@@ -8,25 +8,7 @@ using Sungero.SmartCapture.Contract;
 namespace Sungero.SmartCapture.Shared
 {
   partial class ContractFunctions
-  {
-    public override void SetRequiredProperties()
-    {
-      
-      base.SetRequiredProperties();
-      
-      // Изменить обязательность полей в зависимости от того, программная или визуальная работа.
-      var isVisualMode = ((Domain.Shared.IExtendedEntity)_obj).Params.ContainsKey(Sungero.Docflow.PublicConstants.OfficialDocument.IsVisualModeParamName);
-
-      // При визуальной работе обязательность содержания и контрагента как в Contract.
-      // Обязательность категории вычисляется по стандартной логике.
-      // При программной работе содержание, контрагента и категорию делаем необязательными.
-      // Чтобы сбросить обязательность, если она изменилась в вызове текущего метода в базовой сущности.
-      _obj.State.Properties.Subject.IsRequired = isVisualMode;
-      _obj.State.Properties.Counterparty.IsRequired = isVisualMode;
-      if (!isVisualMode)
-        _obj.State.Properties.DocumentGroup.IsRequired = false;
-    }
-    
+  {   
     [Public]
     public override bool IsVerificationModeSupported()
     {
