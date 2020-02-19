@@ -10,13 +10,6 @@ namespace Sungero.SmartCapture
   partial class ContractStatementClientHandlers
   {
 
-    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
-    {
-      base.Closing(e);
-      
-      _obj.State.Properties.Counterparty.IsRequired = false;
-    }
-
     public override void TotalAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
     {
       base.TotalAmountValueInput(e);
@@ -76,10 +69,6 @@ namespace Sungero.SmartCapture
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
     {
       base.Refresh(e);
-      
-      // Контрагент не дб задизейблен, если незаполнен.
-      if (_obj.Counterparty == null)
-        _obj.State.Properties.Counterparty.IsEnabled = true;
       
       Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
