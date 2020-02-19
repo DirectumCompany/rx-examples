@@ -1879,20 +1879,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.SupAgreements.Create();
       
-      // Вид документа.
-      FillDocumentKind(document);
-
-      // Заполнить данные нашей стороны и корреспондента.
-      FillContractualDocumentParties(recognitionResult, responsible, document);
-      
-      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      document.ResponsibleEmployee = responsible;
-      
-      // Дата и номер.
-      this.FillNumberAndDate(document, recognitionResult, FactNames.SupAgreement);
-
-      // Сумма и валюта.
-      FillAmountAndCurrency(document, recognitionResult);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, null);
       
       return document;
     }
