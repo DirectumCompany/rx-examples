@@ -24,22 +24,6 @@ namespace Sungero.Capture.Structures.Module
     // Факт, из полей которого были излеченны данные контрагента.
     public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
   }
- 
-  /// <summary>
-  /// Договорной документ и сопоставленный с ним факт.
-  /// </summary>
-  [Public]
-  partial class ContractFactMatching
-  {
-    // Договорной документ.
-    public Sungero.Contracts.IContractualDocument Contract { get; set; }
-    
-    // Факт, по полям которого был найден договорной документ.
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
-    
-    // Доверять ли найденному значению.
-    public bool IsTrusted { get; set; }
-  }
   
   /// <summary>
   /// Файлы захваченного письма.

@@ -131,15 +131,6 @@
       "Value": "\"SmartService is running\""
     },
     {
-      "Name": "Buyer",
-      "ParentClasses": [
-        "Module",
-        "CounterpartyTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"BUYER\""
-    },
-    {
       "Name": "CaptureInstanceInfoList",
       "ParentClasses": [
         "Module",
@@ -155,15 +146,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"CaptureMockMode\""
-    },
-    {
-      "Name": "Consignee",
-      "ParentClasses": [
-        "Module",
-        "CounterpartyTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"CONSIGNEE\""
     },
     {
       "Name": "Contract",
@@ -373,15 +355,6 @@
       "Value": "\"Name\""
     },
     {
-      "Name": "Payer",
-      "ParentClasses": [
-        "Module",
-        "CounterpartyTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"PAYER\""
-    },
-    {
       "Name": "PositionElementDelimiter",
       "ParentClasses": [
         "Module"
@@ -423,24 +396,6 @@
       "Value": "\"#FAC6B6\""
     },
     {
-      "Name": "Seller",
-      "ParentClasses": [
-        "Module",
-        "CounterpartyTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SELLER\""
-    },
-    {
-      "Name": "Shipper",
-      "ParentClasses": [
-        "Module",
-        "CounterpartyTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SHIPPER\""
-    },
-    {
       "Name": "SimpleRelationRelationName",
       "ParentClasses": [
         "Module"
@@ -474,15 +429,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"SupAgreement\""
-    },
-    {
-      "Name": "Supplier",
-      "ParentClasses": [
-        "Module",
-        "CounterpartyTypes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"SUPPLIER\""
     },
     {
       "Name": "TaxInvoice",
@@ -736,28 +682,6 @@
           "Name": "Subject",
           "IsNullable": true,
           "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "ContractFactMatching",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Contract",
-          "IsEntity": true,
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Contracts.IContractualDocument"
-        },
-        {
-          "Name": "Fact",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFact"
-        },
-        {
-          "Name": "IsTrusted",
-          "TypeFullName": "global::System.Boolean"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"

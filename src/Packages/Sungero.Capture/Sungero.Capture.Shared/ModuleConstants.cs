@@ -112,29 +112,7 @@ namespace Sungero.Capture.Constants
       [Sungero.Core.Public]
       public const string Yellow = "#FFEA00";
     }
-    
-    // Типы контрагента.
-    public static class CounterpartyTypes
-    {
-      [Sungero.Core.Public]
-      public const string Consignee = "CONSIGNEE";
       
-      [Sungero.Core.Public]
-      public const string Payer = "PAYER";
-      
-      [Sungero.Core.Public]
-      public const string Shipper = "SHIPPER";
-      
-      [Sungero.Core.Public]
-      public const string Supplier = "SUPPLIER";
-      
-      [Sungero.Core.Public]
-      public const string Buyer = "BUYER";
-      
-      [Sungero.Core.Public]
-      public const string Seller = "SELLER";
-    }
-    
     public static class Initialize
     {
       public static readonly Guid MockIncomingLetterKindGuid = Guid.Parse("E37D0916-7814-441E-84EF-904B7B643497");
