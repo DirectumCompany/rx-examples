@@ -183,4 +183,7 @@
   <data name="Property_LeadingDocument" xml:space="preserve">
     <value>Contract</value>
   </data>
+  <data name="Property_Subject" xml:space="preserve">
+    <value>Subject</value>
+  </data>
 </root>

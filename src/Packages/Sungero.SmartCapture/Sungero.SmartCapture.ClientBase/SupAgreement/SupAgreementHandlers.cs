@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -71,15 +71,6 @@ namespace Sungero.SmartCapture
       base.CounterpartyValueInput(e);
       
       this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
-    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
-    {
-      base.Closing(e);
-      
-      _obj.State.Properties.Subject.IsRequired = false;
-      _obj.State.Properties.LeadingDocument.IsRequired = false;
-      _obj.State.Properties.Counterparty.IsRequired = false;
     }
 
     public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
