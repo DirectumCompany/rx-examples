@@ -9,10 +9,6 @@ namespace Sungero.SmartCapture.Shared
 {
   partial class ContractFunctions
   {   
-    [Public]
-    public override bool IsVerificationModeSupported()
-    {
-      return true;
-    }
+    
   }
 }
