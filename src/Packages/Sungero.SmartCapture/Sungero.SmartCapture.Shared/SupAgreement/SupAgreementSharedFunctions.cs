@@ -23,11 +23,5 @@ namespace Sungero.SmartCapture.Shared
       _obj.State.Properties.Counterparty.IsRequired = isVisualMode;
       _obj.State.Properties.LeadingDocument.IsRequired = isVisualMode;
     }
-    
-    [Public]
-    public override bool IsVerificationModeSupported()
-    {
-      return true;
-    }
   }
 }
