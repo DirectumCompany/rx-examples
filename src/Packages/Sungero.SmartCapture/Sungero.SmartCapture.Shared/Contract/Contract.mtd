@@ -565,7 +565,6 @@
         "ValueInputClient"
       ],
       "IsAncestorMetadata": true,
-      "IsRequired": true,
       "Overridden": [
         "IsRequired",
         "HandledEvents"
