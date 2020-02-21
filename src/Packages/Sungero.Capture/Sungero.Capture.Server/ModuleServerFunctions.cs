@@ -527,13 +527,7 @@ namespace Sungero.Capture.Server
         document = CreateSimpleDocument(name, responsible);
       }
       
-      FillDeliveryMethod(document, recognitionResult.SendedByEmail);
-      /* Статус документа задается до создания версии, чтобы корректно прописалось наименование,
-         если его не из чего формировать.*/
-      document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, string.Empty);
-      // Принудительно заполняем имя документа, для случаев когда имя не автоформируемое, чтобы не падало при сохранении.
-      Docflow.PublicFunctions.OfficialDocument.FillName(document);
       document.Save();
       return document;
     }
@@ -838,7 +832,7 @@ namespace Sungero.Capture.Server
       
       var documentName = Resources.EmailBodyDocumentNameFormat(mailInfo.FromEmail);
       var document = CreateSimpleDocument(documentName, responsible);
-      FillDeliveryMethod(document, true);
+      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, true);
       
       // Наименование и содержание.
       if (!string.IsNullOrWhiteSpace(mailInfo.Subject))
@@ -893,7 +887,7 @@ namespace Sungero.Capture.Server
     {
       var name = Path.GetFileName(file.Description);
       var document = CreateSimpleDocument(name, responsible);
-      FillDeliveryMethod(document, sendedByEmail);
+      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, sendedByEmail);
       document.Save();
       
       var application = Docflow.PublicFunctions.Module.GetAssociatedApplicationByFileName(file.Path);
@@ -1323,7 +1317,6 @@ namespace Sungero.Capture.Server
       var facts = recognitionResult.Facts;
       var document = FinancialArchive.Waybills.Create();
       var props = document.Info.Properties;
-      FillDocumentKind(document);
       
       // НОР и КА.
       var counterpartyTypes = new List<string>();
@@ -1352,13 +1345,7 @@ namespace Sungero.Capture.Server
       var isTrusted = (contractualDocuments.Count() == 1) ? Docflow.PublicFunctions.Module.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName) : false;
       Docflow.PublicFunctions.Module.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
       
-      // Подразделение и ответственный.
-      document.Department = Company.PublicFunctions.Department.GetDepartment(responsible);
-      document.ResponsibleEmployee = responsible;
-      
-      // Сумма и валюта.
-      Docflow.PublicFunctions.AccountingDocumentBase.FillAmountAndCurrency(document, recognitionResult);
-      
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, documentParties);
       return document;
     }
     
@@ -1989,23 +1976,7 @@ namespace Sungero.Capture.Server
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                                                  document.RegistrationNumber, isTrustedNumber);
     }
-    
-    /// <summary>
-    /// Заполнить способ доставки
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <param name="sendedByEmail">Доставлен эл.почтой.</param>
-    public virtual void FillDeliveryMethod(IOfficialDocument document, bool sendedByEmail)
-    {
-      var methodName = sendedByEmail
-        ? MailDeliveryMethods.Resources.EmailMethod
-        : MailDeliveryMethods.Resources.MailMethod;
-      
-      document.DeliveryMethod = MailDeliveryMethods.GetAll()
-        .Where(m => m.Name.Equals(methodName, StringComparison.InvariantCultureIgnoreCase))
-        .FirstOrDefault();
-    }        
-    
+  
     #endregion
     
     #region Поиск контрагента/НОР
