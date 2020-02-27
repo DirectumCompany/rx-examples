@@ -197,8 +197,7 @@ namespace Sungero.Capture.Server
               else
               {
                 documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
-                Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
-                document.VerificationState = Sungero.Docflow.OfficialDocument.VerificationState.InProcess;
+                Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);                
                 document.Save();
               }
             }
