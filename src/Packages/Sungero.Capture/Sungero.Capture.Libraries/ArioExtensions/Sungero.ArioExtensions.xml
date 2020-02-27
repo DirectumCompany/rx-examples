@@ -4,6 +4,12 @@
         <name>Sungero.ArioExtensions</name>
     </assembly>
     <members>
+        <member name="M:Sungero.ArioExtensions.ArioConnector.GetInfo">
+            <summary>
+            Получить информацию о сервисе.
+            </summary>
+            <returns>Информация о сервисе.</returns>
+        </member>
         <member name="M:Sungero.ArioExtensions.ArioConnector.GetDocumentByGuid(System.String)">
             <summary>
             Получить pdf-документ по гуиду.
@@ -11,12 +17,11 @@
             <param name="documentGuid">Гуид документа.</param>
             <returns>PDF-документ.</returns>
         </member>
-        <member name="M:Sungero.ArioExtensions.ArioConnector.ConvertDocumentToPdfAndGetGuid(System.Byte[],System.String)">
+        <member name="M:Sungero.ArioExtensions.ArioConnector.ConvertDocumentToPdfAndGetGuid(System.String)">
             <summary>
             Преобразовать документ в pdf и получить Guid.
             </summary>
-            <param name="document">Документ.</param>
-            <param name="docName">Имя документа.</param>
+            <param name="documentPath">Путь до документа.</param>
             <returns></returns>
         </member>
         <member name="M:Sungero.ArioExtensions.ArioConnector.UpdateGuidInClassificationResults(System.String,System.String)">
@@ -34,7 +39,7 @@
             <param name="trainTaskId"> Ид задачи.</param>
             <returns></returns>
         </member>
-        <member name="M:Sungero.ArioExtensions.ArioConnector.TrainClassifierByFolder(System.String,System.String)">
+        <member name="M:Sungero.ArioExtensions.ArioConnector.TrainClassifierFromFolder(System.String,System.String)">
             <summary>
             Обучить классификатор через папку с файлами.
             </summary>
@@ -626,6 +631,106 @@
         <member name="P:Sungero.ArioExtensions.Models.PackageProcessResult.AdditionalClassificationResults">
             <summary>
             Результат классификации дополнительными классификаторами.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ArioInfo">
+            <summary>
+            Информация о сервисе.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ArioInfo.State">
+            <summary>
+            Сообщение о состоянии сервиса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ArioInfo.Version">
+            <summary>
+            Версия сервиса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ArioInfo.LicenseInfo">
+            <summary>
+            Лицензия.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ArioInfo.ServiceConfig">
+            <summary>
+            Конфигурация.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.LicenseInfo">
+            <summary>
+            Информация о лицензии.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.LicenseInfo.ValidTo">
+            <summary>
+            Срок действия.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.LicenseInfo.Operations">
+            <summary>
+            Операции.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.Operations">
+            <summary>
+            Операция.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Operations.Name">
+            <summary>
+            Наименование.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.Operations.Count">
+            <summary>
+            Количество запросов на сервис.
+            </summary>
+        </member>
+        <member name="T:Sungero.ArioExtensions.Models.ServiceConfig">
+            <summary>
+            Конфигурация сервиса.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.SmartServiceAddress">
+            <summary>
+            Адрес сервиса SmartService.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.ClassificationServiceAddress">
+            <summary>
+            Адрес сервиса ClassificationService.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.TextExtractionServiceAddress">
+            <summary>
+            Адрес сервиса TextExtractionService.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.TrainingServiceAddress">
+            <summary>
+            Адрес сервиса TrainingService.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.AllowLocalPath">
+            <summary>
+            Признак разрешения использовать локальные пути.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.FactExtractorServiceAddress">
+            <summary>
+            Адрес сервиса FactExtractorService.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.ObjectDetectionServiceAddress">
+            <summary>
+            Адрес сервиса ObjectDetectionService.
+            </summary>
+        </member>
+        <member name="P:Sungero.ArioExtensions.Models.ServiceConfig.FactExtractorServiceLearningAddress">
+            <summary>
+            Адрес сервиса FactExtractorServiceLearning.
             </summary>
         </member>
         <member name="T:Sungero.ArioExtensions.Models.ProcessTask">
