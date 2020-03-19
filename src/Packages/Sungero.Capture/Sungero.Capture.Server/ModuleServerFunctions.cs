@@ -1702,55 +1702,11 @@ namespace Sungero.Capture.Server
     /// <returns>Счет на оплату.</returns>
     public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
-      var facts = recognitionResult.Facts;
+      
       var document = Contracts.IncomingInvoices.Create();
-      var props = document.Info.Properties;
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, null);      
       
-      // НОР и КА.
-      var counterpartyTypes = new List<string>();
-      counterpartyTypes.Add(CounterpartyTypes.Seller);
-      counterpartyTypes.Add(CounterpartyTypes.Buyer);
-      counterpartyTypes.Add(string.Empty);
-      var factMatches = Docflow.PublicFunctions.Module.MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault();
-      var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault();
-      var nonType = factMatches.Where(m => m.Type == string.Empty).ToList();
-      var documentParties = Docflow.PublicFunctions.Module.GetDocumentParties(buyer, seller, nonType, responsible);
-      // TODO rassokhina: FillDocumentParties() и LinkDocumentParties() везде используються в паре подряд. Можно объединить.
-      Docflow.PublicFunctions.AccountingDocumentBase.FillDocumentParties(document, documentParties);
-      Docflow.PublicFunctions.AccountingDocumentBase.LinkDocumentParties(document, recognitionResult, documentParties);
-      
-      // Договор.
-      var contractFact = Docflow.PublicFunctions.Module.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
-      var contract = Docflow.PublicFunctions.Module.GetLeadingDocument(contractFact, document.Info.Properties.Contract.Name, document.Counterparty, document.Info.Properties.Counterparty.Name);
-      document.Contract = contract.Contract;
-      Docflow.PublicFunctions.Module.LinkFactAndProperty(recognitionResult, contractFact, null, props.Contract.Name, document.Contract, contract.IsTrusted);
-      
-      // Дата.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
-      var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
-      if (!isDateValid)
-        date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && Docflow.PublicFunctions.Module.IsTrustedField(dateFact, FieldNames.Document.Date);
-      document.Date = date;
-      Docflow.PublicFunctions.Module.LinkFactAndProperty(recognitionResult, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
-      
-      // Номер.
-      var numberFact = Docflow.PublicFunctions.Module.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
-      var number = Docflow.PublicFunctions.Module.GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
-      Nullable<bool> isTrustedNumber = null;
-      if (number.Length > document.Info.Properties.Number.Length)
-      {
-        number = number.Substring(0, document.Info.Properties.Number.Length);
-        isTrustedNumber = false;
-      }
-      document.Number = number;
-      Docflow.PublicFunctions.Module.LinkFactAndProperty(recognitionResult, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number, isTrustedNumber);
-      
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, documentParties);
-      
-      return document;
+      return document;      
     }
     
     #endregion
