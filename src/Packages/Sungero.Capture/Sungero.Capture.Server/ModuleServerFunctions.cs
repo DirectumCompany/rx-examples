@@ -197,7 +197,7 @@ namespace Sungero.Capture.Server
               else
               {
                 documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
-                Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);                
+                Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
                 document.Save();
               }
             }
@@ -809,8 +809,15 @@ namespace Sungero.Capture.Server
     [Public]
     public static ISimpleDocument CreateSimpleDocument(string name, Company.IEmployee responsible)
     {
-      var document = Docflow.PublicFunctions.SimpleDocument.CreateSimpleDocument(name, responsible);
-      document.VerificationState = Docflow.SimpleDocument.VerificationState.InProcess;
+      var document = SimpleDocuments.Create();
+      
+      // TODO Шкляев. Для заполнения свойств простого документа recognitionResult не нужен.
+      // Пока передавать дефолтный для универсальности кода.
+      // Но нужно будет продумать, что с этим, в итоге, делать.
+      // Также имя пока передавать в additionalInfo (при решении учесть US 97236).
+      var recognitionResult = Sungero.Docflow.Structures.Module.RecognitionResult.Create();
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, name);
+      
       return document;
     }
     
@@ -1704,9 +1711,9 @@ namespace Sungero.Capture.Server
     {
       
       var document = Contracts.IncomingInvoices.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, null);      
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, null);
       
-      return document;      
+      return document;
     }
     
     #endregion
@@ -1894,7 +1901,7 @@ namespace Sungero.Capture.Server
         document.Currency = currency;
         DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
       }
-    }    
+    }
     
     /// <summary>
     /// Заполнить номер и дату для Mock-документов.
@@ -1932,7 +1939,7 @@ namespace Sungero.Capture.Server
       DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
                                                  document.RegistrationNumber, isTrustedNumber);
     }
-  
+    
     #endregion
     
     #region Поиск контрагента/НОР
@@ -1956,11 +1963,11 @@ namespace Sungero.Capture.Server
       counterparty.Trrc = DocflowPublicFunctions.GetFieldValue(mostProbabilityFact, FieldNames.Counterparty.TRRC);
       counterparty.Fact = mostProbabilityFact;
       return counterparty;
-    }      
-          
+    }
+    
     #endregion
     
-    #region Работа с полями/фактами    
+    #region Работа с полями/фактами
     /// <summary>
     /// Получить значение численного параметра из docflow_params.
     /// </summary>
@@ -1986,7 +1993,7 @@ namespace Sungero.Capture.Server
       highlightActivationStyle.UseFilling = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseFilling);
       highlightActivationStyle.FillingColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.FillingColor);
       return highlightActivationStyle;
-    }    
+    }
     
     /// <summary>
     /// Получить наименование ведущего документа.
@@ -2049,7 +2056,7 @@ namespace Sungero.Capture.Server
         }
       }
       documentParams.Remove(Docflow.PublicConstants.OfficialDocument.NeedStoreVerifiedPropertiesValuesParamName);
-    }                  
+    }
     
     #endregion
     
