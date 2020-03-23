@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -9,13 +9,6 @@ namespace Sungero.SmartCapture
 {
   partial class WaybillClientHandlers
   {
-
-    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
-    {
-      base.Closing(e);
-      
-      _obj.State.Properties.Counterparty.IsRequired = false;
-    }
 
     public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
     {

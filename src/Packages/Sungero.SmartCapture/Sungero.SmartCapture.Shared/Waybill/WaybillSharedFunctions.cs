@@ -8,13 +8,7 @@ using Sungero.SmartCapture.Waybill;
 namespace Sungero.SmartCapture.Shared
 {
   partial class WaybillFunctions
-  {
-    
-    [Public]
-    public override bool IsVerificationModeSupported()
-    {
-      return true;
-    }
+  {   
     
   }
 }

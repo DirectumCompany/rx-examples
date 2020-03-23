@@ -1232,39 +1232,9 @@ namespace Sungero.Capture.Server
     /// <returns>Накладная.</returns>
     public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult, IEmployee responsible)
     {
-      var facts = recognitionResult.Facts;
       var document = FinancialArchive.Waybills.Create();
-      var props = document.Info.Properties;
-      
-      // НОР и КА.
-      var counterpartyTypes = new List<string>();
-      counterpartyTypes.Add(CounterpartyTypes.Supplier);
-      counterpartyTypes.Add(CounterpartyTypes.Payer);
-      counterpartyTypes.Add(CounterpartyTypes.Shipper);
-      counterpartyTypes.Add(CounterpartyTypes.Consignee);
-      
-      var factMatches = Docflow.PublicFunctions.Module.MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Supplier).FirstOrDefault() ??
-        factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
-      var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Payer).FirstOrDefault() ??
-        factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
-      var documentParties = Docflow.PublicFunctions.Module.GetDocumentParties(buyer, seller, responsible);
-      
-      Docflow.PublicFunctions.AccountingDocumentBase.FillDocumentParties(document, documentParties);
-      Docflow.PublicFunctions.AccountingDocumentBase.LinkDocumentParties(document, recognitionResult, documentParties);
-      
-      // Дата, номер и регистрация.
-      Docflow.PublicFunctions.OfficialDocument.NumberDocument(document, recognitionResult, FactNames.FinancialDocument, null);
-      
-      // Документ-основание.
-      var leadingDocFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
-      var contractualDocuments = Docflow.PublicFunctions.Module.GetLeadingDocuments(leadingDocFact, document.Counterparty);
-      document.LeadingDocument = contractualDocuments.FirstOrDefault();
-      var isTrusted = (contractualDocuments.Count() == 1) ? Docflow.PublicFunctions.Module.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName) : false;
-      Docflow.PublicFunctions.Module.LinkFactAndProperty(recognitionResult, leadingDocFact, null, props.LeadingDocument.Name, document.LeadingDocument, isTrusted);
-      
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, documentParties);
-      return document;
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, recognitionResult, responsible, null);
+      return document;      
     }
     
     #endregion
