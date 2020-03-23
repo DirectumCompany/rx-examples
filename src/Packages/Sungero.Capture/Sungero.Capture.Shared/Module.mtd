@@ -665,28 +665,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "CapturedMailInfo",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Name",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "FromEmail",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Subject",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "DocumentsCreatedByRecognitionResults",
       "IsPublic": true,
       "Properties": [

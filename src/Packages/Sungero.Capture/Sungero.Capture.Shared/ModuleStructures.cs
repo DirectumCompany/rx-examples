@@ -39,22 +39,6 @@ namespace Sungero.Capture.Structures.Module
   }
   
   /// <summary>
-  /// Информация о захваченном письме.
-  /// </summary>
-  [Public]
-  partial class CapturedMailInfo
-  {
-    // Имя отправителя.
-    public string Name { get; set; }
-    
-    // Адрес отправителя.
-    public string FromEmail { get; set; }
-    
-    // Тема письма.
-    public string Subject { get; set; }
-  }
-  
-  /// <summary>
   /// Ответ от Арио.
   /// </summary>
   [Public]
