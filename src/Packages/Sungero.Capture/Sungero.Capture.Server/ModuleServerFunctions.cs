@@ -830,7 +830,7 @@ namespace Sungero.Capture.Server
     /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
     /// <returns>ИД созданного документа.</returns>
     [Remote]
-    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Sungero.Docflow.Structures.Module.ICapturedMailInfo mailInfo,
+    public virtual Sungero.Docflow.ISimpleDocument CreateSimpleDocumentFromEmailBody(Structures.Module.ICapturedMailInfo mailInfo,
                                                                                      Sungero.Docflow.Structures.Module.IFileDto bodyDto,
                                                                                      IEmployee responsible)
     {

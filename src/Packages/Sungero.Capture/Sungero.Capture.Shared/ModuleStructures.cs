@@ -26,6 +26,19 @@ namespace Sungero.Capture.Structures.Module
   }
   
   /// <summary>
+  /// Файлы захваченного письма.
+  /// </summary>
+  [Public]
+  partial class CapturedMailFiles
+  {
+    // Тело письма.
+    public Sungero.Docflow.Structures.Module.IFileDto Body { get; set; }
+    
+    // Вложенные в письмо файлы.
+    public List<Sungero.Docflow.Structures.Module.IFileDto> Attachments { get; set; }
+  }
+  
+  /// <summary>
   /// Информация о захваченном письме.
   /// </summary>
   [Public]
