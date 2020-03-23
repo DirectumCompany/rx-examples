@@ -647,24 +647,6 @@
       "StructureNamespace": "Sungero.Capture.Structures.Module"
     },
     {
-      "Name": "CapturedMailFiles",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Body",
-          "IsNullable": true,
-          "TypeFullName": "global::Sungero.Docflow.Structures.Module.IFileDto"
-        },
-        {
-          "Name": "Attachments",
-          "IsList": true,
-          "IsNullable": true,
-          "TypeFullName": "global::System.Collections.Generic.List<global::Sungero.Docflow.Structures.Module.IFileDto>"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
       "Name": "CapturedMailInfo",
       "IsPublic": true,
       "Properties": [
