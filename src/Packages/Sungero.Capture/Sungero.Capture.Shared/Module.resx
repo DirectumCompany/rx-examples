@@ -149,9 +149,6 @@ If a document was captured by mistake, delete it.</value>
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>Document</value>
   </data>
-  <data name="EmailBodyDocumentName" xml:space="preserve">
-    <value>Email from {0}</value>
-  </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
     <value>Capture Service cannot classify the document:</value>
   </data>

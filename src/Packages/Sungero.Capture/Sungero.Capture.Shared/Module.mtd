@@ -174,15 +174,6 @@
       "Value": "\"DocumentIsLocked\""
     },
     {
-      "Name": "EndTag",
-      "ParentClasses": [
-        "Module",
-        "HtmlTags"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"</html>\""
-    },
-    {
       "Name": "FileDescription",
       "ParentClasses": [
         "Module",
@@ -336,15 +327,6 @@
       "Value": "\"MailSourceInfo\""
     },
     {
-      "Name": "MaskForSearch",
-      "ParentClasses": [
-        "Module",
-        "HtmlTags"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"<html\""
-    },
-    {
       "Name": "Name",
       "ParentClasses": [
         "Module",
@@ -402,15 +384,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"Simple relation\""
-    },
-    {
-      "Name": "StartTag",
-      "ParentClasses": [
-        "Module",
-        "HtmlTags"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"<html>\""
     },
     {
       "Name": "Subject",
@@ -483,24 +456,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"Waybill\""
-    },
-    {
-      "Name": "WithDot",
-      "ParentClasses": [
-        "Module",
-        "HtmlExtension"
-      ],
-      "TypeName": "System.String",
-      "Value": "\".html\""
-    },
-    {
-      "Name": "WithoutDot",
-      "ParentClasses": [
-        "Module",
-        "HtmlExtension"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"html\""
     },
     {
       "Name": "Yellow",
@@ -743,7 +698,6 @@
     "AttachmentName",
     "CheckPackageTaskText",
     "SimpleDocumentName",
-    "EmailBodyDocumentName",
     "FailedClassifyDocumentTaskText",
     "CheckDocumentTaskName",
     "FailedClassifyDocumentsTaskText",

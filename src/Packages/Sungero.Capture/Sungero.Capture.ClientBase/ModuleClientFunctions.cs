@@ -86,10 +86,10 @@ namespace Sungero.Capture.Client
       var emailBody = Docflow.SimpleDocuments.Null;
       if (mailFiles.Body != null && !string.IsNullOrEmpty(mailFiles.Body.Path))
       {
-        RemoveImagesFromEmailBody(mailFiles.Body.Path);
+        Sungero.Docflow.PublicFunctions.Module.RemoveImagesFromEmailBody(mailFiles.Body.Path);
         mailFiles.Body.Data = System.IO.File.ReadAllBytes(mailFiles.Body.Path);
         
-        emailBody = Functions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
+        emailBody = Sungero.Docflow.PublicFunctions.Module.Remote.CreateSimpleDocumentFromEmailBody(mailInfo, mailFiles.Body, responsible);
         Logger.Debug("Captured Package Process. Document from e-mail body created.");
       }
       else
@@ -257,32 +257,6 @@ namespace Sungero.Capture.Client
     {
       var inlineImagesCount = AsposeExtensions.HtmlTagReader.GetInlineImagesCount(htmlBodyPath);
       return attachments.Skip(inlineImagesCount).ToList();
-    }
-    
-    /// <summary>
-    /// Удалить изображения из тела письма.
-    /// </summary>
-    /// <param name="path">Пусть к html-файлу письма.</param>
-    public virtual void RemoveImagesFromEmailBody(string path)
-    {
-      // Нет смысла удалять изображения в файлах, расширение которых не html.
-      if (Path.GetExtension(path).ToLower() != Constants.Module.HtmlExtension.WithDot)
-        return;
-
-      try
-      {
-        var mailBody = File.ReadAllText(path);
-        mailBody = System.Text.RegularExpressions.Regex.Replace(mailBody, @"<img([^\>]*)>", string.Empty);
-        
-        // В некоторых случаях Aspose не может распознать файл как html, поэтому добавляем тег html, если его нет.
-        if (!mailBody.Contains(Constants.Module.HtmlTags.MaskForSearch))
-          mailBody = string.Concat(Constants.Module.HtmlTags.StartTag, mailBody, Constants.Module.HtmlTags.EndTag);
-        File.WriteAllText(path, mailBody);
-      }
-      catch(Exception ex)
-      {
-        Logger.ErrorFormat("RemoveImagesFromEmailBody: Cannot remove images from email body.", ex);
-      }
     }
     
     /// <summary>

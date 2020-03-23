@@ -149,9 +149,6 @@
   <data name="SimpleDocumentName" xml:space="preserve">
     <value>Документ</value>
   </data>
-  <data name="EmailBodyDocumentName" xml:space="preserve">
-    <value>Эл. письмо от {0}</value>
-  </data>
   <data name="FailedClassifyDocumentTaskText" xml:space="preserve">
     <value>Службе ввода не удалось классифицировать документ:</value>
   </data>

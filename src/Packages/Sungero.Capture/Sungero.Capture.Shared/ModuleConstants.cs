@@ -213,29 +213,5 @@ namespace Sungero.Capture.Constants
         public const string Name = "Name";
       }
     }
-    
-    // Html расширение.
-    public static class HtmlExtension
-    {
-      [Sungero.Core.Public]
-      public const string WithDot = ".html";
-      
-      [Sungero.Core.Public]
-      public const string WithoutDot = "html";
-    }
-    
-    // Html теги.
-    public static class HtmlTags
-    {
-      [Sungero.Core.Public]
-      public const string MaskForSearch = "<html";
-      
-      [Sungero.Core.Public]
-      public const string StartTag = "<html>";
-      
-      [Sungero.Core.Public]
-      public const string EndTag = "</html>";
-    }
-    
   }
 }
