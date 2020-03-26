@@ -479,6 +479,7 @@
     }
   ],
   "HandledEvents": [
+    "AfterSaveServer"
     "RefreshClient",
     "ShowingClient"
   ],

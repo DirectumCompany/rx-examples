@@ -246,24 +246,6 @@
       "Value": "\"From\""
     },
     {
-      "Name": "Green",
-      "ParentClasses": [
-        "Module",
-        "PropertiesHighlightColorCodes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"#E3EFD0\""
-    },
-    {
-      "Name": "Green",
-      "ParentClasses": [
-        "Module",
-        "PreviewHighlightColorCodes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"#74B014\""
-    },
-    {
       "Name": "Html",
       "ParentClasses": [
         "Module",
@@ -335,47 +317,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"Name\""
-    },
-    {
-      "Name": "PositionElementDelimiter",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.Char",
-      "Value": "'|'"
-    },
-    {
-      "Name": "PositionsDelimiter",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.Char",
-      "Value": "'#'"
-    },
-    {
-      "Name": "PropertiesAlreadyColoredParamName",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"PropertiesAlreadyColored\""
-    },
-    {
-      "Name": "PropertyAndPositionDelimiter",
-      "ParentClasses": [
-        "Module"
-      ],
-      "TypeName": "System.Char",
-      "Value": "'-'"
-    },
-    {
-      "Name": "Red",
-      "ParentClasses": [
-        "Module",
-        "PropertiesHighlightColorCodes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"#FAC6B6\""
     },
     {
       "Name": "SimpleRelationRelationName",
@@ -456,24 +397,6 @@
       ],
       "TypeName": "System.String",
       "Value": "\"Waybill\""
-    },
-    {
-      "Name": "Yellow",
-      "ParentClasses": [
-        "Module",
-        "PropertiesHighlightColorCodes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"#FFFBCC\""
-    },
-    {
-      "Name": "Yellow",
-      "ParentClasses": [
-        "Module",
-        "PreviewHighlightColorCodes"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"#FFEA00\""
     }
   ],
   "PublicFunctions": [
@@ -498,20 +421,6 @@
       "Name": "GetClassRuleMapping",
       "Placement": "Client",
       "ReturnType": "System.Collections.Generic.Dictionary<global::System.String, global::System.String>"
-    },
-    {
-      "Name": "GetDocflowParamsNumbericValue",
-      "IsRemote": true,
-      "Parameters": [
-        {
-          "Name": "paramName",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "global::System.Double",
-      "ReturnTypeFullName": "System.Double"
     },
     {
       "Name": "SendToResponsible",
@@ -558,6 +467,14 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
+      "Name": "StoreVerifiedPropertiesValues",
+      "Parameters": [
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        }
+      ],
       "Name": "SwitchVerificationMode",
       "Parameters": [
         {
@@ -638,37 +555,6 @@
           "IsList": true,
           "IsNullable": true,
           "TypeFullName": "global::System.Collections.Generic.List<global::System.Int32>"
-        }
-      ],
-      "StructureNamespace": "Sungero.Capture.Structures.Module"
-    },
-    {
-      "Name": "HighlightActivationStyle",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "UseBorder",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "BorderColor",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "BorderWidth",
-          "TypeFullName": "global::System.Double"
-        },
-        {
-          "Name": "UseFilling",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "FillingColor",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
         }
       ],
       "StructureNamespace": "Sungero.Capture.Structures.Module"

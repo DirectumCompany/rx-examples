@@ -643,6 +643,8 @@
     }
   ],
   "HandledEvents": [
+<<<<<<< HEAD
+    "AfterSaveServer",
     "RefreshClient",
     "ShowingClient",
     "ClosingClient"
