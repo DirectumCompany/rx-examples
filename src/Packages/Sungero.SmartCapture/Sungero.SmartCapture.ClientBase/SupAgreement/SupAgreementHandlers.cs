@@ -73,5 +73,19 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
+    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
+    {
+      base.Refresh(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
+    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
+    {
+      base.Showing(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
   }
 }

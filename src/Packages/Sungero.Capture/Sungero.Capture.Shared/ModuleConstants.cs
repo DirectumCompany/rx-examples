@@ -16,7 +16,28 @@ namespace Sungero.Capture.Constants
     
     // Сообщение при успешном подключении к Ario.
     [Sungero.Core.Public]
-    public const string ArioConnectionSuccessMessage = "SmartService is running";        
+    public const string ArioConnectionSuccessMessage = "SmartService is running";
+    
+    // Названия параметров отображения фокусировки подсветки в предпросмотре.
+    public static class HighlightActivationStyleParamNames
+    {
+      // Признак фокусировки поля с помощью рамки.
+      public const string UseBorder = "HighlightActivationStyleUseBorder";
+      
+      // Цвет рамки.
+      public const string BorderColor = "HighlightActivationStyleBorderColor";
+      
+      // Толщина рамки.
+      public const string BorderWidth = "HighlightActivationStyleBorderWidth";
+      
+      // Признак фокусировки поля с помощью заливки.
+      public const string UseFilling = "HighlightActivationStyleUseFilling";
+      
+      // Цвет заливки.
+      public const string FillingColor = "HighlightActivationStyleFillingColor";
+    }
+    
+    public const int HighlightActivationBorderDefaultWidth = 10;
     
     // Наименование правил для извлечения фактов Ario.
     public static class ArioGrammarNames
@@ -50,11 +71,47 @@ namespace Sungero.Capture.Constants
       
       [Sungero.Core.Public]
       public const string SupAgreement = "SupAgreement";
-    }    
+    }
+    
+    // Имя параметра: подсвечены ли свойства.
+    [Sungero.Core.Public]
+    public const string PropertiesAlreadyColoredParamName = "PropertiesAlreadyColored";
     
     // Имя параметра: заблокирован ли документ.
     [Sungero.Core.Public]
-    public const string DocumentIsLockedParamName = "DocumentIsLocked";          
+    public const string DocumentIsLockedParamName = "DocumentIsLocked";
+    
+    [Sungero.Core.Public]
+    public const char PositionsDelimiter = '#';
+    
+    [Sungero.Core.Public]
+    public const char PositionElementDelimiter = '|';
+    
+    [Sungero.Core.Public]
+    public const char PropertyAndPositionDelimiter = '-';
+    
+    // Коды цвета подсветки свойств.
+    public static class PropertiesHighlightColorCodes
+    {
+      [Sungero.Core.Public]
+      public const string Green = "#E3EFD0";
+      
+      [Sungero.Core.Public]
+      public const string Yellow = "#FFFBCC";
+      
+      [Sungero.Core.Public]
+      public const string Red = "#FAC6B6";
+    }
+    
+    // Коды цвета подсветки полей в предпросмотре.
+    public static class PreviewHighlightColorCodes
+    {
+      [Sungero.Core.Public]
+      public const string Green = "#74B014";
+      
+      [Sungero.Core.Public]
+      public const string Yellow = "#FFEA00";
+    }
       
     public static class Initialize
     {

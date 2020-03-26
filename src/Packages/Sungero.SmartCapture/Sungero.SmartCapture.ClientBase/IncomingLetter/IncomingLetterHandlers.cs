@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -16,6 +16,13 @@ namespace Sungero.SmartCapture
       
       _obj.State.Properties.Subject.IsRequired = false;
       _obj.State.Properties.Correspondent.IsRequired = false;
+    }
+
+    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
+    {
+      base.Showing(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void ContactValueInput(Sungero.RecordManagement.Client.IncomingLetterContactValueInputEventArgs e)
@@ -93,6 +100,13 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Correspondent.HighlightColor = Sungero.Core.Colors.Empty;
       this._obj.State.Properties.Contact.HighlightColor = Sungero.Core.Colors.Empty;
       this._obj.State.Properties.SignedBy.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+    
+    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
+    {
+      base.Refresh(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
   }
 }

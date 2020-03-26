@@ -452,12 +452,8 @@
     }
   ],
   "HandledEvents": [
-<<<<<<< HEAD
     "ShowingClient",
     "RefreshClient"
-=======
-    "AfterSaveServer"
->>>>>>> #99837 #100015 перенос логики верификации в коробку (switchverificationmode и все связанное)
   ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "f37c7e63-b134-4446-9b5b-f8811f6c9666",

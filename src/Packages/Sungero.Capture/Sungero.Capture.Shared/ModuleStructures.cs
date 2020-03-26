@@ -69,5 +69,23 @@ namespace Sungero.Capture.Structures.Module
     // Ид документов, которые были найдены по штрихкоду.
     public List<int> DocumentFoundByBarcodeIds { get; set; }
     public List<int> LockedDocumentIds { get; set; }
-  }  
+  }
+  
+  /// <summary>
+  /// Параметры отображения фокусировки подстветки в предпросмотре.
+  /// </summary>
+  [Public]
+  partial class HighlightActivationStyle
+  {
+    public string UseBorder { get; set; }
+    
+    public string BorderColor { get; set; }
+    
+    public double BorderWidth { get; set; }
+    
+    public string UseFilling { get; set; }
+    
+    public string FillingColor { get; set; }
+  }
+
 }

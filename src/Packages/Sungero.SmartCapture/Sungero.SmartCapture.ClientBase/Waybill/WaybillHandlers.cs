@@ -10,6 +10,13 @@ namespace Sungero.SmartCapture
   partial class WaybillClientHandlers
   {
 
+    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
+    {
+      base.Showing(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
+    }
+
     public override void BusinessUnitValueInput(Sungero.Docflow.Client.OfficialDocumentBusinessUnitValueInputEventArgs e)
     {
       base.BusinessUnitValueInput(e);
@@ -62,6 +69,13 @@ namespace Sungero.SmartCapture
         return;
       
       this._obj.State.Properties.RegistrationDate.HighlightColor = Sungero.Core.Colors.Empty;
+    }
+
+    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
+    {
+      base.Refresh(e);
+      
+      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
   }

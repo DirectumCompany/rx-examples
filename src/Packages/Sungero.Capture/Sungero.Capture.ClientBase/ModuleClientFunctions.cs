@@ -458,7 +458,377 @@ namespace Sungero.Capture.Client
       };
     }
     
-    #endregion    
+    #endregion
+    
+    #region Верификация
+    
+    /// <summary>
+    /// Включить режим верификации.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    [Public]
+    public virtual void SwitchVerificationMode(Sungero.Docflow.IOfficialDocument document)
+    {
+      // Активировать / скрыть вкладку, подсветить свойства карточки и факты в теле только один раз при открытии.
+      // Либо в событии Showing либо в Refresh.
+      // Вызов в Refresh необходим, т.к. при отмене изменений не вызывается Showing.
+      var formParams = ((Sungero.Domain.Shared.IExtendedEntity)document).Params;
+      if (formParams.ContainsKey(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName))
+        return;
+      else
+        formParams.Add(Capture.PublicConstants.Module.PropertiesAlreadyColoredParamName, true);
+      
+      // Активировать / скрыть вкладку.
+      if (document.VerificationState != Docflow.OfficialDocument.VerificationState.InProcess)
+      {
+        document.State.Pages.PreviewPage.IsVisible = false;
+        return;
+      }
+      document.State.Pages.PreviewPage.IsVisible = true;
+      document.State.Pages.PreviewPage.Activate();
+      
+      // Точно распознанные свойства документа подсветить зелёным цветом, неточно - жёлтым.
+      // Точно и неточно распознанные свойства получить с сервера отдельными вызовами метода из-за того, что получение списка структур с
+      // атрибутом Public с помощью Remote-функции невозможно из-за ограничений платформы, а в данном случае Public необходим, так как
+      // данная функция используется за пределами модуля.
+      var documentRecognitionInfo = Sungero.Commons.PublicFunctions.EntityRecognitionInfo.Remote.GetEntityRecognitionInfo(document);
+      var highlightActivationStyle = Functions.Module.Remote.GetHighlightActivationStyle();
+      var exactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, true);
+      HighlightPropertiesAndFacts(document, exactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Green), highlightActivationStyle);
+      
+      var notExactlyRecognizedProperties = GetRecognizedProperties(document, documentRecognitionInfo, false);
+      HighlightPropertiesAndFacts(document, notExactlyRecognizedProperties, Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Yellow), highlightActivationStyle);
+      
+      // Подсветить номенклатуру (демо-режим).
+      if (MockDocumentBases.Is(document))
+        HighlightGoodsInMockMode(document, documentRecognitionInfo, highlightActivationStyle);
+    }
+    
+    /// <summary>
+    /// Получить список распознанных свойств документа.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
+    /// <param name="isTrusted">Точно ли распознано свойство: да/нет.</param>
+    /// <returns>Список распознанных свойств документа.</returns>
+    public virtual List<string> GetRecognizedProperties(Docflow.IOfficialDocument document,
+                                                        Commons.IEntityRecognitionInfo documentRecognitionInfo,
+                                                        bool isTrusted)
+    {
+      var result = new List<string>();
+      
+      if (document == null || documentRecognitionInfo == null)
+        return result;
+      
+      // Взять только заполненные свойства самого документа. Свойства-коллекции записываются через точку.
+      var linkedFacts = documentRecognitionInfo.Facts
+        .Where(x => !string.IsNullOrEmpty(x.PropertyName) && !x.PropertyName.Any(с => с == '.'))
+        .Where(x => x.IsTrusted == isTrusted);
+      
+      // Взять только неизмененные пользователем свойства.
+      var type = document.GetType();
+      foreach (var linkedFact in linkedFacts)
+      {
+        var propertyName = linkedFact.PropertyName;
+        var property = type.GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+        if (property != null)
+        {
+          object propertyValue = property.GetValue(document);
+          var propertyStringValue = Docflow.PublicFunctions.Module.GetPropertyValueAsString(propertyValue);
+          if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, linkedFact.PropertyValue) ||
+              this.CanCompareAsNumbers(propertyStringValue, linkedFact.PropertyValue) && this.CompareAsNumbers(propertyStringValue, linkedFact.PropertyValue) == 0)
+          {
+            var propertyAndPosition = string.Format("{1}{0}{2}", Constants.Module.PropertyAndPositionDelimiter,
+                                                    propertyName, linkedFact.Position);
+            result.Add(propertyAndPosition);
+          }
+        }
+      }
+      
+      return result.Distinct().ToList();
+    }
+    
+    /// <summary>
+    /// Подсветить указанные свойства в карточке документа и факты в теле.
+    /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="propertyNamesAndPositions">Список имён свойств и позиций подсветки.</param>
+    /// <param name="color">Цвет.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    public virtual void HighlightPropertiesAndFacts(Sungero.Docflow.IOfficialDocument document, List<string> propertyNamesAndPositions, Sungero.Core.Color color,
+                                                    Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
+    {
+      var posColor = color == Sungero.Core.Colors.Parse(Constants.Module.PropertiesHighlightColorCodes.Yellow)
+        ? Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Yellow)
+        : Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Green);
+
+      foreach (var propertyNameAndPosition in propertyNamesAndPositions)
+      {
+        // Подсветка полей карточки.
+        var splitedPropertyNameAndPosition = propertyNameAndPosition.Split(Constants.Module.PropertyAndPositionDelimiter);
+        var propertyName = splitedPropertyNameAndPosition[0];
+        var property = document.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+        if (property != null)
+          document.State.Properties[propertyName].HighlightColor = color;
+        
+        // Подсветка фактов в теле документа.
+        if (splitedPropertyNameAndPosition.Count() > 1 && !string.IsNullOrWhiteSpace(splitedPropertyNameAndPosition[1]))
+        {
+          var propertyInfo = document.Info.Properties.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+          var propertyInfoValue = (Sungero.Domain.Shared.IInternalPropertyInfo)propertyInfo.GetReflectionPropertyValue(document.Info.Properties);
+          var fieldsPositions = splitedPropertyNameAndPosition[1].Split(Constants.Module.PositionsDelimiter);
+          foreach (var fieldPosition in fieldsPositions)
+            HighlightFactInPreview(document.State.Controls.Preview, fieldPosition,
+                                   posColor, (Sungero.Domain.Shared.IPropertyInfo)propertyInfoValue,
+                                   highlightActivationStyle);
+        }
+      }
+    }
+    
+    /// <summary>
+    /// Подстветить номенклатуру (демо-режим).
+    /// </summary>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
+    /// <param name="document">Документ.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    public virtual void HighlightGoodsInMockMode(Sungero.Docflow.IOfficialDocument document,
+                                                 Commons.IEntityRecognitionInfo documentRecognitionInfo,
+                                                 Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
+    {
+      if (MockIncomingTaxInvoices.Is(document))
+      {
+        var incomingTaxInvoice = MockIncomingTaxInvoices.As(document);
+        HighlightCollection(documentRecognitionInfo, incomingTaxInvoice.Goods,
+                            incomingTaxInvoice.State.Controls.GoodsPreview, highlightActivationStyle);
+      }
+      if (MockContractStatements.Is(document))
+      {
+        var contractStatement = MockContractStatements.As(document);
+        HighlightCollection(documentRecognitionInfo, contractStatement.Goods,
+                            contractStatement.State.Controls.GoodsPreview, highlightActivationStyle);
+      }
+      if (MockWaybills.Is(document))
+      {
+        var waybill = MockWaybills.As(document);
+        HighlightCollection(documentRecognitionInfo, waybill.Goods,
+                            waybill.State.Controls.GoodsPreview, highlightActivationStyle);
+      }
+    }
+    
+    /// <summary>
+    /// Подсветить записи свойства-коллекции в карточке документа и факты в предпросмотре.
+    /// </summary>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
+    /// <param name="collection">Коллекция.</param>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    public virtual void HighlightCollection(Commons.IEntityRecognitionInfo documentRecognitionInfo,
+                                            Sungero.Domain.Shared.IChildEntityCollection<Sungero.Domain.Shared.IChildEntity> collection,
+                                            Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                            Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
+    {
+      var recognizedFacts = documentRecognitionInfo.Facts;
+      foreach (var record in collection)
+      {
+        var recognizedRecordFacts = recognizedFacts.Where(x => x.CollectionRecordId == record.Id &&
+                                                          !string.IsNullOrEmpty(x.PropertyName) &&
+                                                          x.PropertyName.Any(с => с == '.') && x.IsTrusted != null);
+        foreach (var recognizedRecordFact in recognizedRecordFacts)
+        {
+          var propertyName = recognizedRecordFact.PropertyName.Split('.').LastOrDefault();
+          var property = record.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+          if (property != null)
+          {
+            object propertyValue = property.GetValue(record);
+            var propertyStringValue = Docflow.PublicFunctions.Module.GetPropertyValueAsString(propertyValue);
+            if (!string.IsNullOrWhiteSpace(propertyStringValue) && Equals(propertyStringValue, recognizedRecordFact.PropertyValue))
+            {
+              record.State.Properties[propertyName].HighlightColor = recognizedRecordFact.IsTrusted.Value
+                ? Colors.Parse(PublicConstants.Module.PropertiesHighlightColorCodes.Green)
+                : Colors.Parse(PublicConstants.Module.PropertiesHighlightColorCodes.Yellow);
+              
+              var recordPreviewColor = recognizedRecordFact.IsTrusted.Value
+                ? Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Green)
+                : Colors.Parse(PublicConstants.Module.PreviewHighlightColorCodes.Yellow);
+              
+              var propertyInfo = record.Info.Properties.GetType().GetProperties().Where(p => p.Name == propertyName).LastOrDefault();
+              var propertyInfoValue = (Sungero.Domain.Shared.IInternalPropertyInfo)propertyInfo.GetReflectionPropertyValue(record.Info.Properties);
+              HighlightFactInPreview(previewControl, recognizedRecordFact.Position, recordPreviewColor,
+                                     record, (Sungero.Domain.Shared.IPropertyInfo)propertyInfoValue,
+                                     highlightActivationStyle);
+            }
+          }
+        }
+      }
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl, string position, Sungero.Core.Color color)
+    {
+      var positions = position.Split(Constants.Module.PositionElementDelimiter);
+      if (positions.Count() >= 7)
+        previewControl.HighlightAreas.Add(color,
+                                          int.Parse(positions[0]),
+                                          double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                          double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре с фокусировкой по нажатию на свойство.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    /// <param name="propertyInfo">Информация о свойстве.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IPropertyInfo propertyInfo,
+                                               Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
+    {
+
+      var area = AddHighlightArea(previewControl, position, color, highlightActivationStyle);
+      if (area == null)
+        return;
+      
+      area.SetRelatedProperty(propertyInfo);
+    }
+    
+    /// <summary>
+    /// Подсветить факт в предпросмотре с фокусировской по нажатию на свойство в табличной части.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиция.</param>
+    /// <param name="color">Цвет.</param>
+    /// <param name="childEntity">Свойство-коллекция.</param>
+    /// <param name="childpropertyInfo">Информация о свойстве в коллекции.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    public virtual void HighlightFactInPreview(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                               string position, Sungero.Core.Color color, Sungero.Domain.Shared.IChildEntity childEntity,
+                                               Sungero.Domain.Shared.IPropertyInfo childpropertyInfo,
+                                               Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
+    {
+      var area = AddHighlightArea(previewControl, position, color, highlightActivationStyle);
+      if (area == null)
+        return;
+      
+      area.SetRelatedChildCollectionProperty(childEntity, childpropertyInfo);
+    }
+    
+    /// <summary>
+    /// Добавить область выделения в предпросмотре.
+    /// </summary>
+    /// <param name="previewControl">Контрол предпросмотра.</param>
+    /// <param name="position">Позиции.</param>
+    /// <param name="color">Цвет.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    /// <returns>Область выделения в предпросмотре.</returns>
+    public virtual Sungero.Domain.Shared.IPreviewHighlight AddHighlightArea(Sungero.Domain.Shared.IPreviewControlState previewControl,
+                                                                            string position, Sungero.Core.Color color,
+                                                                            Sungero.Capture.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
+    {
+      var positions = position.Split(Constants.Module.PositionElementDelimiter);
+      if (positions.Count() >= 7)
+      {
+        var area = previewControl.HighlightAreas.Add(int.Parse(positions[0]),
+                                                     double.Parse(positions[1].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[2].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[3].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[4].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[5].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture),
+                                                     double.Parse(positions[6].Replace(",", "."), System.Globalization.CultureInfo.InvariantCulture));
+        // Установить подсветку согласно вероятности.
+        area.Style.Color = color;
+        
+        // Установить поведение при фокусировке.
+        // Рамка.
+        var borderColor = TryParseColorCode(highlightActivationStyle.BorderColor);
+        if (highlightActivationStyle.UseBorder != null)
+        {
+          area.ActivationStyle.BorderColor = borderColor != Sungero.Core.Colors.Empty ? borderColor : Colors.Common.Red;          
+          area.ActivationStyle.BorderWidth = highlightActivationStyle.BorderWidth > 0
+            ? (int) highlightActivationStyle.BorderWidth
+            : Constants.Module.HighlightActivationBorderDefaultWidth;
+        }
+        
+        // Заливка цветом.
+        var fillingColor = TryParseColorCode(highlightActivationStyle.FillingColor);
+        if (highlightActivationStyle.UseFilling != null || highlightActivationStyle.UseBorder == null)
+          area.ActivationStyle.Color = fillingColor != Sungero.Core.Colors.Empty ? fillingColor : Colors.Common.Blue;
+        
+        return area;
+      }
+      
+      return null;
+    }
+    
+    /// <summary>
+    /// Получить цвет по коду.
+    /// </summary>
+    /// <param name="paramName">Код цвета.</param>
+    /// <returns>Цвет.</returns>
+    public static Sungero.Core.Color TryParseColorCode(string colorCode)
+    {
+      var color = Sungero.Core.Colors.Empty;
+      if (!string.IsNullOrWhiteSpace(colorCode))
+      {
+        try
+        {
+          color = Sungero.Core.Colors.Parse(colorCode);
+        }
+        catch {}
+      }
+      
+      return color;
+    }
+    
+    /// <summary>
+    /// Проверить возможность проверки строк как чисел.
+    /// </summary>
+    /// <param name="firstString">Первая строка для сравнения.</param>
+    /// <param name="secondString">Вторая строка для сравнения.</param>
+    /// <returns>True - можно сравнивать как числа, иначе - False.</returns>
+    private bool CanCompareAsNumbers(string firstString, string secondString)
+    {
+      
+      firstString = firstString.Replace(',', '.');
+      secondString = secondString.Replace(',', '.');
+      double number;
+      var numberStyles = System.Globalization.NumberStyles.Any;
+      var invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
+      
+      return double.TryParse(firstString, numberStyles, invariantCulture, out number) &&
+        double.TryParse(secondString, numberStyles, invariantCulture, out number);
+    }
+    
+    /// <summary>
+    /// Сравнить строки как числа.
+    /// </summary>
+    /// <param name="firstString">Первая строка для сравнения.</param>
+    /// <param name="secondString">Вторая строка для сравнения.</param>
+    /// <returns>Значение, указывающее, каков относительный порядок сравниваемых объектов.</returns>
+    /// <remarks>https://docs.microsoft.com/ru-ru/dotnet/api/system.icomparable.compareto?view=netframework-4.8</remarks>
+    private int CompareAsNumbers(string firstString, string secondString)
+    {
+      firstString = firstString.Replace(',', '.');
+      secondString = secondString.Replace(',', '.');
+      var numberStyles = System.Globalization.NumberStyles.Any;
+      var invariantCulture = System.Globalization.CultureInfo.InvariantCulture;
+      var firstNumber = double.Parse(firstString, numberStyles, invariantCulture);
+      var secondNumber = double.Parse(secondString, numberStyles, invariantCulture);
+      
+      return firstNumber.CompareTo(secondNumber);
+    }
+    
+    #endregion
     
     #region Настройка и тесты
     
