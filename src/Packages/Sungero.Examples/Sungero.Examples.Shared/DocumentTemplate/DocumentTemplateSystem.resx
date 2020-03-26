@@ -117,9 +117,6 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="FilterPanel_DocumentGroup_7bf5d5df8a434a11b81aaffdba4ad922" xml:space="preserve">
-    <value>Contract category</value>
-  </data>
   <data name="Resource_5b60092fa2ec437b8fb836f08d61843b" xml:space="preserve">
     <value />
   </data>

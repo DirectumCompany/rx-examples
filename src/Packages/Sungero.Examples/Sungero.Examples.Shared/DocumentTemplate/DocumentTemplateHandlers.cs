@@ -10,23 +10,17 @@ namespace Sungero.Examples
 
   partial class DocumentTemplateSharedHandlers
   {
+
+    public override void DocumentTypeChanged(Sungero.Domain.Shared.StringPropertyChangedEventArgs e)
+    {
+      base.DocumentTypeChanged(e);
+      Functions.DocumentTemplate.RemoveIncompatibleDocumentGroups(_obj);
+    }
     
     public override void DocumentKindsChanged(Sungero.Domain.Shared.CollectionPropertyChangedEventArgs e)
     {
       base.DocumentKindsChanged(e);
-      
-      var availableDocumentGroups = Functions.DocumentTemplate.GetAvailableDocumentGroups(_obj);
-      var suitableDocumentGroups = _obj.DocumentGroups.Select(d => d.DocumentGroup).Where(dg => availableDocumentGroups.Contains(dg)).ToList();
-      
-      if (suitableDocumentGroups.Count < _obj.DocumentGroups.Count())
-      {
-        Functions.DocumentTemplate.TryToShowNotifyMessage(Functions.DocumentTemplate.GetIncompatibleDocumentGroupsExcludedHint(_obj));
-        _obj.DocumentGroups.Clear();
-        foreach (var documentGroup in suitableDocumentGroups)
-          _obj.DocumentGroups.AddNew().DocumentGroup = documentGroup;
-      }
-      
-      _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
+      Functions.DocumentTemplate.RemoveIncompatibleDocumentGroups(_obj);
     }
 
   }

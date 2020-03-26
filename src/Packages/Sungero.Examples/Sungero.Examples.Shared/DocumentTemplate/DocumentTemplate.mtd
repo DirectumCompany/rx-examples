@@ -25,18 +25,13 @@
           "PreviousGuid"
         ],
         "ParentGuid": "2039a945-3d63-41a4-b06b-d515e47c838e",
-        "PreviousGuid": "7bf5d5df-8a43-4a11-b81a-affdba4ad922"
-      },
-      {
-        "$type": "Sungero.Metadata.FilterNavigationMetadata, Sungero.Metadata",
-        "NameGuid": "7bf5d5df-8a43-4a11-b81a-affdba4ad922",
-        "Name": "DocumentGroup",
-        "EntityGuid": "f5061291-4ac6-428f-b091-d53acdbe9ae5",
-        "ParentGuid": "2039a945-3d63-41a4-b06b-d515e47c838e",
         "PreviousGuid": "c6fde210-fabe-4a2e-8c9c-66c157ad65d7"
       }
     ],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Overridden": [
+      "Controls"
+    ]
   },
   "Forms": [
     {
@@ -145,13 +140,25 @@
     }
   ],
   "HandledEvents": [
-    "RefreshClient",
-    "FilteringServer"
+    "FilteringServer",
+    "RefreshClient"
   ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "9abcf1b7-f630-4a82-9912-7f79378ab199",
   "OperationsClass": "",
   "Properties": [
+    {
+      "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "72b92a02-3a90-412c-b61a-786a78bb80d2",
+      "Name": "DocumentType",
+      "HandledEvents": [
+        "ChangedShared"
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
@@ -210,19 +217,58 @@
       "Versions": []
     }
   ],
+  "PublicConstants": [
+    {
+      "Name": "ContractTypeGuid",
+      "ParentClasses": [
+        "DocumentTemplate"
+      ],
+      "TypeName": "System.Guid",
+      "Value": "new System.Guid(\"f37c7e63-b134-4446-9b5b-f8811f6c9666\")"
+    }
+  ],
   "PublicFunctions": [
     {
-      "Name": "TryToShowNotifyMessage",
+      "Name": "FilterTemplatesByCriteria",
       "Parameters": [
         {
-          "Name": "message",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
+          "Name": "documentTemplates",
+          "ParameterType": "global::System.Linq.IQueryable<global::Sungero.Examples.IDocumentTemplate>",
+          "ParameterTypeFullName": "System.Linq.IQueryable"
+        },
+        {
+          "Name": "document",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "documentKind",
+          "ParameterType": "global::Sungero.Docflow.IDocumentKind",
+          "ParameterTypeFullName": "Sungero.Docflow.IDocumentKind, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "businessUnit",
+          "ParameterType": "global::Sungero.Company.IBusinessUnit",
+          "ParameterTypeFullName": "Sungero.Company.IBusinessUnit, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "department",
+          "ParameterType": "global::Sungero.Company.IDepartment",
+          "ParameterTypeFullName": "Sungero.Company.IDepartment, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "documentGroup",
+          "ParameterType": "global::Sungero.Docflow.IDocumentGroupBase",
+          "ParameterTypeFullName": "Sungero.Docflow.IDocumentGroupBase, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "isCalledFromDocument",
+          "ParameterType": "global::System.Boolean",
+          "ParameterTypeFullName": "System.Boolean"
         }
       ],
-      "Placement": "Shared",
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
+      "ReturnType": "global::System.Linq.IQueryable<global::Sungero.Examples.IDocumentTemplate>",
+      "ReturnTypeFullName": "System.Linq.IQueryable"
     }
   ],
   "PublicStructures": [],

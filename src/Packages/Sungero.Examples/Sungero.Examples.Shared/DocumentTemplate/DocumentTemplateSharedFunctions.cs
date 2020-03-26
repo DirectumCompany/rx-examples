@@ -11,32 +11,37 @@ namespace Sungero.Examples.Shared
   partial class DocumentTemplateFunctions
   {
     
-    public virtual string GetIncompatibleDocumentGroupsExcludedHint()
-    {
-      return Sungero.Examples.DocumentTemplates.Resources.IncompatibleCategoriesExcluded;
-    }
-    
     /// <summary>
-    /// Показать сообщение Dialog.NotifyMessage через Reflection.
+    /// Получить список категорий договоров, доступных для выбора в шаблоне.
     /// </summary>
-    /// <param name="message">Сообщение.</param>
-    [Public]
-    public static void TryToShowNotifyMessage(string message)
-    {
-      var dialogs = Type.GetType("Sungero.Core.Dialogs, Sungero.Domain.ClientBase");
-      if (dialogs != null)
-        dialogs.InvokeMember("NotifyMessage", System.Reflection.BindingFlags.InvokeMethod, null, null, new string[1] { message });
-    }
-    
-    /// <summary>
-    /// Получить список групп документов, доступных для выбора в шаблоне.
-    /// </summary>
-    /// <returns>Список групп документов.</returns>
+    /// <returns>Список категорий договоров.</returns>
     public virtual List<IDocumentGroupBase> GetAvailableDocumentGroups()
     {
-      var contractKinds = _obj.DocumentKinds.Select(k => k.DocumentKind).ToList();
-      return Sungero.Contracts.PublicFunctions.ContractCategory.GetFilteredContractCategoris(contractKinds);
+      var kinds = _obj.DocumentKinds.Select(k => k.DocumentKind).ToList();
+      var contractKinds = Docflow.PublicFunctions.DocumentKind.GetAvailableDocumentKinds(typeof(Contracts.IContractBase)).ToList();
+      if (_obj.DocumentType == Constants.Docflow.DocumentTemplate.ContractTypeGuid && (!kinds.Any() || (kinds.Any() && kinds.All(k => contractKinds.Contains(k)))))
+        return Contracts.PublicFunctions.ContractCategory.GetFilteredContractCategoris(kinds);
+      return new List<IDocumentGroupBase>();
     }
-
+    
+    /// <summary>
+    /// Очистить несовместимые категории договоров.
+    /// </summary>
+    public virtual void RemoveIncompatibleDocumentGroups()
+    {
+      var availableDocumentGroups = Functions.DocumentTemplate.GetAvailableDocumentGroups(_obj);
+      var suitableDocumentGroups = _obj.DocumentGroups.Select(d => d.DocumentGroup).Where(dg => availableDocumentGroups.Contains(dg)).ToList();
+      
+      if (suitableDocumentGroups.Count < _obj.DocumentGroups.Count())
+      {
+        Docflow.PublicFunctions.Module.TryToShowNotifyMessage(Examples.DocumentTemplates.Resources.IncompatibleCategoriesExcluded);
+        _obj.DocumentGroups.Clear();
+        foreach (var documentGroup in suitableDocumentGroups)
+          _obj.DocumentGroups.AddNew().DocumentGroup = documentGroup;
+      }
+      
+      _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
+    }
+    
   }
 }
