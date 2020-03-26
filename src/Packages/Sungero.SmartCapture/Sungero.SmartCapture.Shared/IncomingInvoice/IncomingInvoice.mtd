@@ -645,7 +645,6 @@
   "HandledEvents": [
     "RefreshClient",
     "ShowingClient",
-    "AfterSaveServer",
     "ClosingClient"
   ],
   "IconResourcesKeys": [],

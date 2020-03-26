@@ -558,18 +558,6 @@
       "ReturnTypeFullName": "System.Void"
     },
     {
-      "Name": "StoreVerifiedPropertiesValues",
-      "Parameters": [
-        {
-          "Name": "document",
-          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
-          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
-        }
-      ],
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    },
-    {
       "Name": "SwitchVerificationMode",
       "Parameters": [
         {
