@@ -38,7 +38,7 @@ namespace Sungero.Examples.Server
                                                      d.DocumentType == typeGuid) ||
                                                     d.DocumentKinds.Any(k => Equals(k.DocumentKind, documentKind)));
       }
-      else if (document != null)
+      else if (isCalledFromDocument)
       {
         var typeGuid = document.TypeDiscriminator;
         var availableKinds = Docflow.PublicFunctions.DocumentKind.GetAvailableDocumentKinds(document);
