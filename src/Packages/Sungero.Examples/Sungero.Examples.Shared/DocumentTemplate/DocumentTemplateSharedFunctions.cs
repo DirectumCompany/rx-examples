@@ -33,12 +33,7 @@ namespace Sungero.Examples.Shared
       var suitableDocumentGroups = _obj.DocumentGroups.Select(d => d.DocumentGroup).Where(dg => availableDocumentGroups.Contains(dg)).ToList();
       
       if (suitableDocumentGroups.Count < _obj.DocumentGroups.Count())
-      {
-        Docflow.PublicFunctions.Module.TryToShowNotifyMessage(Examples.DocumentTemplates.Resources.IncompatibleCategoriesExcluded);
         _obj.DocumentGroups.Clear();
-        foreach (var documentGroup in suitableDocumentGroups)
-          _obj.DocumentGroups.AddNew().DocumentGroup = documentGroup;
-      }
       
       _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
     }
