@@ -18,6 +18,7 @@ namespace Sungero.Examples
       if (Guid.Parse(e.NewValue) != Constants.Docflow.DocumentTemplate.ContractTypeGuid)
         _obj.DocumentGroups.Clear();
       
+      // Принудительно обновляем доступность поля категорий, т.к. в десктопе не всегда отрабатывает рефреш.
       var availableDocumentGroups = Functions.DocumentTemplate.GetAvailableDocumentGroups(_obj);
       _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
     }
@@ -32,6 +33,8 @@ namespace Sungero.Examples
         .Where(dg => availableDocumentGroups.Contains(dg));
       if (suitableDocumentGroups.Count() < _obj.DocumentGroups.Count())
         _obj.DocumentGroups.Clear();
+      
+      // Принудительно обновляем доступность поля категорий, т.к. в десктопе не всегда отрабатывает рефреш.
       _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
     }
 
