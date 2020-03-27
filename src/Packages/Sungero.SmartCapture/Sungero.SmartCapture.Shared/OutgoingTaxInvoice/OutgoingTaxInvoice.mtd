@@ -439,10 +439,6 @@
       ]
     }
   ],
-  "HandledEvents": [
-    "RefreshClient",
-    "ShowingClient"
-  ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "f50c4d8a-56bc-43ef-bac3-856f57ca70be",
   "OpenCardByDefaultInCollection": true,

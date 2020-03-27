@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -29,20 +29,6 @@ namespace Sungero.Capture
       base.SubjectValueInput(e);
       
       this._obj.State.Properties.Subject.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
-    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
-    {
-      base.Refresh(e);
-      
-      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
-    }
-
-    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
-    {
-      base.Showing(e);
-      
-      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
     public override void DocumentKindValueInput(Sungero.Docflow.Client.OfficialDocumentDocumentKindValueInputEventArgs e)

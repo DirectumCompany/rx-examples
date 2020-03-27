@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -9,11 +9,6 @@ namespace Sungero.SmartCapture
 {
   partial class IncomingInvoiceClientHandlers
   {
-
-    public override void Closing(Sungero.Presentation.FormClosingEventArgs e)
-    {
-      base.Closing(e);      
-    }
 
     public override void ContractValueInput(Sungero.Contracts.Client.IncomingInvoiceContractValueInputEventArgs e)
     {
@@ -62,20 +57,6 @@ namespace Sungero.SmartCapture
       base.CounterpartyValueInput(e);
       
       this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
-    public override void Showing(Sungero.Presentation.FormShowingEventArgs e)
-    {
-      base.Showing(e);
-      
-      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
-    }
-
-    public override void Refresh(Sungero.Presentation.FormRefreshEventArgs e)
-    {
-      base.Refresh(e);     
-      
-      Sungero.Capture.PublicFunctions.Module.SwitchVerificationMode(_obj);
     }
 
   }

@@ -19,7 +19,6 @@ using FactNames = Sungero.Docflow.Constants.Module.FactNames;
 using LetterPersonTypes = Sungero.RecordManagement.PublicConstants.IncomingLetter.LetterPersonTypes;
 using CounterpartyTypes = Sungero.Docflow.Constants.Module.CounterpartyTypes;
 using ArioClassNames = Sungero.Docflow.PublicConstants.Module.ArioClassNames;
-using HighlightActivationStyleParamNames = Sungero.Capture.Constants.Module.HighlightActivationStyleParamNames;
 using DocflowPublicFunctions = Sungero.Docflow.PublicFunctions.Module;
 
 namespace Sungero.Capture.Server
@@ -416,7 +415,7 @@ namespace Sungero.Capture.Server
                 var positions = factField.Positions
                   .Where(p => p != null)
                   .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}",
-                                             Constants.Module.PositionElementDelimiter,
+                                             Docflow.Constants.Module.PositionElementDelimiter,
                                              p.Page,
                                              (int)Math.Round(p.Top),
                                              (int)Math.Round(p.Left),
@@ -424,7 +423,7 @@ namespace Sungero.Capture.Server
                                              (int)Math.Round(p.Height),
                                              (int)Math.Round(pages.Where(x => x.Number == p.Page).Select(x => x.Width).FirstOrDefault()),
                                              (int)Math.Round(pages.Where(x => x.Number == p.Page).Select(x => x.Height).FirstOrDefault())));
-                fieldInfo.Position = string.Join(Constants.Module.PositionsDelimiter.ToString(), positions);
+                fieldInfo.Position = string.Join(Docflow.Constants.Module.PositionsDelimiter.ToString(), positions);
               }
             }
           }
@@ -1848,33 +1847,7 @@ namespace Sungero.Capture.Server
     
     #endregion
     
-    #region Работа с полями/фактами
-    /// <summary>
-    /// Получить значение численного параметра из docflow_params.
-    /// </summary>
-    /// <param name="paramName">Наименование параметра.</param>
-    /// <returns>Значение параметра.</returns>
-    [Public, Remote(IsPure = true)]
-    public static double GetDocflowParamsNumbericValue(string paramName)
-    {
-      return Docflow.PublicFunctions.Module.Remote.GetDocflowParamsNumbericValue(paramName);
-    }
-    
-    /// <summary>
-    /// Получить параметры отображения фокусировки подсветки.
-    /// </summary>
-    /// <returns>Параметры.</returns>
-    [Remote]
-    public virtual Structures.Module.IHighlightActivationStyle GetHighlightActivationStyle()
-    {
-      var highlightActivationStyle = Structures.Module.HighlightActivationStyle.Create();
-      highlightActivationStyle.UseBorder = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseBorder);
-      highlightActivationStyle.BorderColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.BorderColor);
-      highlightActivationStyle.BorderWidth = GetDocflowParamsNumbericValue(HighlightActivationStyleParamNames.BorderWidth);
-      highlightActivationStyle.UseFilling = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.UseFilling);
-      highlightActivationStyle.FillingColor = Docflow.PublicFunctions.Module.Remote.GetDocflowParamsStringValue(HighlightActivationStyleParamNames.FillingColor);
-      return highlightActivationStyle;
-    }
+    #region Работа с полями/фактами    
     
     /// <summary>
     /// Получить наименование ведущего документа.
