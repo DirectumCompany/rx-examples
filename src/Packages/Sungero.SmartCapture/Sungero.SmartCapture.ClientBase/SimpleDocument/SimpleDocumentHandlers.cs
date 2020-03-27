@@ -8,4 +8,5 @@ using Sungero.SmartCapture.SimpleDocument;
 namespace Sungero.SmartCapture
 {
 
+
 }

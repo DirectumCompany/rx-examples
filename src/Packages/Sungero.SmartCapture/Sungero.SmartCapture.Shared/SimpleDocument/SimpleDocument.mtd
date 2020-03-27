@@ -277,6 +277,15 @@
   "OperationsClass": "",
   "Properties": [
     {
+      "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
+      "NameGuid": "3e55f091-41a4-4e58-a9c5-dbe90782ccec",
+      "Name": "RegistrationDate",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "HandledEvents"
+      ]
+    },
+    {
       "$type": "Sungero.Metadata.EnumPropertyMetadata, Sungero.Metadata",
       "NameGuid": "9b7cc9f8-d575-45a0-b9e3-e6c820a1fc83",
       "Name": "VerificationState",
