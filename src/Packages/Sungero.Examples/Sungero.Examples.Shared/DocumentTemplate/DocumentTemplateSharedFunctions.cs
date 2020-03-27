@@ -24,19 +24,5 @@ namespace Sungero.Examples.Shared
       return new List<IDocumentGroupBase>();
     }
     
-    /// <summary>
-    /// Очистить несовместимые категории договоров.
-    /// </summary>
-    public virtual void RemoveIncompatibleDocumentGroups()
-    {
-      var availableDocumentGroups = Functions.DocumentTemplate.GetAvailableDocumentGroups(_obj);
-      var suitableDocumentGroups = _obj.DocumentGroups.Select(d => d.DocumentGroup).Where(dg => availableDocumentGroups.Contains(dg)).ToList();
-      
-      if (suitableDocumentGroups.Count < _obj.DocumentGroups.Count())
-        _obj.DocumentGroups.Clear();
-      
-      _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
-    }
-    
   }
 }

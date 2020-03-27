@@ -14,13 +14,25 @@ namespace Sungero.Examples
     public override void DocumentTypeChanged(Sungero.Domain.Shared.StringPropertyChangedEventArgs e)
     {
       base.DocumentTypeChanged(e);
-      Functions.DocumentTemplate.RemoveIncompatibleDocumentGroups(_obj);
+
+      if (Guid.Parse(e.NewValue) != Constants.Docflow.DocumentTemplate.ContractTypeGuid)
+        _obj.DocumentGroups.Clear();
+      
+      var availableDocumentGroups = Functions.DocumentTemplate.GetAvailableDocumentGroups(_obj);
+      _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
     }
     
     public override void DocumentKindsChanged(Sungero.Domain.Shared.CollectionPropertyChangedEventArgs e)
     {
       base.DocumentKindsChanged(e);
-      Functions.DocumentTemplate.RemoveIncompatibleDocumentGroups(_obj);
+      
+      var availableDocumentGroups = Functions.DocumentTemplate.GetAvailableDocumentGroups(_obj);
+      var suitableDocumentGroups = _obj.DocumentGroups
+        .Select(d => d.DocumentGroup)
+        .Where(dg => availableDocumentGroups.Contains(dg));
+      if (suitableDocumentGroups.Count() < _obj.DocumentGroups.Count())
+        _obj.DocumentGroups.Clear();
+      _obj.State.Properties.DocumentGroups.IsEnabled = availableDocumentGroups.Any();
     }
 
   }
