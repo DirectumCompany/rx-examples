@@ -490,9 +490,6 @@
       "$type": "Sungero.Metadata.DoublePropertyMetadata, Sungero.Metadata",
       "NameGuid": "c30d80ad-f9f0-4b10-a2e1-b4d57e40604b",
       "Name": "TotalAmount",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"

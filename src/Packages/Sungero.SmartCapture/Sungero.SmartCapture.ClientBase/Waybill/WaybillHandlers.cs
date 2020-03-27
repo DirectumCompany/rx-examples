@@ -17,13 +17,6 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.BusinessUnit.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void TotalAmountValueInput(Sungero.Presentation.DoubleValueInputEventArgs e)
-    {
-      base.TotalAmountValueInput(e);
-      
-      this._obj.State.Properties.TotalAmount.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void CounterpartyValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCounterpartyValueInputEventArgs e)
     {
       base.CounterpartyValueInput(e);
