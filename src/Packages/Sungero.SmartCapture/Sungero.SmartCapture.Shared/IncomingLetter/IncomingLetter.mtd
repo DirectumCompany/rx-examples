@@ -365,9 +365,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "4bc98f75-10a0-4d54-9f5a-2b88388376b2",
       "Name": "PreparedBy",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -377,9 +374,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "ed9f1bb0-d1cf-467e-8067-aca85212e44d",
       "Name": "BusinessUnit",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -389,9 +383,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "67eba76e-eeb3-4c27-be5b-ad7088591938",
       "Name": "InResponseTo",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -401,9 +392,6 @@
       "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
       "NameGuid": "fd76ebdb-a800-46e0-b491-8e0e3fa99ca6",
       "Name": "Dated",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -413,9 +401,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "a893aea4-fb39-4572-831f-2da03fec597e",
       "Name": "Addressee",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -425,9 +410,6 @@
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "4811fd9e-f5d2-4aec-9304-dedbac73aa35",
       "Name": "InNumber",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -437,9 +419,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "fb7a3a0a-c8a2-4a88-bf5a-d0fb24063114",
       "Name": "SignedBy",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -449,9 +428,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "7117b3fd-2c53-4336-bae4-dd580de20646",
       "Name": "Contact",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -461,9 +437,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "b05e3324-6ade-4c8f-897a-e4c7088ffba3",
       "Name": "Correspondent",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "IsRequired",
@@ -494,9 +467,6 @@
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "4bc39efb-1f46-4a1e-8b8c-04f2b90d6a8b",
       "Name": "Subject",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "IsRequired",
