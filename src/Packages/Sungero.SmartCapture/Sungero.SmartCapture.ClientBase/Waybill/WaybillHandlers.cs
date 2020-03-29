@@ -24,13 +24,6 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void LeadingDocumentValueInput(Sungero.Docflow.Client.OfficialDocumentLeadingDocumentValueInputEventArgs e)
-    {
-      base.LeadingDocumentValueInput(e);
-      
-      this._obj.State.Properties.LeadingDocument.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void RegistrationNumberValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
       base.RegistrationNumberValueInput(e);
