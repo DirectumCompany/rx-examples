@@ -10,13 +10,6 @@ namespace Sungero.SmartCapture
   partial class UniversalTransferDocumentClientHandlers
   {
 
-    public override void RegistrationDateValueInput(Sungero.Presentation.DateTimeValueInputEventArgs e)
-    {
-      base.RegistrationDateValueInput(e);
-      
-      this._obj.State.Properties.RegistrationDate.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void RegistrationNumberValueInput(Sungero.Presentation.StringValueInputEventArgs e)
     {
       base.RegistrationNumberValueInput(e);
