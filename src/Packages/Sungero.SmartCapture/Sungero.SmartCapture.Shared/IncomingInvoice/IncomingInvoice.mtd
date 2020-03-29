@@ -666,9 +666,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "ccf030e2-65bc-4960-a448-a41f49398e5f",
       "Name": "Contract",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -688,9 +685,6 @@
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "70729221-1b08-40c7-8189-2eb0d734a6e9",
       "Name": "Number",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "IsRequired",
@@ -701,9 +695,6 @@
       "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
       "NameGuid": "adc787a4-0b2e-4d10-95bf-5cd09d05860d",
       "Name": "Date",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "IsRequired",
