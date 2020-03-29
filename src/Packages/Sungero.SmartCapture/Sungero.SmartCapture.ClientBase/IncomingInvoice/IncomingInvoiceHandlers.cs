@@ -17,13 +17,6 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Contract.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void CurrencyValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCurrencyValueInputEventArgs e)
-    {
-      base.CurrencyValueInput(e);
-      
-      this._obj.State.Properties.Currency.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void DateValueInput(Sungero.Presentation.DateTimeValueInputEventArgs e)
     {
       base.DateValueInput(e);

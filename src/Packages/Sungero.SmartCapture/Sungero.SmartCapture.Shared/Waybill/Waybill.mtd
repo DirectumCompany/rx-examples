@@ -456,9 +456,6 @@
       "$type": "Sungero.Metadata.DateTimePropertyMetadata, Sungero.Metadata",
       "NameGuid": "3e55f091-41a4-4e58-a9c5-dbe90782ccec",
       "Name": "RegistrationDate",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"

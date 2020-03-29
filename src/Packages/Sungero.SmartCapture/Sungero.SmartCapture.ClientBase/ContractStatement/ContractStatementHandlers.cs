@@ -10,13 +10,6 @@ namespace Sungero.SmartCapture
   partial class ContractStatementClientHandlers
   {
 
-    public override void RegistrationNumberValueInput(Sungero.Presentation.StringValueInputEventArgs e)
-    {
-      base.RegistrationNumberValueInput(e);
-      
-      this._obj.State.Properties.RegistrationNumber.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void LeadingDocumentValueInput(Sungero.Docflow.Client.OfficialDocumentLeadingDocumentValueInputEventArgs e)
     {
       base.LeadingDocumentValueInput(e);

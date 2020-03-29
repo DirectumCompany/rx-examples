@@ -38,17 +38,5 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.RegistrationNumber.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void RegistrationDateValueInput(Sungero.Presentation.DateTimeValueInputEventArgs e)
-    {
-      base.RegistrationDateValueInput(e);
-      
-      // Для DateTime событие изменения отрабатывает, даже если даты одинаковые.
-      // Поэтому еще раз сравниваем только даты без учёта времени.
-      if (e.OldValue.HasValue && e.NewValue.HasValue && Equals(e.OldValue.Value.Date, e.NewValue.Value.Date))
-        return;
-      
-      this._obj.State.Properties.RegistrationDate.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
   }
 }

@@ -46,11 +46,5 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void RegistrationNumberValueInput(Sungero.Presentation.StringValueInputEventArgs e)
-    {
-      base.RegistrationNumberValueInput(e);
-      this._obj.State.Properties.RegistrationNumber.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
   }
 }
