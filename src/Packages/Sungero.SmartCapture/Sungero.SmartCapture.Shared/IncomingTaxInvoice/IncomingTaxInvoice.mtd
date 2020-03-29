@@ -493,9 +493,6 @@
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",
       "Name": "RegistrationNumber",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -532,9 +529,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "901644ff-87b0-485b-9146-13fd6ba7ede1",
       "Name": "Currency",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -544,9 +538,6 @@
       "$type": "Sungero.Metadata.BooleanPropertyMetadata, Sungero.Metadata",
       "NameGuid": "bbdbae6d-40ce-4443-aeb6-bf4a14565963",
       "Name": "IsAdjustment",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -556,9 +547,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "c0aa900b-eb79-4558-8080-2b5ce3d9cf06",
       "Name": "Corrected",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
