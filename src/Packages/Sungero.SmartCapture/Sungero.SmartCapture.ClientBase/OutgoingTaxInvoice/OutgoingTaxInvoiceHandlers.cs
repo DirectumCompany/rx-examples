@@ -28,12 +28,6 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Currency.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void BusinessUnitValueInput(Sungero.Docflow.Client.OfficialDocumentBusinessUnitValueInputEventArgs e)
-    {
-      base.BusinessUnitValueInput(e);
-      this._obj.State.Properties.BusinessUnit.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void ContactValueInput(Sungero.Docflow.Client.AccountingDocumentBaseContactValueInputEventArgs e)
     {
       base.ContactValueInput(e);
