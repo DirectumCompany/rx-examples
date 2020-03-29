@@ -10,13 +10,6 @@ namespace Sungero.SmartCapture
   partial class ContractStatementClientHandlers
   {
 
-    public override void CurrencyValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCurrencyValueInputEventArgs e)
-    {
-      base.CurrencyValueInput(e);
-      
-      this._obj.State.Properties.Currency.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
     public override void BusinessUnitValueInput(Sungero.Docflow.Client.OfficialDocumentBusinessUnitValueInputEventArgs e)
     {
       base.BusinessUnitValueInput(e);
