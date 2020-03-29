@@ -31,12 +31,5 @@ namespace Sungero.SmartCapture
       this._obj.State.Properties.Number.HighlightColor = Sungero.Core.Colors.Empty;
     }
 
-    public override void CounterpartyValueInput(Sungero.Docflow.Client.AccountingDocumentBaseCounterpartyValueInputEventArgs e)
-    {
-      base.CounterpartyValueInput(e);
-      
-      this._obj.State.Properties.Counterparty.HighlightColor = Sungero.Core.Colors.Empty;
-    }
-
   }
 }

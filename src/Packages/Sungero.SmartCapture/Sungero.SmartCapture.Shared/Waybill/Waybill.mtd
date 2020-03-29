@@ -444,9 +444,6 @@
       "$type": "Sungero.Metadata.StringPropertyMetadata, Sungero.Metadata",
       "NameGuid": "263cf068-e224-4a83-9df0-198e828101d1",
       "Name": "RegistrationNumber",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents"
@@ -501,9 +498,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "cc53a990-5123-4f3a-b5ac-f3899be1f40a",
       "Name": "Counterparty",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "IsRequired",

@@ -526,9 +526,6 @@
       "$type": "Sungero.Metadata.NavigationPropertyMetadata, Sungero.Metadata",
       "NameGuid": "cc53a990-5123-4f3a-b5ac-f3899be1f40a",
       "Name": "Counterparty",
-      "HandledEvents": [
-        "ValueInputClient"
-      ],
       "IsAncestorMetadata": true,
       "Overridden": [
         "IsRequired",
