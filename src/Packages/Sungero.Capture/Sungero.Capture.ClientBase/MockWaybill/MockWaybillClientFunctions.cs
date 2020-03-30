@@ -17,16 +17,22 @@ namespace Sungero.Capture.Client
       if (!_obj.VerificationState.HasValue || _obj.VerificationState.Value == VerificationState.Completed)
         _obj.State.Controls.GoodsPreview.IsVisible = false;
     }
-    
-    public override void HighlightGoodsInMockMode(Commons.IEntityRecognitionInfo documentRecognitionInfo,
+
+    /// <summary>
+    /// Дополнительная подсветка.
+    /// </summary>
+    /// <param name="documentRecognitionInfo">Результат распознавания документа.</param>
+    /// <param name="highlightActivationStyle">Параметры отображения фокусировки подсветки.</param>
+    public override void AdditionalHighlight(Commons.IEntityRecognitionInfo documentRecognitionInfo,
                                              Docflow.Structures.Module.IHighlightActivationStyle highlightActivationStyle)
     {
-      base.HighlightGoodsInMockMode(documentRecognitionInfo, highlightActivationStyle);
+      base.AdditionalHighlight(documentRecognitionInfo, highlightActivationStyle);
       
+      // Подсветка номенклатуры.
       var waybill = MockWaybills.As(_obj);
       HighlightCollection(waybill.State.Controls.GoodsPreview,
                           documentRecognitionInfo, waybill.Goods,
                           highlightActivationStyle);
-    }    
+    }
   }
 }
