@@ -10,11 +10,5 @@ namespace Sungero.SmartCapture.Shared
   partial class UniversalTransferDocumentFunctions
   {
     
-    [Public]
-    public override bool IsVerificationModeSupported()
-    {
-      return true;
-    }
-    
   }
 }
