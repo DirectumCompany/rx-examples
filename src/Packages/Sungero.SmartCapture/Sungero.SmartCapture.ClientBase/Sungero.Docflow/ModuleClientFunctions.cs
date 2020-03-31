@@ -8,14 +8,6 @@ namespace Sungero.SmartCapture.Module.Docflow.Client
 {
   partial class ModuleFunctions
   {
-    /// <summary>
-    /// Показать настройки интеллектуальной обработки документов.
-    /// </summary>
-    public virtual void ShowSmartProcessingSettings()
-    {
-      var smartProcessingSettings = Sungero.Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
-      smartProcessingSettings.Show();
-    }
 
   }
 }
