@@ -24,16 +24,6 @@
     }
   },
   "DesktopViews": [],
-  "ExplorerTreeOrder": [
-    {
-      "ItemId": "ac821862-ecec-4df6-81a9-1ab3a9a42245",
-      "PreviousItemId": "7c2f5c32-e221-4e09-96f8-48c74a9940bb"
-    },
-    {
-      "ItemId": "ff04fdfc-e570-4afd-ad89-ca291495e28c",
-      "PreviousItemId": "ac821862-ecec-4df6-81a9-1ab3a9a42245"
-    }
-  ],
   "IconResourcesKeys": [],
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
