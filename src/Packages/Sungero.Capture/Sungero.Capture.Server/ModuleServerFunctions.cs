@@ -547,7 +547,7 @@ namespace Sungero.Capture.Server
         leadingDocumentPriority.Add(MockWaybills.Info.GetType().GetFinalType(), 3);
         leadingDocumentPriority.Add(MockIncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
         leadingDocumentPriority.Add(MockIncomingInvoices.Info.GetType().GetFinalType(), 1);
-        leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
+        leadingDocumentPriority.Add(SimpleDocuments.Info.GetType().GetFinalType(), 0);
       }
       else
       {
@@ -558,7 +558,7 @@ namespace Sungero.Capture.Server
         leadingDocumentPriority.Add(Sungero.SmartCapture.Waybills.Info.GetType().GetFinalType(), 3);
         leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
         leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingInvoices.Info.GetType().GetFinalType(), 1);
-        leadingDocumentPriority.Add(Sungero.SmartCapture.SimpleDocuments.Info.GetType().GetFinalType(), 0);
+        leadingDocumentPriority.Add(SimpleDocuments.Info.GetType().GetFinalType(), 0);
       }
       return leadingDocumentPriority;
     }
