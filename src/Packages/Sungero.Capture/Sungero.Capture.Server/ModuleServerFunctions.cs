@@ -551,7 +551,7 @@ namespace Sungero.Capture.Server
       }
       else
       {
-        leadingDocumentPriority.Add(Sungero.SmartCapture.IncomingLetters.Info.GetType().GetFinalType(), 7);
+        leadingDocumentPriority.Add(IncomingLetters.Info.GetType().GetFinalType(), 7);
         leadingDocumentPriority.Add(Sungero.SmartCapture.Contracts.Info.GetType().GetFinalType(), 6);
         leadingDocumentPriority.Add(Sungero.SmartCapture.SupAgreements.Info.GetType().GetFinalType(), 5);
         leadingDocumentPriority.Add(Sungero.SmartCapture.ContractStatements.Info.GetType().GetFinalType(), 4);
