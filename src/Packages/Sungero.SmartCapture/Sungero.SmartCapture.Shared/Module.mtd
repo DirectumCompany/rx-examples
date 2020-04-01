@@ -30,28 +30,12 @@
       "PreviousItemId": "f8062a92-e137-4016-8ec4-dfaad2690f15"
     },
     {
-      "ItemId": "ce74f1c2-c639-408d-bae5-695189b5db85",
+      "ItemId": "7c2f5c32-e221-4e09-96f8-48c74a9940bb",
       "PreviousItemId": "09cbbe65-8245-4489-b40c-d2dc0289a922"
     },
     {
-      "ItemId": "7c2f5c32-e221-4e09-96f8-48c74a9940bb",
-      "PreviousItemId": "ce74f1c2-c639-408d-bae5-695189b5db85"
-    },
-    {
-      "ItemId": "296576eb-c935-4fbe-a719-03d957fdaebc",
-      "PreviousItemId": "7c2f5c32-e221-4e09-96f8-48c74a9940bb"
-    },
-    {
-      "ItemId": "b4d090eb-8fde-4354-8aac-d4e98d79c852",
-      "PreviousItemId": "296576eb-c935-4fbe-a719-03d957fdaebc"
-    },
-    {
-      "ItemId": "6a32afa7-50d5-47a4-bc81-c646f7177251",
-      "PreviousItemId": "b4d090eb-8fde-4354-8aac-d4e98d79c852"
-    },
-    {
       "ItemId": "ac821862-ecec-4df6-81a9-1ab3a9a42245",
-      "PreviousItemId": "6a32afa7-50d5-47a4-bc81-c646f7177251"
+      "PreviousItemId": "7c2f5c32-e221-4e09-96f8-48c74a9940bb"
     },
     {
       "ItemId": "ff04fdfc-e570-4afd-ad89-ca291495e28c",
