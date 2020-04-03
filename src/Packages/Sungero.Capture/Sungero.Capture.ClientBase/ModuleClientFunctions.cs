@@ -74,6 +74,7 @@ namespace Sungero.Capture.Client
     /// <param name="folder">Путь к папке хранения файлов, переданных в пакете.</param>
     /// <param name="instanceInfo">Путь к xml файлу DCS c информацией об экземплярах захвата и о захваченных файлах.</param>
     /// <param name="responsible">Сотрудник, ответственный за обработку захваченных документов.</param>
+    /// <param name="senderLineName">Имя линии захвата.</param>
     public virtual void ProcessEmailPackage(string filesInfo, string folder, string instanceInfo, Sungero.Company.IEmployee responsible, string senderLineName = "")
     {
       Logger.Debug("Captured Package Process. Captured package type is MAIL.");
