@@ -1768,7 +1768,7 @@ namespace Sungero.Capture.Server
       {
         var amount = recognizedAmount.Amount;
         document.TotalAmount = amount;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty2(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.Probability);
       }
       
       // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
@@ -1779,7 +1779,7 @@ namespace Sungero.Capture.Server
       {
         var currency = recognizedCurrency.Currency;
         document.Currency = currency;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
+        DocflowPublicFunctions.LinkFactAndProperty2(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.Probability);
       }
     }
     
