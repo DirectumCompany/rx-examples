@@ -196,7 +196,7 @@ namespace Sungero.Capture.Server
               else
               {
                 documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
-                Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
+                SmartProcessing.PublicFunctions.Module.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
                 document.Save();
               }
             }
@@ -526,7 +526,7 @@ namespace Sungero.Capture.Server
         document = CreateSimpleDocument(name, responsible);
       }
       
-      Docflow.PublicFunctions.OfficialDocument.CreateVersion(document, arioDocument, string.Empty);
+      SmartProcessing.PublicFunctions.Module.CreateVersion(document, arioDocument, string.Empty);
       document.Save();
       return document;
     }
