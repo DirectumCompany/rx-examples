@@ -180,7 +180,7 @@ namespace Sungero.Capture.Server
       {
         var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
         var document = OfficialDocuments.Null;
-        using (var body = Docflow.PublicFunctions.SmartProcessingSetting.GetDocumentBody(arioUrl, recognitionResult.BodyGuid))
+        using (var body = SmartProcessing.PublicFunctions.Module.GetDocumentBody(arioUrl, recognitionResult.BodyGuid))
         {
           var docId = Functions.Module.SearchDocumentBarcodeIds(body).FirstOrDefault();
           // FOD на пустом List<int> вернет 0.
