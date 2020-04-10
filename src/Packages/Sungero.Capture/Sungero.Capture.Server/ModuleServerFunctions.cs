@@ -1763,36 +1763,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить сумму и валюту.
-    /// </summary>
-    /// <param name="document">Договорной документ.</param>
-    /// <param name="recognitionResult">Результат обработки документа в Ario.</param>
-    public virtual void FillAmountAndCurrency(IContractualDocumentBase document, Sungero.Docflow.Structures.Module.IRecognitionResult recognitionResult)
-    {
-      if (!ContractualDocumentBases.Is(document))
-        return;
-      
-      var recognizedAmount = DocflowPublicFunctions.GetRecognizedAmount(recognitionResult);
-      if (recognizedAmount.HasValue)
-      {
-        var amount = recognizedAmount.Amount;
-        document.TotalAmount = amount;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount, document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.Probability);
-      }
-      
-      // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
-      // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
-      // а в них все расчеты ведутся в одной валюте.
-      var recognizedCurrency = DocflowPublicFunctions.GetRecognizedCurrency(recognitionResult);
-      if (recognizedCurrency.HasValue)
-      {
-        var currency = recognizedCurrency.Currency;
-        document.Currency = currency;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionResult, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency, document.Info.Properties.Currency.Name, currency, recognizedCurrency.Probability);
-      }
-    }
-    
-    /// <summary>
     /// Заполнить номер и дату для Mock-документов.
     /// </summary>
     /// <param name="document">Документ.</param>
