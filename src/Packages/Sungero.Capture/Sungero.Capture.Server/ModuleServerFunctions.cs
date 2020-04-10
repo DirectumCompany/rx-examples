@@ -197,6 +197,12 @@ namespace Sungero.Capture.Server
               {
                 documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
                 SmartProcessing.PublicFunctions.Module.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
+                
+                // Заполнить статус верификации для документов, в которых поддерживается режим верификации.
+                // Сделано для проставления статуса верификации у документов занесенных по ШК.
+                #warning rassokhina У документов по ШК должен проставляться статус верификации "В процессе"?
+                if (Docflow.PublicFunctions.OfficialDocument.IsVerificationModeSupported(document))
+                  document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
                 document.Save();
               }
             }
@@ -527,6 +533,12 @@ namespace Sungero.Capture.Server
       }
       
       SmartProcessing.PublicFunctions.Module.CreateVersion(document, arioDocument, string.Empty);
+      
+      // Заполнить статус верификации для документов, в которых поддерживается режим верификации.
+      // Сделано для проставления статуса верификации у документов занесенных по ШК.
+      #warning rassokhina У документов по ШК должен проставляться статус верификации "В процессе"?
+      if (Docflow.PublicFunctions.OfficialDocument.IsVerificationModeSupported(document))
+        document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
       document.Save();
       return document;
     }
