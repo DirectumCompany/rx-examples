@@ -1769,7 +1769,7 @@ namespace Sungero.Capture.Server
     /// Заполнить сумму и валюту.
     /// </summary>
     /// <param name="document">Договорной документ.</param>
-    /// <param name="recognitionInfo">Результат обработки документа в Арио.</param>
+    /// <param name="recognitionInfo">Запись в справочнике для сохранения результатов распознавания документа.</param>
     /// <param name="facts">Извлеченные из документа факты.</param>
     public virtual void FillAmountAndCurrency(IContractualDocumentBase document, 
                                               Commons.IEntityRecognitionInfo recognitionInfo, 
@@ -1804,7 +1804,7 @@ namespace Sungero.Capture.Server
     /// Заполнить номер и дату для Mock-документов.
     /// </summary>
     /// <param name="document">Документ.</param>
-    /// <param name="recognitionInfo">Результат обработки документа в Арио.</param>
+    /// <param name="recognitionInfo">Запись в справочнике для сохранения результатов распознавания документа.</param>
     /// <param name="facts">Извлеченные из документа факты.</param>
     /// <param name="factName">Наименование факта с датой и номером документа.</param>
     public void FillMockRegistrationData(IOfficialDocument document,
