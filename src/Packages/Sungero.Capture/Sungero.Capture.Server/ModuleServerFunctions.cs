@@ -352,11 +352,11 @@ namespace Sungero.Capture.Server
     /// <param name="file">Исходный файл.</param>
     /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
     /// <returns>Десериализованный результат классификации в Ario.</returns>
-    public virtual List<Sungero.Docflow.Structures.Module.IArioDocument> GetRecognitionResults(string jsonClassificationResults,
-                                                                                               Sungero.Docflow.Structures.Module.IFileDto file,
-                                                                                               bool sendedByEmail)
+    public virtual List<Sungero.SmartProcessing.Structures.Module.IArioDocument> GetRecognitionResults(string jsonClassificationResults,
+                                                                                                       Sungero.Docflow.Structures.Module.IFileDto file,
+                                                                                                       bool sendedByEmail)
     {
-      var arioDocuments = new List<Sungero.Docflow.Structures.Module.IArioDocument>();
+      var arioDocuments = new List<Sungero.SmartProcessing.Structures.Module.IArioDocument>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
         return arioDocuments;
       
@@ -364,7 +364,7 @@ namespace Sungero.Capture.Server
       foreach (var packageProcessResult in packageProcessResults)
       {
         // Класс и гуид тела документа.
-        var arioDocument = Sungero.Docflow.Structures.Module.ArioDocument.Create();
+        var arioDocument = Sungero.SmartProcessing.Structures.Module.ArioDocument.Create();
         var clsResult = packageProcessResult.ClassificationResult;
         arioDocument.ClassificationResultId = clsResult.Id;
         arioDocument.BodyGuid = packageProcessResult.Guid;
@@ -447,7 +447,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат классификации в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Документ, созданный на основе классификации.</returns>
-    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Sungero.Docflow.Structures.Module.IArioDocument arioDocument,
+    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument,
                                                                        IEmployee responsible)
     {
       // Входящее письмо.
@@ -826,7 +826,7 @@ namespace Sungero.Capture.Server
       // Пока передавать дефолтный для универсальности кода.
       // Но нужно будет продумать, что с этим, в итоге, делать.
       // Также имя пока передавать в additionalInfo (при решении учесть US 97236).
-      var arioDocument = Sungero.Docflow.Structures.Module.ArioDocument.Create();
+      var arioDocument = Sungero.SmartProcessing.Structures.Module.ArioDocument.Create();
       Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, name);
       
       return document;
@@ -842,7 +842,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки письма в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Документ.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       
@@ -856,7 +856,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioDocument">Результат обработки письма в Ario.</param>
     /// <returns>Документ.</returns>
-    public Docflow.IOfficialDocument CreateMockIncomingLetter(Sungero.Docflow.Structures.Module.IArioDocument arioDocument)
+    public Docflow.IOfficialDocument CreateMockIncomingLetter(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument)
     {
       var document = Sungero.Capture.MockIncomingLetters.Create();
       var props = document.Info.Properties;
@@ -970,7 +970,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioDocument">Результат обработки акта выполненных работ в Ario.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public Docflow.IOfficialDocument CreateMockContractStatement(Sungero.Docflow.Structures.Module.IArioDocument arioDocument)
+    public Docflow.IOfficialDocument CreateMockContractStatement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument)
     {
       var document = Sungero.Capture.MockContractStatements.Create();
       var props = document.Info.Properties;
@@ -1102,7 +1102,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки акта выполненных работ в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Акт выполненных работ.</returns>
-    public virtual Docflow.IOfficialDocument CreateContractStatement(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateContractStatement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = FinancialArchive.ContractStatements.Create();
       Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
@@ -1118,7 +1118,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioDocument">Результат обработки накладной в Ario.</param>
     /// <returns>Накладная.</returns>
-    public Docflow.IOfficialDocument CreateMockWaybill(Sungero.Docflow.Structures.Module.IArioDocument arioDocument)
+    public Docflow.IOfficialDocument CreateMockWaybill(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument)
     {
       var document = Sungero.Capture.MockWaybills.Create();
       var props = document.Info.Properties;
@@ -1241,7 +1241,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки накладной в Ario.</param>
     /// <param name="responsible">Ответственный сотрудник.</param>
     /// <returns>Накладная.</returns>
-    public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = FinancialArchive.Waybills.Create();
       Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
@@ -1257,7 +1257,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioDocument">Результат обработки счет-фактуры в Ario.</param>
     /// <returns>Счет-фактура.</returns>
-    public Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Sungero.Docflow.Structures.Module.IArioDocument arioDocument)
+    public Docflow.IOfficialDocument CreateMockIncomingTaxInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument)
     {
       var facts = arioDocument.Facts;
       var document = Sungero.Capture.MockIncomingTaxInvoices.Create();
@@ -1373,7 +1373,7 @@ namespace Sungero.Capture.Server
     /// <param name="isAdjustment">Корректировочная.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Счет-фактура.</returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, bool isAdjustment, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, bool isAdjustment, IEmployee responsible)
     {
       var facts = arioDocument.Facts;
       var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
@@ -1467,7 +1467,7 @@ namespace Sungero.Capture.Server
     /// <param name="isAdjustment">Корректировочная.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>УПД.</returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, bool isAdjustment, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, bool isAdjustment, IEmployee responsible)
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       
@@ -1485,7 +1485,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioDocument">Результат обработки счета на оплату в Ario.</param>
     /// <returns>Счет на оплату.</returns>
-    public Docflow.IOfficialDocument CreateMockIncomingInvoice(Sungero.Docflow.Structures.Module.IArioDocument arioDocument)
+    public Docflow.IOfficialDocument CreateMockIncomingInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument)
     {
       var document = Sungero.Capture.MockIncomingInvoices.Create();
       var props = document.Info.Properties;
@@ -1599,7 +1599,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки документа в Арио.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Счет на оплату.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
+    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       
       var document = Contracts.IncomingInvoices.Create();
@@ -1617,7 +1617,7 @@ namespace Sungero.Capture.Server
     /// </summary>
     /// <param name="arioDocument">Результат обработки договора в Ario.</param>
     /// <returns>Договор.</returns>
-    public Docflow.IOfficialDocument CreateMockContract(Sungero.Docflow.Structures.Module.IArioDocument arioDocument)
+    public Docflow.IOfficialDocument CreateMockContract(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument)
     {
       var document = Sungero.Capture.MockContracts.Create();
       
@@ -1697,7 +1697,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки договора в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Договор.</returns>
-    public Docflow.IOfficialDocument CreateContract(Sungero.Docflow.Structures.Module.IArioDocument arioDocument,
+    public Docflow.IOfficialDocument CreateContract(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument,
                                                     Sungero.Company.IEmployee responsible)
     {
       var document = Sungero.Contracts.Contracts.Create();
@@ -1717,7 +1717,8 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки доп.соглашения в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Доп.соглашение.</returns>
-    public Docflow.IOfficialDocument CreateSupAgreement(Sungero.Docflow.Structures.Module.IArioDocument arioDocument, Sungero.Company.IEmployee responsible)
+    public Docflow.IOfficialDocument CreateSupAgreement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, 
+                                                        Sungero.Company.IEmployee responsible)
     {
       var document = Sungero.Contracts.SupAgreements.Create();
       
@@ -1771,8 +1772,8 @@ namespace Sungero.Capture.Server
     /// <param name="document">Договорной документ.</param>
     /// <param name="recognitionInfo">Запись в справочнике для сохранения результатов распознавания документа.</param>
     /// <param name="facts">Извлеченные из документа факты.</param>
-    public virtual void FillAmountAndCurrency(IContractualDocumentBase document, 
-                                              Commons.IEntityRecognitionInfo recognitionInfo, 
+    public virtual void FillAmountAndCurrency(IContractualDocumentBase document,
+                                              Commons.IEntityRecognitionInfo recognitionInfo,
                                               List<Docflow.Structures.Module.IArioFact> facts)
     {
       if (!ContractualDocumentBases.Is(document))
