@@ -926,8 +926,8 @@ namespace Sungero.Capture.Server
       {
         var signatoryFact = personFacts.Where(x => DocflowPublicFunctions.GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Signatory).FirstOrDefault();
         document.Signatory = Docflow.Server.ModuleFunctions.GetFullNameByFact(predictedClass, signatoryFact);
-        var isTrusted = DocflowPublicFunctions.IsTrustedField(signatoryFact, FieldNames.LetterPerson.Type);
-        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, signatoryFact, null, props.Signatory.Name, document.Signatory, isTrusted);
+        var probability = DocflowPublicFunctions.GetFieldProbability(signatoryFact, FieldNames.LetterPerson.Type);
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, signatoryFact, null, props.Signatory.Name, document.Signatory, probability);
       }
       
       // Заполнить контакт.
@@ -935,8 +935,8 @@ namespace Sungero.Capture.Server
       {
         var responsibleFact = personFacts.Where(x => DocflowPublicFunctions.GetFieldValue(x, FieldNames.LetterPerson.Type) == LetterPersonTypes.Responsible).FirstOrDefault();
         document.Contact = Docflow.Server.ModuleFunctions.GetFullNameByFact(predictedClass, responsibleFact);
-        var isTrusted = DocflowPublicFunctions.IsTrustedField(responsibleFact, FieldNames.LetterPerson.Type);
-        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, responsibleFact, null, props.Contact.Name, document.Contact, isTrusted);
+        var probability = DocflowPublicFunctions.GetFieldProbability(responsibleFact, FieldNames.LetterPerson.Type);
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, responsibleFact, null, props.Contact.Name, document.Contact, probability);
       }
       
       // Заполнить данные нашей стороны.
@@ -947,7 +947,9 @@ namespace Sungero.Capture.Server
         document.Addressees = string.IsNullOrEmpty(document.Addressees) ? addressee : string.Format("{0}; {1}", document.Addressees, addressee);
       }
       foreach (var fact in addresseeFacts)
-        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, fact, null, props.Addressees.Name, document.Addressees, true);
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, fact, null, props.Addressees.Name,
+                                                   document.Addressees,
+                                                   Docflow.Constants.Module.PropertyProbabilityLevels.Max);
       
       // Заполнить содержание перед сохранением, чтобы сформировалось наименование.
       var subjectFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Subject).FirstOrDefault();
@@ -982,7 +984,9 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.LeadDoc = GetLeadingDocumentName(leadingDocFact);
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, leadingDocFact, null, props.LeadDoc.Name, document.LeadDoc, true);
+      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, leadingDocFact, null, props.LeadDoc.Name,
+                                                 document.LeadDoc,
+                                                 Docflow.Constants.Module.PropertyProbabilityLevels.Max);
       
       // Дата и номер.
       FillMockRegistrationData(document, arioDocument.RecognitionInfo, arioDocument.Facts, FactNames.Document);
@@ -1130,8 +1134,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isTrusted = DocflowPublicFunctions.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      var probability = DocflowPublicFunctions.GetFieldProbability(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
+      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, leadingDocFact, null, props.Contract.Name, document.Contract, probability);
       
       // Заполнить контрагентов по типу.
       // Тип передается либо со 100% вероятностью, либо не передается ни тип, ни наименование контрагента.
@@ -1497,8 +1501,8 @@ namespace Sungero.Capture.Server
       // Договор.
       var leadingDocFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.DocumentBaseName).FirstOrDefault();
       document.Contract = GetLeadingDocumentName(leadingDocFact);
-      var isTrusted = DocflowPublicFunctions.IsTrustedField(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, leadingDocFact, null, props.Contract.Name, document.Contract, isTrusted);
+      var probability = DocflowPublicFunctions.GetFieldProbability(leadingDocFact, FieldNames.FinancialDocument.DocumentBaseName);
+      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, leadingDocFact, null, props.Contract.Name, document.Contract, probability);
       
       // Заполнить контрагентов по типу.
       var seller = GetMostProbableMockCounterparty(facts, CounterpartyTypes.Seller);
@@ -1569,9 +1573,14 @@ namespace Sungero.Capture.Server
       var isDateValid = DocflowPublicFunctions.IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
+
       document.Date = date;
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, isTrustedDate);
+      
+      var dateProbability = isDateValid ?
+        Docflow.PublicFunctions.Module.GetFieldProbability(dateFact, Sungero.Docflow.Constants.Module.FieldNames.Document.Date) :
+        Docflow.Constants.Module.PropertyProbabilityLevels.Min;
+      
+      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, dateProbability);
       
       var numberFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
       document.Number = DocflowPublicFunctions.GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
@@ -1717,7 +1726,7 @@ namespace Sungero.Capture.Server
     /// <param name="arioDocument">Результат обработки доп.соглашения в Ario.</param>
     /// <param name="responsible">Ответственный.</param>
     /// <returns>Доп.соглашение.</returns>
-    public Docflow.IOfficialDocument CreateSupAgreement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, 
+    public Docflow.IOfficialDocument CreateSupAgreement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument,
                                                         Sungero.Company.IEmployee responsible)
     {
       var document = Sungero.Contracts.SupAgreements.Create();
@@ -1767,41 +1776,7 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    /// Заполнить сумму и валюту.
-    /// </summary>
-    /// <param name="document">Договорной документ.</param>
-    /// <param name="recognitionInfo">Запись в справочнике для сохранения результатов распознавания документа.</param>
-    /// <param name="facts">Извлеченные из документа факты.</param>
-    public virtual void FillAmountAndCurrency(IContractualDocumentBase document,
-                                              Commons.IEntityRecognitionInfo recognitionInfo,
-                                              List<Docflow.Structures.Module.IArioFact> facts)
-    {
-      if (!ContractualDocumentBases.Is(document))
-        return;
-      
-      var recognizedAmount = DocflowPublicFunctions.GetRecognizedAmount(facts);
-      if (recognizedAmount.HasValue)
-      {
-        var amount = recognizedAmount.Amount;
-        document.TotalAmount = amount;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedAmount.Fact, FieldNames.DocumentAmount.Amount,
-                                                   document.Info.Properties.TotalAmount.Name, amount, recognizedAmount.IsTrusted);
-      }
-      
-      // В факте с суммой документа может быть не указана валюта, поэтому факт с валютой ищем отдельно,
-      // так как на данный момент функция используется для обработки бухгалтерских и договорных документов,
-      // а в них все расчеты ведутся в одной валюте.
-      var recognizedCurrency = DocflowPublicFunctions.GetRecognizedCurrency(facts);
-      if (recognizedCurrency.HasValue)
-      {
-        var currency = recognizedCurrency.Currency;
-        document.Currency = currency;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedCurrency.Fact, FieldNames.DocumentAmount.Currency,
-                                                   document.Info.Properties.Currency.Name, currency, recognizedCurrency.IsTrusted);
-      }
-    }
     
-    /// <summary>
     /// Заполнить номер и дату для Mock-документов.
     /// </summary>
     /// <param name="document">Документ.</param>
@@ -1819,24 +1794,30 @@ namespace Sungero.Capture.Server
       var isDateValid = DocflowPublicFunctions.IsDateValid(date);
       if (!isDateValid)
         date = Calendar.SqlMinValue;
-      var isTrustedDate = isDateValid && DocflowPublicFunctions.IsTrustedField(dateFact, FieldNames.Document.Date);
+
       document.RegistrationDate = date;
+      
+      var dateProbability = isDateValid ?
+        Docflow.PublicFunctions.Module.GetFieldProbability(dateFact, Sungero.Docflow.Constants.Module.FieldNames.Document.Date) :
+        Docflow.Constants.Module.PropertyProbabilityLevels.Min;
 
       // Номер.
       var regNumberFact = DocflowPublicFunctions.GetOrderedFacts(facts, factName, FieldNames.Document.Number).FirstOrDefault();
       var regNumber = DocflowPublicFunctions.GetFieldValue(regNumberFact, FieldNames.Document.Number);
-      Nullable<bool> isTrustedNumber = null;
+      
+      // TODO Suleymanov_RA: при рефакторинге избавиться от null
+      Nullable<double> numberProbability = null;
       if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
       {
         regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
-        isTrustedNumber = false;
+        numberProbability = Docflow.Constants.Module.PropertyProbabilityLevels.Min;
       }
       document.RegistrationNumber = regNumber;
       
       var props = document.Info.Properties;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, isTrustedDate);
+      DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, dateProbability);
       DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
-                                                 document.RegistrationNumber, isTrustedNumber);
+                                                 document.RegistrationNumber, numberProbability);
     }
     
     #endregion
