@@ -22,7 +22,7 @@ namespace Sungero.Capture.Structures.Module
     public string Trrc { get; set; }
     
     // Факт, из полей которого были излеченны данные контрагента.
-    public Sungero.Docflow.Structures.Module.IFact Fact { get; set; }
+    public Sungero.Docflow.Structures.Module.IArioFact Fact { get; set; }
   }
   
   /// <summary>
