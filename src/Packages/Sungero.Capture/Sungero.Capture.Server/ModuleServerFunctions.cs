@@ -354,7 +354,7 @@ namespace Sungero.Capture.Server
     /// <returns>Десериализованный результат классификации в Ario.</returns>
     public virtual List<Sungero.SmartProcessing.Structures.Module.IArioDocument> GetRecognitionResults(string jsonClassificationResults,
                                                                                                        Sungero.Docflow.Structures.Module.IFileDto file,
-                                                                                                       bool sendedByEmail)
+                                                                                                       bool sentByEmail)
     {
       var arioDocuments = new List<Sungero.SmartProcessing.Structures.Module.IArioDocument>();
       if (string.IsNullOrWhiteSpace(jsonClassificationResults))
@@ -371,7 +371,7 @@ namespace Sungero.Capture.Server
         arioDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
         arioDocument.Message = packageProcessResult.Message;
         arioDocument.File = file;
-        arioDocument.SendedByEmail = sendedByEmail;
+        arioDocument.SentByEmail = sentByEmail;
         var docInfo = Commons.EntityRecognitionInfos.Create();
         docInfo.Name = arioDocument.PredictedClass;
         docInfo.RecognizedClass = arioDocument.PredictedClass;
@@ -827,7 +827,7 @@ namespace Sungero.Capture.Server
       // Но нужно будет продумать, что с этим, в итоге, делать.
       // Также имя пока передавать в additionalInfo (при решении учесть US 97236).
       var arioDocument = Sungero.SmartProcessing.Structures.Module.ArioDocument.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, name);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, name);
       
       return document;
     }
@@ -846,7 +846,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       
       return document;
     }
@@ -1109,7 +1109,7 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateContractStatement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = FinancialArchive.ContractStatements.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       return document;
     }
     
@@ -1248,7 +1248,7 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = FinancialArchive.Waybills.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       return document;
     }
     
@@ -1455,7 +1455,7 @@ namespace Sungero.Capture.Server
 
       documentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, facts, responsible, documentParties);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, facts, responsible, arioDocument.SentByEmail, documentParties);
       
       return document;
     }
@@ -1475,7 +1475,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       
       return document;
     }
@@ -1612,7 +1612,7 @@ namespace Sungero.Capture.Server
     {
       
       var document = Contracts.IncomingInvoices.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       
       return document;
     }
@@ -1711,7 +1711,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.Contracts.Create();
 
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       
       return document;
     }
@@ -1731,7 +1731,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.SupAgreements.Create();
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, arioDocument.SentByEmail, null);
       
       return document;
     }
