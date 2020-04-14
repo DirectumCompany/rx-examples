@@ -5,6 +5,25 @@
   "AssociatedGuid": "f83768c8-f40d-43dd-8cfa-3098f694d645",
   "AsyncHandlers": [
     {
+      "NameGuid": "4f03b0d0-f0f5-45ed-b1c5-98d32b864503",
+      "Name": "SetDocumentStorage",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "56bf2d12-f4b0-4e00-aa92-3f367f7414f7",
+          "Name": "DocumentId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "900ec044-ba5f-4430-ad72-24f1f0c2a179",
+          "Name": "StorageId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "767ae28b-d043-48b3-9e31-e54c288bde75",
       "Name": "GrantAccessRightsToDocument",
       "DelayPeriod": 15,
@@ -89,6 +108,20 @@
   "Importance": "Low",
   "Jobs": [
     {
+      "NameGuid": "2ff6172c-7964-4df7-a294-88c77bc97ef2",
+      "Name": "SendNotificationForExpiringPowerOfAttorney",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T08:30:00"
+    },
+    {
+      "NameGuid": "0df1dbd4-8cd1-407d-90ba-537a251d4f7c",
+      "Name": "TransferDocumentsByStoragePolicy",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T04:00:00"
+    },
+    {
       "NameGuid": "d7044e44-89bc-4fb3-9e44-5491514d9b05",
       "Name": "SendMailNotification",
       "Daily": "Repeat",
@@ -121,7 +154,7 @@
   "ResourceInterfaceNamespace": "Sungero.SmartCapture.Module.Docflow",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "3.3.14.1",
+  "Version": "3.3.47.1",
   "Widgets": [],
   "Versions": [
     {

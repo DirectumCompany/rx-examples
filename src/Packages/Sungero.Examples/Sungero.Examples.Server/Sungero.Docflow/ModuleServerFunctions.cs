@@ -15,7 +15,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <returns>Изображение отметки об ЭП для подписи в виде html.</returns>
     /// <description>
     /// Пример перекрытия логики наложения отметки о простой ЭП для всех документов.
-    /// В отметке о простой ЭП изменёны логотип и пропорции заголовка. 
+    /// В отметке о простой ЭП изменёны логотип и пропорции заголовка.
     /// Также в отметку добавлены дата и время подписания.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
@@ -41,7 +41,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <returns>Изображение отметки об ЭП для сертификата в виде html.</returns>
     /// <description>
     /// Пример перекрытия логики наложения отметки о квалифицированной ЭП для всех документов.
-    /// В отметке о квалифицированной ЭП изменёны логотип и пропорции заголовка. 
+    /// В отметке о квалифицированной ЭП изменёны логотип и пропорции заголовка.
     /// Также в отметку добавлены дата и время подписания.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
@@ -87,5 +87,23 @@ namespace Sungero.Examples.Module.Docflow.Server
       return base.CanConvertToPdfInteractively(document);
     }
     
+    /// <summary>
+    /// Перекрытие. Получить запрос создания временной таблицы с развернутыми политиками.
+    /// </summary>
+    /// <param name="now">Время старта фонового процесса.</param>
+    /// <returns>Текст запроса.</returns>
+    public override string GetStoragePolicySettingsQuery(DateTime now)
+    {
+      return string.Format(Docflow.Queries.Module.CreateStoragePolicySettings, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName, now.ToString("yyyy-MM-dd HH:mm:ss"));
+    }
+    
+    /// <summary>
+    /// Перекрытие. Получить запрос получения документов для перемещения.
+    /// </summary>
+    /// <returns>Текст запроса.</returns>
+    public override string GetDocumentsToTransferQuery()
+    {
+      return string.Format(Docflow.Queries.Module.SelectDocumentsToTransfer, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName);
+    }
   }
 }
