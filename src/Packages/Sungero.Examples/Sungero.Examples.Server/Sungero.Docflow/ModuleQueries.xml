@@ -101,27 +101,26 @@ SELECT r.Storage, rdk.Id,
       AND NOT EXISTS (SELECT 1 FROM Sungero_Docflow_SPolicyDocKind k WHERE k.StoragePolicy = r.Id);]]></postgres>
   </query>
   <query key="SelectDocumentsToTransfer">
-    <default><![CDATA[	select doc.Id, t.Storage
+    <default><![CDATA[select doc.Id, t.Storage
 	from Sungero_Content_EDoc doc
-	join Sungero_Docflow_StoragePolicySettings t
+	join (select EntityId, max(HistoryDate) as HD
+          from Sungero_Content_DocHistory
+          where Action in ('Read', 'Create', 'Update')
+            and VersionNumber is not null
+            and Operation <> 'DataTransfer'
+          group by EntityId) as hld
+      on hld.EntityId = doc.Id
+	join {0} t
 	  on t.DocumentKind = doc.DocumentKind_Docflow_Sungero
 	  and doc.DocumentDate_Docflow_Sungero <= t.DocumentDate
 	  and doc.Modified <= t.Modified
-	  and exists(select *
-	               from Sungero_Content_DocHistory h
-				         where h.EntityId = doc.Id
-				           and h.Action in ('Read', 'Create', 'Update')
-					         and h.HistoryDate <= t.LastRead)
+	  and hld.HD <= t.LastRead
 	where t.Priority = (select max(tt.Priority) 
-	                      from Sungero_Docflow_StoragePolicySettings tt 
+	                      from {0} tt 
 						            where tt.DocumentKind = doc.DocumentKind_Docflow_Sungero
 	                        and doc.DocumentDate_Docflow_Sungero <= tt.DocumentDate
 	                        and doc.Modified <= tt.Modified
-							            and exists(select *
-	                                     from Sungero_Content_DocHistory h
-				                               where h.EntityId = doc.Id
-				                                 and h.Action in ('Read', 'Create', 'Update')
-					                               and h.HistoryDate <= t.LastRead))
+							and hld.HD <= t.LastRead)
 	and t.Storage != doc.Storage_Docflow_Sungero
 	and doc.Storage_Docflow_Sungero is not null
 	and t.NeedRetention = 1]]></default>
