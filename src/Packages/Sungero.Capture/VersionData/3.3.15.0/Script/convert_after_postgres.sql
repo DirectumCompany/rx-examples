@@ -33,7 +33,6 @@ select  id
       , fieldvalue
       , fieldprobabil
       , position
-      , istrusted
       , verifiedvalue
       , factlabel
       , collectionreco

@@ -22,7 +22,7 @@ on drr.DocumentId = edoc.Id;
 
 insert into Sungero_Commons_Facts 
       (Id, Discriminator, EntityRecogn, FactId, FieldId, PropertyName, PropertyValue, FactName, FieldName, 
-	   FieldValue, FieldProbabil, Position, IsTrusted, VerifiedValue, FactLabel, CollectionReco)
+	   FieldValue, FieldProbabil, Position, VerifiedValue, FactLabel, CollectionReco)
 select Id
       , 'EA588697-56D5-4A14-9A78-39FA6517351B'
       , DocumentRecogn
@@ -35,7 +35,6 @@ select Id
       , FieldValue
       , FieldProbabil
       , Position
-      , IsTrusted
       , VerifiedValue
       , FactLabel
       , CollectionReco
