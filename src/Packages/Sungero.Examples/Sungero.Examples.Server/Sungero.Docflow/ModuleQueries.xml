@@ -1,3 +1,128 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <queries>
+  <query key="CreateStoragePolicySettings">
+    <mssql><![CDATA[if exists (select * from information_schema.tables where table_name = '{0}')
+  drop table {0}
+
+select r.Storage, rdk.DocumentKind,
+  case when r.DocDateType = 'DocumentDate' then dateadd(DD, -1 * r.DaysToMove, '{1}') else '2100-01-01 00:00:00.000' end as DocumentDate,
+  case when r.DocDateType = 'Modified' then dateadd(DD, -1 * r.DaysToMove, '{1}') else '2100-01-01 00:00:00.000' end as Modified,
+  case when r.DocDateType = 'LastRead' then dateadd(DD, -1 * r.DaysToMove, '{1}') else '2100-01-01 00:00:00.000' end as LastRead,
+  case when r.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef' then r.[Priority] else r.[Priority] + (select coalesce(max(r2.[Priority]), 0) from Sungero_Docflow_StoragePolicy r2 where r2.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef') end as [Priority],
+  case when coalesce(r.NextRetention, '{1}') <= '{1}' then 1 else 0 end as NeedRetention
+into {0}
+  from Sungero_Docflow_StoragePolicy r
+  join Sungero_Docflow_SPolicyDocKind rdk
+    on rdk.StoragePolicy = r.Id
+	where r.Status = 'Active';
+
+insert into {0}
+select r.Storage, rdk.Id,
+  case when r.DocDateType = 'DocumentDate' then dateadd(DD, -1 * r.DaysToMove, '{1}') else '2100-01-01 00:00:00.000' end as DocumentDate,
+  case when r.DocDateType = 'Modified' then dateadd(DD, -1 * r.DaysToMove, '{1}') else '2100-01-01 00:00:00.000' end as Modified,
+  case when r.DocDateType = 'LastRead' then dateadd(DD, -1 * r.DaysToMove, '{1}') else '2100-01-01 00:00:00.000' end as LastRead,
+  case when r.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef' then r.[Priority] else r.[Priority] + (select coalesce(max(r2.[Priority]), 0) from Sungero_Docflow_StoragePolicy r2 where r2.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef') end as [Priority],
+  case when coalesce(r.NextRetention, '{1}') <= '{1}' then 1 else 0 end as NeedRetention
+  from Sungero_Docflow_StoragePolicy r
+  join Sungero_Docflow_DocumentKind rdk
+    on 1=1
+	where r.Status = 'Active'
+	  and not exists (select 1 from Sungero_Docflow_SPolicyDocKind k where k.StoragePolicy = r.Id);]]></mssql>
+    <postgres><![CDATA[DO $$
+BEGIN
+  IF EXISTS (SELECT * FROM information_schema.tables WHERE table_name = LOWER('{0}')) THEN
+    DROP TABLE {0};
+  END IF;
+END $$;
+
+SELECT r.Storage, rdk.DocumentKind,
+  CASE 
+    WHEN r.DocDateType = 'DocumentDate' 
+    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
+    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+  END AS DocumentDate,
+  CASE 
+    WHEN r.DocDateType = 'Modified' 
+    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
+    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+  END AS Modified,
+  CASE 
+    WHEN r.DocDateType = 'LastRead' 
+    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
+    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+  END AS LastRead,																			  
+  CASE 
+    WHEN r.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef' 
+    THEN r.Priority 
+    ELSE r.Priority + (SELECT COALESCE(MAX(r2.Priority), 0) FROM Sungero_Docflow_StoragePolicy r2 WHERE r2.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef') 
+  END AS Priority,
+  CASE 
+    WHEN COALESCE(r.NextRetention, '{1}') <= '{1}' 
+    THEN 1 
+    ELSE 0
+  END AS NeedRetention
+INTO {0}
+  FROM Sungero_Docflow_StoragePolicy r
+  JOIN Sungero_Docflow_SPolicyDocKind rdk
+    ON rdk.StoragePolicy = r.Id
+  WHERE r.Status = 'Active';
+
+INSERT INTO {0}
+SELECT r.Storage, rdk.Id,
+  CASE 
+    WHEN r.DocDateType = 'DocumentDate' 
+    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
+    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+  END AS DocumentDate,
+  CASE 
+    WHEN r.DocDateType = 'Modified' 
+    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
+    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+  END AS Modified,
+  CASE 
+    WHEN r.DocDateType = 'LastRead' 
+    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
+    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+  END AS LastRead,
+  CASE 
+    WHEN r.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef' 
+    THEN r.Priority 
+    ELSE r.Priority + (SELECT COALESCE(MAX(r2.Priority), 0) FROM Sungero_Docflow_StoragePolicy r2 WHERE r2.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef') 
+  END AS Priority,
+  CASE 
+    WHEN COALESCE(r.NextRetention, '{1}') <= '{1}' 
+    THEN 1 
+    ELSE 0 
+  END AS NeedRetention
+  FROM Sungero_Docflow_StoragePolicy r
+  JOIN Sungero_Docflow_DocumentKind rdk
+    ON 1=1
+    WHERE r.Status = 'Active'
+      AND NOT EXISTS (SELECT 1 FROM Sungero_Docflow_SPolicyDocKind k WHERE k.StoragePolicy = r.Id);]]></postgres>
+  </query>
+  <query key="SelectDocumentsToTransfer">
+    <default><![CDATA[select doc.Id, t.Storage
+	from Sungero_Content_EDoc doc
+	join (select EntityId, max(HistoryDate) as HD
+          from Sungero_Content_DocHistory
+          where Action in ('Read', 'Create', 'Update')
+            and VersionNumber is not null
+            and Operation <> 'DataTransfer'
+          group by EntityId) as hld
+      on hld.EntityId = doc.Id
+	join {0} t
+	  on t.DocumentKind = doc.DocumentKind_Docflow_Sungero
+	  and doc.DocumentDate_Docflow_Sungero <= t.DocumentDate
+	  and doc.Modified <= t.Modified
+	  and hld.HD <= t.LastRead
+	where t.Priority = (select max(tt.Priority) 
+	                      from {0} tt 
+						            where tt.DocumentKind = doc.DocumentKind_Docflow_Sungero
+	                        and doc.DocumentDate_Docflow_Sungero <= tt.DocumentDate
+	                        and doc.Modified <= tt.Modified
+							and hld.HD <= t.LastRead)
+	and t.Storage != doc.Storage_Docflow_Sungero
+	and doc.Storage_Docflow_Sungero is not null
+	and t.NeedRetention = 1]]></default>
+  </query>
 </queries>

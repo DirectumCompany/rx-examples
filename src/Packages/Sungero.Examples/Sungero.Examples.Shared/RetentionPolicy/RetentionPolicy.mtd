@@ -1,0 +1,78 @@
+{
+  "$type": "Sungero.Metadata.EntityMetadata, Sungero.Metadata",
+  "NameGuid": "a44884f3-4812-4d3b-bcdb-fb4d32481a7c",
+  "Name": "RetentionPolicy",
+  "BaseGuid": "3af27f75-55f4-41be-802a-9424a8ba9c41",
+  "CanBeNavigationPropertyType": true,
+  "CreationAreaMetadata": {
+    "NameGuid": "f7766750-eee2-4fcd-8003-5c06a90d1f44",
+    "Name": "CreationArea",
+    "Buttons": [],
+    "IsAncestorMetadata": true
+  },
+  "ExtraSearchProperties": [],
+  "FilterPanel": {
+    "NameGuid": "b0125fbd-3b91-4dbb-914a-689276216404",
+    "Name": "FilterPanel",
+    "Controls": [],
+    "IsAncestorMetadata": true
+  },
+  "IconResourcesKeys": [],
+  "LayeredFromGuid": "3af27f75-55f4-41be-802a-9424a8ba9c41",
+  "OperationsClass": "",
+  "Properties": [
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "d9dd3e69-ab52-45c4-9c3a-419a889c7ba6",
+      "Name": "DocumentKinds",
+      "EntityGuid": "142cd281-ceb3-4ff2-a455-726971bd3b11",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "EntityGuid"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.EnumPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "913f8f15-9b51-4114-a54d-457716d41f1f",
+      "Name": "DocumentDateType",
+      "DirectValues": [
+        {
+          "NameGuid": "9d484486-8e63-4094-9149-b821b8abc3f6",
+          "Name": "LastRead",
+          "Code": "LastRead"
+        }
+      ],
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "Values"
+      ]
+    }
+  ],
+  "PublicStructures": [],
+  "ResourcesKeys": [],
+  "RibbonCardMetadata": {
+    "NameGuid": "fe78f11a-edeb-432a-8f14-33e9b0fcdcf2",
+    "Name": "RibbonCard",
+    "Categories": [],
+    "Elements": [],
+    "Groups": [],
+    "IsAncestorMetadata": true,
+    "Pages": [],
+    "RibbonKind": "Card"
+  },
+  "RibbonCollectionMetadata": {
+    "NameGuid": "3d0573c5-e127-40b4-8081-1cb8a3f50613",
+    "Name": "RibbonCollection",
+    "Categories": [],
+    "Elements": [],
+    "Groups": [],
+    "IsAncestorMetadata": true,
+    "Pages": []
+  },
+  "Versions": [
+    {
+      "Type": "EntityMetadata",
+      "Number": 9
+    }
+  ]
+}
