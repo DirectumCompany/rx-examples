@@ -81,7 +81,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     public override bool CanConvertToPdfInteractively(Sungero.Docflow.IOfficialDocument document)
     {
       var jpgFormatsList = new List<string>() { "jpg", "jpeg" };
-      if (jpgFormatsList.Contains(document.LastVersion.Body.DataType.ToLower()))
+      if (jpgFormatsList.Contains(document.LastVersion.BodyAssociatedApplication.Extension.ToLower()))
         return Locks.GetLockInfo(document).IsLockedByMe || !Locks.GetLockInfo(document).IsLocked;
       
       return base.CanConvertToPdfInteractively(document);
