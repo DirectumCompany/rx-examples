@@ -826,7 +826,11 @@ namespace Sungero.Capture.Server
       // Но нужно будет продумать, что с этим, в итоге, делать.
       // Также имя пока передавать в additionalInfo (при решении учесть US 97236).
       var arioDocument = Sungero.SmartProcessing.Structures.Module.ArioDocument.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, name);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document,
+                                                                         arioDocument.RecognitionInfo,
+                                                                         arioDocument.Facts,
+                                                                         responsible,
+                                                                         name);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
@@ -846,7 +850,11 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.RecordManagement.IncomingLetters.Create();
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document,
+                                                                         arioDocument.RecognitionInfo,
+                                                                         arioDocument.Facts,
+                                                                         responsible,
+                                                                         null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
@@ -1110,7 +1118,11 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateContractStatement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = FinancialArchive.ContractStatements.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document,
+                                                                         arioDocument.RecognitionInfo,
+                                                                         arioDocument.Facts,
+                                                                         responsible,
+                                                                         null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       return document;
     }
@@ -1250,7 +1262,7 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = FinancialArchive.Waybills.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       return document;
     }
@@ -1458,7 +1470,7 @@ namespace Sungero.Capture.Server
 
       recognizedDocumentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, facts, responsible, recognizedDocumentParties);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document, arioDocument.RecognitionInfo, facts, responsible, recognizedDocumentParties);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
@@ -1479,7 +1491,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
@@ -1616,8 +1628,8 @@ namespace Sungero.Capture.Server
     public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
     {
       var document = Contracts.IncomingInvoices.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, 
-                                                              arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document, arioDocument.RecognitionInfo,
+                                                                         arioDocument.Facts, responsible, null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
@@ -1717,7 +1729,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.Contracts.Create();
 
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
@@ -1738,7 +1750,7 @@ namespace Sungero.Capture.Server
     {
       var document = Sungero.Contracts.SupAgreements.Create();
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
+      Docflow.PublicFunctions.OfficialDocument.FillPropertiesByArioFacts(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
       SmartProcessing.PublicFunctions.Module.FillDeliveryMethod(document, null);
       
       return document;
