@@ -31,6 +31,13 @@
   "Importance": "Low",
   "Jobs": [
     {
+      "NameGuid": "2ff6172c-7964-4df7-a294-88c77bc97ef2",
+      "Name": "SendNotificationForExpiringPowerOfAttorney",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T06:00:00"
+    },
+    {
       "NameGuid": "133f7487-283e-476c-8774-8c87f4bc892a",
       "Name": "ConvertDocumentToPdf",
       "Daily": "Repeat",
@@ -66,7 +73,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "3.3.14.1",
+  "Version": "3.3.52.1",
   "Widgets": [],
   "Versions": [
     {
