@@ -1402,7 +1402,7 @@ namespace Sungero.Capture.Server
       
       var buyerIsBusinessUnit = buyer != null && buyer.BusinessUnit != null;
       var sellerIsBusinessUnit = seller != null && seller.BusinessUnit != null;
-      var documentParties = Sungero.Docflow.Structures.Module.DocumentParties.Create();
+      var recognizedDocumentParties = Sungero.Docflow.Structures.Module.RecognizedDocumentParties.Create();
       if (buyerIsBusinessUnit && sellerIsBusinessUnit)
       {
         // Мультинорность. Уточнить НОР по ответственному.
@@ -1411,30 +1411,30 @@ namespace Sungero.Capture.Server
         {
           // Исходящий документ.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
-          documentParties.Counterparty = buyer;
-          documentParties.BusinessUnit = seller;
+          recognizedDocumentParties.Counterparty = buyer;
+          recognizedDocumentParties.BusinessUnit = seller;
         }
         else
         {
           // Входящий документ.
           document = FinancialArchive.IncomingTaxInvoices.Create();
-          documentParties.Counterparty = seller;
-          documentParties.BusinessUnit = buyer;
+          recognizedDocumentParties.Counterparty = seller;
+          recognizedDocumentParties.BusinessUnit = buyer;
         }
       }
       else if (buyerIsBusinessUnit)
       {
         // Входящий документ.
         document = FinancialArchive.IncomingTaxInvoices.Create();
-        documentParties.Counterparty = seller;
-        documentParties.BusinessUnit = buyer;
+        recognizedDocumentParties.Counterparty = seller;
+        recognizedDocumentParties.BusinessUnit = buyer;
       }
       else if (sellerIsBusinessUnit)
       {
         // Исходящий документ.
         document = FinancialArchive.OutgoingTaxInvoices.Create();
-        documentParties.Counterparty = buyer;
-        documentParties.BusinessUnit = seller;
+        recognizedDocumentParties.Counterparty = buyer;
+        recognizedDocumentParties.BusinessUnit = seller;
       }
       else
       {
@@ -1443,19 +1443,19 @@ namespace Sungero.Capture.Server
         {
           // Исходящий документ, потому что buyer - контрагент, а другой информации нет.
           document = FinancialArchive.OutgoingTaxInvoices.Create();
-          documentParties.Counterparty = buyer;
+          recognizedDocumentParties.Counterparty = buyer;
         }
         else
         {
           // Входящий документ.
           document = FinancialArchive.IncomingTaxInvoices.Create();
-          documentParties.Counterparty = seller;
+          recognizedDocumentParties.Counterparty = seller;
         }
       }
 
-      documentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
+      recognizedDocumentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
       
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, facts, responsible, arioDocument.SentByEmail, documentParties);
+      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, facts, responsible, arioDocument.SentByEmail, recognizedDocumentParties);
       
       return document;
     }
