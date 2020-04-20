@@ -123,7 +123,7 @@ namespace Sungero.Capture.Client
         else
         {
           Logger.DebugFormat("Captured Package Process. Has some errors with classification and facts extraction. {0}", fileName);
-          var document = Sungero.Docflow.PublicFunctions.Module.CreateSimpleDocumentFromFile(attachment, true, responsible);
+          var document = Sungero.Docflow.PublicFunctions.Module.CreateSimpleDocumentFromFile(attachment, responsible);
           Logger.DebugFormat("Captured Package Process. Simple document created. {0}", fileName);
           notRecognizedDocuments.Add(document);
         }
