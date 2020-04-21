@@ -875,18 +875,24 @@ namespace Sungero.Capture.Server
       FillDocumentKind(document);
       
       // Заполнить номер со стороны корреспондента.
-      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, FactNames.Letter,
-                                                                                FieldNames.Letter.Number,
-                                                                                props.InNumber);
-      document.InNumber = recognizedNumber.Number;
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedNumber.Fact, 
-                                                 FieldNames.Letter.Number, props.InNumber.Name, 
-                                                 document.InNumber, recognizedNumber.Probability);
+      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, FactNames.Letter, FieldNames.Letter.Number, props.InNumber);
+      if (recognizedNumber.Fact != null)
+      {
+        document.InNumber = recognizedNumber.Number;
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedNumber.Fact, 
+                                                   FieldNames.Letter.Number, props.InNumber.Name, 
+                                                   document.InNumber, recognizedNumber.Probability);
+      }
       
       // Заполнить дату со стороны корреспондента.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
-      document.Dated = Functions.Module.GetShortDate(DocflowPublicFunctions.GetFieldValue(dateFact, FieldNames.Letter.Date));
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
+      var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.Letter, FieldNames.Letter.Date);
+      if (recognizedDate.Fact != null)
+      {
+        document.Dated = recognizedDate.Date.ToString();
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedDate.Fact,
+                                                   FieldNames.Letter.Date, props.Dated.Name,
+                                                   document.Dated, recognizedDate.Probability);
+      }
       
       // Заполнить данные корреспондента.
       var correspondentNameFacts = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName);
@@ -1591,28 +1597,26 @@ namespace Sungero.Capture.Server
       }
       
       // Дата и номер.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
-      var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
-      if (!isDateValid)
-        date = Calendar.SqlMinValue;
-
-      document.Date = date;
-      
-      var dateProbability = isDateValid ?
-        Docflow.PublicFunctions.Module.GetFieldProbability(dateFact, Sungero.Docflow.Constants.Module.FieldNames.Document.Date) :
-        Docflow.Constants.Module.PropertyProbabilityLevels.Min;
-      
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, dateProbability);
+      var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date);
+      if (recognizedDate.Fact != null)
+      {
+        document.Date = recognizedDate.Date;
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedDate.Fact, FieldNames.FinancialDocument.Date,
+                                                   props.Date.Name, document.Date, recognizedDate.Probability);
+      }
       
       // Номер.
-      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, FactNames.FinancialDocument,
+      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts,
+                                                                                FactNames.FinancialDocument,
                                                                                 FieldNames.FinancialDocument.Number,
                                                                                 props.Number);
-      document.Number = recognizedNumber.Number;
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedNumber.Fact,
-                                                 FieldNames.FinancialDocument.Number, props.Number.Name,
-                                                 document.Number);
+      if (recognizedNumber.Fact != null)
+      {
+        document.Number = recognizedNumber.Number;
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedNumber.Fact, FieldNames.FinancialDocument.Number,
+                                                   props.Number.Name, document.Number, recognizedNumber.Probability);
+      }
+      
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
       document.TotalAmount = DocflowPublicFunctions.GetFieldNumericalValue(documentAmountFact, FieldNames.DocumentAmount.Amount);
@@ -1818,29 +1822,25 @@ namespace Sungero.Capture.Server
                                          string factName)
     {
       var props = document.Info.Properties;
+      
       // Дата.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
-      var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
-      if (!isDateValid)
-        date = Calendar.SqlMinValue;
-
-      document.RegistrationDate = date;
-      
-      var dateProbability = isDateValid ?
-        Docflow.PublicFunctions.Module.GetFieldProbability(dateFact, Sungero.Docflow.Constants.Module.FieldNames.Document.Date) :
-        Docflow.Constants.Module.PropertyProbabilityLevels.Min;
-      
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, dateProbability);
+      var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, factName, FieldNames.Document.Date);
+      if (recognizedDate.Fact != null)
+      {
+        document.RegistrationDate = recognizedDate.Date;
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedDate.Fact, FieldNames.Document.Date,
+                                                   props.RegistrationDate.Name, document.RegistrationDate, recognizedDate.Probability);
+      }
       
       // Номер.
-      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, factName,
-                                                                                FieldNames.Document.Number,
-                                                                                props.RegistrationNumber);
-      document.RegistrationNumber = recognizedNumber.Number;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedNumber.Fact, FieldNames.Document.Number,
-                                                 props.RegistrationNumber.Name, document.RegistrationNumber,
-                                                 recognizedNumber.Probability);
+      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, factName, FieldNames.Document.Number, props.RegistrationNumber);
+      if (recognizedNumber.Fact != null)
+      {
+        document.RegistrationNumber = recognizedNumber.Number;
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedNumber.Fact, FieldNames.Document.Number,
+                                                   props.RegistrationNumber.Name, document.RegistrationNumber,
+                                                   recognizedNumber.Probability);
+      }
     }
     
     #endregion
