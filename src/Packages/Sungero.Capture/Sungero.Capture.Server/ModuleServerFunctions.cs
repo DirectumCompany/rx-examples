@@ -886,13 +886,11 @@ namespace Sungero.Capture.Server
       
       // Заполнить дату со стороны корреспондента.
       var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.Letter, FieldNames.Letter.Date);
-      if (recognizedDate.Fact != null)
-      {
-        document.Dated = recognizedDate.Date.ToString();
-        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedDate.Fact,
-                                                   FieldNames.Letter.Date, props.Dated.Name,
-                                                   document.Dated, recognizedDate.Probability);
-      }
+      Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
+                                                                        arioDocument.RecognitionInfo,
+                                                                        recognizedDate,
+                                                                        FieldNames.Letter.Date,
+                                                                        props.Dated.Name);
       
       // Заполнить данные корреспондента.
       var correspondentNameFacts = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName);
@@ -1598,12 +1596,11 @@ namespace Sungero.Capture.Server
       
       // Дата и номер.
       var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date);
-      if (recognizedDate.Fact != null)
-      {
-        document.Date = recognizedDate.Date;
-        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedDate.Fact, FieldNames.FinancialDocument.Date,
-                                                   props.Date.Name, document.Date, recognizedDate.Probability);
-      }
+      Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
+                                                                        recognitionInfo,
+                                                                        recognizedDate,
+                                                                        FieldNames.FinancialDocument.Date,
+                                                                        props.Date.Name);
       
       // Номер.
       var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts,
@@ -1825,12 +1822,11 @@ namespace Sungero.Capture.Server
       
       // Дата.
       var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, factName, FieldNames.Document.Date);
-      if (recognizedDate.Fact != null)
-      {
-        document.RegistrationDate = recognizedDate.Date;
-        DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedDate.Fact, FieldNames.Document.Date,
-                                                   props.RegistrationDate.Name, document.RegistrationDate, recognizedDate.Probability);
-      }
+      Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
+                                                                        recognitionInfo,
+                                                                        recognizedDate,
+                                                                        FieldNames.Document.Date,
+                                                                        props.RegistrationDate.Name);
       
       // Номер.
       var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, factName, FieldNames.Document.Number, props.RegistrationNumber);
