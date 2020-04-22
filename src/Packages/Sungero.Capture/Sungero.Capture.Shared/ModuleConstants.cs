@@ -6,56 +6,10 @@ namespace Sungero.Capture.Constants
 {
   public static class Module
   {
-    // Имя типа связи "Прочие".
-    [Sungero.Core.Public]
-    public const string SimpleRelationRelationName = "Simple relation";
-    
     // Ключ параметра демо-режима.
     [Sungero.Core.Public]
     public const string CaptureMockModeKey = "CaptureMockMode";
-    
-    // Сообщение при успешном подключении к Ario.
-    [Sungero.Core.Public]
-    public const string ArioConnectionSuccessMessage = "SmartService is running";    
-    
-    // Наименование правил для извлечения фактов Ario.
-    public static class ArioGrammarNames
-    {
-      [Sungero.Core.Public]
-      public const string Letter = "Letter";
-      
-      [Sungero.Core.Public]
-      public const string ContractStatement = "ContractStatement";
-      
-      [Sungero.Core.Public]
-      public const string Waybill = "Waybill";
-      
-      [Sungero.Core.Public]
-      public const string UniversalTransferDocument = "GeneralTransferDocument";
-      
-      [Sungero.Core.Public]
-      public const string UniversalTransferCorrectionDocument = "GeneralCorrectionDocument";
-      
-      [Sungero.Core.Public]
-      public const string TaxInvoice = "TaxInvoice";
-      
-      [Sungero.Core.Public]
-      public const string TaxinvoiceCorrection = "TaxinvoiceCorrection";
-      
-      [Sungero.Core.Public]
-      public const string IncomingInvoice = "IncomingInvoice";
-      
-      [Sungero.Core.Public]
-      public const string Contract = "Contract";
-      
-      [Sungero.Core.Public]
-      public const string SupAgreement = "SupAgreement";
-    }
-    
-    // Имя параметра: заблокирован ли документ.
-    [Sungero.Core.Public]
-    public const string DocumentIsLockedParamName = "DocumentIsLocked";    
-      
+
     public static class Initialize
     {
       public static readonly Guid MockIncomingLetterKindGuid = Guid.Parse("E37D0916-7814-441E-84EF-904B7B643497");
@@ -64,97 +18,6 @@ namespace Sungero.Capture.Constants
       public static readonly Guid MockIncomingTaxInvoiceGuid = Guid.Parse("69A7B4C2-7D6C-4F36-B760-B6D048EE40A4");
       public static readonly Guid MockIncomingInvoiceGuid = Guid.Parse("a2f02dd2-ae5b-4659-b9d1-cfcfa1f56734");
       public static readonly Guid MockContractGuid = Guid.Parse("3803bce4-67ff-4c9c-af63-7e305ae7ed69");
-    }
-    
-    // Типы источников захвата.
-    public static class CaptureSourceType
-    {
-      [Sungero.Core.Public]
-      public const string Folder = "folder";
-      
-      [Sungero.Core.Public]
-      public const string Mail = "mail";
-    }
-    
-    // Наименования для тела письма с электронной почты.
-    public static class MailBodyName
-    {
-      [Sungero.Core.Public]
-      public const string Html = "body.html";
-      
-      [Sungero.Core.Public]
-      public const string Txt = "body.txt";
-    }
-    
-    // Названия тегов файла DeviceInfo.xml с информацией об устройствах ввода.
-    public static class DeviceInfoTagNames
-    {
-      // Корневой узел для электронной почты.
-      [Sungero.Core.Public]
-      public const string MailSourceInfo = "MailSourceInfo";
-      
-      // Узел c информацией об отправляемых в конечную систему файлах.
-      [Sungero.Core.Public]
-      public const string Files = "Files";
-      
-      // Узел c именем файла без пути.
-      [Sungero.Core.Public]
-      public const string FileDescription = "FileDescription";
-      
-      // Узел c именем захваченного файла относительно папки InputFiles.
-      [Sungero.Core.Public]
-      public const string FileName = "FileName";
-    }
-    
-    // Названия тегов файла InputFiles.xml с информацией об отправляемых в систему файлах службой DCS.
-    public static class InputFilesTagNames
-    {
-      // Корневой узел.
-      [Sungero.Core.Public]
-      public const string InputFilesSection = "InputFilesSection";
-      
-      // Узел c информацией об отправляемых в конечную систему файлах.
-      [Sungero.Core.Public]
-      public const string Files = "Files";
-      
-      // Узел c именем файла без пути.
-      [Sungero.Core.Public]
-      public const string FileDescription = "FileDescription";
-      
-      // Узел c именем захваченного файла относительно папки InputFiles.
-      [Sungero.Core.Public]
-      public const string FileName = "FileName";
-    }
-    
-    // Названия тегов файла InstanceInfos.xml с информацией об экземплярах ввода и о захваченных файлах службой DCS.
-    public static class InstanceInfosTagNames
-    {
-      // Корневой узел для ввода из файловой системы.
-      [Sungero.Core.Public]
-      public const string CaptureInstanceInfoList = "CaptureInstanceInfoList";
-      
-      // Корневой узел для ввода с почтового сервера.
-      [Sungero.Core.Public]
-      public const string MailCaptureInstanceInfo = "MailCaptureInstanceInfo";
-      
-      // Узел c темой почтового сообщения, полученного по электронной почте.
-      [Sungero.Core.Public]
-      public const string Subject = "Subject";
-      
-      // Узел c информацией об отправителе письма.
-      [Sungero.Core.Public]
-      public const string From = "From";
-      
-      public static class FromTags
-      {
-        // Узел c адресом отправителя письма.
-        [Sungero.Core.Public]
-        public const string Address = "Address";
-        
-        // Узел c именем отправителя письма.
-        [Sungero.Core.Public]
-        public const string Name = "Name";
-      }
     }
   }
 }
