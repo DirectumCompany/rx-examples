@@ -1597,7 +1597,7 @@ namespace Sungero.Capture.Server
       // Дата и номер.
       var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date);
       Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
-                                                                        recognitionInfo,
+                                                                        arioDocument.RecognitionInfo,
                                                                         recognizedDate,
                                                                         FieldNames.FinancialDocument.Date,
                                                                         props.Date.Name);
