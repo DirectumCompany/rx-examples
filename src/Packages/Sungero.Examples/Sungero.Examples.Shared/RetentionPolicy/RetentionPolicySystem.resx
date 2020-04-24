@@ -118,15 +118,15 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Enum_DocumentDateType_LastRead" xml:space="preserve">
-    <value>TODO</value>
+    <value>Document accessed</value>
   </data>
   <data name="Enum_DocumentDateType_Modified" xml:space="preserve">
-    <value>TODO</value>
+    <value>Document modified</value>
   </data>
   <data name="Enum_DocumentDateType_DocumentDate" xml:space="preserve">
-    <value>TODO</value>
+    <value>Document created/registered</value>
   </data>
   <data name="Property_DocumentDateType" xml:space="preserve">
-    <value>TODO</value>
+    <value>Event</value>
   </data>
 </root>
