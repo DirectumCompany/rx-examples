@@ -33,12 +33,12 @@ namespace Sungero.Capture.Server
                (t.Subject.Contains(Resources.CheckPackage) ||
                 t.Subject.Contains(Resources.CheckDocument)));
       
-      foreach(var documentId in documentIds)
+      foreach (var documentId in documentIds)
       {
         if (processedIds.Contains(documentId))
           continue;
         
-        // Берем задачи по документу, чтобы отсеять все задачи, уже обработанные ФП.
+        // Взять задачи по документу, чтобы отсеять все задачи, уже обработанные ФП.
         var documentVerificationTasks = verificationTasks
           .Where(vt => vt.AttachmentDetails.Any(att => att.AttachmentId == documentId))
           .OrderByDescending(s => s.Started);
@@ -50,7 +50,7 @@ namespace Sungero.Capture.Server
         if (task.Status != Workflow.Task.Status.Completed)
           continue;
         
-        // Дополнительно проверять вложения на возможность смены статуса верификации.
+        // Дополнительно проверить вложения на возможность смены статуса верификации.
         var attachmentIds = task.AttachmentDetails.Select(att => att.EntityId).ToList();
         var attachedDocumentsVerificationEnabled = Docflow.OfficialDocuments.GetAll()
           .Where(d => attachmentIds.Contains(d.Id))
