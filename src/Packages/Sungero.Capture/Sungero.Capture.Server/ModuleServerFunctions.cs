@@ -108,751 +108,9 @@ namespace Sungero.Capture.Server
     }
     
     #endregion
-    
-    #region Общий процесс обработки захваченных документов
-    
-    /// <summary>
-    /// Обработать документы комплекта.
-    /// </summary>
-    /// <param name="package">Распознанные документы комплекта.</param>
-    /// <param name="notRecognizedDocuments">Нераспознанные документы комплекта.</param>
-    /// <param name="isNeedRenameNotClassifiedDocumentNames">Признак необходимости переименовать неклассифицированные документы в комплекте.</param>
-    /// <returns>Список Id созданных документов.</returns>
-    [Remote]
-    public virtual Structures.Module.IDocumentsCreatedByRecognitionResults ProcessPackageAfterCreationDocuments(List<IOfficialDocument> package,
-                                                                                                                List<IOfficialDocument> notRecognizedDocuments,
-                                                                                                                bool isNeedRenameNotClassifiedDocumentNames)
-    {
-      var result = Structures.Module.DocumentsCreatedByRecognitionResults.Create();
-      if (!package.Any() && (notRecognizedDocuments == null || !notRecognizedDocuments.Any()))
-        return result;
-      
-      // Сформировать список документов, которые не смогли пронумеровать.
-      var documentsWithRegistrationFailure = package.Where(d => IsDocumentRegistrationFailed(d)).ToList();
-      
-      // Сформировать список документов, которые найдены по штрихкоду.
-      var documentsFoundByBarcode = package.Where(d => IsDocumentFoundByBarcode(d));
-      documentsFoundByBarcode = documentsFoundByBarcode.Select(d => RemoveFoundByBarcodeParameter(d)).ToList();
-      
-      // Сформировать список заблокированных документов.
-      var lockedDocuments = package.Where(d => IsDocumentLocked(d)).ToList();
-      
-      // Получить ведущий документ из распознанных документов комплекта. Если список пуст, то из нераспознанных.
-      var leadingDocument = package.Any() ? GetLeadingDocument(package) : GetLeadingDocument(notRecognizedDocuments);
-      LinkDocuments(leadingDocument, package, notRecognizedDocuments);
-      
-      // Для документов, нераспознанных Ario:
-      // со сканера - заполнить имена,
-      // с электронной почты - заполнять имена не надо, они будут как у исходного вложения.
-      if (isNeedRenameNotClassifiedDocumentNames)
-        RenameNotClassifiedDocuments(leadingDocument, package);
-      
-      // Добавить документы, не распознанные Ario, к документам комплекта, чтобы вложить в задачу на обработку.
-      if (notRecognizedDocuments != null && notRecognizedDocuments.Any())
-        package.AddRange(notRecognizedDocuments);
-      
-      result.LeadingDocumentId = leadingDocument.Id;
-      result.RelatedDocumentIds = package.Select(x => x.Id).Where(d => d != result.LeadingDocumentId).ToList();
-      result.DocumentWithRegistrationFailureIds = documentsWithRegistrationFailure.Select(x => x.Id).ToList();
-      result.DocumentFoundByBarcodeIds = documentsFoundByBarcode.Select(x => x.Id).ToList();
-      result.LockedDocumentIds = lockedDocuments.Select(x => x.Id).ToList();
-      return result;
-    }
-    
-    /// <summary>
-    /// Создать документы в RX.
-    /// </summary>
-    /// <param name="recognitionResultsJson">Json результаты классификации и извлечения фактов.</param>
-    /// <param name="originalFile">Исходный файл, полученный с DCS.</param>
-    /// <param name="responsible">Сотрудник, ответственный за проверку документов.</param>
-    /// <param name="sendedByEmail">Доставлено эл.почтой.</param>
-    /// <param name="fromEmail">Адрес эл.почты отправителя.(Не используется, добавлен для перекрытия)</param>
-    /// <returns>Ид созданных документов.</returns>
-    [Remote]
-    public virtual List<IOfficialDocument> CreateDocumentsByRecognitionResults(string recognitionResultsJson, Sungero.Docflow.Structures.Module.IFileDto originalFile,
-                                                                               IEmployee responsible, bool sendedByEmail, string fromEmail)
-    {
-      var recognitionResults = GetRecognitionResults(recognitionResultsJson, originalFile, sendedByEmail);
-      var package = new List<IOfficialDocument>();
-      var documentsWithRegistrationFailure = new List<IOfficialDocument>();
-      
-      foreach (var recognitionResult in recognitionResults)
-      {
-        var arioUrl = Docflow.PublicFunctions.SmartProcessingSetting.GetArioUrl();
-        var document = OfficialDocuments.Null;
-        using (var body = SmartProcessing.PublicFunctions.Module.GetDocumentBody(arioUrl, recognitionResult.BodyGuid))
-        {
-          var docId = Functions.Module.SearchDocumentBarcodeIds(body).FirstOrDefault();
-          // FOD на пустом List<int> вернет 0.
-          if (docId != 0)
-          {
-            document = OfficialDocuments.GetAll().FirstOrDefault(x => x.Id == docId);
-            if (document != null)
-            {
-              var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-              var documentLockInfo = Locks.GetLockInfo(document);
-              if (documentLockInfo.IsLocked)
-                documentParams[Constants.Module.DocumentIsLockedParamName] = true;
-              else
-              {
-                documentParams[Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName] = true;
-                SmartProcessing.PublicFunctions.Module.CreateVersion(document, recognitionResult, Sungero.Docflow.OfficialDocuments.Resources.VersionCreatedByCaptureService);
-                
-                // Заполнить статус верификации для документов, в которых поддерживается режим верификации.
-                // Сделано для проставления статуса верификации у документов занесенных по ШК.
-                #warning rassokhina У документов по ШК должен проставляться статус верификации "В процессе"?
-                if (Docflow.PublicFunctions.OfficialDocument.IsVerificationModeSupported(document))
-                  document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-                document.Save();
-              }
-            }
-          }
-        }
-        
-        // Создание нового документа по фактам.
-        if (document == null)
-          document = CreateDocumentByRecognitionResult(recognitionResult, responsible);
-        
-        // Добавить ИД документа в запись справочника с результатами обработки Ario.
-        recognitionResult.RecognitionInfo.EntityId = document.Id;
-        // Заполнить поле Тип сущности guid'ом конечного типа сущности.
-        recognitionResult.RecognitionInfo.EntityType = document.GetEntityMetadata().GetOriginal().NameGuid.ToString();
-        recognitionResult.RecognitionInfo.Save();
-        
-        package.Add(document);
-      }
-      
-      return package;
-    }
-    
-    /// <summary>
-    /// Переименовать неклассифицированные документы в комплекте.
-    /// </summary>
-    /// <param name="leadingDocument">Ведущий документ.</param>
-    /// <param name="package">Комплект документов.</param>
-    /// <remarks>
-    /// Если неклассифицированных документов несколько и ведущий документ простой,
-    /// то у ведущего будет номер 1, у остальных - следующие по порядку.
-    /// </remarks>
-    public virtual void RenameNotClassifiedDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package)
-    {
-      // Если ведущий документ SimpleDocument, то переименовываем его,
-      // для того чтобы в имени содержался его порядковый номер.
-      int simpleDocumentNumber = 1;
-      var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
-      if (leadingDocumentIsSimple)
-      {
-        leadingDocument.Name = Resources.DocumentNameFormat(simpleDocumentNumber);
-        leadingDocument.Save();
-        simpleDocumentNumber++;
-      }
-      
-      var addendums = package.Where(x => !Equals(x, leadingDocument));
-      foreach (var addendum in addendums)
-      {
-        // У простых документов, захваченных с почты, имя не меняется.
-        if (SimpleDocuments.Is(addendum))
-        {
-          addendum.Name = leadingDocumentIsSimple
-            ? Resources.DocumentNameFormat(simpleDocumentNumber)
-            : Resources.AttachmentNameFormat(simpleDocumentNumber);
-          addendum.Save();
-          simpleDocumentNumber++;
-        }
-      }
-    }
-    
-    /// <summary>
-    /// Связать документы комплекта.
-    /// </summary>
-    /// <param name="leadingDocument">Ведущий документ.</param>
-    /// <param name="package">Распознанные документы комплекта.</param>
-    /// <param name="notRecognizedDocuments">Нераспознанные документы комплекта.</param>
-    /// <remarks>
-    /// Для распознанных документов комплекта, если ведущий документ - простой, то тип связи - "Прочие". Иначе "Приложение".
-    /// Для нераспознанных документов комплекта - тип связи "Прочие".
-    /// </remarks>
-    public virtual void LinkDocuments(IOfficialDocument leadingDocument, List<IOfficialDocument> package, List<IOfficialDocument> notRecognizedDocuments)
-    {
-      var leadingDocumentIsSimple = SimpleDocuments.Is(leadingDocument);
-      
-      var relation = leadingDocumentIsSimple
-        ? Constants.Module.SimpleRelationRelationName
-        : Docflow.PublicConstants.Module.AddendumRelationName;
-      
-      // Связать приложения с ведущим документом.
-      var addendums = package.Where(x => !Equals(x, leadingDocument));
-      foreach (var addendum in addendums)
-      {
-        addendum.Relations.AddFrom(relation, leadingDocument);
-        addendum.Save();
-      }
-      
-      // Связать нераспознанные документы с ведущим документом, тип связи - "Прочие".
-      if (notRecognizedDocuments != null)
-      {
-        notRecognizedDocuments = notRecognizedDocuments.Where(x => !Equals(x, leadingDocument)).ToList();
-        foreach (var notRecognizedDocument in notRecognizedDocuments)
-        {
-          notRecognizedDocument.Relations.AddFrom(Constants.Module.SimpleRelationRelationName, leadingDocument);
-          notRecognizedDocument.Save();
-        }
-      }
-    }
-    
-    /// <summary>
-    /// Проверить, пронумерован ли документ.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>True, если документ успешно пронумерован. Иначе False.</returns>
-    public virtual bool IsDocumentRegistrationFailed(IOfficialDocument document)
-    {
-      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      return documentParams.ContainsKey(Sungero.Docflow.Constants.OfficialDocument.DocumentNumberingBySmartCaptureResultParamName);
-    }
-    
-    /// <summary>
-    /// Удалить параметр о нахождении документа по штрихкоду.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>Документ с удалённым параметром.</returns>
-    public virtual IOfficialDocument RemoveFoundByBarcodeParameter(IOfficialDocument document)
-    {
-      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      documentParams.Remove(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName);
-      return document;
-    }
-    
-    /// <summary>
-    /// Проверить, не найден ли уже существующий документ в Rx по штрихкоду.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>True, если документ найден в Rx по штрихкоду. Иначе False.</returns>
-    public virtual bool IsDocumentFoundByBarcode(IOfficialDocument document)
-    {
-      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      return documentParams.ContainsKey(Docflow.PublicConstants.OfficialDocument.FindByBarcodeParamName);
-    }
-    
-    /// <summary>
-    /// Проверить, заблокирован ли документ.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>True, если документ заблокирован. Иначе False.</returns>
-    public virtual bool IsDocumentLocked(IOfficialDocument document)
-    {
-      var documentParams = ((Domain.Shared.IExtendedEntity)document).Params;
-      return documentParams.ContainsKey(Constants.Module.DocumentIsLockedParamName);
-    }
-    
-    /// <summary>
-    /// Десериализовать результат классификации комплекта или отдельного документа в Ario.
-    /// </summary>
-    /// <param name="jsonClassificationResults">Json с результатами классификации и извлечения фактов.</param>
-    /// <param name="file">Исходный файл.</param>
-    /// <param name="sendedByEmail">Файл получен из эл.почты.</param>
-    /// <returns>Десериализованный результат классификации в Ario.</returns>
-    public virtual List<Sungero.SmartProcessing.Structures.Module.IArioDocument> GetRecognitionResults(string jsonClassificationResults,
-                                                                                                       Sungero.Docflow.Structures.Module.IFileDto file,
-                                                                                                       bool sentByEmail)
-    {
-      var arioDocuments = new List<Sungero.SmartProcessing.Structures.Module.IArioDocument>();
-      if (string.IsNullOrWhiteSpace(jsonClassificationResults))
-        return arioDocuments;
-      
-      var packageProcessResults = ArioExtensions.ArioConnector.DeserializeClassifyAndExtractFactsResultString(jsonClassificationResults);
-      foreach (var packageProcessResult in packageProcessResults)
-      {
-        // Класс и гуид тела документа.
-        var arioDocument = Sungero.SmartProcessing.Structures.Module.ArioDocument.Create();
-        var clsResult = packageProcessResult.ClassificationResult;
-        arioDocument.ClassificationResultId = clsResult.Id;
-        arioDocument.BodyGuid = packageProcessResult.Guid;
-        arioDocument.PredictedClass = clsResult.PredictedClass != null ? clsResult.PredictedClass.Name : string.Empty;
-        arioDocument.Message = packageProcessResult.Message;
-        arioDocument.File = file;
-        arioDocument.SentByEmail = sentByEmail;
-        var docInfo = Commons.EntityRecognitionInfos.Create();
-        docInfo.Name = arioDocument.PredictedClass;
-        docInfo.RecognizedClass = arioDocument.PredictedClass;
-        if (clsResult.PredictedProbability != null)
-          docInfo.ClassProbability = (double)(clsResult.PredictedProbability);
-        
-        // Факты и поля фактов.
-        arioDocument.Facts = new List<Sungero.Docflow.Structures.Module.IArioFact>();
-        var smartProcessingSettings = Docflow.PublicFunctions.SmartProcessingSetting.GetSettings();
-        //var minFactProbability = smartProcessingSettings.LowerConfidenceLimit;
-        if (packageProcessResult.ExtractionResult.Facts != null)
-        {
-          var pages = packageProcessResult.ExtractionResult.DocumentPages;
-          var facts = packageProcessResult.ExtractionResult.Facts
-            .Where(f => !string.IsNullOrWhiteSpace(f.Name))
-            .Where(f => f.Fields.Any())
-            .ToList();
-          foreach (var fact in facts)
-          {
-            var fields = fact.Fields.Where(f => f != null)
-              .Where(f => f.Probability >= smartProcessingSettings.LowerConfidenceLimit)
-              .Select(f => Sungero.Docflow.Structures.Module.ArioFactField.Create(f.Id, f.Name, f.Value, f.Probability));
-            arioDocument.Facts.Add(Sungero.Docflow.Structures.Module.ArioFact.Create(fact.Id, fact.Name, fields.ToList()));
-            
-            foreach (var factField in fact.Fields)
-            {
-              var fieldInfo = docInfo.Facts.AddNew();
-              fieldInfo.FactId = fact.Id;
-              fieldInfo.FieldId = factField.Id;
-              fieldInfo.FactName = fact.Name;
-              fieldInfo.FieldName = factField.Name;
-              fieldInfo.FieldProbability = factField.Probability;
-              var fieldValue = factField.Value;
-              if (fieldValue != null && fieldValue.Length > 1000)
-              {
-                fieldValue = fieldValue.Substring(0, 1000);
-                Logger.DebugFormat("WARN. Value truncated. Length is over 1000 characters. GetRecognitionResults. FactID({0}). FieldID({1}).",
-                                   fact.Id,
-                                   factField.Id);
-              }
-              fieldInfo.FieldValue = fieldValue;
-              
-              
-              // Позиция подсветки фактов в теле документа.
-              if (factField.Positions != null)
-              {
-                var positions = factField.Positions
-                  .Where(p => p != null)
-                  .Select(p => string.Format("{1}{0}{2}{0}{3}{0}{4}{0}{5}{0}{6}{0}{7}",
-                                             Docflow.Constants.Module.PositionElementDelimiter,
-                                             p.Page,
-                                             (int)Math.Round(p.Top),
-                                             (int)Math.Round(p.Left),
-                                             (int)Math.Round(p.Width),
-                                             (int)Math.Round(p.Height),
-                                             (int)Math.Round(pages.Where(x => x.Number == p.Page).Select(x => x.Width).FirstOrDefault()),
-                                             (int)Math.Round(pages.Where(x => x.Number == p.Page).Select(x => x.Height).FirstOrDefault())));
-                fieldInfo.Position = string.Join(Docflow.Constants.Module.PositionsDelimiter.ToString(), positions);
-              }
-            }
-          }
-        }
-        docInfo.Save();
-        arioDocument.RecognitionInfo = docInfo;
-        arioDocuments.Add(arioDocument);
-      }
-      return arioDocuments;
-    }
-    
-    /// <summary>
-    /// Создать документ DirectumRX из результата классификации в Ario.
-    /// </summary>
-    /// <param name="arioDocument">Результат классификации в Ario.</param>
-    /// <param name="responsible">Ответственный сотрудник.</param>
-    /// <returns>Документ, созданный на основе классификации.</returns>
-    public virtual IOfficialDocument CreateDocumentByRecognitionResult(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument,
-                                                                       IEmployee responsible)
-    {
-      // Входящее письмо.
-      var predictedClass = arioDocument.PredictedClass;
-      var isMockMode = Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null;
-      var document = OfficialDocuments.Null;
-      if (predictedClass == ArioClassNames.Letter)
-      {
-        document = isMockMode
-          ? CreateMockIncomingLetter(arioDocument)
-          : CreateIncomingLetter(arioDocument, responsible);
-      }
-      
-      // Акт выполненных работ.
-      else if (predictedClass == ArioClassNames.ContractStatement)
-      {
-        document = isMockMode
-          ? CreateMockContractStatement(arioDocument)
-          : CreateContractStatement(arioDocument, responsible);
-      }
-      
-      // Товарная накладная.
-      else if (predictedClass == ArioClassNames.Waybill)
-      {
-        document = isMockMode
-          ? CreateMockWaybill(arioDocument)
-          : CreateWaybill(arioDocument, responsible);
-      }
-      
-      // Счет-фактура.
-      else if (predictedClass == ArioClassNames.TaxInvoice)
-      {
-        document = isMockMode
-          ? CreateMockIncomingTaxInvoice(arioDocument)
-          : CreateTaxInvoice(arioDocument, false, responsible);
-      }
-      
-      // Корректировочный счет-фактура.
-      else if (predictedClass == ArioClassNames.TaxinvoiceCorrection && !isMockMode)
-      {
-        document = CreateTaxInvoice(arioDocument, true, responsible);
-      }
-      
-      // УПД.
-      else if (predictedClass == ArioClassNames.UniversalTransferDocument && !isMockMode)
-      {
-        document = CreateUniversalTransferDocument(arioDocument, false, responsible);
-      }
-      
-      // УКД.
-      else if (predictedClass == ArioClassNames.UniversalTransferCorrectionDocument && !isMockMode)
-      {
-        document = CreateUniversalTransferDocument(arioDocument, true, responsible);
-      }
-      
-      // Счет на оплату.
-      else if (predictedClass == ArioClassNames.IncomingInvoice)
-      {
-        document = isMockMode
-          ? CreateMockIncomingInvoice(arioDocument)
-          : CreateIncomingInvoice(arioDocument, responsible);
-      }
-      
-      // Договор.
-      else if (predictedClass == ArioClassNames.Contract)
-      {
-        document = isMockMode
-          ? CreateMockContract(arioDocument)
-          : CreateContract(arioDocument, responsible);
-      }
-      
-      // Доп.соглашение.
-      else if (predictedClass == ArioClassNames.SupAgreement && !isMockMode)
-      {
-        document = CreateSupAgreement(arioDocument, responsible);
-      }
-      
-      // Все нераспознанные документы создать простыми.
-      else
-      {
-        var name = !string.IsNullOrWhiteSpace(arioDocument.File.Description) ? arioDocument.File.Description : Resources.SimpleDocumentName;
-        document = CreateSimpleDocument(name, responsible);
-      }
-      
-      SmartProcessing.PublicFunctions.Module.CreateVersion(document, arioDocument, string.Empty);
-      
-      // Заполнить статус верификации для документов, в которых поддерживается режим верификации.
-      // Сделано для проставления статуса верификации у документов занесенных по ШК.
-      #warning rassokhina У документов по ШК должен проставляться статус верификации "В процессе"?
-      if (Docflow.PublicFunctions.OfficialDocument.IsVerificationModeSupported(document))
-        document.VerificationState = Docflow.OfficialDocument.VerificationState.InProcess;
-      document.Save();
-      return document;
-    }
-    
-    /// <summary>
-    /// Получить приоритеты типов документов для определения ведущего документа в комплекте.
-    /// </summary>
-    /// <returns>Словарь с приоритетами типов.</returns>
-    public virtual System.Collections.Generic.IDictionary<System.Type, int> GetPackageDocumentTypePriorities()
-    {
-      var leadingDocumentPriority = new Dictionary<System.Type, int>();
-      
-      if (Docflow.PublicFunctions.Module.GetDocflowParamsValue(Constants.Module.CaptureMockModeKey) != null)
-      {
-        leadingDocumentPriority.Add(MockIncomingLetters.Info.GetType().GetFinalType(), 6);
-        leadingDocumentPriority.Add(MockContracts.Info.GetType().GetFinalType(), 5);
-        leadingDocumentPriority.Add(MockContractStatements.Info.GetType().GetFinalType(), 4);
-        leadingDocumentPriority.Add(MockWaybills.Info.GetType().GetFinalType(), 3);
-        leadingDocumentPriority.Add(MockIncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
-        leadingDocumentPriority.Add(MockIncomingInvoices.Info.GetType().GetFinalType(), 1);
-        leadingDocumentPriority.Add(SimpleDocuments.Info.GetType().GetFinalType(), 0);
-      }
-      else
-      {
-        leadingDocumentPriority.Add(IncomingLetters.Info.GetType().GetFinalType(), 7);
-        leadingDocumentPriority.Add(Contracts.Contracts.Info.GetType().GetFinalType(), 6);
-        leadingDocumentPriority.Add(Contracts.SupAgreements.Info.GetType().GetFinalType(), 5);
-        leadingDocumentPriority.Add(Sungero.FinancialArchive.ContractStatements.Info.GetType().GetFinalType(), 4);
-        leadingDocumentPriority.Add(Sungero.FinancialArchive.Waybills.Info.GetType().GetFinalType(), 3);
-        leadingDocumentPriority.Add(Sungero.FinancialArchive.IncomingTaxInvoices.Info.GetType().GetFinalType(), 2);
-        leadingDocumentPriority.Add(Sungero.Contracts.IncomingInvoices.Info.GetType().GetFinalType(), 1);
-        leadingDocumentPriority.Add(SimpleDocuments.Info.GetType().GetFinalType(), 0);
-      }
-      return leadingDocumentPriority;
-    }
-    
-    /// <summary>
-    /// Определить ведущий документ распознанного комплекта.
-    /// </summary>
-    /// <param name="package">Комплект документов.</param>
-    /// <returns>Ведущий документ.</returns>
-    public virtual IOfficialDocument GetLeadingDocument(List<IOfficialDocument> package)
-    {
-      var packagePriority = new Dictionary<IOfficialDocument, int>();
-      var leadingDocumentPriority = GetPackageDocumentTypePriorities();
-      int priority;
-      foreach (var document in package)
-      {
-        leadingDocumentPriority.TryGetValue(document.Info.GetType().GetFinalType(), out priority);
-        packagePriority.Add(document, priority);
-      }
-      
-      var leadingDocument = packagePriority.OrderByDescending(p => p.Value).FirstOrDefault().Key;
-      return leadingDocument;
-    }
-    
-    /// <summary>
-    /// Отправить задачу на проверку документов.
-    /// </summary>
-    /// <param name="leadingDocument">Ведущий документ.</param>
-    /// <param name="documents">Прочие документы из комплекта.</param>
-    /// <param name="documentsWithRegistrationFailure">Документы, которые не удалось зарегистрировать.</param>
-    /// <param name="documentsFoundByBarcode">Документы, найденные по штрихкоду.</param>
-    /// <param name="lockedDocuments">Документы, которые были заблокированы.</param>
-    /// <param name="emailBody">Тело электронного письма.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Простая задача.</returns>
-    [Public, Remote]
-    public virtual void SendToResponsible(IOfficialDocument leadingDocument, List<IOfficialDocument> documents,
-                                          List<IOfficialDocument> documentsWithRegistrationFailure,
-                                          List<IOfficialDocument> documentsFoundByBarcode,
-                                          List<IOfficialDocument> lockedDocuments,
-                                          Docflow.IOfficialDocument emailBody, Company.IEmployee responsible)
-    {
-      if (leadingDocument == null)
-        return;
-      
-      // Собрать пакет документов. Порядок важен, чтобы ведущий был первым.
-      var package = new List<IOfficialDocument>();
-      package.Add(leadingDocument);
-      package.AddRange(documents);
-      
-      // Тема.
-      var task = SimpleTasks.Create();
-      task.Subject = package.Count() > 1
-        ? Resources.CheckPackageTaskNameFormat(leadingDocument)
-        : Resources.CheckDocumentTaskNameFormat(leadingDocument);
-      if (task.Subject.Length > task.Info.Properties.Subject.Length)
-        task.Subject = task.Subject.Substring(0, task.Info.Properties.Subject.Length);
-      
-      // Вложить в задачу и выдать права на документы ответственному.
-      var notClassifiedDocumentsHyperlinks = new List<string>();
-      foreach (var document in package)
-      {
-        document.AccessRights.Grant(responsible, DefaultAccessRightsTypes.FullAccess);
-        document.Save();
-        task.Attachments.Add(document);
-        
-        // Собрать ссылки на неклассифицированные документы.
-        // Не нужно считать тело письма неклассифицированным документом и писать об этом.
-        if (Docflow.SimpleDocuments.Is(document) && (emailBody == null || document.Id != emailBody.Id))
-          notClassifiedDocumentsHyperlinks.Add(Hyperlinks.Get(document));
-      }
-      
-      // Собрать ссылки на документы, которые не удалось зарегистрировать.
-      var documentsWithRegistrationFailureHyperlinks = new List<string>();
-      documentsWithRegistrationFailureHyperlinks.AddRange(documentsWithRegistrationFailure.Select(x => Hyperlinks.Get(x)));
-      
-      // Собрать ссылки на документы, которые найдены по штрихкоду.
-      var documentsFoundByBarcodeHyperlinks = new List<string>();
-      documentsFoundByBarcodeHyperlinks.AddRange(documentsFoundByBarcode.Select(x => Hyperlinks.Get(x)));
 
-      // Текст задачи.
-      task.ActiveText = Resources.CheckPackageTaskText;
-      
-      // Добавить в текст задачи список документов, которые найдены по штрихкоду.
-      if (documentsFoundByBarcode.Any())
-      {
-        var documentsFoundBarcodeTaskText = Sungero.Capture.Resources.DocumentsFoundByBarcodeTaskText;
-        
-        var documentsFoundByBarcodeHyperlinksLabel = string.Join("\n    ", documentsFoundByBarcodeHyperlinks);
-        
-        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsFoundBarcodeTaskText,
-                                        documentsFoundByBarcodeHyperlinksLabel);
-      }
-      
-      // Добавить в текст задачи список не классифицированных документов.
-      if (notClassifiedDocumentsHyperlinks.Any())
-      {
-        var failedClassifyTaskText = notClassifiedDocumentsHyperlinks.Count() == 1
-          ? Resources.FailedClassifyDocumentTaskText
-          : Resources.FailedClassifyDocumentsTaskText;
-        
-        var notClassifiedDocumentsHyperlinksLabel = string.Join("\n    ", notClassifiedDocumentsHyperlinks);
-        
-        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedClassifyTaskText, notClassifiedDocumentsHyperlinksLabel);
-      }
-      
-      // Добавить в текст задачи список документов, которые не удалось зарегистрировать.
-      if (documentsWithRegistrationFailure.Any())
-      {
-        documentsWithRegistrationFailure = documentsWithRegistrationFailure.OrderBy(x => x.DocumentKind.Name).ToList();
-        var documentsText = documentsWithRegistrationFailure.Count() == 1 ? Sungero.Capture.Resources.Document : Sungero.Capture.Resources.Documents;
-        var documentKinds = documentsWithRegistrationFailure.Select(x => string.Format("\"{0}\"", x.DocumentKind.Name)).Distinct();
-        var documentKindsText = documentKinds.Count() == 1 ? Sungero.Capture.Resources.Kind : Sungero.Capture.Resources.Kinds;
-        var documentKindsListText = string.Join(", ", documentKinds);
-        
-        var documentsWithRegistrationFailureTaskText = string.Format(Sungero.Capture.Resources.DocumentsWithRegistrationFailureTaskText,
-                                                                     documentsText, documentKindsText, documentKindsListText);
-        
-        var documentsWithRegistrationFailureHyperlinksLabel = string.Join("\n    ", documentsWithRegistrationFailureHyperlinks);
-        
-        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, documentsWithRegistrationFailureTaskText,
-                                        documentsWithRegistrationFailureHyperlinksLabel);
-      }
-      
-      // Добавить в текст задачи список документов, которые были заблокированы при занесении новой версии.
-      if (lockedDocuments.Any())
-      {
-        var failedCreateVersionTaskText = lockedDocuments.Count() == 1
-          ? Sungero.Capture.Resources.FailedCreateVersionTaskText
-          : Sungero.Capture.Resources.FailedCreateVersionsTaskText;
-
-        var lockedDocumentsHyperlinksLabels = new List<string>();
-        foreach (var lockedDocument in lockedDocuments)
-        {
-          var loginId = Locks.GetLockInfo(lockedDocument).LoginId;
-          var employee = Employees.GetAll(x => x.Login.Id == loginId).FirstOrDefault();
-          // Текстовка на случай, когда блокировка снята в момент создания задачи.
-          var employeeLabel = Sungero.Capture.Resources.DocumentWasLockedTaskText.ToString();
-          if (employee != null)
-            employeeLabel = string.Format(Sungero.Capture.Resources.DocumentLockedByEmployeeTaskText,
-                                          Hyperlinks.Get(employee));
-          var documentHyperlink = Hyperlinks.Get(lockedDocument);
-          lockedDocumentsHyperlinksLabels.Add(string.Format("{0} {1}", documentHyperlink, employeeLabel));
-        }
-        
-        var lockedDocumentsHyperlinksLabel = string.Join("\n    ", lockedDocumentsHyperlinksLabels);
-        task.ActiveText = string.Format("{0}\n\n{1}\n    {2}", task.ActiveText, failedCreateVersionTaskText, lockedDocumentsHyperlinksLabel);
-      }
-      
-      // Маршрут.
-      var step = task.RouteSteps.AddNew();
-      step.AssignmentType = Workflow.SimpleTask.AssignmentType.Assignment;
-      step.Performer = responsible;
-      
-      // Добавить наблюдателями ответственных за документы, которые вернулись по ШК.
-      var responsibleEmployees = GetDocumentsResponsibleEmployees(documentsFoundByBarcode);
-      responsibleEmployees = responsibleEmployees.Where(r => !Equals(r, responsible)).ToList();
-      foreach (var responsibleEmployee in responsibleEmployees)
-      {
-        var observer = task.Observers.AddNew();
-        observer.Observer = responsibleEmployee;
-      }
-      
-      task.NeedsReview = false;
-      task.Deadline = Calendar.Now.AddWorkingHours(4);
-      task.Save();
-      task.Start();
-      
-      // Старт фонового процесса на смену статуса верификации.
-      Jobs.ChangeVerificationState.Enqueue();
-    }
-    
-    /// <summary>
-    /// Получить список ответственных за документы.
-    /// </summary>
-    /// <param name="documents">Документы.</param>
-    /// <returns>Список ответственных.</returns>
-    /// <remarks>Ответственных искать только у документов, тип которых: договорной документ, акт, накладная, УПД.</remarks>
-    public virtual List<IEmployee> GetDocumentsResponsibleEmployees(List<IOfficialDocument> documents)
-    {
-      var responsibleEmployees = new List<IEmployee>();
-      var withResponsibleDocuments = documents.Where(d => Contracts.ContractualDocuments.Is(d) ||
-                                                     FinancialArchive.ContractStatements.Is(d) ||
-                                                     FinancialArchive.Waybills.Is(d) ||
-                                                     FinancialArchive.UniversalTransferDocuments.Is(d));
-      foreach (var document in withResponsibleDocuments)
-      {
-        var responsibleEmployee = Employees.Null;
-        responsibleEmployee = Sungero.Docflow.PublicFunctions.OfficialDocument.GetDocumentResponsibleEmployee(document);
-        
-        if (responsibleEmployee != Employees.Null && responsibleEmployee.IsSystem != true)
-          responsibleEmployees.Add(responsibleEmployee);
-      }
-      
-      return responsibleEmployees.Distinct().ToList();
-    }
-    
-    /// <summary>
-    /// Отправить документы ответственному.
-    /// </summary>
-    /// <param name="documentsCreatedByRecognition">Результат создания документов.</param>
-    /// <param name="emailBody">Тело электронного письма.</param>
-    /// <param name="responsible">Сотрудник, ответственный за обработку документов.</param>
-    [Remote]
-    public virtual void SendToResponsible(Structures.Module.IDocumentsCreatedByRecognitionResults documentsCreatedByRecognition,
-                                          Docflow.IOfficialDocument emailBody, Sungero.Company.IEmployee responsible)
-    {
-      var leadingDocument = OfficialDocuments.GetAll()
-        .FirstOrDefault(x => x.Id == documentsCreatedByRecognition.LeadingDocumentId);
-
-      var relatedDocuments = documentsCreatedByRecognition.RelatedDocumentIds != null
-        ? OfficialDocuments.GetAll().Where(x => documentsCreatedByRecognition.RelatedDocumentIds.Contains(x.Id)).ToList()
-        : new List<Docflow.IOfficialDocument>();
-      
-      if (leadingDocument == null && !relatedDocuments.Any())
-        return;
-      
-      var allDocuments = new List<Docflow.IOfficialDocument>();
-      allDocuments.Add(leadingDocument);
-      allDocuments.AddRange(relatedDocuments);
-      
-      var documentsWithRegistrationFailure = documentsCreatedByRecognition.DocumentWithRegistrationFailureIds != null
-        ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentWithRegistrationFailureIds.Contains(x.Id)).ToList()
-        : new List<Docflow.IOfficialDocument>();
-      
-      var documentsFoundByBarcode = documentsCreatedByRecognition.DocumentFoundByBarcodeIds != null
-        ? allDocuments.Where(x => documentsCreatedByRecognition.DocumentFoundByBarcodeIds.Contains(x.Id)).ToList()
-        : new List<Docflow.IOfficialDocument>();
-      
-      var lockedDocuments = documentsCreatedByRecognition.LockedDocumentIds != null
-        ? allDocuments.Where(x => documentsCreatedByRecognition.LockedDocumentIds.Contains(x.Id)).ToList()
-        : new List<Docflow.IOfficialDocument>();
-      
-      SendToResponsible(leadingDocument, relatedDocuments, documentsWithRegistrationFailure, documentsFoundByBarcode, lockedDocuments, emailBody, responsible);
-    }
-    
-    #endregion
-    
-    #region Простой документ
-    
-    /// <summary>
-    /// Создать простой документ.
-    /// </summary>
-    /// <param name="name">Наименование документа.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns></returns>
-    [Public]
-    public static ISimpleDocument CreateSimpleDocument(string name, Company.IEmployee responsible)
-    {
-      var document = SimpleDocuments.Create();
-      
-      // TODO Шкляев. Для заполнения свойств простого документа recognitionResult не нужен.
-      // Пока передавать дефолтный для универсальности кода.
-      // Но нужно будет продумать, что с этим, в итоге, делать.
-      // Также имя пока передавать в additionalInfo (при решении учесть US 97236).
-      var arioDocument = Sungero.SmartProcessing.Structures.Module.ArioDocument.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, name);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
-    #endregion
-    
     #region Входящее письмо
-    
-    /// <summary>
-    /// Создать входящее письмо в RX.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки письма в Ario.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Документ.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingLetter(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
-    {
-      var document = Sungero.RecordManagement.IncomingLetters.Create();
-      
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
+
     /// <summary>
     /// Создать входящее письмо (демо режим).
     /// </summary>
@@ -867,13 +125,23 @@ namespace Sungero.Capture.Server
       // Заполнить основные свойства.
       FillDocumentKind(document);
       
-      // Заполнить дату и номер письма со стороны корреспондента.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Date).FirstOrDefault();
-      var numberFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.Number).FirstOrDefault();
-      document.InNumber = DocflowPublicFunctions.GetFieldValue(numberFact, FieldNames.Letter.Number);
-      document.Dated = Functions.Module.GetShortDate(DocflowPublicFunctions.GetFieldValue(dateFact, FieldNames.Letter.Date));
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, dateFact, FieldNames.Letter.Date, props.Dated.Name, document.Dated);
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, numberFact, FieldNames.Letter.Number, props.InNumber.Name, document.InNumber);
+      // Заполнить номер со стороны корреспондента.
+      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, FactNames.Letter, FieldNames.Letter.Number, props.InNumber);
+      if (recognizedNumber.Fact != null)
+      {
+        document.InNumber = recognizedNumber.Number;
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedNumber.Fact, 
+                                                   FieldNames.Letter.Number, props.InNumber.Name, 
+                                                   document.InNumber, recognizedNumber.Probability);
+      }
+      
+      // Заполнить дату со стороны корреспондента.
+      var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.Letter, FieldNames.Letter.Date);
+      Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
+                                                                        arioDocument.RecognitionInfo,
+                                                                        recognizedDate,
+                                                                        FieldNames.Letter.Date,
+                                                                        props.Dated.Name);
       
       // Заполнить данные корреспондента.
       var correspondentNameFacts = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.Letter, FieldNames.Letter.CorrespondentName);
@@ -1102,20 +370,6 @@ namespace Sungero.Capture.Server
       return document;
     }
     
-    /// <summary>
-    /// Создать акт выполненных работ.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки акта выполненных работ в Ario.</param>
-    /// <param name="responsible">Ответственный сотрудник.</param>
-    /// <returns>Акт выполненных работ.</returns>
-    public virtual Docflow.IOfficialDocument CreateContractStatement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
-    {
-      var document = FinancialArchive.ContractStatements.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      return document;
-    }
-    
     #endregion
     
     #region Накладная
@@ -1241,21 +495,7 @@ namespace Sungero.Capture.Server
       
       return document;
     }
-    
-    /// <summary>
-    /// Создать накладную.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки накладной в Ario.</param>
-    /// <param name="responsible">Ответственный сотрудник.</param>
-    /// <returns>Накладная.</returns>
-    public virtual Docflow.IOfficialDocument CreateWaybill(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
-    {
-      var document = FinancialArchive.Waybills.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      return document;
-    }
-    
+
     #endregion
     
     #region Счет-фактура
@@ -1374,118 +614,6 @@ namespace Sungero.Capture.Server
       return document;
     }
     
-    /// <summary>
-    /// Создать счет-фактуру.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки документа в Арио.</param>
-    /// <param name="isAdjustment">Корректировочная.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Счет-фактура.</returns>
-    public virtual Docflow.IOfficialDocument CreateTaxInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, bool isAdjustment, IEmployee responsible)
-    {
-      var facts = arioDocument.Facts;
-      var responsibleEmployeeBusinessUnit = Company.PublicFunctions.BusinessUnit.Remote.GetBusinessUnit(responsible);
-      var responsibleEmployeePersonalSettings = Docflow.PublicFunctions.PersonalSetting.GetPersonalSettings(responsible);
-      var responsibleEmployeePersonalSettingsBusinessUnit = responsibleEmployeePersonalSettings != null
-        ? responsibleEmployeePersonalSettings.BusinessUnit
-        : Company.BusinessUnits.Null;
-      var document = AccountingDocumentBases.Null;
-      var props = AccountingDocumentBases.Info.Properties;
-      
-      // Определить направление документа, НОР и КА.
-      // Если НОР выступает продавцом, то создаем исходящую счет-фактуру, иначе - входящую.
-      var counterpartyTypes = new List<string>();
-      counterpartyTypes.Add(CounterpartyTypes.Seller);
-      counterpartyTypes.Add(CounterpartyTypes.Buyer);
-      counterpartyTypes.Add(CounterpartyTypes.Shipper);
-      counterpartyTypes.Add(CounterpartyTypes.Consignee);
-      
-      var factMatches = Docflow.PublicFunctions.Module.MatchFactsWithBusinessUnitsAndCounterparties(facts, counterpartyTypes);
-      var seller = factMatches.Where(m => m.Type == CounterpartyTypes.Seller).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Shipper).FirstOrDefault();
-      var buyer = factMatches.Where(m => m.Type == CounterpartyTypes.Buyer).FirstOrDefault() ?? factMatches.Where(m => m.Type == CounterpartyTypes.Consignee).FirstOrDefault();
-      
-      var buyerIsBusinessUnit = buyer != null && buyer.BusinessUnit != null;
-      var sellerIsBusinessUnit = seller != null && seller.BusinessUnit != null;
-      var recognizedDocumentParties = Sungero.Docflow.Structures.Module.RecognizedDocumentParties.Create();
-      if (buyerIsBusinessUnit && sellerIsBusinessUnit)
-      {
-        // Мультинорность. Уточнить НОР по ответственному.
-        if (Equals(seller.BusinessUnit, responsibleEmployeePersonalSettingsBusinessUnit) ||
-            Equals(seller.BusinessUnit, responsibleEmployeeBusinessUnit))
-        {
-          // Исходящий документ.
-          document = FinancialArchive.OutgoingTaxInvoices.Create();
-          recognizedDocumentParties.Counterparty = buyer;
-          recognizedDocumentParties.BusinessUnit = seller;
-        }
-        else
-        {
-          // Входящий документ.
-          document = FinancialArchive.IncomingTaxInvoices.Create();
-          recognizedDocumentParties.Counterparty = seller;
-          recognizedDocumentParties.BusinessUnit = buyer;
-        }
-      }
-      else if (buyerIsBusinessUnit)
-      {
-        // Входящий документ.
-        document = FinancialArchive.IncomingTaxInvoices.Create();
-        recognizedDocumentParties.Counterparty = seller;
-        recognizedDocumentParties.BusinessUnit = buyer;
-      }
-      else if (sellerIsBusinessUnit)
-      {
-        // Исходящий документ.
-        document = FinancialArchive.OutgoingTaxInvoices.Create();
-        recognizedDocumentParties.Counterparty = buyer;
-        recognizedDocumentParties.BusinessUnit = seller;
-      }
-      else
-      {
-        // НОР не найдена по фактам - НОР будет взята по ответственному.
-        if (buyer != null && buyer.Counterparty != null && (seller == null || seller.Counterparty == null))
-        {
-          // Исходящий документ, потому что buyer - контрагент, а другой информации нет.
-          document = FinancialArchive.OutgoingTaxInvoices.Create();
-          recognizedDocumentParties.Counterparty = buyer;
-        }
-        else
-        {
-          // Входящий документ.
-          document = FinancialArchive.IncomingTaxInvoices.Create();
-          recognizedDocumentParties.Counterparty = seller;
-        }
-      }
-
-      recognizedDocumentParties.ResponsibleEmployeeBusinessUnit = Docflow.PublicFunctions.Module.GetDefaultBusinessUnit(responsible);
-      
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, facts, responsible, recognizedDocumentParties);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
-    #endregion
-    
-    #region УПД
-    
-    /// <summary>
-    /// Создать УПД.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки УПД в Ario.</param>
-    /// <param name="isAdjustment">Корректировочная.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>УПД.</returns>
-    public virtual Docflow.IOfficialDocument CreateUniversalTransferDocument(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, bool isAdjustment, IEmployee responsible)
-    {
-      var document = Sungero.FinancialArchive.UniversalTransferDocuments.Create();
-      
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
     #endregion
     
     #region Счет на оплату
@@ -1574,23 +702,24 @@ namespace Sungero.Capture.Server
       }
       
       // Дата и номер.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date).FirstOrDefault();
-      var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.FinancialDocument.Date);
-      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
-      if (!isDateValid)
-        date = Calendar.SqlMinValue;
-
-      document.Date = date;
+      var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Date);
+      Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
+                                                                        arioDocument.RecognitionInfo,
+                                                                        recognizedDate,
+                                                                        FieldNames.FinancialDocument.Date,
+                                                                        props.Date.Name);
       
-      var dateProbability = isDateValid ?
-        Docflow.PublicFunctions.Module.GetFieldProbability(dateFact, Sungero.Docflow.Constants.Module.FieldNames.Document.Date) :
-        Docflow.Constants.Module.PropertyProbabilityLevels.Min;
-      
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, dateFact, FieldNames.FinancialDocument.Date, props.Date.Name, date, dateProbability);
-      
-      var numberFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.FinancialDocument, FieldNames.FinancialDocument.Number).FirstOrDefault();
-      document.Number = DocflowPublicFunctions.GetFieldValue(numberFact, FieldNames.FinancialDocument.Number);
-      DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, numberFact, FieldNames.FinancialDocument.Number, props.Number.Name, document.Number);
+      // Номер.
+      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts,
+                                                                                FactNames.FinancialDocument,
+                                                                                FieldNames.FinancialDocument.Number,
+                                                                                props.Number);
+      if (recognizedNumber.Fact != null)
+      {
+        document.Number = recognizedNumber.Number;
+        DocflowPublicFunctions.LinkFactAndProperty(arioDocument.RecognitionInfo, recognizedNumber.Fact, FieldNames.FinancialDocument.Number,
+                                                   props.Number.Name, document.Number, recognizedNumber.Probability);
+      }
       
       // Сумма и валюта.
       var documentAmountFact = DocflowPublicFunctions.GetOrderedFacts(facts, FactNames.DocumentAmount, FieldNames.DocumentAmount.Amount).FirstOrDefault();
@@ -1607,23 +736,7 @@ namespace Sungero.Capture.Server
       
       return document;
     }
-    
-    /// <summary>
-    /// Создать счет на оплату.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки документа в Арио.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Счет на оплату.</returns>
-    public virtual Docflow.IOfficialDocument CreateIncomingInvoice(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument, IEmployee responsible)
-    {
-      var document = Contracts.IncomingInvoices.Create();
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, 
-                                                              arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
+
     #endregion
     
     #region Договор
@@ -1707,44 +820,6 @@ namespace Sungero.Capture.Server
       return document;
     }
     
-    /// <summary>
-    /// Создать договор.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки договора в Ario.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Договор.</returns>
-    public Docflow.IOfficialDocument CreateContract(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument,
-                                                    Sungero.Company.IEmployee responsible)
-    {
-      var document = Sungero.Contracts.Contracts.Create();
-
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
-    #endregion
-    
-    #region Доп.соглашение
-    
-    /// <summary>
-    /// Создать доп.соглашение.
-    /// </summary>
-    /// <param name="arioDocument">Результат обработки доп.соглашения в Ario.</param>
-    /// <param name="responsible">Ответственный.</param>
-    /// <returns>Доп.соглашение.</returns>
-    public Docflow.IOfficialDocument CreateSupAgreement(Sungero.SmartProcessing.Structures.Module.IArioDocument arioDocument,
-                                                        Sungero.Company.IEmployee responsible)
-    {
-      var document = Sungero.Contracts.SupAgreements.Create();
-      
-      Docflow.PublicFunctions.OfficialDocument.FillProperties(document, arioDocument.RecognitionInfo, arioDocument.Facts, responsible, null);
-      Docflow.PublicFunctions.OfficialDocument.FillDeliveryMethod(document, arioDocument.SentByEmail);
-      
-      return document;
-    }
-    
     #endregion
     
     #region Заполнение свойств документа
@@ -1785,7 +860,6 @@ namespace Sungero.Capture.Server
     }
     
     /// <summary>
-    
     /// Заполнить номер и дату для Mock-документов.
     /// </summary>
     /// <param name="document">Документ.</param>
@@ -1797,36 +871,25 @@ namespace Sungero.Capture.Server
                                          List<Docflow.Structures.Module.IArioFact> facts,
                                          string factName)
     {
-      // Дата.
-      var dateFact = DocflowPublicFunctions.GetOrderedFacts(facts, factName, FieldNames.Document.Date).FirstOrDefault();
-      var date = DocflowPublicFunctions.GetFieldDateTimeValue(dateFact, FieldNames.Document.Date);
-      var isDateValid = DocflowPublicFunctions.IsDateValid(date);
-      if (!isDateValid)
-        date = Calendar.SqlMinValue;
-
-      document.RegistrationDate = date;
-      
-      var dateProbability = isDateValid ?
-        Docflow.PublicFunctions.Module.GetFieldProbability(dateFact, Sungero.Docflow.Constants.Module.FieldNames.Document.Date) :
-        Docflow.Constants.Module.PropertyProbabilityLevels.Min;
-
-      // Номер.
-      var regNumberFact = DocflowPublicFunctions.GetOrderedFacts(facts, factName, FieldNames.Document.Number).FirstOrDefault();
-      var regNumber = DocflowPublicFunctions.GetFieldValue(regNumberFact, FieldNames.Document.Number);
-      
-      // TODO Suleymanov_RA: при рефакторинге избавиться от null
-      Nullable<double> numberProbability = null;
-      if (regNumber.Length > document.Info.Properties.RegistrationNumber.Length)
-      {
-        regNumber = regNumber.Substring(0, document.Info.Properties.RegistrationNumber.Length);
-        numberProbability = Docflow.Constants.Module.PropertyProbabilityLevels.Min;
-      }
-      document.RegistrationNumber = regNumber;
-      
       var props = document.Info.Properties;
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, dateFact, FieldNames.Document.Date, props.RegistrationDate.Name, date, dateProbability);
-      DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, regNumberFact, FieldNames.Document.Number, props.RegistrationNumber.Name,
-                                                 document.RegistrationNumber, numberProbability);
+      
+      // Дата.
+      var recognizedDate = DocflowPublicFunctions.GetRecognizedDate(facts, factName, FieldNames.Document.Date);
+      Sungero.Docflow.PublicFunctions.OfficialDocument.FillDocumentDate(document,
+                                                                        recognitionInfo,
+                                                                        recognizedDate,
+                                                                        FieldNames.Document.Date,
+                                                                        props.RegistrationDate.Name);
+      
+      // Номер.
+      var recognizedNumber = Docflow.PublicFunctions.Module.GetRecognizedNumber(facts, factName, FieldNames.Document.Number, props.RegistrationNumber);
+      if (recognizedNumber.Fact != null)
+      {
+        document.RegistrationNumber = recognizedNumber.Number;
+        DocflowPublicFunctions.LinkFactAndProperty(recognitionInfo, recognizedNumber.Fact, FieldNames.Document.Number,
+                                                   props.RegistrationNumber.Name, document.RegistrationNumber,
+                                                   recognizedNumber.Probability);
+      }
     }
     
     #endregion
@@ -1882,48 +945,6 @@ namespace Sungero.Capture.Server
         documentName = string.Format("{0} от {1}", documentName, date);
       
       return documentName;
-    }
-    
-    #endregion
-    
-    #region Штрихкоды
-    
-    /// <summary>
-    /// Поиск Id документа по штрихкодам.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>Список распознанных Id документа.</returns>
-    /// <remarks>
-    /// Поиск штрихкодов осуществляется только на первой странице документа.
-    /// Формат штрихкода: Code128.
-    /// </remarks>
-    public virtual List<int> SearchDocumentBarcodeIds(System.IO.Stream document)
-    {
-      var result = new List<int>();
-      try
-      {
-        var barcodeReader = new AsposeExtensions.BarcodeReader();
-        var barcodeList = barcodeReader.Extract(document, Aspose.BarCode.BarCodeRecognition.DecodeType.Code128);
-        if (!barcodeList.Any())
-          return result;
-        
-        var tenantId = Docflow.PublicFunctions.Module.Remote.GetCurrentTenantId();
-        var formattedTenantId = Docflow.PublicFunctions.Module.FormatTenantIdForBarcode(tenantId).Trim();
-        var ourBarcodes = barcodeList.Where(b => b.Contains(formattedTenantId));
-        foreach (var barcode in ourBarcodes)
-        {
-          int id;
-          // Формат штрихкода "id тенанта - id документа".
-          var stringId = barcode.Split(new string[] {" - ", "-"}, StringSplitOptions.None).Last();
-          if (int.TryParse(stringId, out id))
-            result.Add(id);
-        }
-      }
-      catch (AsposeExtensions.BarcodeReaderException e)
-      {
-        Logger.Error(e.Message);
-      }
-      return result;
     }
     
     #endregion
