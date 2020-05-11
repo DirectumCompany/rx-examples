@@ -57,6 +57,25 @@
     }
   ],
   "OrderedSpecialFolders": [],
+  "PublicFunctions": [
+    {
+      "Name": "CreateIncomingLetter",
+      "Parameters": [
+        {
+          "Name": "arioDocument",
+          "ParameterType": "global::Sungero.SmartProcessing.Structures.Module.IArioDocument",
+          "ParameterTypeFullName": "Sungero.SmartProcessing.Structures.Module.IArioDocument"
+        },
+        {
+          "Name": "responsible",
+          "ParameterType": "global::Sungero.Company.IEmployee",
+          "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
+      "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+    }
+  ],
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples",
