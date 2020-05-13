@@ -1,0 +1,73 @@
+{
+  "$type": "Sungero.Metadata.ModuleMetadata, Sungero.Metadata",
+  "NameGuid": "bf72b033-54e8-43e7-8696-0f05786dead1",
+  "Name": "SmartAddClassifiersExample",
+  "AsyncHandlers": [],
+  "ClientAssemblyName": "Sungero.SmartAddClassifiersExample.Client",
+  "ClientBaseAssemblyName": "Sungero.SmartAddClassifiersExample.ClientBase",
+  "ClientBaseNamespace": "Sungero.SmartAddClassifiersExample.ClientBase",
+  "ClientNamespace": "Sungero.SmartAddClassifiersExample.Client",
+  "Code": "AddClEx",
+  "CompanyCode": "Sungero",
+  "Cover": {
+    "NameGuid": "d9a4d591-40fd-4cb2-8a66-4e6b28ba1f8b",
+    "Actions": [],
+    "Background": null,
+    "Footer": {
+      "NameGuid": "4cc0c748-112d-4555-9d2c-b3bcd7cf70c6",
+      "BackgroundPosition": "Stretch"
+    },
+    "Groups": [],
+    "Header": {
+      "NameGuid": "abb66e4e-7a0d-4645-83f8-8c911c83636b",
+      "BackgroundPosition": "Stretch"
+    }
+  },
+  "Dependencies": [
+    {
+      "Id": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+      "IsSolutionModule": true,
+      "MaxVersion": "",
+      "MinVersion": ""
+    }
+  ],
+  "HandledEvents": [
+    "InitializingServer"
+  ],
+  "IconResourcesKeys": [],
+  "Importance": "Medium",
+  "InitializationFunctions": [
+    {
+      "Name": "FillSmartAdditionalClassifiers",
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
+  "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "InterfaceNamespace": "Sungero.SmartAddClassifiersExample",
+  "IsVisible": false,
+  "Overridden": [
+    "IsVisible"
+  ],
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.SmartAddClassifiersExample",
+  "ResourcesKeys": [],
+  "ServerAssemblyName": "Sungero.SmartAddClassifiersExample.Server",
+  "ServerNamespace": "Sungero.SmartAddClassifiersExample.Server",
+  "SharedAssemblyName": "Sungero.SmartAddClassifiersExample.Shared",
+  "SharedNamespace": "Sungero.SmartAddClassifiersExample.Shared",
+  "SpecialFolders": [],
+  "Version": "0.0.1.0",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "ModuleMetadata",
+      "Number": 6
+    },
+    {
+      "Type": "DomainApi",
+      "Number": 3
+    }
+  ]
+}
