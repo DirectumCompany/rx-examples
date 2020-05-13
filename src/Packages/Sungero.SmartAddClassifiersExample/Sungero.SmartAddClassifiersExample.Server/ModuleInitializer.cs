@@ -29,11 +29,13 @@ namespace Sungero.SmartAddClassifiersExample.Server
         var classifierId = smartProcessingSettings.TypeClassifierId;
         var classifierName = smartProcessingSettings.TypeClassifierName;
         
-        var additionalClassifier = smartProcessingSettings.AdditionalClassifiers.AddNew();
-        additionalClassifier.ClassifierId = classifierId;
-        additionalClassifier.ClassifierName = classifierName;
-        
-        smartProcessingSettings.Save();
+        if (smartProcessingSettings.AdditionalClassifiers.Where(c => c.ClassifierId == classifierId).Count() == 0)
+        {
+          var additionalClassifier = smartProcessingSettings.AdditionalClassifiers.AddNew();
+          additionalClassifier.ClassifierId = classifierId;
+          additionalClassifier.ClassifierName = classifierName;          
+          smartProcessingSettings.Save();
+        }
       }
     }
     
