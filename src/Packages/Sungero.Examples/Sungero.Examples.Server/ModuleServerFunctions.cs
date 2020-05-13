@@ -27,9 +27,9 @@ namespace Sungero.Examples.Server
       Sungero.SmartProcessing.PublicFunctions.Module.FillIncomingLetterProperties(document, arioDocument, responsible);
       
       // Доп. классификатор.
-      var arioExtraClassifiers = arioDocument.RecognitionInfo.ExtraClassifiers;
-      if (arioExtraClassifiers.Count > 0)
-        document.Note = string.Format("Доп. класс = {0}", arioExtraClassifiers.FirstOrDefault().PredictedClass);
+      var additionalClassifiers = arioDocument.RecognitionInfo.AdditionalClassifiers;
+      if (additionalClassifiers.Count > 0)
+        document.Note = string.Format("Доп. класс = {0}", additionalClassifiers.FirstOrDefault().PredictedClass);
       
       return document;
     }
