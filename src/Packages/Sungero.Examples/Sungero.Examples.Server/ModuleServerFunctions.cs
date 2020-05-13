@@ -4,6 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.SmartProcessing.Structures.Module;
+using Sungero.Commons;
 using Sungero.Company;
 using Sungero.Docflow;
 
@@ -26,9 +27,9 @@ namespace Sungero.Examples.Server
       Sungero.SmartProcessing.PublicFunctions.Module.FillIncomingLetterProperties(document, arioDocument, responsible);
       
       // Доп. классификатор.
-      var arioAdditionalClasses = arioDocument.AdditionalClasses;
-      if (arioAdditionalClasses.Count > 0)
-        document.Note = string.Format("Доп. класс = {0}", arioAdditionalClasses.FirstOrDefault().PredictedClass);
+      var arioExtraClassifiers = arioDocument.RecognitionInfo.ExtraClassifiers;
+      if (arioExtraClassifiers.Count > 0)
+        document.Note = string.Format("Доп. класс = {0}", arioExtraClassifiers.FirstOrDefault().PredictedClass);
       
       return document;
     }
