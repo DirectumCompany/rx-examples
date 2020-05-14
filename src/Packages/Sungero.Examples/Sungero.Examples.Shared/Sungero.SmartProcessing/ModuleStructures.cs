@@ -4,7 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.SmartAddClassifiersExample.Client
+namespace Sungero.Examples.Module.SmartProcessing.Structures.Module
 {
 
 }

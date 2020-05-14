@@ -1,7 +1,7 @@
 using System;
 using Sungero.Core;
 
-namespace Sungero.SmartAddClassifiersExample.Constants
+namespace Sungero.Examples.Module.SmartProcessing.Constants
 {
   public static class Module
   {

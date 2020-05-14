@@ -4,10 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.SmartAddClassifiersExample.Shared
+namespace Sungero.Examples.Module.SmartProcessing.Client
 {
-  public class ModuleFunctions
-  {
 
-  }
 }

@@ -5,13 +5,15 @@ using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Domain.Initialization;
 
-namespace Sungero.SmartAddClassifiersExample.Server
+namespace Sungero.Examples.Module.SmartProcessing.Server
 {
   public partial class ModuleInitializer
   {
-    
+
     public override void Initializing(Sungero.Domain.ModuleInitializingEventArgs e)
     {
+      base.Initializing(e);
+      
       InitializationLogger.Debug("Init: Fill smart processing additional classifiers.");
       FillSmartAdditionalClassifiers();
     }
@@ -33,7 +35,7 @@ namespace Sungero.SmartAddClassifiersExample.Server
         {
           var additionalClassifier = smartProcessingSettings.AdditionalClassifiers.AddNew();
           additionalClassifier.ClassifierId = classifierId;
-          additionalClassifier.ClassifierName = classifierName;          
+          additionalClassifier.ClassifierName = classifierName;
           smartProcessingSettings.Save();
         }
       }

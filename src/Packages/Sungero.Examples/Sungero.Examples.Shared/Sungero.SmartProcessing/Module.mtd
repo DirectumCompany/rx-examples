@@ -1,0 +1,53 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "0b86c914-d3cf-47ee-b621-96429e972c35",
+  "Name": "SmartProcessing",
+  "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [],
+  "BaseGuid": "bb685d97-a673-42ea-8605-66889967467f",
+  "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
+  "ClientBaseNamespace": "Sungero.Examples.Module.SmartProcessing.ClientBase",
+  "Code": "Smart",
+  "CompanyCode": "Sungero",
+  "ExplorerTreeOrder": [],
+  "HandledEvents": [
+    "InitializingServer"
+  ],
+  "IconResourcesKeys": [],
+  "Importance": "Medium",
+  "InitializationFunctions": [
+    {
+      "Name": "FillSmartAdditionalClassifiers",
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
+  "Jobs": [
+    {
+      "NameGuid": "aed5a3c7-76e7-4ba8-b24a-46e14937f44d",
+      "Name": "ChangeVerificationState",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 10
+    }
+  ],
+  "LayeredFromGuid": "bb685d97-a673-42ea-8605-66889967467f",
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
+  "ResourcesKeys": [],
+  "SpecialFolders": [],
+  "Version": "3.4.3.1",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 6
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 6
+    }
+  ]
+}
