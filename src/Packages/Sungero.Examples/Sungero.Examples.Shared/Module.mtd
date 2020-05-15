@@ -62,9 +62,9 @@
       "Name": "CreateIncomingLetter",
       "Parameters": [
         {
-          "Name": "arioDocument",
-          "ParameterType": "global::Sungero.SmartProcessing.Structures.Module.IArioDocument",
-          "ParameterTypeFullName": "Sungero.SmartProcessing.Structures.Module.IArioDocument"
+          "Name": "documentInfo",
+          "ParameterType": "global::Sungero.SmartProcessing.Structures.Module.IDocumentInfo",
+          "ParameterTypeFullName": "Sungero.SmartProcessing.Structures.Module.IDocumentInfo"
         },
         {
           "Name": "responsible",
