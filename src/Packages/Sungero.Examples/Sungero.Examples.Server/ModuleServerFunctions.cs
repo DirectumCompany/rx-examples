@@ -15,19 +15,19 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Создать входящее письмо (пример использования доп. классификатора).
     /// </summary>
-    /// <param name="arioDocument">Распознанный в Ario документ.</param>
+    /// <param name="documentInfo">Информация о документе.</param>
     /// <param name="responsible">Ответственный за верификацию.</param>
     /// <returns>Входящее письмо.</returns>
     [Public]
-    public virtual IOfficialDocument CreateIncomingLetter(IArioDocument arioDocument,
+    public virtual IOfficialDocument CreateIncomingLetter(IDocumentInfo documentInfo,
                                                           IEmployee responsible)
     {
       // Входящее письмо.
       var document = RecordManagement.IncomingLetters.Create();
-      Sungero.SmartProcessing.PublicFunctions.Module.FillIncomingLetterProperties(document, arioDocument, responsible);
+      Sungero.SmartProcessing.PublicFunctions.Module.FillIncomingLetterProperties(document, documentInfo, responsible);
       
       // Доп. классификатор.
-      var additionalClassifiers = arioDocument.RecognitionInfo.AdditionalClassifiers;
+      var additionalClassifiers = documentInfo.ArioDocument.RecognitionInfo.AdditionalClassifiers;
       if (additionalClassifiers.Count > 0)
         document.Note = string.Format("Доп. класс = {0}", additionalClassifiers.FirstOrDefault().PredictedClass);
       
