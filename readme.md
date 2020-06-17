@@ -1,8 +1,8 @@
-﻿# DirectumRXExamples
+﻿# rx-examples
 
 Репозиторий с примерами слоения прикладной разработки.
 
-## Порядок установки.
+## Порядок установки
 
 1. Для работы требуется установленный Directum RX соответствующей версии.
 2. Склонировать репозиторий с DirectumRXExamples в папку.
@@ -11,13 +11,14 @@
 <block name="REPOSITORIES">
   <repository folderName="Base" solutionType="Base" url="" />
   <repository folderName="RX" solutionType="Base" url="<адрес локального репозитория>" />
-  <repository folderName="<Папка из п.2>" solutionType="Work" url="https://github.com/DirectumCompany/rx-examples" />
+  <repository folderName="<Папка из п.2>" solutionType="Work" 
+    url="https://github.com/DirectumCompany/rx-examples" />
 </block>
 ```
 
-## Кейсы. 
+## Кейсы 
 
-### Преобразование в PDF и наложение отметки об ЭП.
+### Преобразование в PDF и наложение отметки об ЭП
 
 1. Все документы. Изменён логотип и цвет отметки на фиолетовый. В отметку добавлена дата и время подписания. 
 <br>**Точки входа:** серверные методы [GetSignatureMarkForSimpleSignatureAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L22-L35) и [GetSignatureMarkForCertificateAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L48-L74) модуля Docflow.
@@ -31,17 +32,16 @@
 4. Служебная записка. На первой странице документа, в верхнем левом углу поставить отметки о всех подписях документа. Отметки ставятся сверху вниз, с небольшим отсутпом друг от друга. 
 <br>**Точка входа:** серверный метод [ConvertToPdfAndAddSignatureMark](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Memo/MemoServerFunctions.cs#L48-L128) документа Memo. 
 
-### Политики перемещения.
- 
+### Политики перемещения 
  1. Политики перемещения. Добавлено событие "Обращение к документу" в критерии перемещения. Документ перемещается в новое хранилище, если прошло указанное время с даты последнего обращения к документу. 
 <br>**Точки входа:** серверные методы [GetStoragePolicySettingsQuery](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L95-L98), [GetDocumentsToTransferQuery](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L104-L107) модуля Docflow.
  
- ### Интеллектуальная обработка.
+ ### Интеллектуальная обработка
  
  1. Дополнительный классификатор в настройках интеллектуальной обработки. 
 <br>**Точки входа:** серверный метод [FillSmartAdditionalClassifiers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.SmartProcessing/ModuleInitializer.cs#L25-L42) в инициализации модуля SmartProcessing. Серверный метод [CreateIncomingLetter](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ModuleServerFunctions.cs#L22-L35) в решении Examples.
  
- ### Валидация панели фильрации.
+ ### Валидация панели фильрации
  
  1. Список "Входящие документы" на обложке модуля Делопроизводство. Реализовано ограничение списка "Входящие документы" при помощи валидация в панели фильтрации. Должен быть заполнен один из критериев: журнал региистрации, от кого, произвольный период. 
 <br>**Точка входа:** действие [IncomingDocumentsValidateFilterPanel](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.ClientBase/Sungero.RecordManagementUI/ModuleHandlers.cs#L12-L16) вычисляемой папки модуля Делопроизводство.
