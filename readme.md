@@ -20,7 +20,7 @@
 
 ### Преобразование в PDF и наложение отметки об ЭП
 
-1. Все документы. Изменён логотип и цвет отметки на фиолетовый. В отметку добавлена дата и время подписания. 
+1. Все документы. Изменен логотип и цвет отметки на фиолетовый. В отметку добавлена дата и время подписания. 
 <br>**Точки входа:** серверные методы [GetSignatureMarkForSimpleSignatureAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L22-L35) и [GetSignatureMarkForCertificateAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L48-L74) модуля Docflow.
 
 2. Входящий счёт. Цвет отметки изменён на красный, текст отметки изменен на "ПРИНЯТ К ОПЛАТЕ". 
