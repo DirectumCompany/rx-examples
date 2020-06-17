@@ -5,7 +5,7 @@
 ## Порядок установки
 
 1. Для работы требуется установленный Directum RX соответствующей версии.
-2. Склонировать репозиторий с DirectumRXExamples в папку.
+2. Склонировать репозиторий rx-examples в папку.
 3. Указать в _ConfigSettings.xml DDS:
 ```xml
 <block name="REPOSITORIES">
@@ -33,15 +33,13 @@
 <br>**Точка входа:** серверный метод [ConvertToPdfAndAddSignatureMark](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Memo/MemoServerFunctions.cs#L48-L128) документа Memo. 
 
 ### Политики перемещения 
- 1. Политики перемещения. Добавлено событие "Обращение к документу" в критерии перемещения. Документ перемещается в новое хранилище, если прошло указанное время с даты последнего обращения к документу. 
+Добавлено событие "Обращение к документу" в критерии перемещения. Документ перемещается в новое хранилище, если прошло указанное время с даты последнего обращения к документу. 
 <br>**Точки входа:** серверные методы [GetStoragePolicySettingsQuery](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L95-L98), [GetDocumentsToTransferQuery](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L104-L107) модуля Docflow.
  
- ### Интеллектуальная обработка
- 
- 1. Дополнительный классификатор в настройках интеллектуальной обработки. 
+### Интеллектуальная обработка
+Дополнительный классификатор в настройках интеллектуальной обработки. 
 <br>**Точки входа:** серверный метод [FillSmartAdditionalClassifiers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.SmartProcessing/ModuleInitializer.cs#L25-L42) в инициализации модуля SmartProcessing. Серверный метод [CreateIncomingLetter](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ModuleServerFunctions.cs#L22-L35) в решении Examples.
  
- ### Валидация панели фильрации
- 
- 1. Список "Входящие документы" на обложке модуля Делопроизводство. Реализовано ограничение списка "Входящие документы" при помощи валидация в панели фильтрации. Должен быть заполнен один из критериев: журнал региистрации, от кого, произвольный период. 
+### Валидация панели фильрации 
+Список "Входящие документы" на обложке модуля Делопроизводство. Реализовано ограничение списка "Входящие документы" при помощи валидация в панели фильтрации. Должен быть заполнен один из критериев: журнал региистрации, от кого, произвольный период. 
 <br>**Точка входа:** действие [IncomingDocumentsValidateFilterPanel](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.ClientBase/Sungero.RecordManagementUI/ModuleHandlers.cs#L12-L16) вычисляемой папки модуля Делопроизводство.
