@@ -3,7 +3,22 @@
   "NameGuid": "0b86c914-d3cf-47ee-b621-96429e972c35",
   "Name": "SmartProcessing",
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
-  "AsyncHandlers": [],
+  "AsyncHandlers": [
+    {
+      "NameGuid": "2a536470-c8d5-466a-9ad5-8489733edf0c",
+      "Name": "DeleteEntityRecognitionInfo",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "1f2de67f-1909-4f4f-8cf3-9222a526daf0",
+          "Name": "EntityId",
+          "ParameterType": "Integer"
+        }
+      ]
+    }
+  ],
   "BaseGuid": "bb685d97-a673-42ea-8605-66889967467f",
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.SmartProcessing.ClientBase",
@@ -25,7 +40,7 @@
   "Jobs": [
     {
       "NameGuid": "aed5a3c7-76e7-4ba8-b24a-46e14937f44d",
-      "Name": "ChangeVerificationState",
+      "Name": "DeleteBlobPackages",
       "Daily": "Repeat",
       "IsAncestorMetadata": true,
       "MonthSchedule": "Monthly",
@@ -38,7 +53,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "3.4.7.1",
+  "Version": "3.5.20.1",
   "Widgets": [],
   "Versions": [
     {

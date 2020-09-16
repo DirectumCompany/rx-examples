@@ -5,6 +5,30 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "a416fcc6-b361-48de-a665-d19de3c5379d",
+      "Name": "ConvertDocumentToPdf",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "4e5da2d1-cc60-4ca6-908e-28338a72c3f9",
+          "Name": "UserId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "a24c08e5-19cb-48ed-8b64-54fb429dc2cf",
+          "Name": "VersionId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "bafcd04d-1721-4fe0-a72d-7acbc7bfc61f",
+          "Name": "DocumentId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "4f03b0d0-f0f5-45ed-b1c5-98d32b864503",
       "Name": "SetDocumentStorage",
       "DelayPeriod": 15,
@@ -64,14 +88,6 @@
       "StartAt": "1753-01-01T06:00:00"
     },
     {
-      "NameGuid": "133f7487-283e-476c-8774-8c87f4bc892a",
-      "Name": "ConvertDocumentToPdf",
-      "Daily": "Repeat",
-      "IsAncestorMetadata": true,
-      "MonthSchedule": "Monthly",
-      "TimePeriod": 10
-    },
-    {
       "NameGuid": "d7044e44-89bc-4fb3-9e44-5491514d9b05",
       "Name": "SendMailNotification",
       "Daily": "Repeat",
@@ -99,7 +115,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "3.4.7.1",
+  "Version": "3.5.20.1",
   "Widgets": [],
   "Versions": [
     {
