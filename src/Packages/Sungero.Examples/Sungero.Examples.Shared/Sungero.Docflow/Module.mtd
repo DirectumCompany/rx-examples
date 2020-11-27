@@ -5,6 +5,50 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "accf7175-912e-48e7-aa12-c7288559f709",
+      "Name": "CopyCaseFiles",
+      "DelayPeriod": 60,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "067cd598-3573-47b0-9094-5724ab542514",
+          "Name": "SourcePeriodStartDate",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "0d05253f-a3e3-455c-bbb6-86ce8ee5f2ef",
+          "Name": "TargetPeriodEndDate",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "93f3646b-89a6-4497-bd71-75eea6180fef",
+          "Name": "BusinessUnitId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "9cc0deea-5879-45c4-bffe-14c033a7ed1f",
+          "Name": "TargetPeriodStartDate",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "9eb0601e-26c1-4958-9500-1fc173ff9d9c",
+          "Name": "SourcePeriodEndDate",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "cf3fa5fb-ad05-47dd-8a90-0b759a486eec",
+          "Name": "DepartmentId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "f0ec8930-8203-403d-b403-b1011c3017b5",
+          "Name": "UserId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "a416fcc6-b361-48de-a665-d19de3c5379d",
       "Name": "ConvertDocumentToPdf",
       "DelayPeriod": 15,
@@ -115,7 +159,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "3.5.20.1",
+  "Version": "3.6.11.1",
   "Widgets": [],
   "Versions": [
     {
