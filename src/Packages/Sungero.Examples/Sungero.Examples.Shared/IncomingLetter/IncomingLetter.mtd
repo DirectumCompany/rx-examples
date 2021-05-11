@@ -60,6 +60,16 @@
         "NeedPassEntityToLookupEvent",
         "EntityGuid"
       ]
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "f81f9dc6-b08a-45d0-887a-8f6fb4a557d2",
+      "Name": "Addressees",
+      "EntityGuid": "c0ed5c16-c7f3-4d3f-9e83-c5b21831a8d5",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "EntityGuid"
+      ]
     }
   ],
   "PublicStructures": [],
