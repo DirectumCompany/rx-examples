@@ -5,6 +5,30 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "a416fcc6-b361-48de-a665-d19de3c5379d",
+      "Name": "ConvertDocumentToPdf",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "4e5da2d1-cc60-4ca6-908e-28338a72c3f9",
+          "Name": "UserId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "a24c08e5-19cb-48ed-8b64-54fb429dc2cf",
+          "Name": "VersionId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "bafcd04d-1721-4fe0-a72d-7acbc7bfc61f",
+          "Name": "DocumentId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "accf7175-912e-48e7-aa12-c7288559f709",
       "Name": "CopyCaseFiles",
       "DelayPeriod": 60,
@@ -49,26 +73,36 @@
       ]
     },
     {
-      "NameGuid": "a416fcc6-b361-48de-a665-d19de3c5379d",
-      "Name": "ConvertDocumentToPdf",
+      "NameGuid": "1a9bf2e4-4778-4fdb-8edc-1f8b5777416b",
+      "Name": "SetDocumentStateAborted",
       "DelayPeriod": 15,
       "DelayStrategy": "ExponentialDelayStrategy",
       "IsAncestorMetadata": true,
       "Parameters": [
         {
-          "NameGuid": "4e5da2d1-cc60-4ca6-908e-28338a72c3f9",
-          "Name": "UserId",
+          "NameGuid": "6597716e-fdf4-45c3-b01e-7726def8c1a0",
+          "Name": "AbortedDate",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "90d8e41c-4e39-460b-8727-69b4b124e3d1",
+          "Name": "TaskId",
           "ParameterType": "Integer"
         },
         {
-          "NameGuid": "a24c08e5-19cb-48ed-8b64-54fb429dc2cf",
-          "Name": "VersionId",
-          "ParameterType": "Integer"
+          "NameGuid": "a11d163d-9758-491f-acd4-e3e5254e9bdc",
+          "Name": "NeedSetState",
+          "ParameterType": "Boolean"
         },
         {
-          "NameGuid": "bafcd04d-1721-4fe0-a72d-7acbc7bfc61f",
-          "Name": "DocumentId",
-          "ParameterType": "Integer"
+          "NameGuid": "d2640167-7fe0-4455-a17e-21f715194c65",
+          "Name": "SetObsolete",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "d61f9488-0855-48be-a6f1-085d4c55d856",
+          "Name": "NeedGrantAccessRightsOnDocument",
+          "ParameterType": "Boolean"
         }
       ]
     },
@@ -159,7 +193,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "3.6.11.1",
+  "Version": "4.0.20.1",
   "Widgets": [],
   "Versions": [
     {
