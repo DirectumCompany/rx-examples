@@ -1,0 +1,82 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "a28fcbbc-7e0d-446e-9a79-6ecb3568f40e",
+  "Name": "Exchange",
+  "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [],
+  "BaseGuid": "cec41b99-da21-422f-9332-0fbc423e95c0",
+  "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
+  "ClientBaseNamespace": "Sungero.Examples.Module.Exchange.ClientBase",
+  "Code": "ExCh",
+  "CompanyCode": "Sungero",
+  "ExplorerTreeOrder": [],
+  "IconResourcesKeys": [],
+  "Importance": "Medium",
+  "IsVisible": false,
+  "Jobs": [
+    {
+      "NameGuid": "65fa7815-170d-489c-b613-c2c2366161a4",
+      "Name": "BodyConverterJob",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T00:00:00",
+      "TimePeriod": 10,
+      "Versions": []
+    },
+    {
+      "NameGuid": "13f61e21-8bb9-4a3d-b72b-e92da64c60b4",
+      "Name": "GetMessages",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T00:00:00",
+      "TimePeriod": 10,
+      "Versions": []
+    },
+    {
+      "NameGuid": "e7b6f44d-78eb-4c9f-b6e5-ffa66a262e91",
+      "Name": "SendReceiptNotificationTasks",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T14:00:00",
+      "Versions": []
+    },
+    {
+      "NameGuid": "b54f0e86-0cac-49bf-b99b-30ffd8030d9b",
+      "Name": "CreateReceiptNotifications",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 10,
+      "Versions": []
+    },
+    {
+      "NameGuid": "a050e9dc-ac0a-40c2-a322-7f1832e53f36",
+      "Name": "SendSignedReceiptNotifications",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 10,
+      "Versions": []
+    }
+  ],
+  "LayeredFromGuid": "cec41b99-da21-422f-9332-0fbc423e95c0",
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
+  "ResourcesKeys": [],
+  "SpecialFolders": [],
+  "Version": "4.1.0.0",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 6
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 6
+    }
+  ]
+}
