@@ -5,6 +5,20 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "0dafb1e3-1520-40a8-ab6e-09deeae72e8f",
+      "Name": "ExecuteApprovalFunction",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "91638f41-9665-4a31-a53d-4114bafd2b73",
+          "Name": "QueueItemId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "a416fcc6-b361-48de-a665-d19de3c5379d",
       "Name": "ConvertDocumentToPdf",
       "DelayPeriod": 15,
@@ -193,7 +207,7 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "4.1.0.0",
+  "Version": "4.1.15.1",
   "Widgets": [],
   "Versions": [
     {
