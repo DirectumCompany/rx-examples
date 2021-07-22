@@ -15,7 +15,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <returns>Изображение отметки об ЭП для подписи в виде html.</returns>
     /// <description>
     /// Пример перекрытия логики наложения отметки о простой ЭП для всех документов.
-    /// В отметке о простой ЭП изменёны логотип и пропорции заголовка.
+    /// В отметке о простой ЭП изменены логотип и пропорции заголовка.
     /// Также в отметку добавлены дата и время подписания.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
@@ -27,10 +27,14 @@ namespace Sungero.Examples.Module.Docflow.Server
       var signatoryFullName = signature.SignatoryFullName;
       var signatoryId = signature.Signatory.Id;
       
-      string html = Resources.HtmlStampTemplateForSignatureCustom;
-      html = html.Replace("{SignatoryFullName}", signatoryFullName);
-      html = html.Replace("{SignatoryId}", signatoryId.ToString());
-      html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      string html;
+      using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
+      {
+        html = Resources.HtmlStampTemplateForSignatureCustom;
+        html = html.Replace("{SignatoryFullName}", signatoryFullName);
+        html = html.Replace("{SignatoryId}", signatoryId.ToString());
+        html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      }
       return html;
     }
     
@@ -41,7 +45,7 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <returns>Изображение отметки об ЭП для сертификата в виде html.</returns>
     /// <description>
     /// Пример перекрытия логики наложения отметки о квалифицированной ЭП для всех документов.
-    /// В отметке о квалифицированной ЭП изменёны логотип и пропорции заголовка.
+    /// В отметке о квалифицированной ЭП изменены логотип и пропорции заголовка.
     /// Также в отметку добавлены дата и время подписания.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
@@ -60,16 +64,21 @@ namespace Sungero.Examples.Module.Docflow.Server
       if (string.IsNullOrEmpty(signatoryFullName))
         signatoryFullName = certificateSubject.CounterpartyName;
       
-      string html = Resources.HtmlStampTemplateForCertificateCustom;
-      html = html.Replace("{SignatoryFullName}", signatoryFullName);
-      html = html.Replace("{Thumbprint}", certificate.Thumbprint.ToLower());
-      var validity = string.Format("{0} {1} {2} {3}",
-                                   Company.Resources.From,
-                                   certificate.NotBefore.Value.ToShortDateString(),
-                                   Company.Resources.To,
-                                   certificate.NotAfter.Value.ToShortDateString());
-      html = html.Replace("{Validity}", validity);
-      html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      string html;
+      string validity;
+      using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
+      {
+        html = Resources.HtmlStampTemplateForCertificateCustom;
+        html = html.Replace("{SignatoryFullName}", signatoryFullName);
+        html = html.Replace("{Thumbprint}", certificate.Thumbprint.ToLower());
+        validity = string.Format("{0} {1} {2} {3}",
+                                 Company.Resources.From,
+                                 certificate.NotBefore.Value.ToShortDateString(),
+                                 Company.Resources.To,
+                                 certificate.NotAfter.Value.ToShortDateString());
+        html = html.Replace("{Validity}", validity);
+        html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      }
       return html;
     }
     

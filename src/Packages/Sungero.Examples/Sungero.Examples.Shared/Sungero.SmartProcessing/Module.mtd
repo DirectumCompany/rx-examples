@@ -5,6 +5,20 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "396a79ad-2965-47b6-91c3-12c44e8681e2",
+      "Name": "ProcessBlobPackage",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "3caaa58b-224f-44ac-8a05-3612ec60d80a",
+          "Name": "BlobPackageId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "2a536470-c8d5-466a-9ad5-8489733edf0c",
       "Name": "DeleteEntityRecognitionInfo",
       "DelayPeriod": 15,
@@ -53,7 +67,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.1.0.0",
+  "Version": "4.1.15.1",
   "Widgets": [],
   "Versions": [
     {

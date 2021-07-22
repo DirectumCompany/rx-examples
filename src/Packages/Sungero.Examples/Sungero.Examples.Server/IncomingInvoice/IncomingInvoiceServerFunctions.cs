@@ -48,10 +48,14 @@ namespace Sungero.Examples.Server
       var signatoryFullName = signature.SignatoryFullName;
       var signatoryId = signature.Signatory.Id;
       
-      string html = Examples.IncomingInvoices.Resources.HtmlStampTemplateForSignatureCustom;
-      html = html.Replace("{SignatoryFullName}", signatoryFullName);
-      html = html.Replace("{SignatoryId}", signatoryId.ToString());
-      html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      string html;
+      using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
+      {
+        html = Examples.IncomingInvoices.Resources.HtmlStampTemplateForSignatureCustom;
+        html = html.Replace("{SignatoryFullName}", signatoryFullName);
+        html = html.Replace("{SignatoryId}", signatoryId.ToString());
+        html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      }
       return html;
     }
     
@@ -82,16 +86,21 @@ namespace Sungero.Examples.Server
       if (string.IsNullOrEmpty(signatoryFullName))
         signatoryFullName = certificateSubject.CounterpartyName;
       
-      string html = Examples.IncomingInvoices.Resources.HtmlStampTemplateForCertificateCustom;
-      html = html.Replace("{SignatoryFullName}", signatoryFullName);
-      html = html.Replace("{Thumbprint}", certificate.Thumbprint.ToLower());
-      var validity = string.Format("{0} {1} {2} {3}",
-                                   Company.Resources.From,
-                                   certificate.NotBefore.Value.ToShortDateString(),
-                                   Company.Resources.To,
-                                   certificate.NotAfter.Value.ToShortDateString());
-      html = html.Replace("{Validity}", validity);
-      html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      string html;
+      string validity;
+      using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
+      {
+        html = Examples.IncomingInvoices.Resources.HtmlStampTemplateForCertificateCustom;
+        html = html.Replace("{SignatoryFullName}", signatoryFullName);
+        html = html.Replace("{Thumbprint}", certificate.Thumbprint.ToLower());
+        validity = string.Format("{0} {1} {2} {3}",
+                                 Company.Resources.From,
+                                 certificate.NotBefore.Value.ToShortDateString(),
+                                 Company.Resources.To,
+                                 certificate.NotAfter.Value.ToShortDateString());
+        html = html.Replace("{Validity}", validity);
+        html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
+      }
       return html;
     }
   }

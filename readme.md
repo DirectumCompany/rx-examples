@@ -29,7 +29,7 @@
 3. Все документы. Изменено условие для интерактивного преобразования документов. Теперь изображения в формате jpg размером < 1 Mb конвертируются интерактивно. 
 <br>**Точка входа:** серверный метод [CanConvertToPdfInteractively](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L81-L88) модуля Docflow. 
 
-4. Служебная записка. На первой странице документа, в верхнем левом углу поставить отметки о всех подписях документа. Отметки ставятся сверху вниз, с небольшим отсутпом друг от друга. 
+4. Служебная записка. На первой странице документа, в верхнем левом углу поставить отметки о всех подписях документа. Отметки ставятся сверху вниз, с небольшим отступом друг от друга. 
 <br>**Точка входа:** серверный метод [ConvertToPdfAndAddSignatureMark](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Memo/MemoServerFunctions.cs#L48-L128) документа Memo. 
 
 ### Политики перемещения 

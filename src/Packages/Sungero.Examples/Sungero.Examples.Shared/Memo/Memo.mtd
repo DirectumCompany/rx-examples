@@ -42,6 +42,16 @@
       "Overridden": [
         "EntityGuid"
       ]
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "b8d2a9bb-bbb2-456f-946e-178af9ea0c6b",
+      "Name": "Addressees",
+      "EntityGuid": "0bb0b78c-4cdf-498b-b50a-41ff859cf636",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "EntityGuid"
+      ]
     }
   ],
   "PublicStructures": [],
@@ -72,7 +82,7 @@
     },
     {
       "Type": "EntityMetadata",
-      "Number": 9
+      "Number": 11
     },
     {
       "Type": "DomainApi",
