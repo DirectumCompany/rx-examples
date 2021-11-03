@@ -5,11 +5,21 @@ namespace Sungero.Examples.Module.Exchange.Constants
 {
   public static class Module
   {
-    public static class NonformalizedKind
+    // Виды документов в Диадоке.
+    public static class NonformalizedKindDiadoc
     {
+      // Входящий счет.
       public const string IncomingInvoice = "ProformaInvoice";
       
+      // Письмо.
       public const string Title = "Title";
+    }
+    
+    // Виды документов в СБИС.
+    public static class NonformalizedKindSbis
+    {      
+      // Входящий счет.
+      public const string IncomingInvoice ="ЭДОСч";
     }
     
     public static class MetadataKeyIncomingInvoice
