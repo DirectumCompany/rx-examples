@@ -72,8 +72,24 @@
       ]
     }
   ],
+  "PublicFunctions": [
+    {
+      "Name": "GetRegistrationMarkAsHtml",
+      "Parameters": [
+        {
+          "Name": "incomingLetter",
+          "ParameterType": "global::Sungero.Examples.IIncomingLetter",
+          "ParameterTypeFullName": "Sungero.Examples.IIncomingLetter, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
+    }
+  ],
   "PublicStructures": [],
-  "ResourcesKeys": [],
+  "ResourcesKeys": [
+    "HtmlStampTemplateForRegistrationMarkCustom"
+  ],
   "RibbonCardMetadata": {
     "NameGuid": "83fa731b-653e-480e-8c87-39e969504721",
     "Name": "RibbonCard",
