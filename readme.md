@@ -32,6 +32,10 @@
 4. Служебная записка. На первой странице документа, в верхнем левом углу поставить отметки о всех подписях документа. Отметки ставятся сверху вниз, с небольшим отступом друг от друга. 
 <br>**Точка входа:** серверный метод [ConvertToPdfAndAddSignatureMark](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Memo/MemoServerFunctions.cs#L48-L128) документа Memo. 
 
+### Преобразование в PDF и наложение отметки о поступлении
+Входящее письмо. Цвет отметки о поступлении изменён на фиолетовый, изменена толщина рамки, расположение (отметка сдвинута ближе к центру), добавлено указание подразделения.
+<br>**Точки входа:** серверные методы IncomingLetter: [AddRegistrationMark](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/IncomingLetter/IncomingLetterServerFunctions.cs#L47-L50) и [GetRegistrationMarkAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/IncomingLetter/IncomingLetterServerFunctions.cs#L17-L38).
+
 ### Политики перемещения 
 Добавлено событие "Обращение к документу" в критерии перемещения. Документ перемещается в новое хранилище, если прошло указанное время с даты последнего обращения к документу. 
 <br>**Точки входа:** серверные методы [GetStoragePolicySettingsQuery](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L95-L98), [GetDocumentsToTransferQuery](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L104-L107) модуля Docflow.
