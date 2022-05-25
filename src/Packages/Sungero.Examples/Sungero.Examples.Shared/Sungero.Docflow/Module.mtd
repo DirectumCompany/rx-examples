@@ -5,6 +5,35 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "3e3240a6-f984-406f-a2e5-79467cb926ea",
+      "Name": "AddRegistrationStamp",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "39919c36-08e7-4812-a86f-809a1503876d",
+          "Name": "BottomIndent",
+          "ParameterType": "Double"
+        },
+        {
+          "NameGuid": "441814f1-ea00-48fe-8401-385359d274e3",
+          "Name": "RightIndent",
+          "ParameterType": "Double"
+        },
+        {
+          "NameGuid": "73348e23-17f3-4845-8be2-1380dd989814",
+          "Name": "VersionId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "d82a50f3-ad3f-4bc4-9362-d7ae6f6e41a9",
+          "Name": "DocumentId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
       "NameGuid": "0dafb1e3-1520-40a8-ab6e-09deeae72e8f",
       "Name": "ExecuteApprovalFunction",
       "DelayPeriod": 15,
@@ -166,6 +195,14 @@
   "Importance": "Low",
   "Jobs": [
     {
+      "NameGuid": "35ba6be5-acff-4551-9f4d-48f0c7bb6419",
+      "Name": "SendSummaryMailNotifications",
+      "IsAncestorMetadata": true,
+      "Monthly": "WorkingDays",
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T07:00:00"
+    },
+    {
       "NameGuid": "0df1dbd4-8cd1-407d-90ba-537a251d4f7c",
       "Name": "TransferDocumentsByStoragePolicy",
       "IsAncestorMetadata": true,
@@ -207,16 +244,16 @@
     "HtmlStampTemplateForSignatureCustom"
   ],
   "SpecialFolders": [],
-  "Version": "4.4.0.0",
+  "Version": "4.4.18.1",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 6
+      "Number": 8
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 6
+      "Number": 8
     }
   ]
 }

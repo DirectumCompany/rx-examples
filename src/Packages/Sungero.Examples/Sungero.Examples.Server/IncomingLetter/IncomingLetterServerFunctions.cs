@@ -14,7 +14,7 @@ namespace Sungero.Examples.Server
     /// </summary>
     /// <returns>Изображение отметки о регистрации в виде html.</returns>
     [Public]
-    public override string GetRegistrationMarkAsHtml()
+    public override string GetRegistrationStampAsHtml()
     {
       var regNumber = _obj.RegistrationNumber;
       var regDate = _obj.RegistrationDate;
@@ -44,9 +44,9 @@ namespace Sungero.Examples.Server
     /// <param name="bottomIndent">Значение отступа снизу.</param>
     /// <returns>Результат преобразования.</returns>
     [Remote]
-    public override Sungero.Docflow.Structures.OfficialDocument.СonversionToPdfResult AddRegistrationMark(double rightIndent, double bottomIndent)
+    public override Sungero.Docflow.Structures.OfficialDocument.СonversionToPdfResult AddRegistrationStamp(double rightIndent, double bottomIndent)
     {
-      return base.AddRegistrationMark(5, 1);
+      return base.AddRegistrationStamp(5, 1);
     }
   }
 }

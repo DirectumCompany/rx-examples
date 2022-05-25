@@ -74,7 +74,7 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "GetRegistrationMarkAsHtml",
+      "Name": "GetRegistrationStampAsHtml",
       "Parameters": [
         {
           "Name": "incomingLetter",
