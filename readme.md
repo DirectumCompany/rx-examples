@@ -16,7 +16,11 @@
 </block>
 ```
 
-## Кейсы 
+## Кейсы
+
+### Согласование по регламенту
+Добавлена роль "Сотрудники подразделения инициатора" с несколькими исполнителями. Роль можно указать в качестве исполнителя в этапах согласования с типом "Согласование".
+<br>**Точки входа:** серверные методы [GetRolePerformers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ApprovalRole/ApprovalRoleServerFunctions.cs#L17-L23) и [GetInitiatorDepartmentEmployeesRolePerformers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ApprovalRole/ApprovalRoleServerFunctions.cs#L30-L40) справочника ApprovalRole.
 
 ### Преобразование в PDF и наложение отметки об ЭП
 

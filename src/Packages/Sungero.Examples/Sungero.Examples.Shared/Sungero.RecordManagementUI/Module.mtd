@@ -99,19 +99,11 @@
     },
     {
       "IsAncestorMetadata": true,
-      "ItemId": "be859f9b-7a04-4f07-82bc-441352bce627",
-      "Overridden": [
-        "PreviousItemId"
-      ],
-      "PreviousItemId": "ce3e34ed-7be2-4426-a951-d5a70f966650"
-    },
-    {
-      "IsAncestorMetadata": true,
       "ItemId": "c290b098-12c7-487d-bb38-73e2c98f9789",
       "Overridden": [
         "PreviousItemId"
       ],
-      "PreviousItemId": "be859f9b-7a04-4f07-82bc-441352bce627"
+      "PreviousItemId": "ce3e34ed-7be2-4426-a951-d5a70f966650"
     },
     {
       "IsAncestorMetadata": true,
@@ -284,7 +276,7 @@
       "OpenCardByDefault": true
     }
   ],
-  "Version": "4.4.18.1",
+  "Version": "4.5.9.1",
   "Widgets": [],
   "Versions": [
     {
