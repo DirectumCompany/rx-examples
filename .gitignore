@@ -28,3 +28,16 @@ _ConfigSettings.xml*
 
 # Enable "build/" folder in the NuGet Packages folder since NuGet packages use it for MSBuild targets
 !packages/*/build/
+
+
+*.nupkg
+*.diff
+*.csproj
+*.sln
+*.g.cs
+*.xaml
+*.xaml.cs
+*.bak
+AssemblyInfo.cs
+[bB]in/*
+_ConfigSettings.xml
