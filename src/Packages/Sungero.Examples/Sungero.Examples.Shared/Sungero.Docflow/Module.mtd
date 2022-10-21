@@ -5,6 +5,25 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "e243048a-0320-4bb6-b9b0-b3e1b1c1770f",
+      "Name": "GrantAccessRightsToDocumentsBulk",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "13cdd20b-a00a-45f8-ab81-4f7b387e22d0",
+          "Name": "RuleId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "3e31932c-fe59-47ab-a381-e4e8b06a740a",
+          "Name": "DocumentIds",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
       "NameGuid": "3e3240a6-f984-406f-a2e5-79467cb926ea",
       "Name": "AddRegistrationStamp",
       "DelayPeriod": 15,
@@ -248,7 +267,7 @@
     "RoleInitiatorDepartmentEmployees"
   ],
   "SpecialFolders": [],
-  "Version": "4.5.20.1",
+  "Version": "4.5.104.1",
   "Widgets": [],
   "Versions": [
     {
