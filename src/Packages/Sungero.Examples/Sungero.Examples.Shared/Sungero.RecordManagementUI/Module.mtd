@@ -117,6 +117,7 @@
   "IconResourcesKeys": [],
   "Importance": "High",
   "IsLicensed": true,
+  "IsolatedAreas": [],
   "LayeredFromGuid": "51247c94-981f-4bc8-819a-128704b5aa31",
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
@@ -276,7 +277,7 @@
       "OpenCardByDefault": true
     }
   ],
-  "Version": "4.5.20.1",
+  "Version": "4.6.3.1",
   "Widgets": [],
   "Versions": [
     {

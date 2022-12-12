@@ -79,7 +79,7 @@ namespace Sungero.Examples.Server
             pdfStamp.XIndent = horizontalCoord;
             // Отступ сверху на высоту штампа.
             pdfStamp.YIndent = verticalCoord - pdfStamp.PdfPage.PageInfo.Height;
-            pdfConverter.AddStampToDocument(pdfDocument, pdfStamp, pages);
+            pdfConverter.GetPdfDocumentWithStamp(pdfDocument, pdfStamp, pages, false);
             verticalCoord = verticalCoord - pdfStamp.PdfPage.PageInfo.Height - 5;
           }
           pdfDocument.Save(pdfDocumentStream);
