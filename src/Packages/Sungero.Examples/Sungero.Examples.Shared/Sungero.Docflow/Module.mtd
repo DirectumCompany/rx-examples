@@ -244,6 +244,32 @@
   "IconResourcesKeys": [],
   "Importance": "Low",
   "IsolatedAreas": [],
+  "IsolatedFunctions": [
+    {
+      "NameGuid": "993e7c0e-42c5-4d3f-91b7-b3f0cf23b1c3",
+      "Name": "AddAllSignatureStamps",
+      "IsolatedAreaId": "52690720-3344-4349-9041-c8d15b7eebb7",
+      "Parameters": [
+        {
+          "Name": "inputStream",
+          "ParameterType": "global::System.IO.Stream",
+          "ParameterTypeFullName": "System.IO.Stream"
+        },
+        {
+          "Name": "htmlStamps",
+          "ParameterType": "global::System.Collections.Generic.List<global::System.String>",
+          "ParameterTypeFullName": "System.Collections.Generic.List`1[[System.String]]"
+        },
+        {
+          "Name": "extension",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "ReturnType": "global::System.IO.Stream",
+      "ReturnTypeFullName": "System.IO.Stream"
+    }
+  ],
   "Jobs": [
     {
       "NameGuid": "622cfeba-32e5-4bd0-a85f-f216afe0c210",

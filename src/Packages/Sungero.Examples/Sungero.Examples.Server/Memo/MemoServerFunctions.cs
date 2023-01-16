@@ -57,36 +57,20 @@ namespace Sungero.Examples.Server
         return info;
       }
       
-      var pdfDocumentStream = new System.IO.MemoryStream();
+      System.IO.Stream pdfDocumentStream = null;
       using (var inputStream = new System.IO.MemoryStream())
       {
         version.Body.Read().CopyTo(inputStream);
         try
         {
-          var pdfConverter = new AsposeExtensions.Converter();
           var extension = version.BodyAssociatedApplication.Extension;
-          // Конвертация в pdf документ.
-          var pdfDocument = pdfConverter.GeneratePdfDocument(inputStream, extension);
-          // Координаты отсчитываются от нижнего левого угла.
-          var horizontalCoord = 312;
-          var verticalCoord = pdfDocument.Pages[1].Rect.Height - 100;
           var htmlStamps = this.GetDocumentHtmlStamps(versionId);
-          // Отметка об эп проставляется только на первой странице.
-          var pages = new int[] { 1 };
-          foreach (var htmlStamp in htmlStamps)
-          {
-            var pdfStamp = pdfConverter.CreateMarkFromHtml(htmlStamp);
-            pdfStamp.XIndent = horizontalCoord;
-            // Отступ сверху на высоту штампа.
-            pdfStamp.YIndent = verticalCoord - pdfStamp.PdfPage.PageInfo.Height;
-            pdfConverter.GetPdfDocumentWithStamp(pdfDocument, pdfStamp, pages, false);
-            verticalCoord = verticalCoord - pdfStamp.PdfPage.PageInfo.Height - 5;
-          }
-          pdfDocument.Save(pdfDocumentStream);
+          // Конвертация в pdf документ.
+          pdfDocumentStream = Sungero.Examples.Module.Docflow.IsolatedFunctions.PdfConverter.AddAllSignatureStamps(inputStream, htmlStamps, extension);
         }
         catch (Exception e)
         {
-          if (e is AsposeExtensions.PdfConvertException)
+          if (e is AppliedCodeException)
             Logger.Error(Docflow.Resources.PdfConvertErrorFormat(_obj.Id), e.InnerException);
           else
             Logger.Error(string.Format("{0} {1}", Docflow.Resources.PdfConvertErrorFormat(_obj.Id), e.Message));
