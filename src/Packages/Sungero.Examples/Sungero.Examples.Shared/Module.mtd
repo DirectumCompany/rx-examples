@@ -58,16 +58,8 @@
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Examples",
-  "IsolatedAreas": [],
   "IsolatedAssemblyName": "Sungero.Examples.Isolated",
   "IsolatedNamespace": "Sungero.Examples.Isolated",
-  "Libraries": [
-    {
-      "NameGuid": "76862e07-3323-46d0-82f0-8a0737805c52",
-      "Name": "AsposePdf",
-      "Scope": "Server"
-    }
-  ],
   "OrderedSpecialFolders": [],
   "PublicFunctions": [
     {
