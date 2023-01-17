@@ -11,12 +11,12 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
   public partial class IsolatedFunctions
   {
     /// <summary>
-    /// 
+    /// Добавить в документ отметки обо всех электронных подписях.
     /// </summary>
-    /// <param name="inputStream"></param>
-    /// <param name="htmlStamps"></param>
-    /// <param name="extension"></param>
-    /// <returns></returns>
+    /// <param name="inputStream">Поток с исходным документом.</param>
+    /// <param name="htmlStamps">Отметки об ЭП.</param>
+    /// <param name="extension">Расширение документа.</param>
+    /// <returns>Поток с документом с проставленными отметками.</returns>
     [Public]
     public virtual Stream AddAllSignatureStamps(Stream inputStream, List<string> htmlStamps, string extension)
     {
@@ -42,13 +42,13 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
     }
     
     /// <summary>
-    /// 
+    /// Добавить в документ заданные отметки об ЭП.
     /// </summary>
-    /// <param name="pdfDocument"></param>
-    /// <param name="pdfConverter"></param>
-    /// <param name="htmlStamps"></param>
-    /// <param name="outputStream"></param>
-    /// <returns></returns>
+    /// <param name="pdfDocument">Исходный документ.</param>
+    /// <param name="pdfConverter">Конвертер в PDF.</param>
+    /// <param name="htmlStamps">Отметки об ЭП.</param>
+    /// <param name="outputStream">Поток, куда записывать результат.</param>
+    /// <returns>Поток с документом с проставленными отметками.</returns>
     public virtual Stream AddHtmlStamps(Aspose.Pdf.Document pdfDocument, Sungero.AsposeExtensions.Converter pdfConverter, List<string> htmlStamps, Stream outputStream)
     {
       const int horizontalCoord = 312;
