@@ -12,7 +12,7 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Получить список всех подписей документа.
     /// </summary>
-    /// <param name="versionId">Ид версии документа.</param>
+    /// <param name="versionId">ИД версии документа.</param>
     /// <returns>Коллекция подписей документа.</returns>
     public System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> GetDocumentSignatures(int versionId)
     {
@@ -26,7 +26,7 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Получить список отметок об ЭП в формате html.
     /// </summary>
-    /// <param name="versionId">Ид версии документа.</param>
+    /// <param name="versionId">ИД версии документа.</param>
     /// <returns>Список отметок об ЭП.</returns>
     public List<string> GetDocumentHtmlStamps(int versionId)
     {
@@ -65,8 +65,11 @@ namespace Sungero.Examples.Server
         {
           var extension = version.BodyAssociatedApplication.Extension;
           var htmlStamps = this.GetDocumentHtmlStamps(versionId);
+          
           // Конвертация в pdf документ.
-          pdfDocumentStream = Sungero.Examples.Module.Docflow.IsolatedFunctions.PdfConverter.AddAllSignatureStamps(inputStream, htmlStamps, extension);
+          pdfDocumentStream = Sungero.Examples.Module.Docflow.IsolatedFunctions.PdfConverter.AddAllSignatureStamps(inputStream,
+                                                                                                                   htmlStamps,
+                                                                                                                   extension);
         }
         catch (Exception e)
         {
