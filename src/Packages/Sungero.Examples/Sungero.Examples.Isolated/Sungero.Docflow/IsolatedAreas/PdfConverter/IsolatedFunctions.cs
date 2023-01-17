@@ -13,6 +13,7 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
     [Public]
     public virtual Stream AddAllSignatureStamps(Stream inputStream, List<string> htmlStamps, string extension)
     {
+      System.IO.Stream outputStream = null;
       var pdfDocumentStream = new MemoryStream();
       try
       {
@@ -31,18 +32,21 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
           pdfStamp.XIndent = horizontalCoord;
           // Отступ сверху на высоту штампа.
           pdfStamp.YIndent = verticalCoord - pdfStamp.PdfPage.PageInfo.Height;
-          pdfDocumentStream = pdfConverter.GetPdfDocumentWithStamp(pdfDocument, pdfStamp, pages, false);
+          outputStream = pdfConverter.GetPdfDocumentWithStamp(pdfDocument, pdfStamp, pages, false);
           verticalCoord = verticalCoord - pdfStamp.PdfPage.PageInfo.Height - 5;
         }
-        
-        //pdfDocument.Save(pdfDocumentStream);
-        return pdfDocumentStream;
+        pdfDocument.Save(pdfDocumentStream);
+        return outputStream;
       }
       catch (Exception ex)
       {
-        pdfDocumentStream.Close();
+        outputStream.Close();
         Logger.Error("Cannot add stamp", ex);
         throw new AppliedCodeException("Cannot add stamp");
+      }
+      finally
+      {
+        pdfDocumentStream.Close();
       }
     }
   }
