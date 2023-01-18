@@ -3,7 +3,46 @@
   "NameGuid": "a28fcbbc-7e0d-446e-9a79-6ecb3568f40e",
   "Name": "Exchange",
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
-  "AsyncHandlers": [],
+  "AsyncHandlers": [
+    {
+      "NameGuid": "a55a422f-8052-4ad2-bf69-f7e362bf9d4e",
+      "Name": "ProcessMessages",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "50bdd6e9-e3f2-4b4e-833f-aa2738552e45",
+          "Name": "AsyncHandlerId",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "7b4a3f6f-c217-4bbf-b959-8512b6f7c16b",
+          "Name": "QueueItemIds",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "a0d6af7a-25e1-4ca0-b01b-169b2478fdbb",
+      "Name": "ConvertExchangeDocumentToPdf",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "15021bc4-5d42-4a45-a4ba-55fc998e7c97",
+          "Name": "QueueItemId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "1c65aa69-c1ca-4436-8680-619c3b3c0078",
+          "Name": "AsyncHandlerId",
+          "ParameterType": "String"
+        }
+      ]
+    }
+  ],
   "BaseGuid": "cec41b99-da21-422f-9332-0fbc423e95c0",
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.Exchange.ClientBase",
@@ -67,7 +106,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.5.20.1",
+  "Version": "4.6.18.1",
   "Widgets": [],
   "Versions": [
     {

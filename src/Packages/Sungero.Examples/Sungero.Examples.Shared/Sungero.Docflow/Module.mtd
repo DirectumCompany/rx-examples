@@ -5,6 +5,53 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "e243048a-0320-4bb6-b9b0-b3e1b1c1770f",
+      "Name": "GrantAccessRightsToDocumentsBulk",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "c75d8e8c-6c1b-4ed1-9c88-b6073cd333ae",
+          "Name": "QueueItemId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
+      "NameGuid": "1789c9a0-c48c-4a00-8d0e-fdc2a9c274a8",
+      "Name": "ClearAccessRightsRuleState",
+      "DelayPeriod": 15,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "5c69d42e-2a65-40a5-8fb8-508e7c0c6b2e",
+          "Name": "RuleId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
+      "NameGuid": "dd7a5d44-7c4e-41bc-97b6-957f45a4f8c2",
+      "Name": "CompareDocuments",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "10387b94-21d8-41a4-ad00-2842c53d57ac",
+          "Name": "ComparisonInfoId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "22243d0c-0ffd-49fa-bf46-aedf7c8ef6bc",
+          "Name": "ProcessingStartTime",
+          "ParameterType": "DateTime"
+        }
+      ]
+    },
+    {
       "NameGuid": "3e3240a6-f984-406f-a2e5-79467cb926ea",
       "Name": "AddRegistrationStamp",
       "DelayPeriod": 15,
@@ -196,7 +243,49 @@
   ],
   "IconResourcesKeys": [],
   "Importance": "Low",
+  "IsolatedAreas": [],
+  "IsolatedFunctions": [
+    {
+      "NameGuid": "993e7c0e-42c5-4d3f-91b7-b3f0cf23b1c3",
+      "Name": "AddAllSignatureStamps",
+      "IsolatedAreaId": "52690720-3344-4349-9041-c8d15b7eebb7",
+      "Parameters": [
+        {
+          "Name": "inputStream",
+          "ParameterType": "global::System.IO.Stream",
+          "ParameterTypeFullName": "System.IO.Stream"
+        },
+        {
+          "Name": "htmlStamps",
+          "ParameterType": "global::System.Collections.Generic.List<global::System.String>",
+          "ParameterTypeFullName": "System.Collections.Generic.List`1[[System.String]]"
+        },
+        {
+          "Name": "extension",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
+        }
+      ],
+      "ReturnType": "global::System.IO.Stream",
+      "ReturnTypeFullName": "System.IO.Stream"
+    }
+  ],
   "Jobs": [
+    {
+      "NameGuid": "622cfeba-32e5-4bd0-a85f-f216afe0c210",
+      "Name": "GrantAccessRightsToDocuments",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 10
+    },
+    {
+      "NameGuid": "3069c638-bc15-4cba-bd4d-2d0dca77906d",
+      "Name": "DeleteComparisonInfos",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00"
+    },
     {
       "NameGuid": "35ba6be5-acff-4551-9f4d-48f0c7bb6419",
       "Name": "SendSummaryMailNotifications",
@@ -227,14 +316,6 @@
       "MonthSchedule": "Monthly",
       "StartAt": "1753-01-01T00:00:00",
       "TimePeriod": 30
-    },
-    {
-      "NameGuid": "1e83711c-fc18-4a48-83aa-124d8ef9b690",
-      "Name": "GrantAccessRightsToDocuments",
-      "Daily": "Repeat",
-      "IsAncestorMetadata": true,
-      "MonthSchedule": "Monthly",
-      "TimePeriod": 60
     }
   ],
   "LayeredFromGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
@@ -248,7 +329,7 @@
     "RoleInitiatorDepartmentEmployees"
   ],
   "SpecialFolders": [],
-  "Version": "4.5.20.1",
+  "Version": "4.6.18.1",
   "Widgets": [],
   "Versions": [
     {

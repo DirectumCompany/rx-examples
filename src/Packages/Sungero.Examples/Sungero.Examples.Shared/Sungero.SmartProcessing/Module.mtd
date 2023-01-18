@@ -51,6 +51,7 @@
       "ReturnTypeFullName": "System.Void"
     }
   ],
+  "IsolatedAreas": [],
   "Jobs": [
     {
       "NameGuid": "aed5a3c7-76e7-4ba8-b24a-46e14937f44d",
@@ -67,7 +68,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.5.20.1",
+  "Version": "4.6.18.1",
   "Widgets": [],
   "Versions": [
     {
