@@ -21,7 +21,6 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
     public virtual Stream AddAllSignatureStamps(Stream inputStream, List<string> htmlStamps, string extension)
     {
       System.IO.Stream outputStream = null;
-      
       try
       {
         using (var pdfDocumentStream = new MemoryStream())
