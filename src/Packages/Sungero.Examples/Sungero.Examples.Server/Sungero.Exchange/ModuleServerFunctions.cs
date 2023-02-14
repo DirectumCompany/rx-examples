@@ -69,5 +69,61 @@ namespace Sungero.Examples.Module.Exchange.Server
       
       return result && !isTitle;
     }
+    
+    /// <summary>
+    /// Отфильтровать легкие сообшения.
+    /// </summary>
+    /// <param name="businessUnitBox">Абонентский ящик.</param>
+    /// <param name="messages">Сообщения.</param>
+    /// <returns>Список отфильтрованных сообщений.</returns>
+    public override List<NpoComputer.DCX.Common.IMessage> FilterLiteMessages(ExchangeCore.IBusinessUnitBox businessUnitBox, List<NpoComputer.DCX.Common.IMessage> messages)
+    {
+      var filteredMessages = new List<NpoComputer.DCX.Common.IMessage>();
+      
+      // Типы документов сервисов: 
+      // - СБИС - https://sbis.ru/help/integration/catalog/guide#_tipy_vlozhenij_dokumenta
+      // - Диадок(см. AttachmentType) - https://developer.kontur.ru/Docs/diadoc-api/proto/Entity%20message.html
+      var sbisUTDTypes = new string[] { "УпдДоп", "УпдСчфДоп" };
+      
+      // Пример данных по организации и департаменту в СБИС.
+      var sbisSenderBoxId = "1121011351/110901001";
+      var sbisSenderDepartmentCode = "1";
+      // Пример данных по организации и департаменту в Диадок.
+      var diadocSenderBoxId = "405b3fb0af6a4215b89bab864ff8aca0@diadoc.ru";
+      var diadocSenderDepartmentCode = "6e9ab7bd-576d-4fc2-9a1e-9282ec8bebb3";
+      
+      foreach (var message in messages)
+      {
+        // Не обрабатывать входящие документы от организации с Ид 1121011351/110901001.
+        if (string.Equals(message.Sender?.BoxId, sbisSenderBoxId))
+          continue;
+        
+        // Не обрабатывать входящие документы от подразделения с Ид 1 организации с Ид 1121011351/110901001.
+        if (string.Equals(message.Sender?.BoxId, sbisSenderBoxId) && string.Equals(message.FromDepartment?.Id, sbisSenderDepartmentCode))
+          continue;
+        
+        // Получать из СБИС только сообщения с УПД.
+        if (businessUnitBox.ExchangeService.ExchangeProvider == ExchangeCore.ExchangeService.ExchangeProvider.Sbis &&
+            message.IsRoot && !message.PrimaryDocuments.Any(pdoc => sbisUTDTypes.Contains(pdoc.ServiceType)))
+          continue;
+        
+        // Ответные сообщения на пропущенные основные сообщения не нужно загружать.
+        if (!message.IsRoot &&
+            // Родительского сообщения нет среди новых ещё необработанных.
+            !filteredMessages.Any(m => m.IsRoot && m.ServiceMessageId == message.ParentServiceMessageId) &&
+            // Родительского сообщения нет в очереди обработки.
+            !ExchangeCore.MessageQueueItems.GetAll(item => (bool)item.IsRootMessage && item.RootMessageId == message.ParentServiceMessageId).Any() &&
+            // Родительское сообщение не обработано и по нему нет инфошки.
+            // Для Диадока.
+            !ExchangeDocumentInfos.GetAll(info => info.ServiceMessageId == message.ParentServiceMessageId).Any() &&
+            // Для СБИСа.
+            !ExchangeDocumentInfos.GetAll(info => info.ServiceMessageId.Contains(message.ParentServiceMessageId)).Any())
+          continue;
+        
+        filteredMessages.Add(message);
+      }
+      
+      return filteredMessages;
+    }
   }
 }
