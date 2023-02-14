@@ -22,6 +22,25 @@
           "ParameterType": "String"
         }
       ]
+    },
+    {
+      "NameGuid": "a0d6af7a-25e1-4ca0-b01b-169b2478fdbb",
+      "Name": "ConvertExchangeDocumentToPdf",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "15021bc4-5d42-4a45-a4ba-55fc998e7c97",
+          "Name": "QueueItemId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "1c65aa69-c1ca-4436-8680-619c3b3c0078",
+          "Name": "AsyncHandlerId",
+          "ParameterType": "String"
+        }
+      ]
     }
   ],
   "BaseGuid": "cec41b99-da21-422f-9332-0fbc423e95c0",
@@ -87,7 +106,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.5.104.1",
+  "Version": "4.6.18.1",
   "Widgets": [],
   "Versions": [
     {
