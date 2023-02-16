@@ -5,6 +5,39 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "1e242010-c369-4d37-9f8d-83b9cd9bab10",
+      "Name": "TrainClassifier",
+      "DelayPeriod": 10,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "3eb7fbb3-aabf-4f47-9b14-110b3d9a6081",
+          "Name": "ClassifierTrainingSessionId",
+          "ParameterType": "Integer"
+        }
+      ]
+    },
+    {
+      "NameGuid": "4a96850a-bcd5-4023-a357-57691c0db237",
+      "Name": "SetClassifierTrainingStatus",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "3b4cbf61-9012-4283-bdc2-ae54e2e397ca",
+          "Name": "RecognitionInfoId",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "cccf130c-51e4-4ad0-8939-70e2f4cab9bf",
+          "Name": "TrainingStatus",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
       "NameGuid": "396a79ad-2965-47b6-91c3-12c44e8681e2",
       "Name": "ProcessBlobPackage",
       "DelayPeriod": 15,
@@ -54,6 +87,15 @@
   "IsolatedAreas": [],
   "Jobs": [
     {
+      "NameGuid": "3f749e3c-3fee-40cf-81ca-dd605388dc63",
+      "Name": "StartClassifierTraining",
+      "DaysOfWeekSchedule": "Saturday",
+      "IsAncestorMetadata": true,
+      "Monthly": "Weekly",
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T21:00:00"
+    },
+    {
       "NameGuid": "aed5a3c7-76e7-4ba8-b24a-46e14937f44d",
       "Name": "DeleteBlobPackages",
       "Daily": "Repeat",
@@ -68,7 +110,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.6.18.1",
+  "Version": "4.6.29.1",
   "Widgets": [],
   "Versions": [
     {

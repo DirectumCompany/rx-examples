@@ -54,6 +54,16 @@
   "IsVisible": false,
   "Jobs": [
     {
+      "NameGuid": "86815fea-c9d8-4531-b90d-44100affbaa6",
+      "Name": "GetHistoricalMessages",
+      "Daily": "Custom",
+      "EndAt": "1753-01-01T08:00:00",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T00:00:00",
+      "TimePeriod": 5
+    },
+    {
       "NameGuid": "65fa7815-170d-489c-b613-c2c2366161a4",
       "Name": "BodyConverterJob",
       "Daily": "Repeat",
@@ -106,7 +116,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.6.18.1",
+  "Version": "4.6.29.1",
   "Widgets": [],
   "Versions": [
     {
