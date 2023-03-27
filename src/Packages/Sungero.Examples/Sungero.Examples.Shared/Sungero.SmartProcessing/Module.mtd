@@ -5,6 +5,14 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "27031b75-9843-4516-9320-bdd8dd0cd3bf",
+      "Name": "ElasticsearchReindex",
+      "DelayPeriod": 15,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": []
+    },
+    {
       "NameGuid": "1e242010-c369-4d37-9f8d-83b9cd9bab10",
       "Name": "TrainClassifier",
       "DelayPeriod": 10,
@@ -110,7 +118,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.6.29.1",
+  "Version": "4.7.6.1",
   "Widgets": [],
   "Versions": [
     {

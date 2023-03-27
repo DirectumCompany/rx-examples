@@ -16,10 +16,10 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <description>
     /// Пример перекрытия логики наложения отметки о простой ЭП для всех документов.
     /// В отметке о простой ЭП изменены логотип и пропорции заголовка.
-    /// Также в отметку добавлены дата и время подписания.
+    /// Также в отметку добавлены дата и время подписания независимо от параметров простановки отметки.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
-    public override string GetSignatureMarkForSimpleSignatureAsHtml(Sungero.Domain.Shared.ISignature signature)
+    public override string GetSignatureMarkForSimpleSignatureAsHtml(Sungero.Domain.Shared.ISignature signature, Sungero.Docflow.Structures.StampSetting.ISignatureStampParams signatureStampParams)
     {
       if (signature == null)
         return string.Empty;
@@ -42,14 +42,15 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// Получить отметку об ЭП для сертификата из подписи.
     /// </summary>
     /// <param name="signature">Подпись.</param>
+    /// <param name="signatureStampParams">Параметры простановки отметки.</param>
     /// <returns>Изображение отметки об ЭП для сертификата в виде html.</returns>
     /// <description>
     /// Пример перекрытия логики наложения отметки о квалифицированной ЭП для всех документов.
     /// В отметке о квалифицированной ЭП изменены логотип и пропорции заголовка.
-    /// Также в отметку добавлены дата и время подписания.
+    /// Также в отметку добавлены дата и время подписания независимо от параметров простановки отметки.
     /// Цвет отметки изменён на фиолетовый.
     /// </description>
-    public override string GetSignatureMarkForCertificateAsHtml(Sungero.Domain.Shared.ISignature signature)
+    public override string GetSignatureMarkForCertificateAsHtml(Sungero.Domain.Shared.ISignature signature, Sungero.Docflow.Structures.StampSetting.ISignatureStampParams signatureStampParams)
     {
       if (signature == null)
         return string.Empty;

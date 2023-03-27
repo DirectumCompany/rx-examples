@@ -14,7 +14,7 @@ namespace Sungero.Examples.Server
     /// </summary>
     /// <param name="versionId">ИД версии документа.</param>
     /// <returns>Коллекция подписей документа.</returns>
-    public System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> GetDocumentSignatures(int versionId)
+    public System.Collections.Generic.IEnumerable<Sungero.Domain.Shared.ISignature> GetDocumentSignatures(long versionId)
     {
       var version = _obj.Versions.FirstOrDefault(x => x.Id == versionId);
       var versionSignatures = Signatures.Get(version)
@@ -28,26 +28,27 @@ namespace Sungero.Examples.Server
     /// </summary>
     /// <param name="versionId">ИД версии документа.</param>
     /// <returns>Список отметок об ЭП.</returns>
-    public List<string> GetDocumentHtmlStamps(int versionId)
+    public List<string> GetDocumentHtmlStamps(long versionId)
     {
       var signatures = this.GetDocumentSignatures(versionId);
       var htmlStamps = new List<string>();
       var htmlStamp = string.Empty;
       foreach (var signature in signatures)
       {
+        var defaultSignatureStampParams = Sungero.Docflow.PublicFunctions.Module.GetDefaultSignatureStampParams(signature.SignCertificate != null);
         if (signature.SignCertificate != null)
-          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature);
+          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature, defaultSignatureStampParams);
         else
-          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSimpleSignatureAsHtml(signature);
+          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSimpleSignatureAsHtml(signature, defaultSignatureStampParams);
         htmlStamps.Add(htmlStamp);
       }
       
       return htmlStamps;
     }
     
-    public override Sungero.Docflow.Structures.OfficialDocument.СonversionToPdfResult ConvertToPdfAndAddSignatureMark(int versionId)
+    public override Sungero.Docflow.Structures.OfficialDocument.ConversionToPdfResult ConvertToPdfAndAddSignatureMark(long versionId)
     {
-      var info = Docflow.Structures.OfficialDocument.СonversionToPdfResult.Create();
+      var info = Docflow.Structures.OfficialDocument.ConversionToPdfResult.Create();
       info.HasErrors = true;
       var version = _obj.Versions.SingleOrDefault(v => v.Id == versionId);
       if (version == null)

@@ -1,4 +1,5 @@
 ﻿using System;
+using Aspose.Pdf;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -23,13 +24,9 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
       System.IO.Stream outputStream = null;
       try
       {
-        using (var pdfDocumentStream = new MemoryStream())
-        {
-          var pdfConverter = new AsposeExtensions.Converter();
-          inputStream.CopyTo(pdfDocumentStream);
-          var pdfDocument = pdfConverter.GeneratePdfDocument(pdfDocumentStream, extension);
-          outputStream  = this.AddHtmlStamps(pdfDocument, pdfConverter, htmlStamps, outputStream);
-        }
+        var pdfConverter = this.CreatePdfConverter();
+        var pdfDocumentStream = pdfConverter.GeneratePdf(inputStream, extension);
+        outputStream  = this.AddHtmlStamps(pdfDocumentStream, htmlStamps);
         return outputStream;
       }
       catch (Exception ex)
@@ -48,30 +45,36 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
     /// <param name="htmlStamps">Отметки об ЭП.</param>
     /// <param name="outputStream">Поток, куда записывать результат.</param>
     /// <returns>Поток с документом с проставленными отметками.</returns>
-    public virtual Stream AddHtmlStamps(Aspose.Pdf.Document pdfDocument, Sungero.AsposeExtensions.Converter pdfConverter, List<string> htmlStamps, Stream outputStream)
+    public virtual Stream AddHtmlStamps(Stream pdfDocumentStream, List<string> htmlStamps)
     {
-      const int horizontalCoord = 312;
-      const int verticalOffset = 100;
-      const int verticalSpacing = 5;
-      
-      // Координаты отсчитываются от нижнего левого угла.
-      var verticalCoord = pdfDocument.Pages[1].Rect.Height - verticalOffset;
-      
-      // Отметка об ЭП проставляется только на первой странице.
-      var pages = new int[] { 1 };
-      
-      foreach (var htmlStamp in htmlStamps)
+      using (var pdfDocument = new Aspose.Pdf.Document(pdfDocumentStream))
       {
-        var pdfStamp = pdfConverter.CreateMarkFromHtml(htmlStamp);
-        pdfStamp.XIndent = horizontalCoord;
+        Stream outputStream = null;
+        pdfDocumentStream.CopyTo(outputStream);
         
-        // Отступ сверху на высоту штампа.
-        pdfStamp.YIndent = verticalCoord - pdfStamp.PdfPage.PageInfo.Height;
-        outputStream = pdfConverter.GetPdfDocumentWithStamp(pdfDocument, pdfStamp, pages, false);
-        verticalCoord = verticalCoord - pdfStamp.PdfPage.PageInfo.Height - verticalSpacing;
+        // Координаты отсчитываются от нижнего левого угла.
+        const int horizontalCoord = 312;
+        const int verticalOffset = 100;
+        const int verticalSpacing = 5;
+        var verticalCoord = pdfDocument.Pages[1].Rect.Height - verticalOffset;
+        
+        // Отметка об ЭП проставляется только на первой странице.
+        var firstPageIndex = 1;
+        
+        foreach (var htmlStamp in htmlStamps)
+        {
+          var pdfStamper = this.CreatePdfStamper();
+          var pdfStamp = pdfStamper.CreateMarkFromHtml(htmlStamp);
+          pdfStamp.XIndent = horizontalCoord;
+          
+          // Отступ сверху на высоту штампа.
+          pdfStamp.YIndent = verticalCoord - pdfStamp.PdfPage.PageInfo.Height;
+          outputStream = pdfStamper.AddStampToDocumentPage(outputStream,firstPageIndex, pdfStamp);
+          verticalCoord = verticalCoord - pdfStamp.PdfPage.PageInfo.Height - verticalSpacing;
+        }
+        
+        return outputStream;
       }
-      
-      return outputStream;
     }
   }
 }
