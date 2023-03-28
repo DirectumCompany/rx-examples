@@ -29,11 +29,11 @@
             <property name="ActualWidth">5*</property>
           </property>
           <property name="Item2" isnull="true" iskey="true">
-            <property name="FieldName">Integer_ID</property>
+            <property name="FieldName">LongInteger_ID</property>
             <property name="AutoFilterCondition">Equals</property>
             <property name="SortMode">Custom</property>
             <property name="Visible">false</property>
-            <property name="Name">Integer_ID</property>
+            <property name="Name">LongInteger_ID</property>
             <property name="ExtendedVisibleIndex">5</property>
             <property name="VisibleIndex">2</property>
             <property name="ActualWidth">NaN</property>

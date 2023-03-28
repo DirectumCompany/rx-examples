@@ -14,7 +14,7 @@ namespace Sungero.Examples.Server
     /// </summary>
     /// <param name="versionId">Id версии, для генерации.</param>
     /// <returns>Изображение отметки об ЭП в виде html.</returns>
-    public override string GetSignatureMarkAsHtml(int versionId)
+    public override string GetSignatureMarkAsHtml(long versionId)
     {
       var signature = this.GetSignatureForMark(versionId);
       if (signature == null)
