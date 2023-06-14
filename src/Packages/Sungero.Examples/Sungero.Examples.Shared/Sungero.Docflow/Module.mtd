@@ -5,6 +5,54 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "f5517a1a-7aa1-4702-ae21-77f029b08be8",
+      "Name": "IndexDocumentForFullTextSearch",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "c6ccf740-ec3b-4585-ab6b-391cccfa7185",
+          "Name": "QueueItemId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "32f27e17-010a-4b36-8523-47926dc70f33",
+      "Name": "BulkIndexDocumentsForFullTextSearch",
+      "DelayPeriod": 1,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "02a3594a-6ff1-49c9-b3d7-64ead25bd357",
+          "Name": "Mode",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "3f3bd3d7-e532-4221-a4f4-698acc73279f",
+          "Name": "LastDocumentId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "77a7b537-34d0-4a1a-b894-90eefd9c8e8b",
+          "Name": "Priority",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "8fdcbcaa-5b4e-4825-968e-ead247096168",
+          "Name": "PeriodBegin",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "d0439254-e1e3-46f9-9bed-061abf0ca88d",
+          "Name": "PeriodEnd",
+          "ParameterType": "DateTime"
+        }
+      ]
+    },
+    {
       "NameGuid": "e243048a-0320-4bb6-b9b0-b3e1b1c1770f",
       "Name": "GrantAccessRightsToDocumentsBulk",
       "DelayPeriod": 15,
@@ -272,6 +320,16 @@
   ],
   "Jobs": [
     {
+      "NameGuid": "9d346c59-72e0-4957-b13a-9becf38218b1",
+      "Name": "IndexDocumentsForFullTextSearch",
+      "Daily": "Custom",
+      "EndAt": "1753-01-01T06:00:00",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T00:00:00",
+      "TimePeriod": 5
+    },
+    {
       "NameGuid": "622cfeba-32e5-4bd0-a85f-f216afe0c210",
       "Name": "GrantAccessRightsToDocuments",
       "Daily": "Repeat",
@@ -329,7 +387,7 @@
     "RoleInitiatorDepartmentEmployees"
   ],
   "SpecialFolders": [],
-  "Version": "4.7.6.1",
+  "Version": "4.7.22.1",
   "Widgets": [],
   "Versions": [
     {
