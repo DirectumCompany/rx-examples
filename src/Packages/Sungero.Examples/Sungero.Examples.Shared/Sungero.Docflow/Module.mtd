@@ -5,6 +5,77 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "8d3ccc00-7327-4fc4-b055-781286f29e0e",
+      "Name": "SetFPoARegistrationState",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "1a0ecbd1-a809-446b-ad08-2b7c94f256ce",
+          "Name": "QueueItemId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "75ae1f1f-a990-481a-92d1-ae1a9d866fff",
+      "Name": "SetSignatureSettingValidTill",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "1c617714-79d8-40e5-bac2-93a662a23d51",
+          "Name": "SignatureSettingId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "7e3b54c4-f4bf-4bb6-a197-912ad6e59d6d",
+          "Name": "ValidTill",
+          "ParameterType": "DateTime"
+        }
+      ]
+    },
+    {
+      "NameGuid": "1a842c29-0f70-4340-99c9-84362dc91144",
+      "Name": "SyncFormalizedPoAWithService",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "68d6dcef-d922-4a0e-94b1-953e2938a773",
+          "Name": "BusinessUnitId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "96abf1f9-fba9-4827-b51c-be683c032361",
+          "Name": "BatchGuid",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "d310685d-fdab-482c-ad16-548b0a8833b8",
+      "Name": "SetFPoARevocationState",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "54005bee-7d87-4e24-a3ea-6f37fb29033f",
+          "Name": "QueueItemId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "81b6968e-ee0f-4f09-a702-99f477c53ab8",
+          "Name": "State",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
       "NameGuid": "f5517a1a-7aa1-4702-ae21-77f029b08be8",
       "Name": "IndexDocumentForFullTextSearch",
       "DelayPeriod": 15,
@@ -320,6 +391,13 @@
   ],
   "Jobs": [
     {
+      "NameGuid": "91cb2efd-0ef2-4073-b1d0-fce8bec52690",
+      "Name": "SyncFormalizedPowerOfAttorneyState",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00"
+    },
+    {
       "NameGuid": "9d346c59-72e0-4957-b13a-9becf38218b1",
       "Name": "IndexDocumentsForFullTextSearch",
       "Daily": "Custom",
@@ -387,7 +465,7 @@
     "RoleInitiatorDepartmentEmployees"
   ],
   "SpecialFolders": [],
-  "Version": "4.7.22.1",
+  "Version": "4.8.23.1",
   "Widgets": [],
   "Versions": [
     {
