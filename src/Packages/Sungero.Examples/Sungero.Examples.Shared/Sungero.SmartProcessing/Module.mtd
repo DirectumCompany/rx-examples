@@ -18,6 +18,7 @@
       "DelayPeriod": 10,
       "DelayStrategy": "RegularDelayStrategy",
       "IsAncestorMetadata": true,
+      "MaxRetryCount": 400,
       "Parameters": [
         {
           "NameGuid": "3eb7fbb3-aabf-4f47-9b14-110b3d9a6081",
@@ -95,6 +96,15 @@
   "IsolatedAreas": [],
   "Jobs": [
     {
+      "NameGuid": "4289f5c9-eac2-4c51-8fab-8fdd917e6d73",
+      "Name": "StartFirstPageClassifierTraining",
+      "DaysOfWeekSchedule": "Sunday",
+      "IsAncestorMetadata": true,
+      "Monthly": "Weekly",
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00"
+    },
+    {
       "NameGuid": "3f749e3c-3fee-40cf-81ca-dd605388dc63",
       "Name": "StartClassifierTraining",
       "DaysOfWeekSchedule": "Saturday",
@@ -118,7 +128,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.7.22.1",
+  "Version": "4.8.23.1",
   "Widgets": [],
   "Versions": [
     {
