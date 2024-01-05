@@ -64,6 +64,7 @@
     "Overridden": [
       "Actions"
     ],
+    "RemoteControls": [],
     "Tabs": []
   },
   "ExplorerTreeOrder": [
@@ -276,7 +277,7 @@
       "OpenCardByDefault": true
     }
   ],
-  "Version": "4.8.23.1",
+  "Version": "4.9.18.0",
   "Widgets": [],
   "Versions": [
     {

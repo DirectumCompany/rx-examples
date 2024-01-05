@@ -22,6 +22,7 @@
       "NameGuid": "b1387d73-f986-4cf5-96ca-9d9fb8b5d1d0",
       "BackgroundPosition": "Stretch"
     },
+    "RemoteControls": [],
     "Tabs": []
   },
   "DesktopViews": [],
@@ -52,6 +53,10 @@
     {
       "ItemId": "5c7b7bc5-9e00-4ed2-93ff-4723ded64e3d",
       "PreviousItemId": "60fe8139-5277-445b-beba-b6b5c12c4e4d"
+    },
+    {
+      "ItemId": "a91215d7-4fbf-4d69-954f-a14bce212b47",
+      "PreviousItemId": "5c7b7bc5-9e00-4ed2-93ff-4723ded64e3d"
     }
   ],
   "IconResourcesKeys": [],
@@ -78,6 +83,18 @@
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
       "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+    },
+    {
+      "Name": "GetSyncEntity1CHyperlink",
+      "Parameters": [
+        {
+          "Name": "entity",
+          "ParameterType": "global::Sungero.Domain.Shared.IEntity",
+          "ParameterTypeFullName": "Sungero.Domain.Shared.IEntity, Sungero.Domain.Shared"
+        }
+      ],
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
     }
   ],
   "PublicStructures": [],
