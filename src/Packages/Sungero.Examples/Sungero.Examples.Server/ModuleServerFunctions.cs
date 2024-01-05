@@ -37,36 +37,62 @@ namespace Sungero.Examples.Server
       return document;
     }
     
-    [Public]
-    public static string GetSyncEntity1CHyperlink(Sungero.Domain.Shared.IEntity entity)
+    #region Интеграция с 1С
+    
+    /// <summary>
+    /// Получить ссылку на связанную запись 1С.
+    /// </summary>
+    /// <param name="entity">Запись Directum RX.</param>
+    /// <param name="extEntityType">Тип записи 1С.</param>
+    /// <returns>Структура: Hyperlink - ссылка на связанную запись 1С, ErrorMessage - текст ошибки.</returns>
+    [Remote, Public]
+    public static Structures.Module.IGetHyperlink1CResult GetSyncEntity1CHyperlink(Sungero.Domain.Shared.IEntity entity, string extEntityType)
     {
+      var result = Examples.Structures.Module.GetHyperlink1CResult.Create();
       var hyperlink = string.Empty;
+      var errorMessage = string.Empty;
       
       var typeGuid = entity.TypeDiscriminator.ToString().ToUpper();
       var entityExternalLinks = ExternalEntityLinks.GetAll().Where(x => x.EntityType.ToUpper() == typeGuid &&
-                                                                   x.EntityId == entity.Id);
+                                                                   x.EntityId == entity.Id &&
+                                                                   x.ExtEntityType == extEntityType);
       if (!entityExternalLinks.Any())
       {
-        throw new Exception("Нет связанной записи в 1С.");
+        errorMessage = Examples.Resources.OpenRecord1CErrorNotExist;
       }
       else
       {
         var entityExternalLink = entityExternalLinks.First();
         
         if (entityExternalLink.IsDeleted == true)
-          throw new Exception("Запись в 1С удалена.");
+          errorMessage =  Examples.Resources.OpenRecord1CErrorIsDelete;
         
         var getHyperlinkRequestUrl = string.Format("{0}/hs/gethyperlink/GetHyperlink/{1}/{2}",
                                                     Constants.Module.ServiceUrl1C, 
                                                     entityExternalLink.ExtEntityId,
                                                     entityExternalLink.ExtEntityType);
-      
-        hyperlink = ExecuteGetRequest(getHyperlinkRequestUrl, Constants.Module.UserName1C, Constants.Module.Password1C);         
+        try
+        {
+          hyperlink = ExecuteGetRequest(getHyperlinkRequestUrl, Constants.Module.UserName1C, Constants.Module.Password1C);
+        }
+        catch
+        {
+          errorMessage =  Examples.Resources.OpenRecord1CError;
+        }
       }
       
-      return hyperlink;
+      result.Hyperlink = hyperlink;
+      result.ErrorMessage = errorMessage;
+      return result;
     }
     
+    /// <summary>
+    /// Выполнить GET-запрос.
+    /// </summary>
+    /// <param name="url">GET-запрос.</param>
+    /// <param name="userName">Имя пользователя.</param>
+    /// <param name="password">Пароль.</param>
+    /// <returns></returns>
     public static string ExecuteGetRequest(string url, string userName, string password)
     {
       var httpClientHandler = new HttpClientHandler();
@@ -85,6 +111,8 @@ namespace Sungero.Examples.Server
         throw new Exception($"Get request execution error. URL: {url}. Status code: {response.StatusCode}. Response content: {responseContent}.");
 
       return responseContent;
-    }    
+    }
+    
+    #endregion
   }
 }

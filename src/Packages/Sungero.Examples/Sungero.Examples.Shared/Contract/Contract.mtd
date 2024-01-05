@@ -6,11 +6,11 @@
   "Actions": [
     {
       "NameGuid": "a838c42f-a3f1-475a-b232-432adfa09da8",
-      "Name": "OpenRecord1CSungero",
+      "Name": "OpenEntity1CSungero",
       "ActionArea": "Card",
       "GenerateHandler": true,
-      "LargeIconName": null,
-      "SmallIconName": null
+      "LargeIconName": "Action_OpenEntity1CSungero_large_a838c42fa3f1475ab232432adfa09da8.png",
+      "SmallIconName": "Action_OpenEntity1CSungero_small_a838c42fa3f1475ab232432adfa09da8.png"
     }
   ],
   "BaseGuid": "f37c7e63-b134-4446-9b5b-f8811f6c9666",

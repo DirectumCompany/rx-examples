@@ -19,5 +19,10 @@ namespace Sungero.Examples.Constants
     /// Пароль пользователя 1С.
     /// </summary>
     public const string Password1C = "";    
+
+    /// <summary>
+    /// Тип записи внешней системы для договоров.
+    /// </summary>
+    public const string ContractsExtEntityType = "ДоговорыКонтрагентов";
   }
 }

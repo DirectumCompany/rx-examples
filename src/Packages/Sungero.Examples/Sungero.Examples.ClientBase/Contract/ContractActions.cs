@@ -9,28 +9,24 @@ namespace Sungero.Examples.Client
 {
   partial class ContractActions
   {
-    public virtual void OpenRecord1CSungero(Sungero.Domain.Client.ExecuteActionArgs e)
+    public virtual void OpenEntity1CSungero(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      var hyperlink = string.Empty;
+      var getHyperlinkResult = Sungero.Examples.PublicFunctions.Module.Remote.GetSyncEntity1CHyperlink(_obj, Constants.Module.ContractsExtEntityType);
       
-      try
-      {
-        hyperlink = Sungero.Examples.PublicFunctions.Module.GetSyncEntity1CHyperlink(_obj);
-
-        if (!string.IsNullOrEmpty(hyperlink))
-          Hyperlinks.Open(hyperlink);
-        else
-          e.AddWarning("Нет связанной записи в 1С.");
-      }
-      catch (Exception ex)
-      {
-        e.AddWarning(ex.Message);
-      }        
+      var hyperlink = getHyperlinkResult.Hyperlink;
+      var errorMessage = getHyperlinkResult.ErrorMessage;
+      
+      if (!string.IsNullOrEmpty(hyperlink))
+        Hyperlinks.Open(hyperlink);
+      else if (!string.IsNullOrEmpty(errorMessage))
+        e.AddWarning(errorMessage);
+      else
+        e.AddWarning(Examples.Resources.OpenRecord1CError);
     }
 
-    public virtual bool CanOpenRecord1CSungero(Sungero.Domain.Client.CanExecuteActionArgs e)
+    public virtual bool CanOpenEntity1CSungero(Sungero.Domain.Client.CanExecuteActionArgs e)
     {
-      return true;
+      return !_obj.State.IsInserted;
     }
 
   }

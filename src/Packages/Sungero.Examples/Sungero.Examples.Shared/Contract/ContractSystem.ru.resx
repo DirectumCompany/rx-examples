@@ -58,13 +58,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Action_OpenRecord1CSungero" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungero" xml:space="preserve">
     <value>Открыть в 1С</value>
   </data>
-  <data name="Action_OpenRecord1CSungeroHint" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungeroHint" xml:space="preserve">
     <value>Открыть запись в 1С</value>
   </data>
-  <data name="Action_OpenRecord1CSungeroDescription" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungeroDescription" xml:space="preserve">
     <value>Открытие записи в 1С</value>
   </data>
 </root>

@@ -86,22 +86,50 @@
     },
     {
       "Name": "GetSyncEntity1CHyperlink",
+      "IsRemote": true,
       "Parameters": [
         {
           "Name": "entity",
           "ParameterType": "global::Sungero.Domain.Shared.IEntity",
           "ParameterTypeFullName": "Sungero.Domain.Shared.IEntity, Sungero.Domain.Shared"
+        },
+        {
+          "Name": "extEntityType",
+          "ParameterType": "global::System.String",
+          "ParameterTypeFullName": "System.String"
         }
       ],
-      "ReturnType": "global::System.String",
-      "ReturnTypeFullName": "System.String"
+      "Placement": "Shared",
+      "ReturnType": "global::Sungero.Examples.Structures.Module.IGetHyperlink1CResult",
+      "ReturnTypeFullName": "Sungero.Examples.Structures.Module.IGetHyperlink1CResult"
     }
   ],
-  "PublicStructures": [],
+  "PublicStructures": [
+    {
+      "Name": "GetHyperlink1CResult",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "Hyperlink",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "ErrorMessage",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Examples.Structures.Module"
+    }
+  ],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples",
   "ResourcesKeys": [
-    "HtmlStampTemplate"
+    "HtmlStampTemplate",
+    "OpenRecord1CErrorIsDelete",
+    "OpenRecord1CErrorNotExist",
+    "OpenRecord1CError"
   ],
   "ServerAssemblyName": "Sungero.Examples.Server",
   "ServerNamespace": "Sungero.Examples.Server",
