@@ -21,7 +21,7 @@ namespace Sungero.Examples.Client
       else if (!string.IsNullOrEmpty(errorMessage))
         e.AddWarning(errorMessage);
       else
-        e.AddWarning(Examples.Resources.OpenRecord1CError);      
+        e.AddWarning(Examples.Resources.OpenIncomingInvoice1CErrorNotFound);
     }
 
     public virtual bool CanOpen1CEntitySungero(Sungero.Domain.Client.CanExecuteActionArgs e)

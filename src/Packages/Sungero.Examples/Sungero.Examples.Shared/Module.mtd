@@ -150,7 +150,8 @@
     "HtmlStampTemplate",
     "OpenRecord1CErrorIsDelete",
     "OpenRecord1CErrorNotExist",
-    "OpenRecord1CError"
+    "OpenRecord1CError",
+    "OpenIncomingInvoice1CErrorNotFound"
   ],
   "ServerAssemblyName": "Sungero.Examples.Server",
   "ServerNamespace": "Sungero.Examples.Server",

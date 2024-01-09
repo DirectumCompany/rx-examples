@@ -22,14 +22,14 @@ namespace Sungero.Integration1CExtensions
     #region Методы api для получения ссылок на объекты 1С.
 
     /// <summary>
-    /// Получить ссылку на связанную запись 1С.
+    /// Получить ссылку на запись 1С.
     /// </summary>
     /// <param name="extEntityType">Тип объекта 1С.</param>
-    /// <param name="extEntityId">ИД объекта 1С.</param>
+    /// <param name="extEntityId">ИД записи 1С.</param>
     /// <returns>Ссылка на запись 1С.</returns>
     public string GetSyncEntity1CHyperlink(string extEntityType, string extEntityId)
     {
-      return this.GetRequest(string.Format($"{this.ServiceUrl}/hs/gethyperlink/GetHyperlink/{extEntityId}/{extEntityType}"));
+      return this.RunGetRequest(string.Format($"{this.ServiceUrl}/hs/gethyperlink/GetHyperlink/{extEntityId}/{extEntityType}"));
     }
 
     /// <summary>
@@ -37,31 +37,31 @@ namespace Sungero.Integration1CExtensions
     /// </summary>
     /// <param name="number">Номер счета.</param>
     /// <param name="date">Дата Счета.</param>
-    /// <param name="butin">ИНН нашей организации.</param>
-    /// <param name="butrrc">КПП нашей организации.</param>
-    /// <param name="ctin">ИНН контрагента.</param>
-    /// <param name="ctrrc">КПП контрагента.</param>
+    /// <param name="bisinessUnitTin">ИНН нашей организации.</param>
+    /// <param name="bisinessUnitTrrc">КПП нашей организации.</param>
+    /// <param name="counterpartyTin">ИНН контрагента.</param>
+    /// <param name="counterpartyTrrc">КПП контрагента.</param>
     /// <returns>Ссылка на входящий счет 1С.</returns>
-    public string GetIncomingInvoice1CHyperlink(string number, DateTime date, string butin, string butrrc,
-                                                string ctin, string ctrrc)
+    public string GetIncomingInvoice1CHyperlink(string number, DateTime date, string bisinessUnitTin, string bisinessUnitTrrc,
+                                                string counterpartyTin, string counterpartyTrrc)
     {
       var getHyperlinkRequestUrl = string.Format("{0}/hs/gethyperlink/GetIncomingInvoiceHyperlink/{1}/{2}/{3}/{4}/{5}/{6}",
                                                   this.ServiceUrl, number, date.ToString("yyyy-MM-dd"),
-                                                  butin, butrrc, ctin, ctrrc);
-      return this.GetRequest(getHyperlinkRequestUrl);
+                                                  bisinessUnitTin, bisinessUnitTrrc, counterpartyTin, counterpartyTrrc);
+      return this.RunGetRequest(getHyperlinkRequestUrl);
     }
 
     #endregion
 
     #region Методы по работе с http-запросами.
 
-    private string GetRequest(string url)
+    private string RunGetRequest(string url)
     {      
       var response = this.Client.GetAsync(url).Result;
       var responseContent = response.Content.ReadAsStringAsync().Result;
 
       if (!response.IsSuccessStatusCode)
-        throw new Exception($"Get request execution error. URL: {url}. Status code: {response.StatusCode}. Response content: {responseContent}.");
+        throw new Exception($"Integration1C. Get request execution error. URL: {url}. Status code: {response.StatusCode}. Response content: {responseContent}.");
 
       return responseContent;
     }

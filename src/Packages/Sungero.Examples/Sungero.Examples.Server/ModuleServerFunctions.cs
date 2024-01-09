@@ -41,7 +41,7 @@ namespace Sungero.Examples.Server
     /// Получить ссылку на связанную запись 1С.
     /// </summary>
     /// <param name="entity">Запись Directum RX.</param>
-    /// <param name="extEntityType">Тип записи 1С.</param>
+    /// <param name="extEntityType">Тип объекта 1С.</param>
     /// <returns>Структура: Hyperlink - ссылка на связанную запись 1С, ErrorMessage - текст ошибки.</returns>
     [Remote, Public]
     public virtual Structures.Module.IGetHyperlink1CResult GetSyncEntity1CHyperlink(Sungero.Domain.Shared.IEntity entity, string extEntityType)
@@ -96,6 +96,7 @@ namespace Sungero.Examples.Server
       try
       {
         var connector1C = this.GetConnector1C();
+        // Ограничение: работает только, если у нашей организации и контрагента заполнены поля: ИНН и КПП.
         hyperlink = connector1C.GetIncomingInvoice1CHyperlink(incommingInvoice.Number.Trim(),
                                                               incommingInvoice.Date.Value,
                                                               incommingInvoice.BusinessUnit?.TIN,
