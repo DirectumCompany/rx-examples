@@ -65,6 +65,13 @@
   "InterfaceNamespace": "Sungero.Examples",
   "IsolatedAssemblyName": "Sungero.Examples.Isolated",
   "IsolatedNamespace": "Sungero.Examples.Isolated",
+  "Libraries": [
+    {
+      "NameGuid": "b5d8dd2c-d414-4685-92cd-79281b3c04c6",
+      "Name": "Integration1CExtensions",
+      "Scope": "Both"
+    }
+  ],
   "OrderedSpecialFolders": [],
   "PublicFunctions": [
     {
@@ -83,6 +90,20 @@
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
       "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+    },
+    {
+      "Name": "GetIncomingInvoice1CHyperlink",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "incommingInvoice",
+          "ParameterType": "global::Sungero.Examples.IIncomingInvoice",
+          "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::Sungero.Examples.Structures.Module.IGetHyperlink1CResult",
+      "ReturnTypeFullName": "Sungero.Examples.Structures.Module.IGetHyperlink1CResult"
     },
     {
       "Name": "GetSyncEntity1CHyperlink",

@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<settings>
+  <ViewName>Default</ViewName>
+  <AccessRightsAccessRightEntryCardGrid_38106a151b4548f2900c4f02ff9fa8b2>
+    <XtraSerializer version="1.0" application="GridControl">
+      <property name="#LayoutVersion" isnull="true" />
+      <property name="\$GridControl" iskey="true" value="GridControl">
+        <property name="TotalSummary" iskey="true" value="0" />
+        <property name="View" isnull="true" iskey="true">
+          <property name="AutoWidth">true</property>
+          <property name="ShowGroupPanel">false</property>
+          <property name="ShowTotalSummary">false</property>
+          <property name="LinesPerRowMode">None</property>
+        </property>
+      </property>
+    </XtraSerializer>
+  </AccessRightsAccessRightEntryCardGrid_38106a151b4548f2900c4f02ff9fa8b2>
+  <collapsableTree>
+    <Layout>
+      <IsDocked>true</IsDocked>
+      <Width>230</Width>
+    </Layout>
+  </collapsableTree>
+  <treeListLayout>
+    <GridViewSettings xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+      <ColumnWidths>
+        <string>230</string>
+        <string>Auto</string>
+        <string>*</string>
+      </ColumnWidths>
+    </GridViewSettings>
+  </treeListLayout>
+</settings>

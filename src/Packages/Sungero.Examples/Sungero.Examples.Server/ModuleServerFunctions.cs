@@ -1,15 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Http;
-using System.Text;
-using System.Net.Http.Headers;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.SmartProcessing.Structures.Module;
 using Sungero.Commons;
 using Sungero.Company;
 using Sungero.Docflow;
+using Sungero.Integration1CExtensions;
 
 namespace Sungero.Examples.Server
 {
@@ -46,7 +44,7 @@ namespace Sungero.Examples.Server
     /// <param name="extEntityType">Тип записи 1С.</param>
     /// <returns>Структура: Hyperlink - ссылка на связанную запись 1С, ErrorMessage - текст ошибки.</returns>
     [Remote, Public]
-    public static Structures.Module.IGetHyperlink1CResult GetSyncEntity1CHyperlink(Sungero.Domain.Shared.IEntity entity, string extEntityType)
+    public virtual Structures.Module.IGetHyperlink1CResult GetSyncEntity1CHyperlink(Sungero.Domain.Shared.IEntity entity, string extEntityType)
     {
       var result = Examples.Structures.Module.GetHyperlink1CResult.Create();
       var hyperlink = string.Empty;
@@ -67,13 +65,10 @@ namespace Sungero.Examples.Server
         if (entityExternalLink.IsDeleted == true)
           errorMessage =  Examples.Resources.OpenRecord1CErrorIsDelete;
         
-        var getHyperlinkRequestUrl = string.Format("{0}/hs/gethyperlink/GetHyperlink/{1}/{2}",
-                                                    Constants.Module.ServiceUrl1C, 
-                                                    entityExternalLink.ExtEntityId,
-                                                    entityExternalLink.ExtEntityType);
         try
         {
-          hyperlink = ExecuteGetRequest(getHyperlinkRequestUrl, Constants.Module.UserName1C, Constants.Module.Password1C);
+          var connector1C = this.GetConnector1C();
+          hyperlink = connector1C.GetSyncEntity1CHyperlink(entityExternalLink.ExtEntityType, entityExternalLink.ExtEntityId);
         }
         catch
         {
@@ -87,31 +82,45 @@ namespace Sungero.Examples.Server
     }
     
     /// <summary>
-    /// Выполнить GET-запрос.
+    /// Получить ссылку на входящий счет 1С.
     /// </summary>
-    /// <param name="url">GET-запрос.</param>
-    /// <param name="userName">Имя пользователя.</param>
-    /// <param name="password">Пароль.</param>
-    /// <returns></returns>
-    public static string ExecuteGetRequest(string url, string userName, string password)
+    /// <param name="incommingInvoice">Входящий счет.</param>
+    /// <returns>Структура: Hyperlink - ссылка на входящий счет 1С, ErrorMessage - текст ошибки.</returns>
+    [Remote, Public]
+    public virtual Structures.Module.IGetHyperlink1CResult GetIncomingInvoice1CHyperlink(Sungero.Examples.IIncomingInvoice incommingInvoice)
     {
-      var httpClientHandler = new HttpClientHandler();
-      httpClientHandler.ServerCertificateCustomValidationCallback =
-        (message, cert, chain, sslPolicyErrors) => true;
-
-      var client = new HttpClient(httpClientHandler);
-      client.Timeout = TimeSpan.FromMinutes(5);
-      var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"));
-      client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
-
-      var response = client.GetAsync(url).Result;
-      var responseContent = response.Content.ReadAsStringAsync().Result;
-
-      if (!response.IsSuccessStatusCode)
-        throw new Exception($"Get request execution error. URL: {url}. Status code: {response.StatusCode}. Response content: {responseContent}.");
-
-      return responseContent;
+      var result = Examples.Structures.Module.GetHyperlink1CResult.Create();
+      var hyperlink = string.Empty;
+      var errorMessage = string.Empty;
+      
+      try
+      {
+        var connector1C = this.GetConnector1C();
+        hyperlink = connector1C.GetIncomingInvoice1CHyperlink(incommingInvoice.Number.Trim(),
+                                                              incommingInvoice.Date.Value,
+                                                              incommingInvoice.BusinessUnit?.TIN,
+                                                              incommingInvoice.BusinessUnit?.TRRC,
+                                                              incommingInvoice.Counterparty?.TIN,
+                                                              Sungero.Parties.CompanyBases.As(incommingInvoice.Counterparty)?.TRRC);
+      }
+      catch
+      {
+        errorMessage =  Examples.Resources.OpenRecord1CError;
+      }
+      
+      result.Hyperlink = hyperlink;
+      result.ErrorMessage = errorMessage;
+      return result;
     }
+    
+    /// <summary>
+    /// Получить коннектор к 1С.
+    /// </summary>
+    /// <returns>Коннектор к 1С.</returns>
+    public virtual Sungero.Integration1CExtensions.Connector1C GetConnector1C()
+    {
+      return Integration1CExtensions.Connector1C.Get(Constants.Module.ServiceUrl1C, Constants.Module.UserName1C, Constants.Module.Password1C);
+    }    
     
     #endregion
   }
