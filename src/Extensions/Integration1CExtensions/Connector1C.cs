@@ -66,7 +66,7 @@ namespace Sungero.Integration1CExtensions
       return responseContent;
     }
 
-    private static HttpClient GetClient(string userName, string password)
+    private HttpClient GetClient(string userName, string password)
     {
       var httpClientHandler = new HttpClientHandler();
       httpClientHandler.ServerCertificateCustomValidationCallback =
@@ -100,7 +100,7 @@ namespace Sungero.Integration1CExtensions
     private Connector1C(string serviceUrl, string login, string password)
     {
       this.ServiceUrl = serviceUrl;
-      this.Client = GetClient(login, password);
+      this.Client = this.GetClient(login, password);
     }
 
     #endregion

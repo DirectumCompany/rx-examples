@@ -49,19 +49,21 @@ namespace Sungero.Examples.Server
       var result = Examples.Structures.Module.GetHyperlink1CResult.Create();
       var hyperlink = string.Empty;
       var errorMessage = string.Empty;
+            
+      var typeGuid = entity.TypeDiscriminator.ToString();
+      var entityExternalLink = ExternalEntityLinks.GetAll()
+                                                  .Where(x => string.Equals(x.EntityType, typeGuid, StringComparison.OrdinalIgnoreCase) &&
+                                                                            x.EntityId == entity.Id &&
+                                                                            x.ExtEntityType == extEntityType)
+                                                  .FirstOrDefault();
       
-      var typeGuid = entity.TypeDiscriminator.ToString().ToUpper();
-      var entityExternalLinks = ExternalEntityLinks.GetAll().Where(x => x.EntityType.ToUpper() == typeGuid &&
-                                                                   x.EntityId == entity.Id &&
-                                                                   x.ExtEntityType == extEntityType);
-      if (!entityExternalLinks.Any())
+
+      if (entityExternalLink == null)
       {
         errorMessage = Examples.Resources.OpenRecord1CErrorNotExist;
       }
       else
       {
-        var entityExternalLink = entityExternalLinks.First();
-        
         if (entityExternalLink.IsDeleted == true)
           errorMessage =  Examples.Resources.OpenRecord1CErrorIsDelete;
         
@@ -70,8 +72,10 @@ namespace Sungero.Examples.Server
           var connector1C = this.GetConnector1C();
           hyperlink = connector1C.GetSyncEntity1CHyperlink(entityExternalLink.ExtEntityType, entityExternalLink.ExtEntityId);
         }
-        catch
+        catch (Exception ex)
         {
+          Logger.ErrorFormat("Integration1C. Error while getting sync entity 1C hyperlink. EntityId = {0}, ExtEntityType = {1}, ExtEntityId = {2}.", ex, 
+                             entity.Id, entityExternalLink.ExtEntityType, entityExternalLink.ExtEntityId);
           errorMessage =  Examples.Resources.OpenRecord1CError;
         }
       }
@@ -104,8 +108,9 @@ namespace Sungero.Examples.Server
                                                               incommingInvoice.Counterparty?.TIN,
                                                               Sungero.Parties.CompanyBases.As(incommingInvoice.Counterparty)?.TRRC);
       }
-      catch
+      catch (Exception ex)
       {
+        Logger.ErrorFormat("Integration1C. Error while getting incoming invoice 1C hyperlink. IncomingInvoice Id = {0}.", ex, incommingInvoice.Id);        
         errorMessage =  Examples.Resources.OpenRecord1CError;
       }
       
