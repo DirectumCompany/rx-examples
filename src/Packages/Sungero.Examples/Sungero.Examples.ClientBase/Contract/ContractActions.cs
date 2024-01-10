@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using Sungero.Examples.IncomingInvoice;
+using Sungero.Examples.Contract;
 
 namespace Sungero.Examples.Client
 {
-  partial class IncomingInvoiceActions
+  partial class ContractActions
   {
-    public virtual void Open1CEntitySungero(Sungero.Domain.Client.ExecuteActionArgs e)
+    public virtual void OpenEntity1CSungero(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      var getHyperlinkResult = Sungero.Examples.PublicFunctions.Module.Remote.GetIncomingInvoice1CHyperlink(_obj);
+      var getHyperlinkResult = Sungero.Examples.PublicFunctions.Module.Remote.GetSyncEntity1CHyperlink(_obj, Constants.Module.ContractsExtEntityType);
       
       var hyperlink = getHyperlinkResult.Hyperlink;
       var errorMessage = getHyperlinkResult.ErrorMessage;
@@ -21,15 +21,14 @@ namespace Sungero.Examples.Client
       else if (!string.IsNullOrEmpty(errorMessage))
         e.AddWarning(errorMessage);
       else
-        e.AddWarning(Examples.Resources.OpenIncomingInvoice1CErrorNotFound);
+        e.AddWarning(Examples.Resources.OpenRecord1CError);
     }
 
-    public virtual bool CanOpen1CEntitySungero(Sungero.Domain.Client.CanExecuteActionArgs e)
+    public virtual bool CanOpenEntity1CSungero(Sungero.Domain.Client.CanExecuteActionArgs e)
     {
       return !_obj.State.IsInserted;
     }
 
   }
-
 
 }

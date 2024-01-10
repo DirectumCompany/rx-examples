@@ -64,6 +64,7 @@
     "Overridden": [
       "Actions"
     ],
+    "RemoteControls": [],
     "Tabs": []
   },
   "ExplorerTreeOrder": [
@@ -112,6 +113,11 @@
         "PreviousItemId"
       ],
       "PreviousItemId": "c290b098-12c7-487d-bb38-73e2c98f9789"
+    },
+    {
+      "IsAncestorMetadata": true,
+      "ItemId": "a95ea51d-9926-4c36-87c3-b15d8be7afe2",
+      "PreviousItemId": "bd7ced8f-379e-4cda-9f18-a28193b8d53b"
     }
   ],
   "IconResourcesKeys": [],
@@ -276,7 +282,7 @@
       "OpenCardByDefault": true
     }
   ],
-  "Version": "4.8.23.1",
+  "Version": "4.9.18.0",
   "Widgets": [],
   "Versions": [
     {

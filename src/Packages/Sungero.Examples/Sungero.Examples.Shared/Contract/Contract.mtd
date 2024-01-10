@@ -1,48 +1,37 @@
 {
   "$type": "Sungero.Metadata.DocumentMetadata, Sungero.Content.Shared",
-  "NameGuid": "62f70f15-967a-4211-81ac-7c02aa3928b5",
-  "Name": "IncomingInvoice",
+  "NameGuid": "a91215d7-4fbf-4d69-954f-a14bce212b47",
+  "Name": "Contract",
   "AccessRightsMode": "Both",
   "Actions": [
     {
-      "NameGuid": "e1fb41dc-e33a-4929-b10c-890e37112a04",
-      "Name": "Open1CEntitySungero",
+      "NameGuid": "a838c42f-a3f1-475a-b232-432adfa09da8",
+      "Name": "OpenEntity1CSungero",
       "ActionArea": "Card",
       "GenerateHandler": true,
-      "LargeIconName": "Action_Open1CEntitySungero_large_e1fb41dce33a4929b10c890e37112a04.png",
-      "SmallIconName": "Action_Open1CEntitySungero_small_e1fb41dce33a4929b10c890e37112a04.png"
+      "LargeIconName": "Action_OpenEntity1CSungero_large_a838c42fa3f1475ab232432adfa09da8.png",
+      "SmallIconName": "Action_OpenEntity1CSungero_small_a838c42fa3f1475ab232432adfa09da8.png"
     }
   ],
-  "BaseGuid": "a523a263-bc00-40f9-810d-f582bae2205d",
+  "BaseGuid": "f37c7e63-b134-4446-9b5b-f8811f6c9666",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {
-    "NameGuid": "7322020b-3299-4fba-b9b0-4c995bd2e401",
+    "NameGuid": "a6e37369-efee-41d3-a331-abc1c6ce6823",
     "Name": "CreationArea",
     "Buttons": [],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Versions": []
   },
   "ExtraSearchProperties": [],
   "FilterPanel": {
     "NameGuid": "80d3ce1a-9a72-443a-8b6c-6c6eef0c8d0f",
     "Name": "FilterPanel",
     "Controls": [],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Versions": []
   },
-  "Forms": [
-    {
-      "$type": "Sungero.Metadata.StandaloneFormMetadata, Sungero.Metadata",
-      "NameGuid": "fa03f748-4397-42ef-bdc2-22119af7bf7f",
-      "Name": "Card",
-      "Controls": [],
-      "IsAncestorMetadata": true,
-      "Overridden": [
-        "SettingsResourceKey"
-      ],
-      "Versions": []
-    }
-  ],
   "IconResourcesKeys": [],
-  "LayeredFromGuid": "a523a263-bc00-40f9-810d-f582bae2205d",
+  "LayeredFromGuid": "f37c7e63-b134-4446-9b5b-f8811f6c9666",
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",
   "Properties": [
@@ -50,40 +39,50 @@
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
       "Name": "Versions",
-      "EntityGuid": "2b4dd153-a8e7-413e-b6f7-882801069d72",
+      "EntityGuid": "d6f7aa4f-96d7-47ea-ace3-a23898fdd052",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
     },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "15280407-331e-42f6-b263-041a495b66cd",
       "Name": "Tracking",
-      "EntityGuid": "d7dcca37-1d80-4d18-90c8-3eed64f9498e",
+      "EntityGuid": "4e00cff5-76a9-4b9d-8a00-d1bb76e452f8",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "165c49b7-54cb-42d5-8254-c03460fdcb9b",
+      "Name": "Milestones",
+      "EntityGuid": "972b05e0-0b2e-4335-8ef4-d4f1f04ec83f",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "EntityGuid"
+      ],
+      "Versions": []
     }
   ],
   "PublicStructures": [],
-  "ResourcesKeys": [
-    "HtmlStampTemplateForCertificateCustom",
-    "HtmlStampTemplateForSignatureCustom"
-  ],
+  "ResourcesKeys": [],
   "RibbonCardMetadata": {
-    "NameGuid": "da8e4adc-afdc-4ef8-96f8-d1989b34c51c",
+    "NameGuid": "1e44c34d-1398-48e7-a507-7b72e9ec8ba8",
     "Name": "RibbonCard",
     "Categories": [],
     "Elements": [
       {
         "$type": "Sungero.Metadata.RibbonActionButtonMetadata, Sungero.Metadata",
-        "NameGuid": "80dc75a0-fc36-4458-af25-6df2d455721c",
-        "Name": "Open1CEntitySungeroSungero",
-        "ActionGuid": "e1fb41dc-e33a-4929-b10c-890e37112a04",
+        "NameGuid": "16335dfd-6e58-4be4-b711-41b0b31d8493",
+        "Name": "OpenRecord1CSungeroSungero",
+        "ActionGuid": "a838c42f-a3f1-475a-b232-432adfa09da8",
         "ButtonSize": "Large",
-        "Index": 2,
+        "Index": -1,
         "ParentGuid": "2ed94346-ba89-4c52-9815-d18010d3a2ae"
       }
     ],
@@ -93,7 +92,7 @@
     "RibbonKind": "Card"
   },
   "RibbonCollectionMetadata": {
-    "NameGuid": "0cb950b7-ca00-43b9-873f-7b774427b62f",
+    "NameGuid": "47cd9760-a0cc-4520-89c3-17d3472854c4",
     "Name": "RibbonCollection",
     "Categories": [],
     "Elements": [],
@@ -109,10 +108,6 @@
     {
       "Type": "EntityMetadata",
       "Number": 12
-    },
-    {
-      "Type": "DomainApi",
-      "Number": 2
     }
   ]
 }

@@ -58,19 +58,19 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Action_Open1CEntitySungero" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungero" xml:space="preserve">
     <value>Open in 1C</value>
   </data>
-  <data name="Action_Open1CEntitySungeroDescription" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungeroDescription" xml:space="preserve">
     <value>Opening record in 1C</value>
   </data>
-  <data name="Action_Open1CEntitySungeroHint" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungeroHint" xml:space="preserve">
     <value>Open record in 1C</value>
   </data>
-  <data name="Action_Open1CEntitySungeroConfirmationMessage" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungeroConfirmationMessage" xml:space="preserve">
     <value />
   </data>
-  <data name="Action_Open1CEntitySungeroConfirmationDescription" xml:space="preserve">
+  <data name="Action_OpenEntity1CSungeroConfirmationDescription" xml:space="preserve">
     <value />
   </data>
 </root>
