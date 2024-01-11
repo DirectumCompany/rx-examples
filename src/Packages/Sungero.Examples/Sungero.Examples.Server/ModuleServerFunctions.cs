@@ -50,13 +50,7 @@ namespace Sungero.Examples.Server
       var hyperlink = string.Empty;
       var errorMessage = string.Empty;
             
-      var typeGuid = entity.TypeDiscriminator.ToString();
-      var entityExternalLink = ExternalEntityLinks.GetAll()
-                                                  .Where(x => string.Equals(x.EntityType, typeGuid, StringComparison.OrdinalIgnoreCase) &&
-                                                                            x.EntityId == entity.Id &&
-                                                                            x.ExtEntityType == extEntityType)
-                                                  .FirstOrDefault();
-      
+      var entityExternalLink = this.GetExternalEntityLink(entity, extEntityType);
 
       if (entityExternalLink == null)
       {
@@ -117,6 +111,49 @@ namespace Sungero.Examples.Server
       result.Hyperlink = hyperlink;
       result.ErrorMessage = errorMessage;
       return result;
+    }
+    
+    [Remote, Public]
+    public virtual bool CreateIncomingInvoice1C(Sungero.Examples.IIncomingInvoice incommingInvoice)
+    {
+      var created = false;
+      var counterpartyExtEntityLink = this.GetExternalEntityLink(incommingInvoice.Counterparty, Constants.Module.CounterpartyExtEntityType);
+      var contractExtEntityLink = this.GetExternalEntityLink(incommingInvoice.Counterparty, Constants.Module.ContractsExtEntityType);
+      try
+      {
+        var connector1C = this.GetConnector1C();
+        var incomingInvoice1C = Integration1CExtensions.IncomingInvoice1C.Create(incommingInvoice.Number.Trim(), incommingInvoice.Date.Value, 
+                                                                                 "2e6248b0-4e33-11ee-8dee-107b44a23f62", 
+                                                                                 counterpartyExtEntityLink.ExtEntityId,
+                                                                                 contractExtEntityLink.ExtEntityId);
+        connector1C.CreateIncomingInvoice(incomingInvoice1C);
+        created = true;
+      }
+      catch (Exception ex)
+      {
+        Logger.ErrorFormat("Integration1C. Error while getting incoming invoice 1C hyperlink. IncomingInvoice Id = {0}.", ex, incommingInvoice.Id);
+        created = false;
+      }
+      
+      return created;
+    }
+ 
+    /// <summary>
+    /// Получить ссылку на объект внешней системы.
+    /// </summary>
+    /// <param name="entity">Запись Directum RX.</param>
+    /// <param name="extEntityType">Тип объекта 1С.</param>
+    /// <returns>Ссылка на объект внешней системы. Если не найдена, то null.</returns>
+    public virtual IExternalEntityLink GetExternalEntityLink(Sungero.Domain.Shared.IEntity entity, string extEntityType)
+    {
+      var typeGuid = entity.TypeDiscriminator.ToString();
+      var entityExternalLink = ExternalEntityLinks.GetAll()
+                                                  .Where(x => string.Equals(x.EntityType, typeGuid, StringComparison.OrdinalIgnoreCase) &&
+                                                                            x.EntityId == entity.Id &&
+                                                                            x.ExtEntityType == extEntityType &&
+                                                                            x.ExtSystemId == Constants.Module.ExtSystemId1C)
+                                                  .FirstOrDefault();
+      return entityExternalLink;
     }
     
     /// <summary>

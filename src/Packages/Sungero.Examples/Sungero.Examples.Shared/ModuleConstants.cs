@@ -18,11 +18,21 @@ namespace Sungero.Examples.Constants
     /// <summary>
     /// Пароль пользователя 1С.
     /// </summary>
-    public const string Password1C = "";    
+    public const string Password1C = "";
 
     /// <summary>
-    /// Тип записи внешней системы для договоров.
+    /// Идентификатор системы 1С.
+    /// </summary>
+    public const string ExtSystemId1C = "1C_Acc";    
+    
+    /// <summary>
+    /// Тип объекта системы 1C для договоров.
     /// </summary>
     public const string ContractsExtEntityType = "ДоговорыКонтрагентов";
+    
+    /// <summary>
+    /// Тип объекта системы 1C для контрагентов.
+    /// </summary>
+    public const string CounterpartyExtEntityType = "Контрагенты";    
   }
 }

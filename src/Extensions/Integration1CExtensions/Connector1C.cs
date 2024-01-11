@@ -2,6 +2,7 @@
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
+using Newtonsoft.Json;
 
 namespace Sungero.Integration1CExtensions
 {
@@ -53,6 +54,20 @@ namespace Sungero.Integration1CExtensions
 
     #endregion
 
+    #region Методы api для создания входящего счета.
+
+    /// <summary>
+    /// Создать входящий счет в 1С.
+    /// </summary>
+    /// <param name="incomingInvoice1C">Данные для создания входящего счета.</param>
+    /// <returns></returns>
+    public string CreateIncomingInvoice(IncomingInvoice1C incomingInvoice1C)
+    {      
+      return this.RunPostRequest($"{this.ServiceUrl}/odata/standard.odata/Document_СчетНаОплатуПоставщика?$format=json&$expand=*", incomingInvoice1C);
+    }
+
+    #endregion
+
     #region Методы по работе с http-запросами.
 
     private string RunGetRequest(string url)
@@ -65,6 +80,20 @@ namespace Sungero.Integration1CExtensions
 
       return responseContent;
     }
+
+    private string RunPostRequest(string url, object content)
+    {      
+      var jsonContent = JsonConvert.SerializeObject(content);
+      var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+      var response = this.Client.PostAsync(url, httpContent).Result;
+      var responseContent = response.Content.ReadAsStringAsync().Result;
+
+      if (!response.IsSuccessStatusCode)
+        throw new Exception($"Integration1C. Post request execution error. URL: {url}. Status code: {response.StatusCode}. Response content: {responseContent}.");
+
+      return responseContent;
+    }
+
 
     private HttpClient GetClient(string userName, string password)
     {

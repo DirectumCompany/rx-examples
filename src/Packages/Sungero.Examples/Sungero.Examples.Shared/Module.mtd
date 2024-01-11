@@ -75,6 +75,20 @@
   "OrderedSpecialFolders": [],
   "PublicFunctions": [
     {
+      "Name": "CreateIncomingInvoice1C",
+      "IsRemote": true,
+      "Parameters": [
+        {
+          "Name": "incommingInvoice",
+          "ParameterType": "global::Sungero.Examples.IIncomingInvoice",
+          "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
+        }
+      ],
+      "Placement": "Shared",
+      "ReturnType": "global::System.Boolean",
+      "ReturnTypeFullName": "System.Boolean"
+    },
+    {
       "Name": "CreateIncomingLetter",
       "Parameters": [
         {
