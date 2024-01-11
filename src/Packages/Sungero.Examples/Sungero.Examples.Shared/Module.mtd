@@ -76,7 +76,6 @@
   "PublicFunctions": [
     {
       "Name": "CreateIncomingInvoice1C",
-      "IsRemote": true,
       "Parameters": [
         {
           "Name": "incommingInvoice",
@@ -84,7 +83,6 @@
           "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
         }
       ],
-      "Placement": "Shared",
       "ReturnType": "global::System.Boolean",
       "ReturnTypeFullName": "System.Boolean"
     },

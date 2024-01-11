@@ -113,21 +113,48 @@ namespace Sungero.Examples.Server
       return result;
     }
     
-    [Remote, Public]
+    /// <summary>
+    /// Создать входящий счет в 1С.
+    /// </summary>
+    /// <param name="incommingInvoice">Входящий счет в Directum RX.</param>
+    /// <returns>True - входящий счет успешно создан в 1С, иначе - False.</returns>
+    [Public]
     public virtual bool CreateIncomingInvoice1C(Sungero.Examples.IIncomingInvoice incommingInvoice)
     {
       var created = false;
       var counterpartyExtEntityLink = this.GetExternalEntityLink(incommingInvoice.Counterparty, Constants.Module.CounterpartyExtEntityType);
-      var contractExtEntityLink = this.GetExternalEntityLink(incommingInvoice.Counterparty, Constants.Module.ContractsExtEntityType);
-      try
+      if (counterpartyExtEntityLink == null)
       {
+        Logger.DebugFormat("Integration1C. Incoming invoice not created in 1C: counterparty is not sync to 1C. IncomingInvoice Id = {0}.", incommingInvoice.Id);
+        return false;
+      }
+      
+      var contractExtEntityId = string.Empty;
+      if (incommingInvoice.Contract != null)
+      {
+        var contractExtEntityLink = this.GetExternalEntityLink(incommingInvoice.Contract, Constants.Module.ContractsExtEntityType);
+        if (contractExtEntityLink != null)
+          contractExtEntityId = contractExtEntityLink.ExtEntityId;
+      }
+      
+      try
+      {        
         var connector1C = this.GetConnector1C();
+        
+        var businessUnit1C = this.GetBusinessUnit1C(connector1C, incommingInvoice.BusinessUnit?.TIN, incommingInvoice.BusinessUnit?.TRRC);
+        if (businessUnit1C == null)
+        {
+          Logger.DebugFormat("Integration1C. Incoming invoice not created in 1C: not found single business unit in 1C. IncomingInvoice Id = {0}.", incommingInvoice.Id);
+          return false;
+        }
+        
         var incomingInvoice1C = Integration1CExtensions.IncomingInvoice1C.Create(incommingInvoice.Number.Trim(), incommingInvoice.Date.Value, 
-                                                                                 "2e6248b0-4e33-11ee-8dee-107b44a23f62", 
+                                                                                 businessUnit1C.Ref_Key, 
                                                                                  counterpartyExtEntityLink.ExtEntityId,
-                                                                                 contractExtEntityLink.ExtEntityId);
-        connector1C.CreateIncomingInvoice(incomingInvoice1C);
-        created = true;
+                                                                                 contractExtEntityId);
+        var createdIncomingInvoice1C = connector1C.CreateIncomingInvoice1C(incomingInvoice1C);
+        
+        created = !string.IsNullOrEmpty(createdIncomingInvoice1C?.Ref_Key);
       }
       catch (Exception ex)
       {
@@ -155,6 +182,33 @@ namespace Sungero.Examples.Server
                                                   .FirstOrDefault();
       return entityExternalLink;
     }
+
+    /// <summary>
+    /// Получить организацию в 1С по ИНН и КПП.
+    /// </summary>
+    /// <param name="connector1C">Коннектор к 1С.</param>
+    /// <param name="Tin">ИНН.</param>
+    /// <param name="Trrc">КПП.</param>
+    /// <returns>Организация 1С.</returns>
+    public virtual Sungero.Integration1CExtensions.BusinessUnit1C GetBusinessUnit1C(Sungero.Integration1CExtensions.Connector1C connector1C,
+                                                                                    string Tin, string Trrc)
+    {
+      var businessUnit1CList = connector1C.GetBusinessUnit1CList(Tin, Trrc);
+      if (businessUnit1CList == null || !businessUnit1CList.Any())
+      {
+        Logger.DebugFormat("Integration1C. Business unit by TIN and TRRC not found in 1C. BusinessUnit.TIN = {0}, BusinessUnit.TRRC = {1}.", Tin, Trrc);
+        return null;
+      }
+        
+      if (businessUnit1CList.Count > 1)
+      {
+        Logger.DebugFormat("Integration1C. Found {3} business units in 1C by TIN and TRRC. BusinessUnit.TIN = {0}, BusinessUnit.TRRC = {1}.", 
+                           Tin, Trrc, businessUnit1CList.Count);
+        return null;
+      }
+        
+      return businessUnit1CList.SingleOrDefault();
+    }
     
     /// <summary>
     /// Получить коннектор к 1С.
@@ -163,7 +217,7 @@ namespace Sungero.Examples.Server
     public virtual Sungero.Integration1CExtensions.Connector1C GetConnector1C()
     {
       return Integration1CExtensions.Connector1C.Get(Constants.Module.ServiceUrl1C, Constants.Module.UserName1C, Constants.Module.Password1C);
-    }    
+    }
     
     #endregion
   }

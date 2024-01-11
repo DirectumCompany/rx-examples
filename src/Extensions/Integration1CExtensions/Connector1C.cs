@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
+using System.Collections.Generic;
 
 namespace Sungero.Integration1CExtensions
 {
@@ -60,10 +61,40 @@ namespace Sungero.Integration1CExtensions
     /// Создать входящий счет в 1С.
     /// </summary>
     /// <param name="incomingInvoice1C">Данные для создания входящего счета.</param>
-    /// <returns></returns>
-    public string CreateIncomingInvoice(IncomingInvoice1C incomingInvoice1C)
-    {      
-      return this.RunPostRequest($"{this.ServiceUrl}/odata/standard.odata/Document_СчетНаОплатуПоставщика?$format=json&$expand=*", incomingInvoice1C);
+    /// <returns>Созданный входящий счет в 1С. Если счет не создан - null.</returns>
+    public IncomingInvoice1C CreateIncomingInvoice1C(IncomingInvoice1C incomingInvoice1C)
+    {
+      var response = this.RunPostRequest($"{this.ServiceUrl}/odata/standard.odata/Document_СчетНаОплатуПоставщика?$format=json&$expand=*", incomingInvoice1C);
+
+      var jsonSerializerSettings = new JsonSerializerSettings() 
+      { 
+        DateFormatHandling = DateFormatHandling.IsoDateFormat, 
+        DateParseHandling = DateParseHandling.DateTimeOffset, 
+        DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind
+      };
+
+      return JsonConvert.DeserializeObject<IncomingInvoice1C>(response, jsonSerializerSettings);
+    }
+
+    /// <summary>
+    /// Получить список организаций 1С по ИНН и КПП.
+    /// </summary>
+    /// <param name="Tin">ИНН.</param>
+    /// <param name="Trrc">КПП.</param>
+    /// <returns>Список организаций 1С.</returns>
+    public List<BusinessUnit1C> GetBusinessUnit1CList(string Tin, string Trrc)
+    {
+      var response = this.RunGetRequest(string.Format($"{this.ServiceUrl}/odata/standard.odata/Catalog_Организации?$filter=ИНН eq '{Tin}' and КПП eq '{Trrc}'&$format=json"));
+      
+      var jsonSerializerSettings = new JsonSerializerSettings()
+      {
+        DateFormatHandling = DateFormatHandling.IsoDateFormat,
+        DateParseHandling = DateParseHandling.DateTimeOffset,
+        DateTimeZoneHandling = DateTimeZoneHandling.RoundtripKind
+      };
+
+      var businessUnit1CList = JsonConvert.DeserializeObject<BusinessUnitList1C>(response, jsonSerializerSettings);
+      return businessUnit1CList == null ? null : businessUnit1CList.Value;
     }
 
     #endregion
