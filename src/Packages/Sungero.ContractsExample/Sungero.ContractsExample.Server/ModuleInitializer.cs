@@ -25,7 +25,7 @@ namespace Sungero.ContractsExample.Server
         return;
       
       var stage = ApprovalCreateIncInvoice1CStages.Create();
-      stage.Name = "Создание входящего счета в 1С";
+      stage.Name = Sungero.ContractsExample.Resources.ApprovalCreateIncInvoice1CStageName;
       stage.TimeoutInHours = 4;
       stage.Save();
     }    

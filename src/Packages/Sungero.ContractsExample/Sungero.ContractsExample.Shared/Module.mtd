@@ -50,7 +50,9 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.ContractsExample",
-  "ResourcesKeys": [],
+  "ResourcesKeys": [
+    "ApprovalCreateIncInvoice1CStageName"
+  ],
   "ServerAssemblyName": "Sungero.ContractsExample.Server",
   "ServerNamespace": "Sungero.ContractsExample.Server",
   "SharedAssemblyName": "Sungero.ContractsExample.Shared",
