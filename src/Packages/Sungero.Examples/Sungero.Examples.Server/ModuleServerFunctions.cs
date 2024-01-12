@@ -8,6 +8,8 @@ using Sungero.Commons;
 using Sungero.Company;
 using Sungero.Docflow;
 using Sungero.Integration1CExtensions;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Sungero.Examples.Server
 {
@@ -49,7 +51,7 @@ namespace Sungero.Examples.Server
       var result = Examples.Structures.Module.GetHyperlink1CResult.Create();
       var hyperlink = string.Empty;
       var errorMessage = string.Empty;
-            
+      
       var entityExternalLink = this.GetExternalEntityLink(entity, extEntityType);
 
       if (entityExternalLink == null)
@@ -64,13 +66,14 @@ namespace Sungero.Examples.Server
         try
         {
           var connector1C = this.GetConnector1C();
-          hyperlink = connector1C.GetSyncEntity1CHyperlink(entityExternalLink.ExtEntityType, entityExternalLink.ExtEntityId);
+          hyperlink = connector1C.RunGetRequest(string.Format("{0}/hs/gethyperlink/GetHyperlink/{1}/{2}",
+                                                              Constants.Module.ServiceUrl1C, entityExternalLink.ExtEntityId, entityExternalLink.ExtEntityType));
         }
         catch (Exception ex)
         {
-          Logger.ErrorFormat("Integration1C. Error while getting sync entity 1C hyperlink. EntityId = {0}, ExtEntityType = {1}, ExtEntityId = {2}.", ex, 
+          Logger.ErrorFormat("Integration1C. Error while getting sync entity 1C hyperlink. EntityId = {0}, ExtEntityType = {1}, ExtEntityId = {2}.", ex,
                              entity.Id, entityExternalLink.ExtEntityType, entityExternalLink.ExtEntityId);
-          errorMessage =  Examples.Resources.OpenRecord1CError;
+          errorMessage = Examples.Resources.OpenRecord1CError;
         }
       }
       
@@ -95,17 +98,16 @@ namespace Sungero.Examples.Server
       {
         var connector1C = this.GetConnector1C();
         // Ограничение: работает только, если у нашей организации и контрагента заполнены поля: ИНН и КПП.
-        hyperlink = connector1C.GetIncomingInvoice1CHyperlink(incommingInvoice.Number.Trim(),
-                                                              incommingInvoice.Date.Value,
-                                                              incommingInvoice.BusinessUnit?.TIN,
-                                                              incommingInvoice.BusinessUnit?.TRRC,
-                                                              incommingInvoice.Counterparty?.TIN,
-                                                              Sungero.Parties.CompanyBases.As(incommingInvoice.Counterparty)?.TRRC);
+        var getHyperlinkRequestUrl = string.Format("{0}/hs/gethyperlink/GetIncomingInvoiceHyperlink/{1}/{2}/{3}/{4}/{5}/{6}",
+                                                   Constants.Module.ServiceUrl1C, incommingInvoice.Number.Trim(), incommingInvoice.Date.Value.ToString("yyyy-MM-dd"),
+                                                   incommingInvoice.BusinessUnit?.TIN, incommingInvoice.BusinessUnit?.TRRC,
+                                                   incommingInvoice.Counterparty?.TIN, Sungero.Parties.CompanyBases.As(incommingInvoice.Counterparty)?.TRRC);
+        hyperlink = connector1C.RunGetRequest(getHyperlinkRequestUrl);        
       }
       catch (Exception ex)
       {
-        Logger.ErrorFormat("Integration1C. Error while getting incoming invoice 1C hyperlink. IncomingInvoice Id = {0}.", ex, incommingInvoice.Id);        
-        errorMessage =  Examples.Resources.OpenRecord1CError;
+        Logger.ErrorFormat("Integration1C. Error while getting incoming invoice 1C hyperlink. IncomingInvoice Id = {0}.", ex, incommingInvoice.Id);
+        errorMessage = Examples.Resources.OpenRecord1CError;
       }
       
       result.Hyperlink = hyperlink;
@@ -122,6 +124,8 @@ namespace Sungero.Examples.Server
     public virtual bool CreateIncomingInvoice1C(Sungero.Examples.IIncomingInvoice incommingInvoice)
     {
       var created = false;
+      
+      // Получить ссылку на контрагента.
       var counterpartyExtEntityLink = this.GetExternalEntityLink(incommingInvoice.Counterparty, Constants.Module.CounterpartyExtEntityType);
       if (counterpartyExtEntityLink == null)
       {
@@ -129,6 +133,7 @@ namespace Sungero.Examples.Server
         return false;
       }
       
+      // Получить ИД договора в 1С.
       var contractExtEntityId = string.Empty;
       if (incommingInvoice.Contract != null)
       {
@@ -138,23 +143,46 @@ namespace Sungero.Examples.Server
       }
       
       try
-      {        
+      {
         var connector1C = this.GetConnector1C();
         
-        var businessUnit1C = this.GetBusinessUnit1C(connector1C, incommingInvoice.BusinessUnit?.TIN, incommingInvoice.BusinessUnit?.TRRC);
-        if (businessUnit1C == null)
+        // Получить ИД организации в 1С.
+        var businessUnit1CId = this.GetBusinessUnit1CId(connector1C, incommingInvoice.BusinessUnit?.TIN, incommingInvoice.BusinessUnit?.TRRC);
+        if (string.IsNullOrEmpty(businessUnit1CId))
         {
           Logger.DebugFormat("Integration1C. Incoming invoice not created in 1C: not found single business unit in 1C. IncomingInvoice Id = {0}.", incommingInvoice.Id);
           return false;
         }
         
-        var incomingInvoice1C = Integration1CExtensions.IncomingInvoice1C.Create(incommingInvoice.Number.Trim(), incommingInvoice.Date.Value, 
-                                                                                 businessUnit1C.Ref_Key, 
-                                                                                 counterpartyExtEntityLink.ExtEntityId,
-                                                                                 contractExtEntityId);
-        var createdIncomingInvoice1C = connector1C.CreateIncomingInvoice1C(incomingInvoice1C);
+        // Создать входящий счет в 1С.
+        var incomingInvoice1C = Structures.Module.IncomingInvoice1C.Create();
+        incomingInvoice1C.Организация_Key = businessUnit1CId;
+        incomingInvoice1C.Контрагент_Key = counterpartyExtEntityLink.ExtEntityId;
+        incomingInvoice1C.НомерВходящегоДокумента = incommingInvoice.Number.Trim();
+        incomingInvoice1C.ДатаВходящегоДокумента = incommingInvoice.Date.Value;
+        incomingInvoice1C.Комментарий = incommingInvoice.Note;
+        if (!string.IsNullOrEmpty(contractExtEntityId))
+          incomingInvoice1C.ДоговорКонтрагента_Key = contractExtEntityId;
         
-        created = !string.IsNullOrEmpty(createdIncomingInvoice1C?.Ref_Key);
+        var response = connector1C.RunPostRequest(string.Format("{0}{1}", Constants.Module.ServiceUrl1C, Constants.Module.CreatingIncInvoiceUrlPart1C), incomingInvoice1C);
+        
+        var createdIncomingInvoice1C = JsonConvert.DeserializeObject<Sungero.Examples.Structures.Module.IncomingInvoice1C>(response);
+        var createdIncomingInvoice1CId = createdIncomingInvoice1C?.Ref_Key;
+        
+        // Создать запись в регистре сведений "Сроки оплаты документов" в 1С.
+        if (incommingInvoice.PaymentDueDate.HasValue)
+        {
+          var paymentTermContent = new {
+            Организация_Key = businessUnit1CId,
+            Документ = createdIncomingInvoice1CId,
+            Документ_Type = "StandardODATA.Document_СчетНаОплатуПоставщика",
+            СрокОплаты = incommingInvoice.PaymentDueDate
+          };
+          
+          var paymentTerm = connector1C.RunPostRequest(string.Format("{0}{1}", Constants.Module.ServiceUrl1C, Constants.Module.CreatingPaymentTermUrlPart1C), paymentTermContent);
+        }
+        
+        created = !string.IsNullOrEmpty(createdIncomingInvoice1CId);
       }
       catch (Exception ex)
       {
@@ -164,7 +192,7 @@ namespace Sungero.Examples.Server
       
       return created;
     }
- 
+    
     /// <summary>
     /// Получить ссылку на объект внешней системы.
     /// </summary>
@@ -175,39 +203,45 @@ namespace Sungero.Examples.Server
     {
       var typeGuid = entity.TypeDiscriminator.ToString();
       var entityExternalLink = ExternalEntityLinks.GetAll()
-                                                  .Where(x => string.Equals(x.EntityType, typeGuid, StringComparison.OrdinalIgnoreCase) &&
-                                                                            x.EntityId == entity.Id &&
-                                                                            x.ExtEntityType == extEntityType &&
-                                                                            x.ExtSystemId == Constants.Module.ExtSystemId1C)
-                                                  .FirstOrDefault();
+        .Where(x => string.Equals(x.EntityType, typeGuid, StringComparison.OrdinalIgnoreCase) &&
+               x.EntityId == entity.Id &&
+               x.ExtEntityType == extEntityType &&
+               x.ExtSystemId == Constants.Module.ExtSystemId1C)
+        .FirstOrDefault();
       return entityExternalLink;
     }
 
     /// <summary>
-    /// Получить организацию в 1С по ИНН и КПП.
+    /// Получить ИД организации в 1С по ИНН и КПП.
     /// </summary>
     /// <param name="connector1C">Коннектор к 1С.</param>
-    /// <param name="Tin">ИНН.</param>
-    /// <param name="Trrc">КПП.</param>
-    /// <returns>Организация 1С.</returns>
-    public virtual Sungero.Integration1CExtensions.BusinessUnit1C GetBusinessUnit1C(Sungero.Integration1CExtensions.Connector1C connector1C,
-                                                                                    string Tin, string Trrc)
+    /// <param name="tin">ИНН.</param>
+    /// <param name="trrc">КПП.</param>
+    /// <returns>ИД организации в 1С. Если организация не найдена - null.</returns>
+    public virtual string GetBusinessUnit1CId(Sungero.Integration1CExtensions.Connector1C connector1C, string tin, string trrc)
     {
-      var businessUnit1CList = connector1C.GetBusinessUnit1CList(Tin, Trrc);
-      if (businessUnit1CList == null || !businessUnit1CList.Any())
+      var response = connector1C.RunGetRequest(string.Format("{0}{1}?$filter=ИНН eq '{2}' and КПП eq '{3}'&$format=json",
+                                                             Constants.Module.ServiceUrl1C, Constants.Module.GetBusinessUnitsUrlPart1C,
+                                                             tin, trrc));
+
+      var jsonDataResponse = (JObject)JsonConvert.DeserializeObject(response);
+      var businessUnits1C = jsonDataResponse["value"];
+      var businessUnits1CCount = businessUnits1C.Count();
+
+      if (businessUnits1CCount == 0)
       {
-        Logger.DebugFormat("Integration1C. Business unit by TIN and TRRC not found in 1C. BusinessUnit.TIN = {0}, BusinessUnit.TRRC = {1}.", Tin, Trrc);
+        Logger.DebugFormat("Integration1C. Business unit by TIN and TRRC not found in 1C. BusinessUnit.TIN = {0}, BusinessUnit.TRRC = {1}.", tin, trrc);
         return null;
       }
-        
-      if (businessUnit1CList.Count > 1)
+      
+      if (businessUnits1CCount > 1)
       {
-        Logger.DebugFormat("Integration1C. Found {3} business units in 1C by TIN and TRRC. BusinessUnit.TIN = {0}, BusinessUnit.TRRC = {1}.", 
-                           Tin, Trrc, businessUnit1CList.Count);
+        Logger.DebugFormat("Integration1C. Found {3} business units in 1C by TIN and TRRC. BusinessUnit.TIN = {0}, BusinessUnit.TRRC = {1}.", tin, trrc, businessUnits1CCount);
         return null;
       }
-        
-      return businessUnit1CList.SingleOrDefault();
+      
+      var businessUnit1CId = businessUnits1C.FirstOrDefault()?["Ref_Key"].Value<string>();
+      return businessUnit1CId;
     }
     
     /// <summary>
@@ -216,7 +250,7 @@ namespace Sungero.Examples.Server
     /// <returns>Коннектор к 1С.</returns>
     public virtual Sungero.Integration1CExtensions.Connector1C GetConnector1C()
     {
-      return Integration1CExtensions.Connector1C.Get(Constants.Module.ServiceUrl1C, Constants.Module.UserName1C, Constants.Module.Password1C);
+      return Integration1CExtensions.Connector1C.Get(Constants.Module.UserName1C, Constants.Module.Password1C);
     }
     
     #endregion
