@@ -56,10 +56,10 @@
 ### Интеграция с 1С
 
 1. Открытие договора 1С по кнопке из карточки договора Directum RX (пример открытия записи, связанной через ExternalEntityLink).
-<br>**Точки входа:** действие [OpenEntity1CSungero](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.ClientBase/Contract/ContractActions.cs#L12-L25) документа Contract.
+<br>**Точка входа:** действие [OpenEntity1CSungero](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.ClientBase/Contract/ContractActions.cs#L12-L25) документа Contract.
 
 2. Открытие входящего счёта 1С по кнопке из карточки входящего счета Directum RX (пример открытия записи с поиском по реквизитам). 
-<br>**Точка входа:** серверный метод [OpenEntity1CSungero](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.ClientBase/IncomingInvoice/IncomingInvoiceActions.cs#L12-L25) документа IncomingInvoice. 
+<br>**Точка входа:** действие [OpenEntity1CSungero](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.ClientBase/IncomingInvoice/IncomingInvoiceActions.cs#L12-L25) документа IncomingInvoice. 
 
 3. Новый этап регламента "Создание входящего счета в 1С". В рамках данного этапа создается входящий счет в 1С на основе данных входящего счета Directum RX.
 <br>**Точка входа:** серверный метод [Execute](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.ContractsExample/Sungero.ContractsExample.Server/ApprovalCreateIncInvoice1CStage/ApprovalCreateIncInvoice1CStageServerFunctions.cs#L18-L61) справочника ApprovalCreateIncInvoice1CStage. 
