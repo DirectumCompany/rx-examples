@@ -162,10 +162,11 @@ namespace Sungero.Examples.Server
         incomingInvoice1C.ДатаВходящегоДокумента = incommingInvoice.Date.Value;
         incomingInvoice1C.Комментарий = incommingInvoice.Note;
         if (!string.IsNullOrEmpty(contractExtEntityId))
-          incomingInvoice1C.ДоговорКонтрагента_Key = contractExtEntityId;
+          incomingInvoice1C.ДоговорКонтрагента_Key = contractExtEntityId;        
         
         var response = connector1C.RunPostRequest(string.Format("{0}{1}", Constants.Module.ServiceUrl1C, Constants.Module.CreatingIncInvoiceUrlPart1C), incomingInvoice1C);
         
+        // Результат выполнения запроса (response) можно парсить либо через десериализацию в структуру либо через JObject.
         var createdIncomingInvoice1C = JsonConvert.DeserializeObject<Sungero.Examples.Structures.Module.IncomingInvoice1C>(response);
         var createdIncomingInvoice1CId = createdIncomingInvoice1C?.Ref_Key;
         
@@ -223,7 +224,8 @@ namespace Sungero.Examples.Server
       var response = connector1C.RunGetRequest(string.Format("{0}{1}?$filter=ИНН eq '{2}' and КПП eq '{3}'&$format=json",
                                                              Constants.Module.ServiceUrl1C, Constants.Module.GetBusinessUnitsUrlPart1C,
                                                              tin, trrc));
-
+      
+      // Результат выполнения запроса (response) можно парсить либо через десериализацию в структуру либо через JObject.
       var jsonDataResponse = (JObject)JsonConvert.DeserializeObject(response);
       var businessUnits1C = jsonDataResponse["value"];
       var businessUnits1CCount = businessUnits1C.Count();

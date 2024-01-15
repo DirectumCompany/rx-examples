@@ -77,7 +77,7 @@ namespace Sungero.Integration1CExtensions
       this.Client = this.GetClient(login, password);
     }
 
-    private HttpClient GetClient(string userName, string password)
+    private HttpClient GetClient(string login, string password)
     {
       var httpClientHandler = new HttpClientHandler();
       httpClientHandler.ServerCertificateCustomValidationCallback =
@@ -85,7 +85,7 @@ namespace Sungero.Integration1CExtensions
 
       var client = new HttpClient(httpClientHandler);
       client.Timeout = TimeSpan.FromMinutes(5);
-      var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{userName}:{password}"));
+      var basicAuth = Convert.ToBase64String(Encoding.UTF8.GetBytes($"{login}:{password}"));
       client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", basicAuth);
       return client;
     }
