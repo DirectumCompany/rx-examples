@@ -164,6 +164,7 @@ namespace Sungero.Examples.Server
         if (!string.IsNullOrEmpty(contractExtEntityId))
           incomingInvoice1C.ДоговорКонтрагента_Key = contractExtEntityId;        
         
+        // Примечание: для возможности работы с входящими счетами через API веб-сервера 1С необходимо выполнить один раз GET-запрос: "<Адрес веб-сервера 1С>/hs/handlers/UpdateListObjectsOData".
         var response = connector1C.RunPostRequest(string.Format("{0}{1}", Constants.Module.ServiceUrl1C, Constants.Module.CreatingIncInvoiceUrlPart1C), incomingInvoice1C);
         
         // Результат выполнения запроса (response) можно парсить либо через десериализацию в структуру либо через JObject.
