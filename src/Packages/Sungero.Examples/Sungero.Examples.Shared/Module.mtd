@@ -75,6 +75,18 @@
   "OrderedSpecialFolders": [],
   "PublicFunctions": [
     {
+      "Name": "CreateIncomingInvoice1C",
+      "Parameters": [
+        {
+          "Name": "incommingInvoice",
+          "ParameterType": "global::Sungero.Examples.IIncomingInvoice",
+          "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "global::System.Boolean",
+      "ReturnTypeFullName": "System.Boolean"
+    },
+    {
       "Name": "CreateIncomingLetter",
       "Parameters": [
         {
@@ -137,6 +149,48 @@
         },
         {
           "Name": "ErrorMessage",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        }
+      ],
+      "StructureNamespace": "Sungero.Examples.Structures.Module"
+    },
+    {
+      "Name": "IncomingInvoice1C",
+      "IsPublic": true,
+      "Properties": [
+        {
+          "Name": "НомерВходящегоДокумента",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "ДатаВходящегоДокумента",
+          "IsNullable": true,
+          "TypeFullName": "global::System.DateTime"
+        },
+        {
+          "Name": "Организация_Key",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Контрагент_Key",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "ДоговорКонтрагента_Key",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Комментарий",
+          "IsNullable": true,
+          "TypeFullName": "global::System.String"
+        },
+        {
+          "Name": "Ref_Key",
           "IsNullable": true,
           "TypeFullName": "global::System.String"
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NpoComputer.DCX.Common;
@@ -37,7 +37,7 @@ namespace Sungero.Examples.Module.Exchange.Server
       
       foreach (var info in sortedInfos)
       {
-        var convertedDoc = Contracts.IncomingInvoices.As(info.Document.ConvertTo(Contracts.IncomingInvoices.Info));
+        var convertedDoc = Sungero.Examples.IncomingInvoices.As(info.Document.ConvertTo(Sungero.Examples.IncomingInvoices.Info));
         var incomingInvoice = incomingInvoices.Where(d => d.ServiceEntityId == info.ServiceDocumentId).FirstOrDefault();
         var metadata = incomingInvoice.Metadata;
         System.DateTime dateDocument;
