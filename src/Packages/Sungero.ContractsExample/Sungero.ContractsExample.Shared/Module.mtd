@@ -47,6 +47,10 @@
   "InterfaceNamespace": "Sungero.ContractsExample",
   "IsolatedAssemblyName": "Sungero.ContractsExample.Isolated",
   "IsolatedNamespace": "Sungero.ContractsExample.Isolated",
+  "IsVisible": false,
+  "Overridden": [
+    "IsVisible"
+  ],
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.ContractsExample",
