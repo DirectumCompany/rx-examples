@@ -1,0 +1,455 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "6471e4df-d3fa-4d5f-883d-a01b8ec5e63e",
+  "Name": "RecordManagement",
+  "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [
+    {
+      "NameGuid": "fb880104-4673-4410-a4d2-21ad2e17656d",
+      "Name": "CompleteParentActionItemExecutionAssignment",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "6657ba80-b626-4442-8763-670b7b4eb374",
+          "Name": "parentTaskStartId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "b07866a9-0186-4f4f-8da9-63f1f61b4411",
+          "Name": "parentAssignmentId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "b3946596-df3f-4ff5-be9c-73eda5e8a70d",
+          "Name": "actionItemId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "2fbfc87b-31d2-4c6b-ac46-d6d8cb5b2498",
+      "Name": "ChangeCompoundActionItem",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "0ce1870d-133c-4aeb-a866-28deb1d3150f",
+          "Name": "NewDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "186dcaaa-bc34-4b7e-ace9-202e968472d1",
+          "Name": "ChangeContext",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "28653976-3735-4ef2-a194-2d664ddfde9a",
+          "Name": "TaskIds",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "4774b092-7b84-4de2-918e-149a455099bc",
+          "Name": "OldAssignee",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "4891fb00-26fb-4320-8e56-9f659f53052d",
+          "Name": "ActionItemTaskId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "48c28a80-d28b-49ba-85b3-61a99a6ddd82",
+          "Name": "CoAssigneesNewDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "4e45243d-d2f1-4a5b-9bf4-dbb8fcf695ef",
+          "Name": "NewCoAssignees",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "565c6768-f54c-467f-8a05-b2c88f5ca599",
+          "Name": "OldSupervisor",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "566a477f-d241-4c44-9923-172bebfe4a9e",
+          "Name": "NewAssignee",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "79a5528a-4806-444b-9b62-3f499e57b810",
+          "Name": "OldDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "7cccbdde-3bfc-4e5e-8e3e-52d3c77c3e41",
+          "Name": "AdditionalInfo",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "9214d61d-eaca-4347-8f0f-7fd0f54829e2",
+          "Name": "InitiatorOfChange",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "ae045c5d-1000-4bcb-9b0c-9d29b10762ba",
+          "Name": "ActionItemPartsText",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "b341f0c1-fd70-4a1f-9eee-366515183794",
+          "Name": "CoAssigneesOldDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "b4392884-7b97-4503-b153-451862af259a",
+          "Name": "OldCoAssignees",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "deb8d94e-6089-4bdb-8d31-c162038164fe",
+          "Name": "OnEditGuid",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "dff7ca23-a72b-4e80-b79f-84dcd3d031c5",
+          "Name": "NewSupervisor",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "ead45872-beeb-4a25-b448-d570aa00513d",
+          "Name": "EditingReason",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "55ddaa85-0e92-4619-994b-2211545f06b2",
+      "Name": "ApplyActionItemLockIndependentChanges",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "012de2c0-45eb-4067-aeb7-082d1a71b150",
+          "Name": "OldAssignee",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "02efd555-d36d-4241-85dc-73d4584d890d",
+          "Name": "NewAssignee",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "0ce1870d-133c-4aeb-a866-28deb1d31501",
+          "Name": "NewDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "1dee081c-15ff-4593-940e-fbe35f37eb2b",
+          "Name": "NewSupervisor",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "30dd7093-fba8-4a5f-9539-06954f39c50d",
+          "Name": "ChangeContext",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "3bb7aed1-16db-4c54-87e7-b132365143bc",
+          "Name": "OldSupervisor",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "4460da82-8683-49e4-bdfc-e7fce98eadab",
+          "Name": "ActionItemTaskId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "48c28a80-d28b-49ba-85b3-61a99a6ddd81",
+          "Name": "CoAssigneesNewDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "4e45243d-d2f1-4a5b-9bf4-dbb8fcf695e1",
+          "Name": "NewCoAssignees",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "5e4a0d48-809c-4af4-a06d-9cddcf403cfe",
+          "Name": "InitiatorOfChange",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "6e81c978-1afc-495a-988c-5eb3abb78321",
+          "Name": "PartCoAssigneesDeadlineChanged",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "79a5528a-4806-444b-9b62-3f499e57b811",
+          "Name": "OldDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "7cccbdde-3bfc-4e5e-8e3e-52d3c77c3e42",
+          "Name": "AdditionalInfo",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "b341f0c1-fd70-4a1f-9eee-366515183791",
+          "Name": "CoAssigneesOldDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "b4392884-7b97-4503-b153-451862af2591",
+          "Name": "OldCoAssignees",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "deb8d94e-6089-4bdb-8d31-c162038164f2",
+          "Name": "OnEditGuid",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "ead45872-beeb-4a25-b448-d570aa005131",
+          "Name": "EditingReason",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "16102ef8-8cb0-46c2-9281-c3234fd704fb",
+      "Name": "ApplyActionItemLockDependentChanges",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "0ce1870d-133c-4aeb-a866-28deb1d31502",
+          "Name": "NewDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "1ec3989e-f596-4218-8c1c-52265aede523",
+          "Name": "OldSupervisor",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "25612c16-4a6b-4eaa-aa74-240e08dfbd21",
+          "Name": "InitiatorOfChange",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "48c28a80-d28b-49ba-85b3-61a99a6ddd82",
+          "Name": "CoAssigneesNewDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "4e45243d-d2f1-4a5b-9bf4-dbb8fcf695e2",
+          "Name": "NewCoAssignees",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "6e81c978-1afc-495a-988c-5eb3abb78322",
+          "Name": "PartCoAssigneesDeadlineChanged",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "79a5528a-4806-444b-9b62-3f499e57b812",
+          "Name": "OldDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "7cccbdde-3bfc-4e5e-8e3e-52d3c77c3e43",
+          "Name": "AdditionalInfo",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "b341f0c1-fd70-4a1f-9eee-366515183792",
+          "Name": "CoAssigneesOldDeadline",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "b4392884-7b97-4503-b153-451862af2592",
+          "Name": "OldCoAssignees",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "b74e37e3-9d36-42a9-a4c7-b5bec42038b5",
+          "Name": "ChangeContext",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "b9ea685c-5f60-4ce1-ba93-7a677f7ed69b",
+          "Name": "OldAssignee",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "deb8d94e-6089-4bdb-8d31-c162038164f3",
+          "Name": "OnEditGuid",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "e1411500-e6d2-41ba-acb7-0ae370843fd2",
+          "Name": "NewAssignee",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "ead45872-beeb-4a25-b448-d570aa005132",
+          "Name": "EditingReason",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "ec5634a3-d265-471a-8596-70acbcdd0aae",
+          "Name": "ActionItemTaskId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "f3150cd8-9efb-4638-9fab-3b2918fc2763",
+          "Name": "NewSupervisor",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "266cdf00-2043-4667-a0dd-a8e62c341f0e",
+      "Name": "ExcludeFromAcquaintance",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "5df268ec-5194-4b26-82af-cfcf9cdd2d8c",
+          "Name": "AssignmentIds",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "b7a99a41-01d5-4599-ace0-1df2ad2fd7b5",
+      "Name": "StartActionItemExecutionTasks",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "5a648a50-87b4-40c3-bd8b-801e1785eaef",
+          "Name": "TaskIds",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "6c9872a0-e696-4071-a068-f8a30ae5c64f",
+          "Name": "StartedByUserId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "32701eac-fad4-47dc-9762-36cb518abf2c",
+      "Name": "WaitAndFinalizeAIAssistantTraining",
+      "DelayPeriod": 5,
+      "DelayStrategy": "RegularDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 50,
+      "Parameters": [
+        {
+          "NameGuid": "1d69dbf9-6b5b-4cad-b092-43630ad6a4cc",
+          "Name": "ArioTaskId",
+          "ParameterType": "Integer"
+        }
+      ]
+    }
+  ],
+  "BaseGuid": "4e25caec-c722-4740-bcfd-c4f803840ac6",
+  "Blocks": [
+    {
+      "$type": "Sungero.Metadata.AssignmentBlockMetadata, Sungero.Workflow.Shared",
+      "NameGuid": "795cd493-b578-4519-aa7c-72a354cdba19",
+      "Name": "DocumentReviewBlock",
+      "BaseGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
+      "EntityType": "50e39d87-4fc6-4847-8bad-20847b9ba020",
+      "LayeredFromGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
+      "Overridden": [
+        "HandledEvents",
+        "LayeredFromGuid",
+        "IsGenerated"
+      ]
+    },
+    {
+      "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
+      "NameGuid": "139f7f74-0665-4058-88d7-a69718969613",
+      "Name": "DocumentReviewTaskBloockSungero",
+      "BaseGuid": "af11beb2-61e1-453f-9c69-93b9f06355ec",
+      "EntityType": "4ef03457-8b42-4239-a3c5-d4d05e61f0b6",
+      "HandledEvents": [
+        "DocumentReviewTaskBloockSungeroStartTask"
+      ]
+    }
+  ],
+  "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
+  "ClientBaseNamespace": "Sungero.Examples.Module.RecordManagement.ClientBase",
+  "Code": "RecMan",
+  "CompanyCode": "Sungero",
+  "ExplorerTreeOrder": [],
+  "IconResourcesKeys": [],
+  "Importance": "High",
+  "IsVisible": false,
+  "Jobs": [
+    {
+      "NameGuid": "b0c59ce7-500a-41f4-8064-891445930821",
+      "Name": "PrepareDataForAIAssistantTraining",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 15
+    },
+    {
+      "NameGuid": "665b09ed-643e-4f9b-8a30-dd97b0d34c96",
+      "Name": "StartAIAssistantTraining",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T05:00:00"
+    }
+  ],
+  "LayeredFromGuid": "4e25caec-c722-4740-bcfd-c4f803840ac6",
+  "PublicFunctions": [
+    {
+      "Name": "NeedToAttachDocument",
+      "Parameters": [
+        {
+          "Name": "attachment",
+          "ParameterType": "global::Sungero.Content.IElectronicDocument",
+          "ParameterTypeFullName": "Sungero.Content.IElectronicDocument, Sungero.Content.Shared"
+        },
+        {
+          "Name": "mainOfficialDocument",
+          "ParameterType": "global::Sungero.Docflow.IOfficialDocument",
+          "ParameterTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "global::System.Boolean",
+      "ReturnTypeFullName": "System.Boolean"
+    }
+  ],
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.Examples.Module.RecordManagement",
+  "ResourcesKeys": [],
+  "SpecialFolders": [],
+  "Version": "4.10.1.0",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 8
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 8
+    }
+  ]
+}
