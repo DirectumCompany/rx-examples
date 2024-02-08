@@ -15,7 +15,7 @@ namespace Sungero.Examples.Module.SmartProcessing.Server
       base.Initializing(e);
       
       InitializationLogger.Debug("Init: Fill smart processing additional classifiers.");
-      //FillSmartAdditionalClassifiers();
+      FillSmartAdditionalClassifiers();
     }
     
     /// <summary>
