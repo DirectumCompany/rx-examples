@@ -123,12 +123,25 @@
     }
   ],
   "LayeredFromGuid": "bb685d97-a673-42ea-8605-66889967467f",
+  "PublicFunctions": [
+    {
+      "Name": "GetLeadingDocument",
+      "Parameters": [
+        {
+          "Name": "documents",
+          "ParameterType": "System.Collections.Generic.IEnumerable<global::Sungero.Docflow.IOfficialDocument>"
+        }
+      ],
+      "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
+      "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
+    }
+  ],
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.9.28.0",
+  "Version": "4.10.1.0",
   "Widgets": [],
   "Versions": [
     {
