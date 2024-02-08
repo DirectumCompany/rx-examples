@@ -14,7 +14,7 @@ namespace Sungero.Examples.Module.SmartProcessing.Server
     /// <param name="documents">Комплект документов.</param>
     /// <returns>Ведущий документ.</returns>
     [Public]
-    public virtual Sungero.Docflow.IOfficialDocument GetLeadingDocument(List<Sungero.Docflow.IOfficialDocument> documents)
+    public virtual Sungero.Docflow.IOfficialDocument GetLeadingDocument(System.Collections.Generic.IEnumerable<Sungero.Docflow.IOfficialDocument> documents)
     {
       var documentPriority = new Dictionary<Sungero.Docflow.IOfficialDocument, int>();
       var documentTypePriorities = Sungero.SmartProcessing.PublicFunctions.Module.GetPackageDocumentTypePriorities();

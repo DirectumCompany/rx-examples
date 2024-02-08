@@ -18,7 +18,7 @@ namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
       var attachments = _obj.AllAttachments.Select(a => Content.ElectronicDocuments.As(a)).Distinct().ToList();
       
       // Определить главный документ.
-      var mainDocument = Content.ElectronicDocuments.As(SmartProcessing.PublicFunctions.Module.GetLeadingDocument(attachments.Cast<Sungero.Docflow.IOfficialDocument>().ToList()));
+      var mainDocument = Content.ElectronicDocuments.As(SmartProcessing.PublicFunctions.Module.GetLeadingDocument(attachments.Cast<Sungero.Docflow.IOfficialDocument>()));
       var mainOfficialDocument = Sungero.Docflow.OfficialDocuments.As(mainDocument);
       task.DocumentForReviewGroup.All.Add(mainOfficialDocument);
       

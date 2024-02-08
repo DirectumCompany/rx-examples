@@ -13,7 +13,7 @@ namespace Sungero.Examples.Module.RecordManagement.Server
     /// </summary>
     /// <param name="attachment">Вложения.</param>
     /// <param name="mainOfficialDocument">Выбранный главный документ.</param>
-    /// <returns>True, если нужно.</returns>
+    /// <returns>True, если нужно, иначе - false.</returns>
     [Public]
     public static bool NeedToAttachDocument(Content.IElectronicDocument attachment, Sungero.Docflow.IOfficialDocument mainOfficialDocument)
     {

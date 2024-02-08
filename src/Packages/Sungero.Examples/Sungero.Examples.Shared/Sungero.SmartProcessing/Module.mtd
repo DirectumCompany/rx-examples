@@ -129,8 +129,7 @@
       "Parameters": [
         {
           "Name": "documents",
-          "ParameterType": "global::System.Collections.Generic.List<global::Sungero.Docflow.IOfficialDocument>",
-          "ParameterTypeFullName": "System.Collections.Generic.List"
+          "ParameterType": "System.Collections.Generic.IEnumerable<global::Sungero.Docflow.IOfficialDocument>"
         }
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
