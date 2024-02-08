@@ -30,8 +30,6 @@ namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
           task.OtherGroup.All.Add(attachment);
         }
       }
-      
-      task.Save();
     }
   }
 
