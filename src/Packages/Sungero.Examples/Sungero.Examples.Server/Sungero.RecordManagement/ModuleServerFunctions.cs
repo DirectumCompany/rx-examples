@@ -19,7 +19,6 @@ namespace Sungero.Examples.Module.RecordManagement.Server
     {
       if (Sungero.Docflow.ExchangeDocuments.Is(attachment))
         return false;
-      
       return !mainOfficialDocument.Relations.GetRelatedDocuments(Sungero.Docflow.PublicConstants.Module.AddendumRelationName).Any(ad => ad.Id == attachment.Id);
     }
   }

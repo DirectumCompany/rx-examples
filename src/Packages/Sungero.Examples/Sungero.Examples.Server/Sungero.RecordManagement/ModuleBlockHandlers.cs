@@ -7,6 +7,8 @@ using Sungero.Workflow;
 
 namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
 {
+
+
   partial class DocumentReviewTaskBloockSungeroHandlers
   {
 
@@ -17,7 +19,6 @@ namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
       
       // Определить главный документ.
       var mainDocument = Content.ElectronicDocuments.As(SmartProcessing.PublicFunctions.Module.GetLeadingDocument(attachments.Cast<Sungero.Docflow.IOfficialDocument>().ToList()));
-      
       var mainOfficialDocument = Sungero.Docflow.OfficialDocuments.As(mainDocument);
       task.DocumentForReviewGroup.All.Add(mainOfficialDocument);
       
