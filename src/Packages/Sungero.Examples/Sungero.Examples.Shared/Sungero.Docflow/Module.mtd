@@ -352,6 +352,18 @@
     }
   ],
   "BaseGuid": "df83a2ea-8d43-4ec4-a34a-2e61863014df",
+  "Blocks": [
+    {
+      "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
+      "NameGuid": "330ec121-d18e-4fc3-ba2e-cdbc4bd7ad90",
+      "Name": "ApprovalTaskBlockSungero",
+      "BaseGuid": "af11beb2-61e1-453f-9c69-93b9f06355ec",
+      "EntityType": "100950d0-03d2-44f0-9e31-f9c8dfdf3829",
+      "HandledEvents": [
+        "ApprovalTaskBlockSungeroStartTask"
+      ]
+    }
+  ],
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.Docflow.ClientBase",
   "Code": "Docflow",
