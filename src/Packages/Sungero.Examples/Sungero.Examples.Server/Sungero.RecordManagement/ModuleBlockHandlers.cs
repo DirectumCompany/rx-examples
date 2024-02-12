@@ -7,10 +7,9 @@ using Sungero.Workflow;
 
 namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
 {
-
-
   partial class DocumentReviewTaskBloockSungeroHandlers
   {
+    
     public virtual void DocumentReviewTaskBloockSungeroStartTask(Sungero.RecordManagement.IDocumentReviewTask task)
     {
       var attachments = _obj.AllAttachments.Select(a => Content.ElectronicDocuments.As(a)).Distinct().ToList();
