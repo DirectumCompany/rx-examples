@@ -19,7 +19,7 @@
 ## Кейсы
 
 ## Верификация комплекта документов
-Добавлен пример расширения схемы <br>**Верификация комплекта документов**(https://github.com/DirectumCompany/rx-examples/tree/master/env). После выполнения задания, в зависимости от тип документа создается создается задача на рассмотрение или согласования по регламенту:
+Добавлен пример расширения схемы Верификация комплекта документов(https://github.com/DirectumCompany/rx-examples/tree/master/env). После выполнения задания, в зависимости от тип документа создается создается задача на рассмотрение или согласования по регламенту:
 1. Добавлен блок задачи [Отправка задачи на рассмотрение](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.RecordManagement/ModuleBlockHandlers.cs#L14-L29)
 2. Добавлен блок задачи [Отправка задачи на согласование по регламенту](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleBlockHandlers.cs#L13-L37)
 
