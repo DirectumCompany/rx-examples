@@ -7,14 +7,11 @@ using Sungero.Workflow;
 
 namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
 {
-
-
   partial class DocumentReviewTaskBloockSungeroHandlers
   {
-
+    
     public virtual void DocumentReviewTaskBloockSungeroStartTask(Sungero.RecordManagement.IDocumentReviewTask task)
     {
-      // Проверить заполненность обязательных полей во всех документах комплекта.
       var attachments = _obj.AllAttachments.Select(a => Content.ElectronicDocuments.As(a)).Distinct().ToList();
       
       // Определить главный документ.
@@ -26,11 +23,8 @@ namespace Sungero.Examples.Module.RecordManagement.Server.RecordManagementBlocks
       foreach (var attachment in attachments.Where(att => !task.Attachments.Any(x => Equals(x, att))))
       {
         if (RecordManagement.Functions.Module.NeedToAttachDocument(attachment, mainOfficialDocument))
-        {
           task.OtherGroup.All.Add(attachment);
-        }
       }
     }
   }
-
 }

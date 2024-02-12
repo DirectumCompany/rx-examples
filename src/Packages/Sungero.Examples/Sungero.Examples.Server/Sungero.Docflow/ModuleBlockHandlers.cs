@@ -9,7 +9,7 @@ namespace Sungero.Examples.Module.Docflow.Server.DocflowBlocks
 {
   partial class ApprovalTaskBlockSungeroHandlers
   {
-
+    
     public virtual void ApprovalTaskBlockSungeroStartTask(Sungero.Docflow.IApprovalTask task)
     {
       var attachments = _obj.AllAttachments.Select(a => Content.ElectronicDocuments.As(a)).Distinct();
@@ -36,5 +36,4 @@ namespace Sungero.Examples.Module.Docflow.Server.DocflowBlocks
       }
     }
   }
-
 }

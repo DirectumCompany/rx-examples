@@ -18,10 +18,18 @@
 
 ## Кейсы
 
+## Верификация комплекта документов
+
+1. Добавлен пример расширения схемы варианта процесса [Верификация комплекта документов](https://github.com/DirectumCompany/rx-examples/tree/master/env/ProcessKinds_Examples/VerificationTask_EndToEndProcesses.datx): после задания на верификацию происходит автоматическая отправка входящих писем на рассмотрение руководителем, а договоров на согласование по регламенту.
+
+2. Добавлен блок-задача [Отправка задачи на рассмотрение](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.RecordManagement/ModuleBlockHandlers.cs#L13-L28) в перекрытии модуля RecordManagement.
+
+3. Добавлен блок-задача [Отправка задачи на согласование по регламенту](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleBlockHandlers.cs#L13-L37) в перекрытии модуля Docflow.
+
 ### Согласование по регламенту
 Добавлена роль "Сотрудники подразделения инициатора" с несколькими исполнителями. Роль можно указать в качестве исполнителя в этапах согласования с типом "Согласование".
 <br>**Точки входа:** серверные методы [GetRolePerformers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ApprovalRole/ApprovalRoleServerFunctions.cs#L17-L23) и  [GetInitiatorDepartmentEmployeesRolePerformers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ApprovalRole/ApprovalRoleServerFunctions.cs#L30-L40) справочника ApprovalRole,
-а также шаредный метод [GetPossibleRoles] (https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Shared/ApprovalStage/ApprovalStageSharedFunctions.cs#L16-L24).
+а также шаредный метод [GetPossibleRoles](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Shared/ApprovalStage/ApprovalStageSharedFunctions.cs#L16-L24).
 
 ### Преобразование в PDF и наложение отметки об ЭП
 
