@@ -19,9 +19,12 @@
 ## Кейсы
 
 ## Верификация комплекта документов
-Добавлен пример расширения схемы [Верификация комплекта документов](https://github.com/DirectumCompany/rx-examples/tree/master/env/ProcessKinds_Examples/VerificationTask_EndToEndProcesses.datx). После выполнения задания, в зависимости от типа документа создается создается задача на рассмотрение или согласования по регламенту:
-1. Добавлен блок задачи [Отправка задачи на рассмотрение](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.RecordManagement/ModuleBlockHandlers.cs#L13-L28)
-2. Добавлен блок задачи [Отправка задачи на согласование по регламенту](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleBlockHandlers.cs#L13-L37)
+
+1. Добавлен пример расширения схемы варианта процесса [Верификация комплекта документов](https://github.com/DirectumCompany/rx-examples/tree/master/env/ProcessKinds_Examples/VerificationTask_EndToEndProcesses.datx): после задания на верификацию происходит автоматическая отправка входящих писем на рассмотрение руководителем, а договоров на согласование по регламенту.
+
+2. Добавлен блок-задача [Отправка задачи на рассмотрение](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.RecordManagement/ModuleBlockHandlers.cs#L13-L28) в перекрытии модуля RecordManagement.
+
+3. Добавлен блок-задача [Отправка задачи на согласование по регламенту](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleBlockHandlers.cs#L13-L37) в перекрытии модуля Docflow.
 
 ### Согласование по регламенту
 Добавлена роль "Сотрудники подразделения инициатора" с несколькими исполнителями. Роль можно указать в качестве исполнителя в этапах согласования с типом "Согласование".
