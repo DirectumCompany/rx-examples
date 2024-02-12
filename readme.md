@@ -19,9 +19,10 @@
 ## Кейсы
 
 ## Верификация комплекта документов
-Добавлен пример расширения схемы "Верификация комплекта документов":
+Добавлен пример расширения схемы <br>**Верификация комплекта документов**(https://github.com/DirectumCompany/rx-examples/tree/master/env). После выполнения задания, в зависимости от тип документа создается создается задача на рассмотрение или согласования по регламенту:
 1. Добавлен блок задачи [Отправка задачи на рассмотрение](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.RecordManagement/ModuleBlockHandlers.cs#L14-L29)
-2. Добавлен блок задачи "Отправка задачи на согласование по регламенту"
+2. Добавлен блок задачи [Отправка задачи на согласование по регламенту](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleBlockHandlers.cs#L13-L37)
+
 ### Согласование по регламенту
 Добавлена роль "Сотрудники подразделения инициатора" с несколькими исполнителями. Роль можно указать в качестве исполнителя в этапах согласования с типом "Согласование".
 <br>**Точки входа:** серверные методы [GetRolePerformers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ApprovalRole/ApprovalRoleServerFunctions.cs#L17-L23) и  [GetInitiatorDepartmentEmployeesRolePerformers](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/ApprovalRole/ApprovalRoleServerFunctions.cs#L30-L40) справочника ApprovalRole,
