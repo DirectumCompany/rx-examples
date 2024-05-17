@@ -49,7 +49,8 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
     {
       using (var pdfDocument = new Aspose.Pdf.Document(pdfDocumentStream))
       {
-        Stream outputStream = null;
+        Stream outputStream = new MemoryStream();
+        pdfDocumentStream.Position = 0;
         pdfDocumentStream.CopyTo(outputStream);
         
         // Координаты отсчитываются от нижнего левого угла.
@@ -69,7 +70,7 @@ namespace Sungero.Examples.Module.Docflow.Isolated.PdfConverter
           
           // Отступ сверху на высоту штампа.
           pdfStamp.YIndent = verticalCoord - pdfStamp.PdfPage.PageInfo.Height;
-          outputStream = pdfStamper.AddStampToDocumentPage(outputStream,firstPageIndex, pdfStamp);
+          outputStream = pdfStamper.AddStampToDocumentPage(outputStream, firstPageIndex, pdfStamp);
           verticalCoord = verticalCoord - pdfStamp.PdfPage.PageInfo.Height - verticalSpacing;
         }
         

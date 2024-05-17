@@ -44,7 +44,7 @@ namespace Sungero.Examples.Server
     /// <param name="bottomIndent">Значение отступа снизу.</param>
     /// <returns>Результат преобразования.</returns>
     [Remote]
-    public override Sungero.Docflow.Structures.OfficialDocument.ConversionToPdfResult AddRegistrationStamp(double rightIndent, double bottomIndent)
+    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult AddRegistrationStamp(double rightIndent, double bottomIndent)
     {
       return base.AddRegistrationStamp(5, 1);
     }
