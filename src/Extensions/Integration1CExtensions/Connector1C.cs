@@ -18,7 +18,7 @@ namespace Sungero.Integration1CExtensions
     
     #endregion
 
-   #region Методы api по работе с http-запросами.
+    #region Методы api по работе с http-запросами.
 
     /// <summary>
     /// Выполнить GET-запрос к веб-сервису 1С.
