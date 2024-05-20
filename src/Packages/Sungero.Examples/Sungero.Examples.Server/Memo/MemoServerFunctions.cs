@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -59,8 +59,8 @@ namespace Sungero.Examples.Server
       }
       
       System.IO.Stream pdfDocumentStream = null;
-      var body = Docflow.PublicFunctions.OfficialDocument.GetBodyToConvertToPdf(_obj, version, true);
-      using (var inputStream = new System.IO.MemoryStream(body.Body))
+      var versionBody = Docflow.PublicFunctions.OfficialDocument.GetBodyToConvertToPdf(_obj, version, true);
+      using (var inputStream = new System.IO.MemoryStream(versionBody.Body))
       {
         try
         {
