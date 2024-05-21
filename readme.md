@@ -28,7 +28,7 @@
 1. Все документы. Изменен логотип и цвет отметки на фиолетовый. В отметку добавлена дата и время подписания. 
 <br>**Точки входа:** серверные методы [GetSignatureMarkForSimpleSignatureAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L22-L35) и [GetSignatureMarkForCertificateAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/Sungero.Docflow/ModuleServerFunctions.cs#L48-L74) модуля Docflow.
 
-2. Входящий счёт. Цвет отметки изменён на красный, текст отметки изменен на "ПРИНЯТ К ОПЛАТЕ". 
+2. Входящий счёт. Цвет отметки изменён на красный, текст отметки изменен на "ПРИНЯТО К ОПЛАТЕ". 
 <br>**Точка входа:** серверный метод [GetSignatureMarkAsHtml](https://github.com/DirectumCompany/rx-examples/blob/master/src/Packages/Sungero.Examples/Sungero.Examples.Server/IncomingInvoice/IncomingInvoiceServerFunctions.cs#L17-L29) документа IncomingInvoice. 
 
 3. Все документы. Изменено условие для интерактивного преобразования документов. Теперь изображения в формате jpg размером < 1 Mb конвертируются интерактивно. 
