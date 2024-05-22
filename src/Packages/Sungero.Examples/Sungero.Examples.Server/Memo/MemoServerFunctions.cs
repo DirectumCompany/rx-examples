@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -46,7 +46,7 @@ namespace Sungero.Examples.Server
       return htmlStamps;
     }
     
-    public override Sungero.Docflow.Structures.OfficialDocument.ConversionToPdfResult ConvertToPdfAndAddSignatureMark(long versionId)
+    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfAndAddSignatureMark(long versionId)
     {
       var info = Docflow.Structures.OfficialDocument.ConversionToPdfResult.Create();
       info.HasErrors = true;
@@ -59,9 +59,9 @@ namespace Sungero.Examples.Server
       }
       
       System.IO.Stream pdfDocumentStream = null;
-      using (var inputStream = new System.IO.MemoryStream())
+      var versionBody = Docflow.PublicFunctions.OfficialDocument.GetBodyToConvertToPdf(_obj, version, true);
+      using (var inputStream = new System.IO.MemoryStream(versionBody.Body))
       {
-        version.Body.Read().CopyTo(inputStream);
         try
         {
           var extension = version.BodyAssociatedApplication.Extension;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -114,6 +114,18 @@ namespace Sungero.Examples.Module.Docflow.Server
     public override string GetDocumentsToTransferQuery()
     {
       return string.Format(Docflow.Queries.Module.SelectDocumentsToTransfer, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName);
+    }
+    
+    /// <summary>
+    /// Перекрытие. Добавить множественную роль "Сотрудники подразделения инициатора" в список множественных ролей согласования.
+    /// </summary>
+    /// <returns></returns>
+    public override List<Nullable<Enumeration>> GetMultipleMembersRoles()
+    {
+      var roles = base.GetMultipleMembersRoles();
+      roles.Add(Sungero.Examples.ApprovalRole.Type.InitDepEmpl);
+      
+      return roles;
     }
   }
 }
