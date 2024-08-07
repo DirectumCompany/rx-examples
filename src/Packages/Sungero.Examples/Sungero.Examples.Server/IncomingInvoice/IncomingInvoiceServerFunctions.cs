@@ -19,13 +19,11 @@ namespace Sungero.Examples.Server
     {
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
       {
-        this.CreateAndSaveMark(IncomingInvoiceConstants.PaymentMarkKindSid, 12, 6, 1);
+        this.CreateAndSaveMark(IncomingInvoiceConstants.PaymentMarkKindSid, 12, 20, 1);
       }
       else
       {
-        var paymentMarkKind = Sungero.Docflow.Server.MarkKindFunctions.GetMarkKind(IncomingInvoiceConstants.PaymentMarkKindSid);
-        var paymentMark = Sungero.Docflow.Marks.GetAll(m => m.DocumentId == _obj.Id && m.VersionId == _obj.LastVersion.Id 
-                                                       && Equals(m.MarkKind, paymentMarkKind)).SingleOrDefault();
+        var paymentMark = GetVersionMarks(_obj.LastVersion.Id, IncomingInvoiceConstants.PaymentMarkKindSid).SingleOrDefault();
         Docflow.PublicFunctions.Module.DeleteMark(_obj, paymentMark);
       }
     }
@@ -39,7 +37,7 @@ namespace Sungero.Examples.Server
     /// <param name="page">Страница.</param>
     public virtual void CreateAndSaveMark(string markKindSid, double xIndent, double yIndent, int page)
     {
-      var mark = CreateOrUpdateMark(markKindSid);
+      var mark = GetOrCreateMark(markKindSid);
       mark.XIndent = xIndent;
       mark.YIndent = yIndent;
       mark.Page = page;
