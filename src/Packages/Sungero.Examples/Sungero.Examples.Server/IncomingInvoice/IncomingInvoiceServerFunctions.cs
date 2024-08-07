@@ -1,14 +1,60 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Examples.IncomingInvoice;
+using IncomingInvoiceConstants = Sungero.Examples.PublicConstants.Contracts.IncomingInvoice;
 
 namespace Sungero.Examples.Server
 {
   partial class IncomingInvoiceFunctions
   {
+    /// <summary>
+    /// Получить отметку для входящего счета.
+    /// </summary>
+    /// <param name="invoice">Счет.</param>
+    [Public]
+    public virtual void GetMarkForIncomingInvoiceDocument()
+    {
+      if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
+      {
+        this.CreateAndSaveMark(IncomingInvoiceConstants.PaymentMarkKindSid, 12, 6, 1);
+      }
+      else
+      {
+        var paymentMarkKind = Sungero.Docflow.Server.MarkKindFunctions.GetMarkKind(IncomingInvoiceConstants.PaymentMarkKindSid);
+        var paymentMark = Sungero.Docflow.Marks.GetAll(m => m.DocumentId == _obj.Id && m.VersionId == _obj.LastVersion.Id 
+                                                       && Equals(m.MarkKind, paymentMarkKind)).SingleOrDefault();
+        Docflow.PublicFunctions.Module.DeleteMark(_obj, paymentMark);
+      }
+    }
+    
+    /// <summary>
+    /// Создать и сохранить отметку по заданным координатам.
+    /// </summary>
+    /// <param name="markKindSid">Сид отметки.</param>
+    /// <param name="xIndent">Координата X.</param>
+    /// <param name="yIndent">Координата Y.</param>
+    /// <param name="page">Страница.</param>
+    public virtual void CreateAndSaveMark(string markKindSid, double xIndent, double yIndent, int page)
+    {
+      var mark = CreateOrUpdateMark(markKindSid);
+      mark.XIndent = xIndent;
+      mark.YIndent = yIndent;
+      mark.Page = page;
+      mark.Save();
+    }
+    
+    /// <summary>
+    /// Получить отметку для счета с состоянием "Оплачено".
+    /// </summary>
+    /// <returns>Изображение отметки в виде html.</returns>
+    private static string GetPaymentMarkAsHtml(IOfficialDocument document, long versionId)
+    {
+      return Examples.IncomingInvoices.Resources.HtmlMarkTemplatePayment;
+    }
+    
     /// <summary>
     /// Получить отметку об ЭП.
     /// </summary>
