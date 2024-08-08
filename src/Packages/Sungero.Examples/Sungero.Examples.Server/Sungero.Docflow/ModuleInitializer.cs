@@ -24,6 +24,9 @@ namespace Sungero.Examples.Module.Docflow.Server
       CreateMarkKind(Sungero.Examples.IncomingInvoices.Resources.PaymentMarkName, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindSid,
                      Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindClass, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindMethod);
       
+      CreateMarkKind(Sungero.Examples.Contracts.Resources.ApprovedMarkName, Sungero.Examples.Constants.Contracts.Contract.ApprovedMarkKindSid,
+                     Sungero.Examples.Constants.Contracts.Contract.ApprovedMarkKindClass, Sungero.Examples.Constants.Contracts.Contract.ApprovedMarkKindMethod);
+
       var minutesMarkKind = CreateMarkKind(Sungero.Examples.Minuteses.Resources.MinutesMarkStamp, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid,
                                            Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindClass, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindMethod);
       
