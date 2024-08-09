@@ -11,15 +11,35 @@ namespace Sungero.Examples.Server
   partial class IncomingInvoiceFunctions
   {
     /// <summary>
-    /// Получить отметку для входящего счета.
+    /// Преобразовать документ в PDF с простановкой отметок.
+    /// </summary>
+    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
+    /// <returns>Результат преобразования.</returns>
+    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
+    {
+      /// Пример перекрытия, в котором при выполнении действия
+      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
+      /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
+      this.HandlePaymentMarkForIncomingInvoice();
+      return base.ConvertToPdfWithMarks(versionId);
+    }
+    
+    /// <summary>
+    /// Сохранить отметку для простановки на PDF документе с состоянием "Оплачено".
+    /// Удалить отметку в случае, если состояние документа было изменено
+    /// с "Оплачено" на другое.
     /// </summary>
     /// <param name="invoice">Счет.</param>
     [Public]
-    public virtual void GetMarkForIncomingInvoiceDocument()
+    public virtual void HandlePaymentMarkForIncomingInvoice()
     {
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
       {
-        this.CreateAndSaveMark(IncomingInvoiceConstants.PaymentMarkKindSid, 12, 20, 1);
+        var mark = GetOrCreateMark(IncomingInvoiceConstants.PaymentMarkKindSid);
+        mark.XIndent = 12;
+        mark.YIndent = 20;
+        mark.Page = -1;
+        mark.Save();
       }
       else
       {
@@ -29,26 +49,10 @@ namespace Sungero.Examples.Server
     }
     
     /// <summary>
-    /// Создать и сохранить отметку по заданным координатам.
-    /// </summary>
-    /// <param name="markKindSid">Сид отметки.</param>
-    /// <param name="xIndent">Координата X.</param>
-    /// <param name="yIndent">Координата Y.</param>
-    /// <param name="page">Страница.</param>
-    public virtual void CreateAndSaveMark(string markKindSid, double xIndent, double yIndent, int page)
-    {
-      var mark = GetOrCreateMark(markKindSid);
-      mark.XIndent = xIndent;
-      mark.YIndent = yIndent;
-      mark.Page = page;
-      mark.Save();
-    }
-    
-    /// <summary>
     /// Получить отметку для счета с состоянием "Оплачено".
     /// </summary>
     /// <returns>Изображение отметки в виде html.</returns>
-    private static string GetPaymentMarkAsHtml(IOfficialDocument document, long versionId)
+    private static string GetPaymentMarkAsHtml(IIncomingInvoice document, long versionId)
     {
       return Examples.IncomingInvoices.Resources.HtmlMarkTemplatePayment;
     }

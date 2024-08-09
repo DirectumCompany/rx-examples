@@ -95,7 +95,7 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "GetMarkForIncomingInvoiceDocument",
+      "Name": "HandlePaymentMarkForIncomingInvoice",
       "Parameters": [
         {
           "Name": "incomingInvoice",
