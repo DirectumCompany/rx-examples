@@ -95,7 +95,7 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "HandlePaymentMarkForIncomingInvoice",
+      "Name": "UpdateInvoicePaymentMark",
       "Parameters": [
         {
           "Name": "incomingInvoice",

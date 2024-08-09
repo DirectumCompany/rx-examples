@@ -20,7 +20,7 @@ namespace Sungero.Examples.Server
       /// Пример перекрытия, в котором при выполнении действия
       /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
       /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
-      this.HandlePaymentMarkForIncomingInvoice();
+      this.UpdateInvoicePaymentMark();
       return base.ConvertToPdfWithMarks(versionId);
     }
     
@@ -31,7 +31,7 @@ namespace Sungero.Examples.Server
     /// </summary>
     /// <param name="invoice">Счет.</param>
     [Public]
-    public virtual void HandlePaymentMarkForIncomingInvoice()
+    public virtual void UpdateInvoicePaymentMark()
     {
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
       {
