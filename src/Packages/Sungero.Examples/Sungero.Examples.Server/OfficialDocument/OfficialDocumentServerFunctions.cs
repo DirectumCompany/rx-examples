@@ -17,13 +17,16 @@ namespace Sungero.Examples.Server
     /// <returns>Результат преобразования.</returns>
     public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
     {
-      /// Пример перекрытия, в котором при выполнении действия 
+      /// Пример перекрытия, в котором при выполнении действия
       /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
       /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
       if (IncomingInvoices.Is(_obj))
         Sungero.Examples.PublicFunctions.IncomingInvoice.GetMarkForIncomingInvoiceDocument(IncomingInvoices.As(_obj));
       
+      if (Sungero.Meetings.Minuteses.Is(_obj))
+        Sungero.Examples.PublicFunctions.Minutes.GetMarkForMinutesDocument(Minuteses.As(_obj));
+      
       return Sungero.Docflow.Functions.Module.ConvertToPdfWithMarks(_obj, versionId);
-    }    
+    }
   }
 }

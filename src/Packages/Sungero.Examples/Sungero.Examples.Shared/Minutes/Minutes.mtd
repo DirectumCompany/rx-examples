@@ -1,0 +1,128 @@
+{
+  "$type": "Sungero.Metadata.DocumentMetadata, Sungero.Content.Shared",
+  "NameGuid": "d92b9c6a-72b9-47ed-8576-c4af89c7f09e",
+  "Name": "Minutes",
+  "AccessRightsMode": "Both",
+  "BaseGuid": "bb4780ff-b2c3-4044-a390-e9e110791bf6",
+  "CanBeNavigationPropertyType": true,
+  "CreationAreaMetadata": {
+    "NameGuid": "01403d88-dd86-41ff-aa3b-40002653507a",
+    "Name": "CreationArea",
+    "Buttons": [],
+    "IsAncestorMetadata": true,
+    "Versions": []
+  },
+  "ExtraSearchProperties": [],
+  "FilterPanel": {
+    "NameGuid": "80d3ce1a-9a72-443a-8b6c-6c6eef0c8d0f",
+    "Name": "FilterPanel",
+    "Controls": [],
+    "IsAncestorMetadata": true,
+    "Versions": []
+  },
+  "IconResourcesKeys": [],
+  "LayeredFromGuid": "bb4780ff-b2c3-4044-a390-e9e110791bf6",
+  "OpenCardByDefaultInCollection": true,
+  "OperationsClass": "",
+  "Properties": [
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
+      "Name": "Versions",
+      "EntityGuid": "5cd32075-a5cb-4dc5-82fd-91bc918ae0cd",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "EntityGuid"
+      ],
+      "Versions": []
+    },
+    {
+      "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
+      "NameGuid": "15280407-331e-42f6-b263-041a495b66cd",
+      "Name": "Tracking",
+      "EntityGuid": "86835d39-b5fa-4ec7-b16a-2254ece025fb",
+      "IsAncestorMetadata": true,
+      "Overridden": [
+        "EntityGuid"
+      ],
+      "Versions": []
+    }
+  ],
+  "PublicConstants": [
+    {
+      "Name": "MinutesMarkKindClass",
+      "ParentClasses": [
+        "Minutes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Sungero.Examples.Server.MinutesFunctions\""
+    },
+    {
+      "Name": "MinutesMarkKindGuid",
+      "ParentClasses": [
+        "Minutes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"54417afc-4790-49bf-b1cd-50b90ec76d4d\""
+    },
+    {
+      "Name": "MinutesMarkKindMethod",
+      "ParentClasses": [
+        "Minutes"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"GetMinutesMarkAsHtml\""
+    }
+  ],
+  "PublicFunctions": [
+    {
+      "Name": "GetMarkForMinutesDocument",
+      "Parameters": [
+        {
+          "Name": "minutes",
+          "ParameterType": "global::Sungero.Examples.IMinutes",
+          "ParameterTypeFullName": "Sungero.Examples.IMinutes, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
+  "PublicStructures": [],
+  "ResourcesKeys": [
+    "MinutesMarkStamp",
+    "HtmlMarkTemplateMinutes",
+    "HtmlMarkTemplateSignatory",
+    "HtmlMarkTemplateSignatoryIdentifier",
+    "HtmlMarkTemplateSigningDate"
+  ],
+  "RibbonCardMetadata": {
+    "NameGuid": "7e2f3c61-3722-4de5-939f-5a5a251c9edc",
+    "Name": "RibbonCard",
+    "Categories": [],
+    "Elements": [],
+    "Groups": [],
+    "IsAncestorMetadata": true,
+    "Pages": [],
+    "RibbonKind": "Card"
+  },
+  "RibbonCollectionMetadata": {
+    "NameGuid": "4b8f92f8-ed4b-44b2-93b8-5dcca9fcf9d8",
+    "Name": "RibbonCollection",
+    "Categories": [],
+    "Elements": [],
+    "Groups": [],
+    "IsAncestorMetadata": true,
+    "Pages": []
+  },
+  "Versions": [
+    {
+      "Type": "DocumentMetadata",
+      "Number": 2
+    },
+    {
+      "Type": "EntityMetadata",
+      "Number": 12
+    }
+  ]
+}
