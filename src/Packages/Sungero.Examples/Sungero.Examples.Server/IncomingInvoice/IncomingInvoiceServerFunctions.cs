@@ -29,7 +29,6 @@ namespace Sungero.Examples.Server
     /// Удалить отметку в случае, если состояние документа было изменено
     /// с "Оплачено" на другое.
     /// </summary>
-    /// <param name="invoice">Счет.</param>
     [Public]
     public virtual void UpdateInvoicePaymentMark()
     {
