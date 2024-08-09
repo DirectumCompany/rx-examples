@@ -25,7 +25,7 @@ namespace Sungero.Examples.Module.Docflow.Server
                      Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindClass, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindMethod);
       
       CreateMarkKind(Sungero.Examples.Minuteses.Resources.MinutesMarkStamp, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid,
-                     Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindClass, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindMethod);
+                     Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindClass, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindMethod, true);
     }
   }
 }

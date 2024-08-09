@@ -6,7 +6,7 @@ namespace Sungero.Examples.Constants.Meetings
   public static class Minutes
   {
     [Public]
-    public const string MinutesMarkKindGuid = "54417afc-4790-49bf-b1cd-50b90ec76d4d";
+    public const string MinutesMarkKindGuid = "9f2aabf0-a8a2-4863-9aa3-519dc92e166f";
 
     [Public]
     public const string MinutesMarkKindClass = "Sungero.Examples.Server.MinutesFunctions";
