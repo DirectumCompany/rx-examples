@@ -34,7 +34,7 @@ namespace Sungero.Examples.Server
         var mark = GetOrCreateMark(Constants.Contracts.Contract.ApprovedMarkKindSid);
         mark.XIndent = 0.3;
         mark.YIndent = -2;
-        mark.Page = 1;
+        mark.Page = 0;
         mark.Rotation = 90;
         mark.Save();
       }
