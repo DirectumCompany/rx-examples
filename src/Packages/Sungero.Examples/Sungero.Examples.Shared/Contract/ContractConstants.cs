@@ -15,6 +15,6 @@ namespace Sungero.Examples.Constants.Contracts
     
     // Имя метода получения отметки "Утверждено".
     [Public]
-    public const string ApprovedMarkKindMethod = "GeApprovedMarkAsHtml";
+    public const string ApprovedMarkKindMethod = "GetApprovedMarkAsHtml";
   }
 }

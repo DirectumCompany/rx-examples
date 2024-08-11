@@ -10,31 +10,34 @@ namespace Sungero.Examples.Server
   partial class ContractFunctions
   {
     /// <summary>
-    /// Получить отметку для договора.
+    /// Преобразовать документ в PDF с простановкой отметок.
     /// </summary>
-    [Public]
-    public virtual void GetMarkForIncomingInvoiceDocument()
+    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
+    /// <returns>Результат преобразования.</returns>
+    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
     {
-      if (_obj.LastVersionApproved ?? false)
-        this.CreateAndSaveMark(Sungero.Examples.PublicConstants.Contracts.Contract.ApprovedMarkKindSid, 0.3, -2, 90, 1);
+      /// Пример перекрытия, в котором при выполнении действия
+      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
+      /// добавляется отметка "Утверждено" на преобразованный PDF-документ.
+      this.UpdateContractApprovedMark();
+      return base.ConvertToPdfWithMarks(versionId);
     }
     
     /// <summary>
-    /// Создать и сохранить отметку по заданным координатам.
+    /// Получить отметку для договора.
     /// </summary>
-    /// <param name="markKindSid">Сид отметки.</param>
-    /// <param name="xIndent">Координата X.</param>
-    /// <param name="yIndent">Координата Y.</param>
-    /// <param name="rotation">Поворот.</param>
-    /// <param name="page">Страница.</param>
-    public virtual void CreateAndSaveMark(string markKindSid, double xIndent, double yIndent, int rotation, int page)
+    [Public]
+    public virtual void UpdateContractApprovedMark()
     {
-      var mark = GetOrCreateMark(markKindSid);
-      mark.XIndent = xIndent;
-      mark.YIndent = yIndent;
-      mark.Page = page;
-      mark.Rotation = rotation;
-      mark.Save();
+      if (_obj.LastVersionApproved ?? false)
+      {
+        var mark = GetOrCreateMark(Constants.Contracts.Contract.ApprovedMarkKindSid);
+        mark.XIndent = 0.3;
+        mark.YIndent = -2;
+        mark.Page = 1;
+        mark.Rotation = 90;
+        mark.Save();
+      }
     }
     
     /// <summary>
@@ -43,16 +46,16 @@ namespace Sungero.Examples.Server
     /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
-    private static string GeApprovedMarkAsHtml(IOfficialDocument document, long versionId)
+    private static string GetApprovedMarkAsHtml(Sungero.Docflow.IOfficialDocument document, long versionId)
     {
       var signature = Sungero.Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(document, versionId, false);
-      string html;
+      var html = string.Empty;
       using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
       {
         html = Examples.Contracts.Resources.HtmlMarkTemplateApprove;
         html = html.Replace("{version}", versionId.ToString());
         var employee = Sungero.Company.Employees.As(signature.Signatory);
-        html = html.Replace("{approvedBy}", employee.Department.BusinessUnit.Name);
+        html = html.Replace("{approvedOrganization}", employee.Department.BusinessUnit.Name);
       }
       return html;
     }

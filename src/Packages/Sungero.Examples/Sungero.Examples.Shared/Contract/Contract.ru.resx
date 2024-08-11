@@ -101,7 +101,7 @@
   &lt;/tr&gt;
 &lt;tr&gt;
   &lt;td colspan="2"&gt;
-    &lt;span class="tg2"&gt;{approvedBy}. Версия {version}&lt;/span&gt;
+    &lt;span class="tg2"&gt;{approvedOrganization}. Версия {version}&lt;/span&gt;
   &lt;/td&gt;  
 &lt;/tr&gt;
 &lt;/table&gt;

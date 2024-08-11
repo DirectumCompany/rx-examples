@@ -84,7 +84,7 @@
         "Contract"
       ],
       "TypeName": "System.String",
-      "Value": "\"GeApprovedMarkAsHtml\""
+      "Value": "\"GetApprovedMarkAsHtml\""
     },
     {
       "Name": "ApprovedMarkKindSid",
@@ -97,7 +97,7 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "GetMarkForIncomingInvoiceDocument",
+      "Name": "UpdateContractApprovedMark",
       "Parameters": [
         {
           "Name": "contract",
