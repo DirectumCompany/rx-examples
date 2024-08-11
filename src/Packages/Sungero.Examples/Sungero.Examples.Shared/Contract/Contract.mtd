@@ -71,7 +71,7 @@
   ],
   "PublicConstants": [
     {
-      "Name": "ApprovedMarkKindClass",
+      "Name": "PaginalApproveMarkKindClass",
       "ParentClasses": [
         "Contract"
       ],
@@ -79,7 +79,7 @@
       "Value": "\"Sungero.Examples.Server.ContractFunctions\""
     },
     {
-      "Name": "ApprovedMarkKindMethod",
+      "Name": "PaginalApproveMarkKindMethod",
       "ParentClasses": [
         "Contract"
       ],
@@ -87,7 +87,7 @@
       "Value": "\"GetApprovedMarkAsHtml\""
     },
     {
-      "Name": "ApprovedMarkKindSid",
+      "Name": "PaginalApproveMarkKindSid",
       "ParentClasses": [
         "Contract"
       ],
@@ -111,8 +111,8 @@
   ],
   "PublicStructures": [],
   "ResourcesKeys": [
-    "HtmlMarkTemplateApprove",
-    "ApprovedMarkName"
+    "HtmlMarkTemplatePaginalApprove",
+    "PaginalApproveMarkName"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "1e44c34d-1398-48e7-a507-7b72e9ec8ba8",

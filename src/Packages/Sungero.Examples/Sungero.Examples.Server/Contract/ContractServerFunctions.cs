@@ -31,7 +31,7 @@ namespace Sungero.Examples.Server
     {
       if (_obj.LastVersionApproved ?? false)
       {
-        var mark = GetOrCreateMark(Constants.Contracts.Contract.ApprovedMarkKindSid);
+        var mark = GetOrCreateMark(Constants.Contracts.Contract.PaginalApproveMarkKindSid);
         mark.XIndent = 0.3;
         mark.YIndent = -2;
         mark.Page = 0;
@@ -52,7 +52,7 @@ namespace Sungero.Examples.Server
       var html = string.Empty;
       using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
       {
-        html = Examples.Contracts.Resources.HtmlMarkTemplateApprove;
+        html = Examples.Contracts.Resources.PaginalApproveMarkName;
         html = html.Replace("{version}", versionId.ToString());
         var employee = Sungero.Company.Employees.As(signature.Signatory);
         html = html.Replace("{approvedOrganization}", employee.Department.BusinessUnit.Name);

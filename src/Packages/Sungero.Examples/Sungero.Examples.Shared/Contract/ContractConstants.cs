@@ -7,14 +7,14 @@ namespace Sungero.Examples.Constants.Contracts
   {
     // Sid отметки "Утверждено".
     [Public]
-    public const string ApprovedMarkKindSid = "3cdb9932-708f-4079-bc50-890b700202c6";
+    public const string PaginalApproveMarkKindSid = "3cdb9932-708f-4079-bc50-890b700202c6";
     
     // Полное имя класса, из которого вызывается метод получения отметки "Утверждено".
     [Public]
-    public const string ApprovedMarkKindClass = "Sungero.Examples.Server.ContractFunctions";
+    public const string PaginalApproveMarkKindClass = "Sungero.Examples.Server.ContractFunctions";
     
     // Имя метода получения отметки "Утверждено".
     [Public]
-    public const string ApprovedMarkKindMethod = "GetApprovedMarkAsHtml";
+    public const string PaginalApproveMarkKindMethod = "GetApprovedMarkAsHtml";
   }
 }

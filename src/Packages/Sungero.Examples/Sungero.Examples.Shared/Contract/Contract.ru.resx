@@ -58,7 +58,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="HtmlMarkTemplateApprove" xml:space="preserve">
+  <data name="HtmlMarkTemplatePaginalApprove" xml:space="preserve">
     <value>&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
 &lt;head&gt;
 &lt;style type="text/css"&gt;
@@ -108,7 +108,7 @@
 &lt;/body&gt;
 &lt;/html&gt;</value>
   </data>
-  <data name="ApprovedMarkName" xml:space="preserve">
+  <data name="PaginalApproveMarkName" xml:space="preserve">
     <value>Согласовано</value>
   </data>
 </root>
