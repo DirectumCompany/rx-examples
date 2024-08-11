@@ -19,7 +19,7 @@ namespace Sungero.Examples.Server
       /// Пример перекрытия, в котором при выполнении действия
       /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
       /// добавляется отметка "Утверждено" на преобразованный PDF-документ.
-      this.UpdateContractApprovedMark();
+      this.UpdateContractPaginalApproveMark();
       return base.ConvertToPdfWithMarks(versionId);
     }
     
@@ -27,7 +27,7 @@ namespace Sungero.Examples.Server
     /// Получить отметку для договора.
     /// </summary>
     [Public]
-    public virtual void UpdateContractApprovedMark()
+    public virtual void UpdateContractPaginalApproveMark()
     {
       if (_obj.LastVersionApproved ?? false)
       {

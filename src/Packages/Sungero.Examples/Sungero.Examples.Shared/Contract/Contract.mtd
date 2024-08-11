@@ -97,7 +97,7 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "UpdateContractApprovedMark",
+      "Name": "UpdateContractPaginalApproveMark",
       "Parameters": [
         {
           "Name": "contract",
