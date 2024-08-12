@@ -10,54 +10,57 @@ namespace Sungero.Examples.Server
   partial class MinutesFunctions
   {
     /// <summary>
-    /// Получить отметку для протокола совещания.
+    /// Преобразовать документ в PDF с простановкой отметок.
     /// </summary>
-    [Public]
-    public virtual void GetMarkForMinutesDocument()
-      => this.CreateAndSaveMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid, 2, 1, 1);
+    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
+    /// <returns>Результат преобразования.</returns>
+    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
+    {
+      /// Пример перекрытия, в котором при выполнении действия
+      /// "Создать PDF-документ с отметками" для протокола
+      /// добавляется отметка всех подписантов на преобразованный PDF-документ.
+      this.UpdateMinutesMark();
+      return base.ConvertToPdfWithMarks(versionId);
+    }
 
     /// <summary>
-    /// Создать и сохранить отметку по заданным координатам.
+    /// Получить отметку для протокола.
     /// </summary>
-    /// <param name="markKindSid">Сид отметки.</param>
-    /// <param name="xIndent">Координата X.</param>
-    /// <param name="yIndent">Координата Y.</param>
-    /// <param name="page">Страница.</param>
-    public virtual void CreateAndSaveMark(string markKindSid, double xIndent, double yIndent, int page)
+    [Public]
+    public virtual void UpdateMinutesMark()
     {
-      var mark = GetOrCreateMark(markKindSid);
-      mark.XIndent = xIndent;
-      mark.YIndent = yIndent;
-      mark.Page = page;
+      var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
+      mark.XIndent = 2;
+      mark.YIndent = 1;
+      mark.Page = 1;
       mark.Save();
     }
 
     /// <summary>
-    /// Получить отметку для протокола совещания.
+    /// Получить отметку для протокола.
     /// </summary>
+    /// <param name="document">Документ.</param>
+    /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
-    private static string GetMinutesMarkAsHtml(IOfficialDocument document, long versionId)
+    private static string GetMinutesMarkAsHtml(Sungero.Docflow.IOfficialDocument document, long versionId)
     {
       var signatures =
         Signatures.Get(document.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing))
         .Where(s => s.IsValid)
         .ToList();
       
-      string htmlTemplate = Examples.Minuteses.Resources.HtmlMarkTemplateMinutes;
+      var htmlTemplate = Examples.Minuteses.Resources.HtmlMarkTemplateMinutes;
+      var signatoriesHtml = string.Empty;
       
-      string signatoriesHtml = "";
-      using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
+      foreach(var signature in signatures)
       {
-        foreach(var signature in signatures)
-        {
-          signatoriesHtml += $"<tr><td colspan=\"2\"><span class=\"tg2\">" + Examples.Minuteses.Resources.HtmlMarkTemplateSignatory + $" <b>{signature.SignatoryFullName}</b></span></td></tr>";
-          signatoriesHtml += $"<tr><td colspan=\"2\"><span class=\"tg2\">" + Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryIdentifier + $" {signature.Signatory.Id}</span></td></tr>";
-          signatoriesHtml += $"<tr><td colspan=\"2\"><span class=\"tg2\">"+ Examples.Minuteses.Resources.HtmlMarkTemplateSigningDate + $" {signature.SigningDate.ToString("g")}</span></td></tr>";
-          signatoriesHtml += "<tr><td></td></tr>";
-        }
+        signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryFormat(signature.SignatoryFullName);
+        signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryIdentifierFormat(signature.Signatory.Id);
+        signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSigningDateFormat(signature.SigningDate.ToString("g"));
+        signatoriesHtml += "<tr><td></td></tr>";
       }
       
-      string resultHtml = htmlTemplate.Replace("{0}", signatoriesHtml);
+      string resultHtml = Examples.Minuteses.Resources.HtmlMarkTemplateMinutesFormat(signatoriesHtml);
       return resultHtml;
     }
   }

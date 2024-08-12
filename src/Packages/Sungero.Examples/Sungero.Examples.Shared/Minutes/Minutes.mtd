@@ -76,7 +76,7 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "GetMarkForMinutesDocument",
+      "Name": "UpdateMinutesMark",
       "Parameters": [
         {
           "Name": "minutes",

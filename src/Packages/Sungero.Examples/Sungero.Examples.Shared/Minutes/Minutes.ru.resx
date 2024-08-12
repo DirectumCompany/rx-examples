@@ -66,28 +66,28 @@
 
 &lt;head&gt;
   &lt;style type="text/css"&gt;
-    .box1 {
+    .box1 {{
       border: 2px solid #d7d7d7;
       border-color: #2A6FA8;
       width: 180px;
-    }
+    }}
 
-    .box1 td {
+    .box1 td {{
       padding-bottom: 5px;
-    }
+    }}
 
-    .tg2 {
+    .tg2 {{
       font-size: 16pt;
       font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
       text-align: center;
       line-height: 9.75pt;
       color: #2A6FA8;
       white-space: nowrap;
-    }
+    }}
 
-    .logo {
+    .logo {{
       margin: 15px 15px;
-    }
+    }}
   &lt;/style&gt;
 &lt;/head&gt;
 
@@ -110,12 +110,12 @@
 &lt;/html&gt;</value>
   </data>
   <data name="HtmlMarkTemplateSignatory" xml:space="preserve">
-    <value>Подписал</value>
+    <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;span class="tg2"&gt;Подписал &lt;b&gt;{0}&lt;/b&gt;&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;</value>
   </data>
   <data name="HtmlMarkTemplateSignatoryIdentifier" xml:space="preserve">
-    <value>Идентификатор пользователя</value>
+    <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;span class="tg2"&gt;Идентификатор пользователя {0}&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;</value>
   </data>
   <data name="HtmlMarkTemplateSigningDate" xml:space="preserve">
-    <value>Дата и время подписания</value>
+    <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;span class="tg2"&gt;Дата и время подписания {0}&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;</value>
   </data>
 </root>
