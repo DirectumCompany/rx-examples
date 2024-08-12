@@ -17,7 +17,7 @@ namespace Sungero.Examples.Server
     public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
     {
       /// Пример перекрытия, в котором при выполнении действия
-      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
+      /// "Создать PDF-документ с отметками" для договоров с состоянием "Утверждено"
       /// добавляется отметка "Утверждено" на преобразованный PDF-документ.
       this.UpdateContractPaginalApproveMark();
       return base.ConvertToPdfWithMarks(versionId);
