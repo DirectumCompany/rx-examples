@@ -1,61 +1,14 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Examples.IncomingInvoice;
-using IncomingInvoiceConstants = Sungero.Examples.PublicConstants.Contracts.IncomingInvoice;
 
 namespace Sungero.Examples.Server
 {
   partial class IncomingInvoiceFunctions
   {
-    /// <summary>
-    /// Преобразовать документ в PDF с простановкой отметок.
-    /// </summary>
-    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
-    /// <returns>Результат преобразования.</returns>
-    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
-    {
-      /// Пример перекрытия, в котором при выполнении действия
-      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
-      /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
-      this.UpdateInvoicePaymentMark();
-      return base.ConvertToPdfWithMarks(versionId);
-    }
-    
-    /// <summary>
-    /// Сохранить отметку для простановки на PDF документе с состоянием "Оплачено".
-    /// Удалить отметку в случае, если состояние документа было изменено
-    /// с "Оплачено" на другое.
-    /// </summary>
-    [Public]
-    public virtual void UpdateInvoicePaymentMark()
-    {
-      if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
-      {
-        var mark = GetOrCreateMark(IncomingInvoiceConstants.PaymentMarkKindSid);
-        mark.XIndent = 12;
-        mark.YIndent = 20;
-        mark.Page = -1;
-        mark.Save();
-      }
-      else
-      {
-        var paymentMark = GetVersionMarks(_obj.LastVersion.Id, IncomingInvoiceConstants.PaymentMarkKindSid).SingleOrDefault();
-        Docflow.PublicFunctions.Module.DeleteMark(_obj, paymentMark);
-      }
-    }
-    
-    /// <summary>
-    /// Получить отметку для счета с состоянием "Оплачено".
-    /// </summary>
-    /// <returns>Изображение отметки в виде html.</returns>
-    private static string GetPaymentMarkAsHtml(IIncomingInvoice document, long versionId)
-    {
-      return Examples.IncomingInvoices.Resources.HtmlMarkTemplatePayment;
-    }
-    
     /// <summary>
     /// Получить отметку об ЭП.
     /// </summary>

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -15,14 +15,6 @@ namespace Sungero.Examples.Module.Docflow.Server
       base.Initializing(e);
       
       CreateApprovalRole(Sungero.Examples.ApprovalRole.Type.InitDepEmpl, Sungero.Examples.Module.Docflow.Resources.RoleInitiatorDepartmentEmployees);
-      CreateCustomMarkKinds();
-    }
-    
-    public static void CreateCustomMarkKinds()
-    {
-      InitializationLogger.Debug("Init: Create custom mark kinds.");
-      CreateMarkKind(Sungero.Examples.IncomingInvoices.Resources.PaymentMarkName, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindSid,
-                     Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindClass, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindMethod);
     }
   }
 }
