@@ -29,11 +29,19 @@ namespace Sungero.Examples.Server
     [Public]
     public virtual void UpdateMinutesMark()
     {
-      var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
-      mark.XIndent = 2;
-      mark.YIndent = 1;
-      mark.Page = 1;
-      mark.Save();
+      if (_obj.LastVersionApproved == true)
+      {
+        var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
+        mark.XIndent = 2;
+        mark.YIndent = 1;
+        mark.Page = 1;
+        mark.Save();
+      }
+      else
+      {
+        var minutesMark = GetVersionMarks(_obj.LastVersion.Id, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid).SingleOrDefault();
+        Docflow.PublicFunctions.Module.DeleteMark(_obj, minutesMark);
+      }
     }
 
     /// <summary>
@@ -49,17 +57,16 @@ namespace Sungero.Examples.Server
         .Where(s => s.IsValid)
         .ToList();
       
-      var signatoriesHtml = string.Empty;   
+      var html = new System.Text.StringBuilder();
       foreach(var signature in signatures)
       {
-        signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryFormat(signature.SignatoryFullName);
-        signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryIdentifierFormat(signature.Signatory.Id);
-        signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSigningDateFormat(signature.SigningDate.ToString("g"));
-        signatoriesHtml += "<tr><td></td></tr>";
+        html.Append(Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryFormat(signature.SignatoryFullName));
+        html.Append(Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryIdentifierFormat(signature.Signatory.Id));
+        html.Append(Examples.Minuteses.Resources.HtmlMarkTemplateSigningDateFormat(signature.SigningDate.ToString("g")));
+        html.Append(Examples.Minuteses.Resources.HtmlMarkTemplateSeparator);
       }
       
-      string resultHtml = Examples.Minuteses.Resources.HtmlMarkTemplateMinutesFormat(signatoriesHtml);
-      return resultHtml;
+      return Examples.Minuteses.Resources.HtmlMarkTemplateMinutesFormat(html.ToString());
     }
   }
 }

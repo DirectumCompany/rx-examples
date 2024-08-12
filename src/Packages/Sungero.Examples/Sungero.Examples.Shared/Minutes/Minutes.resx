@@ -118,4 +118,7 @@
   <data name="HtmlMarkTemplateSigningDate" xml:space="preserve">
     <value>&lt;tr&gt;&lt;td colspan="2"&gt;&lt;span class="tg2"&gt;Signing date {0}&lt;/span&gt;&lt;/td&gt;&lt;/tr&gt;</value>
   </data>
+  <data name="HtmlMarkTemplateSeparator" xml:space="preserve">
+    <value>&lt;tr&gt;&lt;td&gt;&lt;/td&gt;&lt;/tr&gt;</value>
+  </data>
 </root>

@@ -94,7 +94,8 @@
     "HtmlMarkTemplateMinutes",
     "HtmlMarkTemplateSignatory",
     "HtmlMarkTemplateSignatoryIdentifier",
-    "HtmlMarkTemplateSigningDate"
+    "HtmlMarkTemplateSigningDate",
+    "HtmlMarkTemplateSeparator"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "7e2f3c61-3722-4de5-939f-5a5a251c9edc",
