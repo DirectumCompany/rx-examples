@@ -49,9 +49,7 @@ namespace Sungero.Examples.Server
         .Where(s => s.IsValid)
         .ToList();
       
-      var htmlTemplate = Examples.Minuteses.Resources.HtmlMarkTemplateMinutes;
-      var signatoriesHtml = string.Empty;
-      
+      var signatoriesHtml = string.Empty;   
       foreach(var signature in signatures)
       {
         signatoriesHtml += Examples.Minuteses.Resources.HtmlMarkTemplateSignatoryFormat(signature.SignatoryFullName);
