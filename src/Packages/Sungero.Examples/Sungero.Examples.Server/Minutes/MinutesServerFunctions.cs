@@ -47,12 +47,13 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Получить отметку для протокола.
     /// </summary>
+    /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
-    public virtual string GetMinutesMarkAsHtml(long versionId)
+    private static string GetMinutesMarkAsHtml(Sungero.Docflow.IOfficialDocument document, long versionId)
     {
       var signatures =
-        Signatures.Get(_obj.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing))
+        Signatures.Get(document.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing))
         .Where(s => s.IsValid)
         .ToList();
       

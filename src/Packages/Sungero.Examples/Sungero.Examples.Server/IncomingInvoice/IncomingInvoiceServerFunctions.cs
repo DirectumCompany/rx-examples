@@ -51,7 +51,7 @@ namespace Sungero.Examples.Server
     /// Получить отметку для счета с состоянием "Оплачено".
     /// </summary>
     /// <returns>Изображение отметки в виде html.</returns>
-    public virtual string GetPaymentMarkAsHtml(long versionId)
+    private static string GetPaymentMarkAsHtml(IIncomingInvoice document, long versionId)
     {
       return Examples.IncomingInvoices.Resources.HtmlMarkTemplatePayment;
     }
