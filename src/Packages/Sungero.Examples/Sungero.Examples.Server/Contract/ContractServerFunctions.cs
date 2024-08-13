@@ -57,7 +57,7 @@ namespace Sungero.Examples.Server
       var html = string.Empty;
       using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
       {
-        html = Examples.Contracts.Resources.PaginalApproveMarkName;
+        html = Examples.Contracts.Resources.HtmlMarkTemplatePaginalApprove;
         html = html.Replace("{version}", versionId.ToString());
         var employee = Sungero.Company.Employees.As(signature.Signatory);
         html = html.Replace("{approvedOrganization}", employee.Department.BusinessUnit.Name);
