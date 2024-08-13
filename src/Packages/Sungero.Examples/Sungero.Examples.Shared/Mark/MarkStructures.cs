@@ -4,7 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.Examples.Module.Docflow.Structures.Module
+namespace Sungero.Examples.Structures.Docflow.Mark
 {
-  
+
 }
