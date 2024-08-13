@@ -29,7 +29,7 @@ namespace Sungero.Examples.Server
     [Public]
     public virtual void UpdateMinutesMark()
     {
-      if (_obj.LastVersionApproved == true)
+      if (_obj.LastVersionApproved.GetValueOrDefault())
       {
         var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
         mark.XIndent = 2;
@@ -47,13 +47,12 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Получить отметку для протокола.
     /// </summary>
-    /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
-    private static string GetMinutesMarkAsHtml(Sungero.Docflow.IOfficialDocument document, long versionId)
+    public virtual string GetMinutesMarkAsHtml(long versionId)
     {
       var signatures =
-        Signatures.Get(document.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing))
+        Signatures.Get(_obj.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing))
         .Where(s => s.IsValid)
         .ToList();
       
