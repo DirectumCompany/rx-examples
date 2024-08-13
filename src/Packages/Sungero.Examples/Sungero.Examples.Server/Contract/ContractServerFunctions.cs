@@ -29,14 +29,19 @@ namespace Sungero.Examples.Server
     [Public]
     public virtual void UpdateContractPaginalApproveMark()
     {
-      if (_obj.LastVersionApproved ?? false)
+      if (_obj.LastVersionApproved == true)
       {
         var mark = GetOrCreateMark(Constants.Contracts.Contract.PaginalApproveMarkKindSid);
         mark.XIndent = 0.3;
         mark.YIndent = -2;
         mark.Page = 0;
-        mark.Rotation = 90;
+        mark.RotationAngle = 90;
         mark.Save();
+      }
+      else
+      {
+        var paginalApproveMark = GetVersionMarks(_obj.LastVersion.Id, Constants.Contracts.Contract.PaginalApproveMarkKindSid).SingleOrDefault();
+        Docflow.PublicFunctions.Module.DeleteMark(_obj, paginalApproveMark);
       }
     }
     
