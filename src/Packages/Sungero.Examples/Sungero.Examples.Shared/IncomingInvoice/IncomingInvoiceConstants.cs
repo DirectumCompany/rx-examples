@@ -11,7 +11,7 @@ namespace Sungero.Examples.Constants.Contracts
     
     // Полное имя класса, из которого вызывается метод получения отметки "Оплачено".
     [Public]
-    public const string PaymentMarkKindClass = "Sungero.Examples.Server.IncomingInvoiceFunctions";
+    public const string PaymentMarkKindClass = "Sungero.Examples.Functions.IncomingInvoice";
     
     // Имя метода получения отметки "Оплачено".
     [Public]
