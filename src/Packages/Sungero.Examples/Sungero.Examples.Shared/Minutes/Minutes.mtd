@@ -55,7 +55,7 @@
         "Minutes"
       ],
       "TypeName": "System.String",
-      "Value": "\"Sungero.Examples.Server.MinutesFunctions\""
+      "Value": "\"Sungero.Examples.Functions.Minutes\""
     },
     {
       "Name": "MinutesMarkKindGuid",

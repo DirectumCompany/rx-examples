@@ -27,7 +27,7 @@ namespace Sungero.Examples.Module.Docflow.Server
       var minutesMarkKind = CreateMarkKind(Sungero.Examples.Minuteses.Resources.MinutesMarkStamp, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid,
                                            Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindClass, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindMethod);
       
-      if (minutesMarkKind.OnBlankPage == false)
+      if (!minutesMarkKind.OnBlankPage.GetValueOrDefault())
       {
         minutesMarkKind.OnBlankPage = true;
         minutesMarkKind.Save();
