@@ -35,7 +35,7 @@ namespace Sungero.Examples.Server
         mark.XIndent = 0.3;
         mark.YIndent = -2;
         mark.Page = 0;
-        mark.RotationAngle = 90;
+        mark.RotateAngle = 90;
         mark.Save();
       }
       else
