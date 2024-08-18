@@ -20,21 +20,21 @@ namespace Sungero.Examples.Server
       /// Пример перекрытия, в котором при выполнении действия
       /// "Создать PDF-документ с отметками" для договоров с состоянием "Утверждено"
       /// добавляется отметка "Утверждено" на преобразованный PDF-документ.
-      this.CreateMemoSignMark(versionId);
+      this.UpdateMemoSignMark(versionId);
       return base.ConvertToPdfWithMarks(versionId);
     }
 
     /// <summary>
-    /// Получить отметку для договора.
+    /// Обновить отметку для служебной записки.
     /// </summary>
     [Public]
-    public virtual void CreateMemoSignMark(long versionId)
+    public virtual void UpdateMemoSignMark(long versionId)
     {
       var signatures = this.GetDocumentSignatures(versionId);
       var yIndent = 15d;
       foreach (var signature in signatures)
       {
-        var mark = Sungero.Examples.Functions.Mark.CreateMark(_obj, Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid);
+        var mark = Sungero.Examples.Functions.Mark.GetOrCreateMark(_obj, Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
         mark.SignatureIdSungero = signature.Id;
         yIndent += 2.3;
         mark.XIndent = 10;
@@ -45,7 +45,7 @@ namespace Sungero.Examples.Server
     }
     
     /// <summary>
-    /// Получить отметку для договора с состоянием "Утверждено".
+    /// Получить отметку для служеьной записки с состоянием "Утверждено".
     /// </summary>
     /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
