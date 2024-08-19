@@ -48,7 +48,6 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Получить отметку для договора с состоянием "Утверждено".
     /// </summary>
-    /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
     public virtual string GetApprovedMarkAsHtml(long versionId)
