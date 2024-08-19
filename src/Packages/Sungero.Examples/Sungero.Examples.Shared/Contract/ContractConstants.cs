@@ -11,7 +11,7 @@ namespace Sungero.Examples.Constants.Contracts
     
     // Полное имя класса, из которого вызывается метод получения отметки "Утверждено".
     [Public]
-    public const string PaginalApproveMarkKindClass = "Sungero.Examples.Server.ContractFunctions";
+    public const string PaginalApproveMarkKindClass = "Sungero.Examples.Functions.Contract";
     
     // Имя метода получения отметки "Утверждено".
     [Public]

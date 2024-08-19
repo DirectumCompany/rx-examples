@@ -76,7 +76,7 @@
         "Contract"
       ],
       "TypeName": "System.String",
-      "Value": "\"Sungero.Examples.Server.ContractFunctions\""
+      "Value": "\"Sungero.Examples.Functions.Contract\""
     },
     {
       "Name": "PaginalApproveMarkKindMethod",

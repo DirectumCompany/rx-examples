@@ -51,9 +51,9 @@ namespace Sungero.Examples.Server
     /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
-    private static string GetApprovedMarkAsHtml(Sungero.Docflow.IOfficialDocument document, long versionId)
+    public virtual string GetApprovedMarkAsHtml(long versionId)
     {
-      var signature = Sungero.Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(document, versionId, false);
+      var signature = Sungero.Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(_obj, versionId, false);
       var html = string.Empty;
       using (Core.CultureInfoExtensions.SwitchTo(TenantInfo.Culture))
       {
