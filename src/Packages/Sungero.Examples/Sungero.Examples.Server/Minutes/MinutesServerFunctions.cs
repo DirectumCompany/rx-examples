@@ -9,6 +9,9 @@ namespace Sungero.Examples.Server
 {
   partial class MinutesFunctions
   {
+    /// <summary>
+    /// Получить экземпляр отметки для протокола.
+    /// </summary>
     [Public]
     public override Sungero.Docflow.IMark GetOrCreateSignatureMark()
     {
