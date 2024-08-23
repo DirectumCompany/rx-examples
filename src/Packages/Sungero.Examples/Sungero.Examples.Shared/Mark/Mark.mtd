@@ -41,17 +41,6 @@
       "Overridden": [
         "EntityGuid"
       ]
-    },
-    {
-      "$type": "Sungero.Metadata.LongIntegerPropertyMetadata, Sungero.Metadata",
-      "NameGuid": "489fbda5-7b9e-45c1-b38f-aa83fd13c962",
-      "Name": "SignatureIdSungero",
-      "CanBeSearch": false,
-      "Code": "SignatureIdSun",
-      "IsShowedInList": false,
-      "IsVisibility": false,
-      "ListDataBinderTypeName": "Sungero.Presentation.CommonDataBinders.NumericEditorToIntAndDoubleBinder",
-      "PreviousPropertyGuid": "47d1703e-6c91-44c5-87c4-d28043b8b9a4"
     }
   ],
   "PublicStructures": [],

@@ -35,7 +35,9 @@ namespace Sungero.Examples.Server
       foreach (var signature in signatures)
       {
         var mark = Sungero.Examples.Functions.Mark.GetOrCreateMark(_obj, Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
-        mark.SignatureIdSungero = signature.Id;
+        var additionalParam = mark.AdditionalParams.AddNew();
+        additionalParam.Name = Constants.Docflow.Memo.MarkSignatureIdKey;
+        additionalParam.Value = signature.Id.ToString();
         yIndent += 2.3;
         mark.XIndent = 10;
         mark.YIndent = yIndent;
@@ -45,14 +47,24 @@ namespace Sungero.Examples.Server
     }
     
     /// <summary>
+    /// Получить экземпляр отметки об электронной подписи документа.
+    /// </summary>
+    /// <returns>Отметка об электронной подписи документа.</returns>
+    /// <remarks>Если отметки об электронной подписи документа не существует, то будет создана отметка для простановки по якорю.</remarks>
+    public override Sungero.Docflow.IMark GetOrCreateSignatureMark()
+    {
+      var signature = this.GetDocumentSignatures(_obj.LastVersion.Id).First();
+      return Sungero.Examples.Functions.Mark.GetOrCreateMark(_obj, Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
+    }
+    
+    /// <summary>
     /// Получить отметку для служеьной записки с состоянием "Утверждено".
     /// </summary>
-    /// <param name="document">Документ.</param>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
-    private static string GetMemoSignMarkAsHtml(Sungero.Docflow.IOfficialDocument document, long versionId, long signatureId)
+    public virtual string GetMemoSignMarkAsHtml(long versionId, long signatureId)
     {
-      var memo = Sungero.Examples.Memos.As(document);
+      var memo = Sungero.Examples.Memos.As(_obj);
       var signature = Functions.Memo.GetDocumentSignatures(memo, versionId).Where(s => s.Id == signatureId).First();
       return GetDocumentHtmlStamp(signature);
     }

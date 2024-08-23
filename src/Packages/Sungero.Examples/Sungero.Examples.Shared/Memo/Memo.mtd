@@ -56,12 +56,20 @@
   ],
   "PublicConstants": [
     {
+      "Name": "MarkSignatureIdKey",
+      "ParentClasses": [
+        "Memo"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SignatureId\""
+    },
+    {
       "Name": "SignMarkKindClass",
       "ParentClasses": [
         "Memo"
       ],
       "TypeName": "System.String",
-      "Value": "\"Sungero.Examples.Server.MemoFunctions\""
+      "Value": "\"Sungero.Examples.Functions.Memo\""
     },
     {
       "Name": "SignMarkKindMethod",

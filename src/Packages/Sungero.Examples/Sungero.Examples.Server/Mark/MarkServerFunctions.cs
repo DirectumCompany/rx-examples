@@ -17,7 +17,8 @@ namespace Sungero.Examples.Server
     public override string GetContent()
     {
       var content = string.Empty;
-      if (_obj.SignatureIdSungero != null)
+      var hasSignatureId = _obj.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey);
+      if (hasSignatureId)
       {
         var document = Sungero.Docflow.OfficialDocuments.Get(_obj.DocumentId.Value);
         content = this.GetContentWithSignerInfo(document, _obj.VersionId.Value);
@@ -42,7 +43,9 @@ namespace Sungero.Examples.Server
     /// <returns>Содержимое отметки в виде строки.</returns>
     private string GetContentWithSignerInfo(Sungero.Docflow.IOfficialDocument document, long versionId)
     {
-      var parameters = new object[] { document, versionId, _obj.SignatureIdSungero};
+      var signatureIdString = _obj.AdditionalParams.Where(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey).First().Value;
+      var signatureId = Convert.ToInt64(signatureIdString);
+      var parameters = new object[] { document, versionId, signatureId};
       return Sungero.Docflow.PublicFunctions.Module.ExecuteMarkFunction(_obj.MarkKind.MarkContentClassName, _obj.MarkKind.MarkContentFunctionName, parameters).ToString();
     }
     
@@ -55,14 +58,13 @@ namespace Sungero.Examples.Server
     /// <returns>Отметка указанного вида.</returns>
     public static IMark GetOrCreateMark(Sungero.Docflow.IOfficialDocument document, string markKindSid, Sungero.Domain.Shared.ISignature signature)
     {
-      var mark = Marks.GetAll(m => m.DocumentId == document.Id && m.MarkKind.Sid == markKindSid && m.SignatureIdSungero == signature.Id).FirstOrDefault();
+      var mark = Marks.GetAll(m => m.DocumentId == document.Id && m.MarkKind.Sid == markKindSid && m.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey)).FirstOrDefault();
       if (mark != null)
         return mark;
       mark = Marks.Create();
       mark.DocumentId = document.Id;
       mark.VersionId = document.LastVersion.Id;
       mark.MarkKind = Sungero.Docflow.PublicFunctions.MarkKind.GetMarkKind(markKindSid);
-      mark.SignatureIdSungero = signature.Id;
       return mark;
     }
   }
