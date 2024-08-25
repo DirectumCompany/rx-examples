@@ -34,16 +34,39 @@ namespace Sungero.Examples.Server
       var yIndent = 15d;
       foreach (var signature in signatures)
       {
-        var mark = Sungero.Examples.Functions.Mark.GetOrCreateMark(_obj, Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
-        var additionalParam = mark.AdditionalParams.AddNew();
-        additionalParam.Name = Constants.Docflow.Memo.MarkSignatureIdKey;
-        additionalParam.Value = signature.Id.ToString();
+        var mark = this.GetOrCreateSignatureBasedMark(Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
+        var hasSignatureIdAdditionalParam = mark.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey);
+        if (!hasSignatureIdAdditionalParam)
+        {
+          var additionalParam = mark.AdditionalParams.AddNew();
+          additionalParam.Name = Constants.Docflow.Memo.MarkSignatureIdKey;
+          additionalParam.Value = signature.Id.ToString();
+        }
         yIndent += 2.3;
         mark.XIndent = 10;
         mark.YIndent = yIndent;
         mark.Page = 1;
         mark.Save();
       }
+    }
+    
+    /// <summary>
+    /// Получить или создать отметку определенного вида.
+    /// </summary>
+    /// <param name="markKindSid">Sid вида отметки.</param>
+    /// <param name="signature">Подпись.</param>
+    /// <returns>Отметка указанного вида.</returns>
+    public virtual IMark GetOrCreateSignatureBasedMark(string markKindSid, Sungero.Domain.Shared.ISignature signature)
+    {
+      var mark = Marks.GetAll(m => m.DocumentId == _obj.Id && m.MarkKind.Sid == markKindSid && 
+                              m.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey && a.Value == signature.Id.ToString())).FirstOrDefault();
+      if (mark != null)
+        return mark;
+      mark = Marks.Create();
+      mark.DocumentId = _obj.Id;
+      mark.VersionId = _obj.LastVersion.Id;
+      mark.MarkKind = Sungero.Docflow.PublicFunctions.MarkKind.GetMarkKind(markKindSid);
+      return mark;
     }
     
     /// <summary>
@@ -54,7 +77,7 @@ namespace Sungero.Examples.Server
     public override Sungero.Docflow.IMark GetOrCreateSignatureMark()
     {
       var signature = this.GetDocumentSignatures(_obj.LastVersion.Id).First();
-      return Sungero.Examples.Functions.Mark.GetOrCreateMark(_obj, Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
+      return this.GetOrCreateSignatureBasedMark(Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
     }
     
     /// <summary>
@@ -64,8 +87,7 @@ namespace Sungero.Examples.Server
     /// <returns>Изображение отметки в виде html.</returns>
     public virtual string GetMemoSignMarkAsHtml(long versionId, long signatureId)
     {
-      var memo = Sungero.Examples.Memos.As(_obj);
-      var signature = Functions.Memo.GetDocumentSignatures(memo, versionId).Where(s => s.Id == signatureId).First();
+      var signature = Functions.Memo.GetDocumentSignatures(_obj, versionId).Where(s => s.Id == signatureId).First();
       return GetDocumentHtmlStamp(signature);
     }
     
