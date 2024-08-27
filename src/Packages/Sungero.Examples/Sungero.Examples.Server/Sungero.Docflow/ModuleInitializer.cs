@@ -24,8 +24,11 @@ namespace Sungero.Examples.Module.Docflow.Server
       CreateMarkKind(Sungero.Examples.IncomingInvoices.Resources.PaymentMarkName, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindSid,
                      Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindClass, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindMethod);
       
-      CreateMarkKind(Sungero.Examples.Contracts.Resources.PaginalApproveMarkName, Sungero.Examples.Constants.Contracts.Contract.PaginalApproveMarkKindSid,
+      CreateMarkKind(Sungero.Examples.ContractualDocuments.Resources.PaginalApproveMarkName, Sungero.Examples.Constants.Contracts.Contract.PaginalApproveMarkKindSid,
                      Sungero.Examples.Constants.Contracts.Contract.PaginalApproveMarkKindClass, Sungero.Examples.Constants.Contracts.Contract.PaginalApproveMarkKindMethod);
+      
+      CreateMarkKind(Sungero.Examples.ContractualDocuments.Resources.PaginalApproveMarkName, Sungero.Examples.Constants.Contracts.SupAgreement.PaginalApproveMarkKindSid,
+                     Sungero.Examples.Constants.Contracts.SupAgreement.PaginalApproveMarkKindClass, Sungero.Examples.Constants.Contracts.SupAgreement.PaginalApproveMarkKindMethod);
 
       var minutesMarkKind = CreateMarkKind(Sungero.Examples.Minuteses.Resources.MinutesMarkStamp, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid,
                                            Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindClass, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindMethod);
