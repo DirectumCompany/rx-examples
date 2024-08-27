@@ -10,40 +10,33 @@ namespace Sungero.Examples.Server
   partial class MinutesFunctions
   {
     /// <summary>
-    /// Преобразовать документ в PDF с простановкой отметок.
-    /// </summary>
-    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
-    /// <returns>Результат преобразования.</returns>
-    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
-    {
-      /// Пример перекрытия, в котором при выполнении действия
-      /// "Создать PDF-документ с отметками" для протокола
-      /// добавляется отметка всех подписантов на преобразованный PDF-документ.
-      this.UpdateMinutesMark();
-      return base.ConvertToPdfWithMarks(versionId);
-    }
-
-    /// <summary>
-    /// Получить отметку для протокола.
+    /// Получить экземпляр отметки для протокола.
     /// </summary>
     [Public]
-    public virtual void UpdateMinutesMark()
+    public override Sungero.Docflow.IMark GetOrCreateSignatureMark()
     {
-      if (_obj.LastVersionApproved.GetValueOrDefault())
-      {
-        var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
-        mark.XIndent = 2;
-        mark.YIndent = 1;
-        mark.Page = 1;
-        mark.Save();
-      }
-      else
-      {
-        var minutesMark = GetVersionMarks(_obj.LastVersion.Id, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid).SingleOrDefault();
-        Docflow.PublicFunctions.Module.DeleteMark(_obj, minutesMark);
-      }
+      var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
+      mark.XIndent = 2;
+      mark.YIndent = 1;
+      mark.Page = -1;
+      return mark;
     }
-
+    
+    /// <summary>
+    /// Удалить отметку документа.
+    /// </summary>
+    /// <param name="versionId">ИД версии.</param>
+    /// <param name="markKindSid">Sid вида отметки.</param>
+    [Public, Remote]
+    public override void DeleteVersionMark(long versionId, string markKindSid)
+    {
+      if (markKindSid == Sungero.Docflow.PublicConstants.MarkKind.ElectronicSignatureMarkKindSid)
+        markKindSid = Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid;
+      
+      var mark = this.GetVersionMarks(versionId, markKindSid).FirstOrDefault();
+      this.DeleteVersionMark(mark);
+    }
+    
     /// <summary>
     /// Получить отметку для протокола.
     /// </summary>
@@ -51,9 +44,13 @@ namespace Sungero.Examples.Server
     /// <returns>Изображение отметки в виде html.</returns>
     public virtual string GetMinutesMarkAsHtml(long versionId)
     {
-      var signatures =
-        Signatures.Get(_obj.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing))
+      /// Получаем все подписи с типом "Согласовано" и "Утверждено"
+      /// Группируем подписи по владельцам
+      /// Для каждой группы выбираем одну с приоритетом для "Утверджено"
+      var signatures = Signatures.Get(_obj.LastVersion, q => q.Where(s => s.SignatureType == SignatureType.Endorsing || s.SignatureType == SignatureType.Approval))
         .Where(s => s.IsValid)
+        .GroupBy(s => s.Signatory.Id)
+        .Select(g => g.OrderByDescending(s => s.SignatureType == SignatureType.Approval).First())
         .ToList();
       
       var html = new System.Text.StringBuilder();
