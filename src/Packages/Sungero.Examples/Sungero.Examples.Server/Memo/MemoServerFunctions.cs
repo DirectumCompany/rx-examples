@@ -35,13 +35,6 @@ namespace Sungero.Examples.Server
       foreach (var signature in signatures)
       {
         var mark = this.GetOrCreateSignatureBasedMark(Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
-        var hasSignatureIdAdditionalParam = mark.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey);
-        if (!hasSignatureIdAdditionalParam)
-        {
-          var additionalParam = mark.AdditionalParams.AddNew();
-          additionalParam.Name = Constants.Docflow.Memo.MarkSignatureIdKey;
-          additionalParam.Value = signature.Id.ToString();
-        }
         yIndent += 2.3;
         mark.XIndent = 10;
         mark.YIndent = yIndent;
@@ -58,11 +51,16 @@ namespace Sungero.Examples.Server
     /// <returns>Отметка указанного вида.</returns>
     public virtual IMark GetOrCreateSignatureBasedMark(string markKindSid, Sungero.Domain.Shared.ISignature signature)
     {
-      var mark = Marks.GetAll(m => m.DocumentId == _obj.Id && m.MarkKind.Sid == markKindSid && 
-                              m.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey && a.Value == signature.Id.ToString())).FirstOrDefault();
+      var mark = Marks.GetAll(m => m.DocumentId == _obj.Id && m.MarkKind.Sid == markKindSid && m.VersionId == _obj.LastVersion.Id)
+        .Where(dm => dm.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey && 
+                                             a.Value == signature.Id.ToString())).FirstOrDefault();
       if (mark != null)
         return mark;
+      
       mark = Marks.Create();
+      var additionalParam = mark.AdditionalParams.AddNew();
+      additionalParam.Name = Constants.Docflow.Memo.MarkSignatureIdKey;
+      additionalParam.Value = signature.Id.ToString();
       mark.DocumentId = _obj.Id;
       mark.VersionId = _obj.LastVersion.Id;
       mark.MarkKind = Sungero.Docflow.PublicFunctions.MarkKind.GetMarkKind(markKindSid);
