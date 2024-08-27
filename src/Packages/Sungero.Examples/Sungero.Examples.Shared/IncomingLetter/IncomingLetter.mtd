@@ -80,6 +80,11 @@
           "Name": "incomingLetter",
           "ParameterType": "global::Sungero.Examples.IIncomingLetter",
           "ParameterTypeFullName": "Sungero.Examples.IIncomingLetter, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "versionId",
+          "ParameterType": "global::System.Int64",
+          "ParameterTypeFullName": "System.Int64"
         }
       ],
       "ReturnType": "global::System.String",
