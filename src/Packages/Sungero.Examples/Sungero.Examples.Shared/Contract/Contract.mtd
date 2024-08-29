@@ -95,25 +95,8 @@
       "Value": "\"3cdb9932-708f-4079-bc50-890b700202c6\""
     }
   ],
-  "PublicFunctions": [
-    {
-      "Name": "UpdateContractPaginalApproveMark",
-      "Parameters": [
-        {
-          "Name": "contract",
-          "ParameterType": "global::Sungero.Examples.IContract",
-          "ParameterTypeFullName": "Sungero.Examples.IContract, Sungero.Domain.Interfaces"
-        }
-      ],
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    }
-  ],
   "PublicStructures": [],
-  "ResourcesKeys": [
-    "HtmlMarkTemplatePaginalApprove",
-    "PaginalApproveMarkName"
-  ],
+  "ResourcesKeys": [],
   "RibbonCardMetadata": {
     "NameGuid": "1e44c34d-1398-48e7-a507-7b72e9ec8ba8",
     "Name": "RibbonCard",

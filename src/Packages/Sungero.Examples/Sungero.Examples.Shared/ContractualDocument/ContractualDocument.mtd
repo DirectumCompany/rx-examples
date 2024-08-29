@@ -1,25 +1,28 @@
 {
   "$type": "Sungero.Metadata.DocumentMetadata, Sungero.Content.Shared",
-  "NameGuid": "898d40b5-d515-4f4e-96c6-3f08ee2c209b",
-  "Name": "Memo",
+  "NameGuid": "a325162f-64d7-45a5-9803-edf21b2f7255",
+  "Name": "ContractualDocument",
   "AccessRightsMode": "Both",
-  "BaseGuid": "95af409b-83fe-4697-a805-5a86ceec33f5",
+  "BaseGuid": "59079f7f-a326-4947-bbd6-0ae6dfb5f59b",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {
-    "NameGuid": "01403d88-dd86-41ff-aa3b-40002653507a",
+    "NameGuid": "3cea7122-33c3-4e25-914f-dbcd03b58f7e",
     "Name": "CreationArea",
     "Buttons": [],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Versions": []
   },
   "ExtraSearchProperties": [],
   "FilterPanel": {
     "NameGuid": "80d3ce1a-9a72-443a-8b6c-6c6eef0c8d0f",
     "Name": "FilterPanel",
     "Controls": [],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Versions": []
   },
   "IconResourcesKeys": [],
-  "LayeredFromGuid": "95af409b-83fe-4697-a805-5a86ceec33f5",
+  "IsAbstract": true,
+  "LayeredFromGuid": "59079f7f-a326-4947-bbd6-0ae6dfb5f59b",
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",
   "Properties": [
@@ -27,80 +30,61 @@
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
       "Name": "Versions",
-      "EntityGuid": "08a68995-851c-4b55-8b01-f3dd4c4505a0",
+      "EntityGuid": "e7df2074-9001-4a11-b702-48ceac299674",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
     },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "15280407-331e-42f6-b263-041a495b66cd",
       "Name": "Tracking",
-      "EntityGuid": "5418ef27-1f5a-4b00-948d-546d6b5ce388",
+      "EntityGuid": "ca2d1de9-b600-4fd2-965e-b40c7616bbc1",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
     },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
-      "NameGuid": "b8d2a9bb-bbb2-456f-946e-178af9ea0c6b",
-      "Name": "Addressees",
-      "EntityGuid": "0bb0b78c-4cdf-498b-b50a-41ff859cf636",
+      "NameGuid": "165c49b7-54cb-42d5-8254-c03460fdcb9b",
+      "Name": "Milestones",
+      "EntityGuid": "6b807cd8-6385-4847-9e6c-7e3611fd992a",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
-    }
-  ],
-  "PublicConstants": [
-    {
-      "Name": "MarkSignatureIdKey",
-      "ParentClasses": [
-        "Memo"
       ],
-      "TypeName": "System.String",
-      "Value": "\"SignatureId\""
-    },
-    {
-      "Name": "SignMarkKindClass",
-      "ParentClasses": [
-        "Memo"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"Sungero.Examples.Functions.Memo\""
-    },
-    {
-      "Name": "SignMarkKindMethod",
-      "ParentClasses": [
-        "Memo"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"GetMemoSignMarkAsHtml\""
-    },
-    {
-      "Name": "SignMarkKindSid",
-      "ParentClasses": [
-        "Memo"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"eeb0239e-0c82-42fc-b3f7-ce937a8b6c4a\""
+      "Versions": []
     }
   ],
   "PublicFunctions": [
     {
-      "Name": "UpdateMemoSignMark",
+      "Name": "GetContractualApprovedMarkAsHtml",
       "Parameters": [
         {
-          "Name": "memo",
-          "ParameterType": "global::Sungero.Examples.IMemo",
-          "ParameterTypeFullName": "Sungero.Examples.IMemo, Sungero.Domain.Interfaces"
+          "Name": "contractualDocument",
+          "ParameterType": "global::Sungero.Examples.IContractualDocument",
+          "ParameterTypeFullName": "Sungero.Examples.IContractualDocument, Sungero.Domain.Interfaces"
         },
         {
           "Name": "versionId",
           "ParameterType": "global::System.Int64",
           "ParameterTypeFullName": "System.Int64"
+        }
+      ],
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
+    },
+    {
+      "Name": "UpdateContractPaginalApproveMark",
+      "Parameters": [
+        {
+          "Name": "contractualDocument",
+          "ParameterType": "global::Sungero.Examples.IContractualDocument",
+          "ParameterTypeFullName": "Sungero.Examples.IContractualDocument, Sungero.Domain.Interfaces"
         }
       ],
       "ReturnType": "void",
@@ -109,10 +93,11 @@
   ],
   "PublicStructures": [],
   "ResourcesKeys": [
-    "SignedMarkName"
+    "HtmlMarkTemplatePaginalApprove",
+    "PaginalApproveMarkName"
   ],
   "RibbonCardMetadata": {
-    "NameGuid": "1e92fa93-31c6-4a1a-8298-b04262e1e9d3",
+    "NameGuid": "dbd42df7-12bd-4d32-8870-24a9c56b0ea6",
     "Name": "RibbonCard",
     "Categories": [],
     "Elements": [],
@@ -122,7 +107,7 @@
     "RibbonKind": "Card"
   },
   "RibbonCollectionMetadata": {
-    "NameGuid": "102677b1-ba42-4a39-8581-aa5a30deb4dd",
+    "NameGuid": "d84323ec-059e-40bf-9629-adabda4086ea",
     "Name": "RibbonCollection",
     "Categories": [],
     "Elements": [],
@@ -138,10 +123,6 @@
     {
       "Type": "EntityMetadata",
       "Number": 12
-    },
-    {
-      "Type": "DomainApi",
-      "Number": 2
     }
   ]
 }

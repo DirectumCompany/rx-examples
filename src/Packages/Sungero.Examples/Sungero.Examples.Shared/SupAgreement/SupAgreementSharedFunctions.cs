@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
+using Sungero.Examples.SupAgreement;
 
-namespace Sungero.Examples.Module.Docflow.Structures.Module
+namespace Sungero.Examples.Shared
 {
-  
+  partial class SupAgreementFunctions
+  {
+
+  }
 }

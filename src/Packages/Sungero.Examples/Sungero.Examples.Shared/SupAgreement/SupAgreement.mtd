@@ -1,25 +1,27 @@
 {
   "$type": "Sungero.Metadata.DocumentMetadata, Sungero.Content.Shared",
-  "NameGuid": "898d40b5-d515-4f4e-96c6-3f08ee2c209b",
-  "Name": "Memo",
+  "NameGuid": "4f338f0b-3257-40dd-8d52-cd102c0e852b",
+  "Name": "SupAgreement",
   "AccessRightsMode": "Both",
-  "BaseGuid": "95af409b-83fe-4697-a805-5a86ceec33f5",
+  "BaseGuid": "265f2c57-6a8a-4a15-833b-ca00e8047fa5",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {
-    "NameGuid": "01403d88-dd86-41ff-aa3b-40002653507a",
+    "NameGuid": "265d0d2c-1bae-4ae4-b35d-cbfd7672ed30",
     "Name": "CreationArea",
     "Buttons": [],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Versions": []
   },
   "ExtraSearchProperties": [],
   "FilterPanel": {
     "NameGuid": "80d3ce1a-9a72-443a-8b6c-6c6eef0c8d0f",
     "Name": "FilterPanel",
     "Controls": [],
-    "IsAncestorMetadata": true
+    "IsAncestorMetadata": true,
+    "Versions": []
   },
   "IconResourcesKeys": [],
-  "LayeredFromGuid": "95af409b-83fe-4697-a805-5a86ceec33f5",
+  "LayeredFromGuid": "265f2c57-6a8a-4a15-833b-ca00e8047fa5",
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",
   "Properties": [
@@ -27,92 +29,66 @@
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "56cbe741-880f-4e6f-9567-343d08494b59",
       "Name": "Versions",
-      "EntityGuid": "08a68995-851c-4b55-8b01-f3dd4c4505a0",
+      "EntityGuid": "1d4e4c11-cb47-4b0a-9395-605e0c3f6896",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
     },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
       "NameGuid": "15280407-331e-42f6-b263-041a495b66cd",
       "Name": "Tracking",
-      "EntityGuid": "5418ef27-1f5a-4b00-948d-546d6b5ce388",
+      "EntityGuid": "211a6d90-4dd5-4763-b49c-fdc61956ad41",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
     },
     {
       "$type": "Sungero.Metadata.CollectionPropertyMetadata, Sungero.Metadata",
-      "NameGuid": "b8d2a9bb-bbb2-456f-946e-178af9ea0c6b",
-      "Name": "Addressees",
-      "EntityGuid": "0bb0b78c-4cdf-498b-b50a-41ff859cf636",
+      "NameGuid": "165c49b7-54cb-42d5-8254-c03460fdcb9b",
+      "Name": "Milestones",
+      "EntityGuid": "9c5aa8cb-251a-4023-b628-e3ceacd18366",
       "IsAncestorMetadata": true,
       "Overridden": [
         "EntityGuid"
-      ]
+      ],
+      "Versions": []
     }
   ],
   "PublicConstants": [
     {
-      "Name": "MarkSignatureIdKey",
+      "Name": "PaginalApproveMarkKindClass",
       "ParentClasses": [
-        "Memo"
+        "SupAgreement"
       ],
       "TypeName": "System.String",
-      "Value": "\"SignatureId\""
+      "Value": "\"Sungero.Examples.Functions.SupAgreement\""
     },
     {
-      "Name": "SignMarkKindClass",
+      "Name": "PaginalApproveMarkKindMethod",
       "ParentClasses": [
-        "Memo"
+        "SupAgreement"
       ],
       "TypeName": "System.String",
-      "Value": "\"Sungero.Examples.Functions.Memo\""
+      "Value": "\"GetApprovedMarkAsHtml\""
     },
     {
-      "Name": "SignMarkKindMethod",
+      "Name": "PaginalApproveMarkKindSid",
       "ParentClasses": [
-        "Memo"
+        "SupAgreement"
       ],
       "TypeName": "System.String",
-      "Value": "\"GetMemoSignMarkAsHtml\""
-    },
-    {
-      "Name": "SignMarkKindSid",
-      "ParentClasses": [
-        "Memo"
-      ],
-      "TypeName": "System.String",
-      "Value": "\"eeb0239e-0c82-42fc-b3f7-ce937a8b6c4a\""
-    }
-  ],
-  "PublicFunctions": [
-    {
-      "Name": "UpdateMemoSignMark",
-      "Parameters": [
-        {
-          "Name": "memo",
-          "ParameterType": "global::Sungero.Examples.IMemo",
-          "ParameterTypeFullName": "Sungero.Examples.IMemo, Sungero.Domain.Interfaces"
-        },
-        {
-          "Name": "versionId",
-          "ParameterType": "global::System.Int64",
-          "ParameterTypeFullName": "System.Int64"
-        }
-      ],
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
+      "Value": "\"16d5e673-4444-4b09-aacf-36a7c3a30022\""
     }
   ],
   "PublicStructures": [],
-  "ResourcesKeys": [
-    "SignedMarkName"
-  ],
+  "ResourcesKeys": [],
   "RibbonCardMetadata": {
-    "NameGuid": "1e92fa93-31c6-4a1a-8298-b04262e1e9d3",
+    "NameGuid": "5bcd43e9-cc93-4980-9f3f-aa202b431ff7",
     "Name": "RibbonCard",
     "Categories": [],
     "Elements": [],
@@ -122,7 +98,7 @@
     "RibbonKind": "Card"
   },
   "RibbonCollectionMetadata": {
-    "NameGuid": "102677b1-ba42-4a39-8581-aa5a30deb4dd",
+    "NameGuid": "82f5ce54-0fca-449c-98e4-bce7da28ce91",
     "Name": "RibbonCollection",
     "Categories": [],
     "Elements": [],
@@ -138,10 +114,6 @@
     {
       "Type": "EntityMetadata",
       "Number": 12
-    },
-    {
-      "Type": "DomainApi",
-      "Number": 2
     }
   ]
 }
