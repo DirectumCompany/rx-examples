@@ -76,23 +76,13 @@
   ],
   "PublicFunctions": [
     {
-      "Name": "DeleteVersionMark",
+      "Name": "DeleteSignatureMark",
       "IsRemote": true,
       "Parameters": [
         {
           "Name": "minutes",
           "ParameterType": "global::Sungero.Examples.IMinutes",
           "ParameterTypeFullName": "Sungero.Examples.IMinutes, Sungero.Domain.Interfaces"
-        },
-        {
-          "Name": "versionId",
-          "ParameterType": "global::System.Int64",
-          "ParameterTypeFullName": "System.Int64"
-        },
-        {
-          "Name": "markKindSid",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
         }
       ],
       "Placement": "Shared",
@@ -101,6 +91,7 @@
     },
     {
       "Name": "GetOrCreateSignatureMark",
+      "IsRemote": true,
       "Parameters": [
         {
           "Name": "minutes",
@@ -108,6 +99,7 @@
           "ParameterTypeFullName": "Sungero.Examples.IMinutes, Sungero.Domain.Interfaces"
         }
       ],
+      "Placement": "Shared",
       "ReturnType": "global::Sungero.Docflow.IMark",
       "ReturnTypeFullName": "Sungero.Docflow.IMark, Sungero.Domain.Interfaces"
     }
