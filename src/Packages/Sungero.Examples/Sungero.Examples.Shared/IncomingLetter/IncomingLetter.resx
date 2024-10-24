@@ -59,7 +59,8 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="HtmlStampTemplateForRegistrationMarkCustom" xml:space="preserve">
-    <value>&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+    <value>&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
 &lt;head&gt;
 &lt;style type="text/css"&gt;
 .box1 {
@@ -72,6 +73,10 @@
   width: 50mm;
   height: 17mm;
 }
+.small-td {
+  font-size: 6pt;
+  line-height: 6pt;
+}
 .tg1{font-size:6pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:1;color: #6904db;white-space: pre-wrap}
 .tg2{font-size:8.25pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:1;color: #6904db;white-space: pre-wrap}
  
@@ -81,15 +86,15 @@
  
 &lt;table class="box1"&gt;
 &lt;tr&gt;
-  &lt;td colspan="2"&gt;  
+  &lt;td class="small-td" colspan="2"&gt;  
     &lt;div class="tg2" style="margin-left:3.75px;margin-right:3.75px"&gt;{Department}&lt;/div&gt;
   &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-  &lt;td&gt;
+  &lt;td class="small-td"&gt;
     &lt;div class="tg1" style="margin-left:1.5px;margin-right:1.5px"&gt;Reg No {RegNumber}&lt;/div&gt;
   &lt;/td&gt;  
- &lt;td&gt;
+ &lt;td class="small-td"&gt;
 &lt;div class="tg1" style="margin-left:1.5px;margin-right:1.5px;text-align:right"&gt;{RegDate}&lt;/div&gt;
  &lt;/td&gt;
 &lt;/tr&gt;
