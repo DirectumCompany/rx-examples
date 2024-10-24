@@ -200,6 +200,6 @@
 &lt;/html&gt;</value>
   </data>
   <data name="PaymentMarkName" xml:space="preserve">
-    <value>Отметка "Оплачено".</value>
+    <value>Отметка "Оплачено"</value>
   </data>
 </root>
