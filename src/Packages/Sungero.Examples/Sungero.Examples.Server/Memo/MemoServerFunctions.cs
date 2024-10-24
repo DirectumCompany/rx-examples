@@ -9,6 +9,87 @@ namespace Sungero.Examples.Server
 {
   partial class MemoFunctions
   {
+    
+    /// <summary>
+    /// Преобразовать документ в PDF с простановкой отметок.
+    /// </summary>
+    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
+    /// <returns>Результат преобразования.</returns>
+    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
+    {
+      /// Пример перекрытия, в котором при выполнении действия
+      /// "Создать PDF-документ с отметками" для договоров с состоянием "Утверждено"
+      /// добавляется отметка "Утверждено" на преобразованный PDF-документ.
+      this.UpdateMemoSignMark(versionId);
+      return base.ConvertToPdfWithMarks(versionId);
+    }
+
+    /// <summary>
+    /// Обновить отметку для служебной записки.
+    /// </summary>
+    [Public]
+    public virtual void UpdateMemoSignMark(long versionId)
+    {
+      var signatures = this.GetDocumentSignatures(versionId);
+      var yIndent = 15d;
+      foreach (var signature in signatures)
+      {
+        var mark = this.GetOrCreateSignatureBasedMark(Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
+        yIndent += 2.3;
+        mark.XIndent = 10;
+        mark.YIndent = yIndent;
+        mark.Page = 1;
+        mark.Save();
+      }
+    }
+    
+    /// <summary>
+    /// Получить или создать отметку определенного вида.
+    /// </summary>
+    /// <param name="markKindSid">Sid вида отметки.</param>
+    /// <param name="signature">Подпись.</param>
+    /// <returns>Отметка указанного вида.</returns>
+    public virtual IMark GetOrCreateSignatureBasedMark(string markKindSid, Sungero.Domain.Shared.ISignature signature)
+    {
+      var signatureIdString = signature.Id.ToString();
+      var mark = Marks.GetAll(m => m.DocumentId == _obj.Id && m.MarkKind.Sid == markKindSid && m.VersionId == _obj.LastVersion.Id)
+        .Where(dm => dm.AdditionalParams.Any(a => a.Name == PublicConstants.Docflow.Memo.MarkSignatureIdKey && 
+                                             a.Value == signatureIdString)).FirstOrDefault();
+      if (mark != null)
+        return mark;
+      
+      mark = Marks.Create();
+      var additionalParam = mark.AdditionalParams.AddNew();
+      additionalParam.Name = Constants.Docflow.Memo.MarkSignatureIdKey;
+      additionalParam.Value = signatureIdString;
+      mark.DocumentId = _obj.Id;
+      mark.VersionId = _obj.LastVersion.Id;
+      mark.MarkKind = Sungero.Docflow.PublicFunctions.MarkKind.GetMarkKind(markKindSid);
+      return mark;
+    }
+    
+    /// <summary>
+    /// Получить экземпляр отметки об электронной подписи документа.
+    /// </summary>
+    /// <returns>Отметка об электронной подписи документа.</returns>
+    /// <remarks>Если отметки об электронной подписи документа не существует, то будет создана отметка для простановки по якорю.</remarks>
+    public override Sungero.Docflow.IMark GetOrCreateSignatureMark()
+    {
+      var signature = this.GetDocumentSignatures(_obj.LastVersion.Id).First();
+      return this.GetOrCreateSignatureBasedMark(Sungero.Examples.Constants.Docflow.Memo.SignMarkKindSid, signature);
+    }
+    
+    /// <summary>
+    /// Получить отметку для служеьной записки с состоянием "Утверждено".
+    /// </summary>
+    /// <param name="versionId">ИД версии.</param>
+    /// <returns>Изображение отметки в виде html.</returns>
+    public virtual string GetMemoSignMarkAsHtml(long versionId, long signatureId)
+    {
+      var signature = Functions.Memo.GetDocumentSignatures(_obj, versionId).Where(s => s.Id == signatureId).First();
+      return GetDocumentHtmlStamp(signature);
+    }
+    
     /// <summary>
     /// Получить список всех подписей документа.
     /// </summary>
@@ -32,18 +113,20 @@ namespace Sungero.Examples.Server
     {
       var signatures = this.GetDocumentSignatures(versionId);
       var htmlStamps = new List<string>();
-      var htmlStamp = string.Empty;
       foreach (var signature in signatures)
-      {
-        var defaultSignatureStampParams = Sungero.Docflow.PublicFunctions.Module.GetDefaultSignatureStampParams(signature.SignCertificate != null);
-        if (signature.SignCertificate != null)
-          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature, defaultSignatureStampParams);
-        else
-          htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSimpleSignatureAsHtml(signature, defaultSignatureStampParams);
-        htmlStamps.Add(htmlStamp);
-      }
-      
+        htmlStamps.Add(GetDocumentHtmlStamp(signature));
       return htmlStamps;
+    }
+    
+    public static string GetDocumentHtmlStamp(Sungero.Domain.Shared.ISignature signature)
+    {
+      var htmlStamp = string.Empty;
+      var defaultSignatureStampParams = Sungero.Docflow.PublicFunctions.Module.GetDefaultSignatureStampParams(signature.SignCertificate != null);
+      if (signature.SignCertificate != null)
+        htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForCertificateAsHtml(signature, defaultSignatureStampParams);
+      else
+        htmlStamp = Docflow.PublicFunctions.Module.GetSignatureMarkForSimpleSignatureAsHtml(signature, defaultSignatureStampParams);
+      return htmlStamp;
     }
     
     public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfAndAddSignatureMark(long versionId)

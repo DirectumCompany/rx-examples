@@ -67,10 +67,52 @@
       ]
     }
   ],
+  "PublicConstants": [
+    {
+      "Name": "PaymentMarkKindClass",
+      "ParentClasses": [
+        "IncomingInvoice"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Sungero.Examples.Functions.IncomingInvoice\""
+    },
+    {
+      "Name": "PaymentMarkKindMethod",
+      "ParentClasses": [
+        "IncomingInvoice"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"GetPaymentMarkAsHtml\""
+    },
+    {
+      "Name": "PaymentMarkKindSid",
+      "ParentClasses": [
+        "IncomingInvoice"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"A89D9F46-9065-422A-B6CA-DED9D29EEDC7\""
+    }
+  ],
+  "PublicFunctions": [
+    {
+      "Name": "UpdateInvoicePaymentMark",
+      "Parameters": [
+        {
+          "Name": "incomingInvoice",
+          "ParameterType": "global::Sungero.Examples.IIncomingInvoice",
+          "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
+        }
+      ],
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
   "PublicStructures": [],
   "ResourcesKeys": [
     "HtmlStampTemplateForCertificateCustom",
-    "HtmlStampTemplateForSignatureCustom"
+    "HtmlStampTemplateForSignatureCustom",
+    "HtmlMarkTemplatePayment",
+    "PaymentMarkName"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "da8e4adc-afdc-4ef8-96f8-d1989b34c51c",
