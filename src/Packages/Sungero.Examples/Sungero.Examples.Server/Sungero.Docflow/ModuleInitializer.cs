@@ -23,6 +23,15 @@ namespace Sungero.Examples.Module.Docflow.Server
       InitializationLogger.Debug("Init: Create custom mark kinds.");
       CreateMarkKind(Sungero.Examples.IncomingInvoices.Resources.PaymentMarkName, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindSid,
                      Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindClass, Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindMethod);
+      
+      var minutesMarkKind = CreateMarkKind(Sungero.Examples.Minuteses.Resources.MinutesMarkStamp, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid,
+                                           Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindClass, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindMethod);
+      
+      if (!minutesMarkKind.OnBlankPage.GetValueOrDefault())
+      {
+        minutesMarkKind.OnBlankPage = true;
+        minutesMarkKind.Save();
+      }
     }
   }
 }
