@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using Sungero.Examples.Contract;
+using Sungero.Examples.SupAgreement;
 
 namespace Sungero.Examples.Server
 {
-  partial class ContractFunctions
+  partial class SupAgreementFunctions
   {
     /// <summary>
-    /// Получить отметку для договорных документов с состоянием "Утверждено".
+    /// Получить отметку для дополнительного соглашения с состоянием "Утверждено".
     /// </summary>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
