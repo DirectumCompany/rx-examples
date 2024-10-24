@@ -10,9 +10,9 @@ namespace Sungero.Examples.Server
   partial class MinutesFunctions
   {
     /// <summary>
-    /// Получить экземпляр отметки для протокола.
+    /// Получить экземпляр отметки со всеми подписями для протокола.
     /// </summary>
-    [Public]
+    [Public, Remote]
     public override Sungero.Docflow.IMark GetOrCreateSignatureMark()
     {
       var mark = GetOrCreateMark(Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
@@ -23,22 +23,16 @@ namespace Sungero.Examples.Server
     }
     
     /// <summary>
-    /// Удалить отметку документа.
+    /// Удалить экземпляр отметки со всеми подписями для протокола.
     /// </summary>
-    /// <param name="versionId">ИД версии.</param>
-    /// <param name="markKindSid">Sid вида отметки.</param>
     [Public, Remote]
-    public override void DeleteVersionMark(long versionId, string markKindSid)
+    public override void DeleteSignatureMark()
     {
-      if (markKindSid == Sungero.Docflow.PublicConstants.MarkKind.ElectronicSignatureMarkKindSid)
-        markKindSid = Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid;
-      
-      var mark = this.GetVersionMarks(versionId, markKindSid).FirstOrDefault();
-      this.DeleteVersionMark(mark);
+      this.DeleteVersionMark(_obj.LastVersion.Id, Sungero.Examples.Constants.Meetings.Minutes.MinutesMarkKindGuid);
     }
     
     /// <summary>
-    /// Получить отметку для протокола.
+    /// Получить отметку со всеми подписями для протокола.
     /// </summary>
     /// <param name="versionId">ИД версии.</param>
     /// <returns>Изображение отметки в виде html.</returns>
