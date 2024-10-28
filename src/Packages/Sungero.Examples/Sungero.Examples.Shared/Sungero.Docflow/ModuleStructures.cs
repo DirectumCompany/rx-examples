@@ -6,5 +6,5 @@ using Sungero.CoreEntities;
 
 namespace Sungero.Examples.Module.Docflow.Structures.Module
 {
-
+  
 }

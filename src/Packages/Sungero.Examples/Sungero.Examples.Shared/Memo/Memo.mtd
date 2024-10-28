@@ -54,8 +54,63 @@
       ]
     }
   ],
+  "PublicConstants": [
+    {
+      "Name": "MarkSignatureIdKey",
+      "ParentClasses": [
+        "Memo"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"SignatureId\""
+    },
+    {
+      "Name": "SignMarkKindClass",
+      "ParentClasses": [
+        "Memo"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Sungero.Examples.Functions.Memo\""
+    },
+    {
+      "Name": "SignMarkKindMethod",
+      "ParentClasses": [
+        "Memo"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"GetMemoSignMarkAsHtml\""
+    },
+    {
+      "Name": "SignMarkKindSid",
+      "ParentClasses": [
+        "Memo"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"eeb0239e-0c82-42fc-b3f7-ce937a8b6c4a\""
+    }
+  ],
+  "PublicFunctions": [
+    {
+      "Name": "UpdateMemoSignMark",
+      "Parameters": [
+        {
+          "Name": "memo",
+          "ParameterType": "global::Sungero.Examples.IMemo",
+          "ParameterTypeFullName": "Sungero.Examples.IMemo, Sungero.Domain.Interfaces"
+        },
+        {
+          "Name": "versionId",
+          "ParameterType": "global::System.Int64",
+          "ParameterTypeFullName": "System.Int64"
+        }
+      ],
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
   "PublicStructures": [],
-  "ResourcesKeys": [],
+  "ResourcesKeys": [
+    "SignedMarkName"
+  ],
   "RibbonCardMetadata": {
     "NameGuid": "1e92fa93-31c6-4a1a-8298-b04262e1e9d3",
     "Name": "RibbonCard",

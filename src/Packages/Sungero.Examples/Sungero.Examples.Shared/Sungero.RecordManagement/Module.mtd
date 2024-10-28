@@ -5,6 +5,40 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "a6ea3ffb-7a49-48ab-a70f-4e0199ad1e67",
+      "Name": "PrepareAIAssistantsTraining",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "275f5d11-65ff-4318-ace0-a18889e4629d",
+          "Name": "AssistantId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "337c94ed-370f-43c5-9f76-9e9a35b838e9",
+          "Name": "PeriodBegin",
+          "ParameterType": "DateTime"
+        },
+        {
+          "NameGuid": "4b21260f-972b-458e-99b3-fedf0fabbd51",
+          "Name": "ProcessedItemsCount",
+          "ParameterType": "Integer"
+        },
+        {
+          "NameGuid": "59d2623c-fe9f-45f6-84a3-40c4c30f39c3",
+          "Name": "ActionItemMinId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "bfd6ac2c-d5c9-4920-acc5-d22fc24f1574",
+          "Name": "PeriodEnd",
+          "ParameterType": "DateTime"
+        }
+      ]
+    },
+    {
       "NameGuid": "fb880104-4673-4410-a4d2-21ad2e17656d",
       "Name": "CompleteParentActionItemExecutionAssignment",
       "DelayPeriod": 15,

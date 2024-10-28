@@ -69,6 +69,32 @@
       "Versions": []
     }
   ],
+  "PublicConstants": [
+    {
+      "Name": "PaginalApproveMarkKindClass",
+      "ParentClasses": [
+        "Contract"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"Sungero.Examples.Functions.Contract\""
+    },
+    {
+      "Name": "PaginalApproveMarkKindMethod",
+      "ParentClasses": [
+        "Contract"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"GetApprovedMarkAsHtml\""
+    },
+    {
+      "Name": "PaginalApproveMarkKindSid",
+      "ParentClasses": [
+        "Contract"
+      ],
+      "TypeName": "System.String",
+      "Value": "\"3cdb9932-708f-4079-bc50-890b700202c6\""
+    }
+  ],
   "PublicStructures": [],
   "ResourcesKeys": [],
   "RibbonCardMetadata": {

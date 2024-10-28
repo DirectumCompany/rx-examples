@@ -59,13 +59,18 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="HtmlStampTemplate" xml:space="preserve">
-    <value>&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
+    <value>&lt;!DOCTYPE html&gt;
+&lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
 &lt;head&gt;
 &lt;style type="text/css"&gt;
 .box1 {
   padding: 3px;
   border: 1px solid #d7d7d7;
   border-color: #9400D3;
+}
+.small-td {
+  font-size: 6pt;
+  line-height: 6pt;
 }
 .tg1{font-weight:bold;font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #9400D3}
 .tg2{font-size:8pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:8pt;color: #9400D3}
@@ -81,7 +86,7 @@
 &lt;col &gt;
 &lt;/colgroup&gt;
 &lt;tr&gt;
-  &lt;td colspan="2"&gt;  
+  &lt;td  class="small-td" colspan="2"&gt;  
     &lt;div class="tg3" style ="margin-bottom: 3px"&gt;Документ подписан&lt;br&gt;электронной подписью в DirectumRX&lt;/div&gt;
   &lt;/td&gt;
 &lt;/tr&gt;
