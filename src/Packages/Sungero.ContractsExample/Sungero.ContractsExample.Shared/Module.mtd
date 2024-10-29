@@ -62,7 +62,7 @@
   "SharedAssemblyName": "Sungero.ContractsExample.Shared",
   "SharedNamespace": "Sungero.ContractsExample.Shared",
   "SpecialFolders": [],
-  "Version": "0.0.1.0",
+  "Version": "4.11.0.0",
   "Widgets": [],
   "Versions": [
     {
