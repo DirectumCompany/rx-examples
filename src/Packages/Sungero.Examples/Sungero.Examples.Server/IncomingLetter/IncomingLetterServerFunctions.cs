@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
@@ -14,7 +14,7 @@ namespace Sungero.Examples.Server
     /// </summary>
     /// <returns>Изображение отметки о регистрации в виде html.</returns>
     [Public]
-    public override string GetRegistrationStampAsHtml()
+    public override string GetRegistrationStampAsHtml(long versionId)
     {
       var regNumber = _obj.RegistrationNumber;
       var regDate = _obj.RegistrationDate;
@@ -47,6 +47,17 @@ namespace Sungero.Examples.Server
     public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult AddRegistrationStamp(double rightIndent, double bottomIndent)
     {
       return base.AddRegistrationStamp(5, 1);
+    }
+    
+    /// <summary>
+    /// Создать экземпляр отметки о поступлении для простановки по координатам от правого нижнего угла.
+    /// </summary>
+    /// <param name="rightIndent">Отступ справа, см.</param>
+    /// <param name="bottomIndent">Отступ снизу, см.</param>
+    /// <returns>Отметка о поступлении для простановки по координатам от правого нижнего угла.</returns>
+    public override Sungero.Docflow.IMark GetOrCreateRightBottomCoordinatesBasedReceiptMark(double rightIndent, double bottomIndent)
+    {
+      return base.GetOrCreateRightBottomCoordinatesBasedReceiptMark(5, 1);
     }
   }
 }
