@@ -35,9 +35,12 @@ namespace Sungero.Examples.Server
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
       {
         var mark = GetOrCreateMark(IncomingInvoiceConstants.PaymentMarkKindSid);
-        mark.XIndent = 12;
-        mark.YIndent = 20;
-        mark.Page = -1;
+        if (!mark.XIndent.HasValue)
+          mark.XIndent = 12;
+        if (!mark.YIndent.HasValue)
+          mark.YIndent = 20;
+        if (!mark.Page.HasValue)
+          mark.Page = -1;
         mark.Save();
       }
       else
