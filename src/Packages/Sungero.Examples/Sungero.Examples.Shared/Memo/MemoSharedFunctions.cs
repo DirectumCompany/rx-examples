@@ -9,6 +9,9 @@ namespace Sungero.Examples.Shared
 {
   partial class MemoFunctions
   {
-
+    public override bool AllowedToAddMarksManually()
+    {
+      return false;
+    }
   }
 }

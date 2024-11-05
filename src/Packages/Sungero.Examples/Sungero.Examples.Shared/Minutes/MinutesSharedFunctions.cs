@@ -9,6 +9,9 @@ namespace Sungero.Examples.Shared
 {
   partial class MinutesFunctions
   {
-
+    public override bool AllowedToAddMarksManually()
+    {
+      return false;
+    }
   }
 }
