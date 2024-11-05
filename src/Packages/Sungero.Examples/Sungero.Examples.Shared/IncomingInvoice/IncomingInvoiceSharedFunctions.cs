@@ -11,12 +11,7 @@ namespace Sungero.Examples.Shared
   {
     public override List<string> GetAvailableMarkKindsSids()
     {
-      var marksKinds = new List<string>()
-      {
-        Docflow.Constants.MarkKind.ElectronicSignatureMarkKindSid,
-        Docflow.Constants.MarkKind.RegistrationDateMarkKindSid,
-        Docflow.Constants.MarkKind.RegistrationNumberMarkKindSid
-      };
+      var marksKinds = base.GetAvailableMarkKindsSids();
       
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
         marksKinds.Add(Sungero.Examples.Constants.Contracts.IncomingInvoice.PaymentMarkKindSid);
