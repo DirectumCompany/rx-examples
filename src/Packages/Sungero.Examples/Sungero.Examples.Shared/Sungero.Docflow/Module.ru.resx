@@ -69,6 +69,10 @@
   border-color: #9400D3;
   width: 235px;
 }
+.small-td {
+  font-size: 6pt;
+  line-height: 6pt;
+}
 .tg1{font-size:6pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:6pt;color: #9400D3;white-space: pre-wrap}
 .tg2{font-size:8.25pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:9.75pt;color: #9400D3;white-space: nowrap}
 .small-td {
@@ -126,6 +130,10 @@
   border: 1px solid #d7d7d7;
   border-color: #9400D3;
   width: 235px;
+}
+.small-td {
+  font-size: 6pt;
+  line-height: 6pt;
 }
 .tg1{font-size:6pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:6pt;color: #9400D3;white-space: pre-wrap}
 .tg2{font-size:8.25pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:9.75pt;color: #9400D3;white-space: nowrap}
