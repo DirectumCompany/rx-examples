@@ -218,4 +218,10 @@
   <data name="DocumentShouldBeApprovedOrPaidToOpenMarkEditor" xml:space="preserve">
     <value>To edit marks on the invoice, it must be paid or its latest version must be approved.</value>
   </data>
+  <data name="DocumentShouldBeApprovedOrPaidTitle" xml:space="preserve">
+    <value>TODO</value>
+  </data>
+  <data name="DocumentShouldBeApprovedOrPaid" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

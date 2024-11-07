@@ -166,5 +166,43 @@ namespace Sungero.Examples.Server
       
       return string.Empty;
     }
+    
+    /// <summary>
+    /// Проверить свойства документа, необходимые для простановки отметок.
+    /// </summary>
+    /// <param name="versionId">ИД версии документа.</param>
+    /// <returns>Результат проверки свойств документа.</returns>
+    [Remote]
+    public override Docflow.Structures.OfficialDocument.IConversionToPdfResult ValidateMarksDataBeforeConversion(long versionId)
+    {
+      var info = Docflow.Structures.OfficialDocument.ConversionToPdfResult.Create();
+      var signature = Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(_obj, versionId);
+      var isPaid = _obj.LifeCycleState == LifeCycleState.Paid;
+      
+      // Логика только для нового режима преобразования (утверждающая подпись не обязательна, если можно проставить другие отметки).
+      if (signature == null && !isPaid)
+      {
+        info.HasErrors = true;
+        info.ErrorTitle = IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaidTitle;
+        info.ErrorMessage = IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaid;
+        return info;
+      }
+      
+      // Валидация подписи.
+      if (signature != null)
+      {
+        var separator = ". ";
+        var validationErrors = Docflow.PublicFunctions.Module.GetSignatureValidationErrorsAsString(signature, separator);
+        if (!string.IsNullOrEmpty(validationErrors))
+        {
+          info.HasErrors = true;
+          info.ErrorTitle = Docflow.OfficialDocuments.Resources.SignatureNotValidErrorTitle;
+          info.ErrorMessage = Docflow.OfficialDocuments.Resources.SignatureNotValidErrorFormat(validationErrors);
+          return info;
+        }
+      }
+      
+      return info;
+    }
   }
 }
