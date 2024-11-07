@@ -215,4 +215,7 @@
   <data name="PaymentMarkName" xml:space="preserve">
     <value>Отметка "Оплачено"</value>
   </data>
+  <data name="DocumentShouldBeApprovedOrPaidToOpenMarkEditor" xml:space="preserve">
+    <value>Для редактирования отметок документ должен быть оплачен или его последняя версия должна быть утверждена.</value>
+  </data>
 </root>

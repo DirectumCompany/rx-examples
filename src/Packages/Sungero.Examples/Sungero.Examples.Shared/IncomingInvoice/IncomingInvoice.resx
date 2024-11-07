@@ -215,4 +215,7 @@
   <data name="PaymentMarkName" xml:space="preserve">
     <value>Mark "Paid"</value>
   </data>
+  <data name="DocumentShouldBeApprovedOrPaidToOpenMarkEditor" xml:space="preserve">
+    <value>TODO</value>
+  </data>
 </root>

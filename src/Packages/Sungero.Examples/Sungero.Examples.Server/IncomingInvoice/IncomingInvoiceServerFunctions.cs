@@ -139,5 +139,32 @@ namespace Sungero.Examples.Server
       }
       return html;
     }
+    
+    /// <summary>
+    /// Проверить свойства документа, необходимые для простановки отметок, перед открытием редактора отметок.
+    /// </summary>
+    /// <param name="versionId">ИД версии документа.</param>
+    /// <returns>Текст ошибки, если она есть. Иначе пустая строка.</returns>
+    [Remote]
+    public override string ValidateMarksDataBeforeOpenMarkEditor(long versionId)
+    {
+      var signature = Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(_obj, _obj.LastVersion.Id);
+      var isPaid = _obj.LifeCycleState == LifeCycleState.Paid;
+      
+      if (signature == null && !isPaid)
+        return IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaidToOpenMarkEditor;
+      
+      if (signature != null)
+      {
+        var separator = ". ";
+        var validationErrors = Docflow.PublicFunctions.Module.GetSignatureValidationErrorsAsString(signature, separator);
+        if (!string.IsNullOrEmpty(validationErrors))
+        {
+          return Docflow.OfficialDocuments.Resources.SignatureNotValidErrorForMarkEditorFormat(validationErrors);
+        }
+      }
+      
+      return string.Empty;
+    }
   }
 }
