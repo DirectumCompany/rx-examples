@@ -115,7 +115,7 @@
     "HtmlStampTemplateForSignatureCustom",
     "HtmlMarkTemplatePayment",
     "PaymentMarkName",
-    "DocumentNotApprovedAndNotPaidForMarkEditor"
+    "DocumentShouldBeApprovedOrPaidToOpenMarkEditor"
   ],
   "RibbonCardMetadata": {
     "NameGuid": "da8e4adc-afdc-4ef8-96f8-d1989b34c51c",

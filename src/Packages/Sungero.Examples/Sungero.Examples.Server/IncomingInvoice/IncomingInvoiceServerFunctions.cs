@@ -152,7 +152,7 @@ namespace Sungero.Examples.Server
       var isPaid = _obj.LifeCycleState == LifeCycleState.Paid;
       
       if (signature == null && !isPaid)
-        return IncomingInvoices.Resources.DocumentNotApprovedAndNotPaidForMarkEditor;
+        return IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaidToOpenMarkEditor;
       
       if (signature != null)
       {
