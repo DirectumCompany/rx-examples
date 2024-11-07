@@ -11,25 +11,11 @@ namespace Sungero.Examples.Server
   partial class IncomingInvoiceFunctions
   {
     /// <summary>
-    /// Преобразовать документ в PDF с простановкой отметок.
-    /// </summary>
-    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
-    /// <returns>Результат преобразования.</returns>
-    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
-    {
-      /// Пример перекрытия, в котором при выполнении действия
-      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
-      /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
-      this.UpdateInvoicePaymentMark();
-      return base.ConvertToPdfWithMarks(versionId);
-    }
-    
-    /// <summary>
     /// Сохранить отметку для простановки на PDF документе с состоянием "Оплачено".
     /// Удалить отметку в случае, если состояние документа было изменено
     /// с "Оплачено" на другое.
     /// </summary>
-    [Public]
+    [Public, Remote]
     public virtual void UpdateInvoicePaymentMark()
     {
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)

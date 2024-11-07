@@ -18,5 +18,13 @@ namespace Sungero.Examples.Shared
       
       return marksKinds;
     }
+    
+    public override void UpdateMarksBeforeConversion(long versionId)
+    {
+      /// Пример перекрытия, в котором при выполнении действия
+      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
+      /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
+      Functions.IncomingInvoice.Remote.UpdateInvoicePaymentMark(_obj);
+    }
   }
 }
