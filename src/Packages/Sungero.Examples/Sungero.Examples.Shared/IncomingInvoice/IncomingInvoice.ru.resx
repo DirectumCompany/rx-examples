@@ -218,4 +218,10 @@
   <data name="DocumentShouldBeApprovedOrPaidToOpenMarkEditor" xml:space="preserve">
     <value>Для редактирования отметок документ должен быть оплачен или его последняя версия должна быть утверждена.</value>
   </data>
+  <data name="DocumentShouldBeApprovedOrPaidTitle" xml:space="preserve">
+    <value>Документ не подписан и не оплачен.</value>
+  </data>
+  <data name="DocumentShouldBeApprovedOrPaid" xml:space="preserve">
+    <value>Для преобразования в PDF документ должен быть оплачен или его последняя версия должна быть утверждена.</value>
+  </data>
 </root>
