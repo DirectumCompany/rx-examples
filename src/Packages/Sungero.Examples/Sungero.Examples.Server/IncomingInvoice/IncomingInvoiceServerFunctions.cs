@@ -11,33 +11,22 @@ namespace Sungero.Examples.Server
   partial class IncomingInvoiceFunctions
   {
     /// <summary>
-    /// Преобразовать документ в PDF с простановкой отметок.
-    /// </summary>
-    /// <param name="versionId">ИД версии, на которую будут проставлены отметки.</param>
-    /// <returns>Результат преобразования.</returns>
-    public override Sungero.Docflow.Structures.OfficialDocument.IConversionToPdfResult ConvertToPdfWithMarks(long versionId)
-    {
-      /// Пример перекрытия, в котором при выполнении действия
-      /// "Создать PDF-документ с отметками" для входящих счетов с состоянием "Оплачен"
-      /// добавляется отметка "Оплачено" на преобразованный PDF-документ.
-      this.UpdateInvoicePaymentMark();
-      return base.ConvertToPdfWithMarks(versionId);
-    }
-    
-    /// <summary>
     /// Сохранить отметку для простановки на PDF документе с состоянием "Оплачено".
     /// Удалить отметку в случае, если состояние документа было изменено
     /// с "Оплачено" на другое.
     /// </summary>
-    [Public]
+    [Public, Remote]
     public virtual void UpdateInvoicePaymentMark()
     {
       if (_obj.LifeCycleState == Sungero.Contracts.IncomingInvoice.LifeCycleState.Paid)
       {
         var mark = GetOrCreateMark(IncomingInvoiceConstants.PaymentMarkKindSid);
-        mark.XIndent = 12;
-        mark.YIndent = 20;
-        mark.Page = -1;
+        if (!mark.XIndent.HasValue)
+          mark.XIndent = 12;
+        if (!mark.YIndent.HasValue)
+          mark.YIndent = 20;
+        if (!mark.Page.HasValue)
+          mark.Page = -1;
         mark.Save();
       }
       else
@@ -149,6 +138,71 @@ namespace Sungero.Examples.Server
         html = html.Replace("{SigningDate}", signature.SigningDate.ToString("g"));
       }
       return html;
+    }
+    
+    /// <summary>
+    /// Проверить свойства документа, необходимые для простановки отметок, перед открытием редактора отметок.
+    /// </summary>
+    /// <param name="versionId">ИД версии документа.</param>
+    /// <returns>Текст ошибки, если она есть. Иначе пустая строка.</returns>
+    [Remote]
+    public override string ValidateMarksDataBeforeOpenMarkEditor(long versionId)
+    {
+      var signature = Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(_obj, _obj.LastVersion.Id);
+      var isPaid = _obj.LifeCycleState == LifeCycleState.Paid;
+      
+      if (signature == null && !isPaid)
+        return IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaidToOpenMarkEditor;
+      
+      if (signature != null)
+      {
+        var separator = ". ";
+        var validationErrors = Docflow.PublicFunctions.Module.GetSignatureValidationErrorsAsString(signature, separator);
+        if (!string.IsNullOrEmpty(validationErrors))
+        {
+          return Docflow.OfficialDocuments.Resources.SignatureNotValidErrorForMarkEditorFormat(validationErrors);
+        }
+      }
+      
+      return string.Empty;
+    }
+    
+    /// <summary>
+    /// Проверить свойства документа, необходимые для простановки отметок.
+    /// </summary>
+    /// <param name="versionId">ИД версии документа.</param>
+    /// <returns>Результат проверки свойств документа.</returns>
+    [Remote]
+    public override Docflow.Structures.OfficialDocument.IConversionToPdfResult ValidateMarksDataBeforeConversion(long versionId)
+    {
+      var info = Docflow.Structures.OfficialDocument.ConversionToPdfResult.Create();
+      var signature = Docflow.PublicFunctions.OfficialDocument.GetSignatureForMark(_obj, versionId);
+      var isPaid = _obj.LifeCycleState == LifeCycleState.Paid;
+      
+      // Логика только для нового режима преобразования (утверждающая подпись не обязательна, если можно проставить другие отметки).
+      if (signature == null && !isPaid)
+      {
+        info.HasErrors = true;
+        info.ErrorTitle = IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaidTitle;
+        info.ErrorMessage = IncomingInvoices.Resources.DocumentShouldBeApprovedOrPaid;
+        return info;
+      }
+      
+      // Валидация подписи.
+      if (signature != null)
+      {
+        var separator = ". ";
+        var validationErrors = Docflow.PublicFunctions.Module.GetSignatureValidationErrorsAsString(signature, separator);
+        if (!string.IsNullOrEmpty(validationErrors))
+        {
+          info.HasErrors = true;
+          info.ErrorTitle = Docflow.OfficialDocuments.Resources.SignatureNotValidErrorTitle;
+          info.ErrorMessage = Docflow.OfficialDocuments.Resources.SignatureNotValidErrorFormat(validationErrors);
+          return info;
+        }
+      }
+      
+      return info;
     }
   }
 }
