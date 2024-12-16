@@ -4,9 +4,6 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.ContractsExample.Server
+namespace Sungero.Examples.Module.RecordManagementUI.Client.RecordManagementUIBlocks
 {
-  partial class ContractsExampleHandlers
-  {
-  }
 }

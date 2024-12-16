@@ -81,27 +81,8 @@
   "InterfaceNamespace": "Sungero.Examples",
   "IsolatedAssemblyName": "Sungero.Examples.Isolated",
   "IsolatedNamespace": "Sungero.Examples.Isolated",
-  "Libraries": [
-    {
-      "NameGuid": "b5d8dd2c-d414-4685-92cd-79281b3c04c6",
-      "Name": "Integration1CExtensions",
-      "Scope": "Both"
-    }
-  ],
   "OrderedSpecialFolders": [],
   "PublicFunctions": [
-    {
-      "Name": "CreateIncomingInvoice1C",
-      "Parameters": [
-        {
-          "Name": "incommingInvoice",
-          "ParameterType": "global::Sungero.Examples.IIncomingInvoice",
-          "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
-        }
-      ],
-      "ReturnType": "global::System.Boolean",
-      "ReturnTypeFullName": "System.Boolean"
-    },
     {
       "Name": "CreateIncomingLetter",
       "Parameters": [
@@ -118,110 +99,13 @@
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
       "ReturnTypeFullName": "Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces"
-    },
-    {
-      "Name": "GetIncomingInvoice1CHyperlink",
-      "IsRemote": true,
-      "Parameters": [
-        {
-          "Name": "incommingInvoice",
-          "ParameterType": "global::Sungero.Examples.IIncomingInvoice",
-          "ParameterTypeFullName": "Sungero.Examples.IIncomingInvoice, Sungero.Domain.Interfaces"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "global::Sungero.Examples.Structures.Module.IGetHyperlink1CResult",
-      "ReturnTypeFullName": "Sungero.Examples.Structures.Module.IGetHyperlink1CResult"
-    },
-    {
-      "Name": "GetSyncEntity1CHyperlink",
-      "IsRemote": true,
-      "Parameters": [
-        {
-          "Name": "entity",
-          "ParameterType": "global::Sungero.Domain.Shared.IEntity",
-          "ParameterTypeFullName": "Sungero.Domain.Shared.IEntity, Sungero.Domain.Shared"
-        },
-        {
-          "Name": "extEntityType",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "global::Sungero.Examples.Structures.Module.IGetHyperlink1CResult",
-      "ReturnTypeFullName": "Sungero.Examples.Structures.Module.IGetHyperlink1CResult"
     }
   ],
-  "PublicStructures": [
-    {
-      "Name": "GetHyperlink1CResult",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "Hyperlink",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "ErrorMessage",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Examples.Structures.Module"
-    },
-    {
-      "Name": "IncomingInvoice1C",
-      "IsPublic": true,
-      "Properties": [
-        {
-          "Name": "НомерВходящегоДокумента",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "ДатаВходящегоДокумента",
-          "IsNullable": true,
-          "TypeFullName": "global::System.DateTime"
-        },
-        {
-          "Name": "Организация_Key",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Контрагент_Key",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "ДоговорКонтрагента_Key",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Комментарий",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        },
-        {
-          "Name": "Ref_Key",
-          "IsNullable": true,
-          "TypeFullName": "global::System.String"
-        }
-      ],
-      "StructureNamespace": "Sungero.Examples.Structures.Module"
-    }
-  ],
+  "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples",
   "ResourcesKeys": [
-    "HtmlStampTemplate",
-    "OpenRecord1CErrorIsDelete",
-    "OpenRecord1CErrorNotExist",
-    "OpenRecord1CError",
-    "OpenIncomingInvoice1CErrorNotFound"
+    "HtmlStampTemplate"
   ],
   "ServerAssemblyName": "Sungero.Examples.Server",
   "ServerNamespace": "Sungero.Examples.Server",

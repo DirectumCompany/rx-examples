@@ -5,6 +5,21 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "0b21574c-6715-40fa-ae3e-264f602997d8",
+      "Name": "ProcessBlobPackageSimple",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 0,
+      "Parameters": [
+        {
+          "NameGuid": "a828c890-053e-45a9-bb81-a356c1536b73",
+          "Name": "BlobPackageId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
       "NameGuid": "27031b75-9843-4516-9320-bdd8dd0cd3bf",
       "Name": "ElasticsearchReindex",
       "DelayPeriod": 15,
@@ -52,6 +67,7 @@
       "DelayPeriod": 15,
       "DelayStrategy": "ExponentialDelayStrategy",
       "IsAncestorMetadata": true,
+      "MaxRetryCount": 100000,
       "Parameters": [
         {
           "NameGuid": "3caaa58b-224f-44ac-8a05-3612ec60d80a",
@@ -76,6 +92,19 @@
     }
   ],
   "BaseGuid": "bb685d97-a673-42ea-8605-66889967467f",
+  "Blocks": [
+    {
+      "$type": "Sungero.Metadata.ScriptBlockMetadata, Sungero.Workflow.Shared",
+      "NameGuid": "05c34011-7df9-42a4-8a66-e2825878c055",
+      "Name": "AnalyzeDocTypeAndFactsRecognitionBlock",
+      "BaseGuid": "4cd54a46-361f-4a70-bc9d-6138384bdb0c",
+      "LayeredFromGuid": "4cd54a46-361f-4a70-bc9d-6138384bdb0c",
+      "Overridden": [
+        "LayeredFromGuid"
+      ],
+      "ProcessStagesDisplayMode": "Hide"
+    }
+  ],
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.SmartProcessing.ClientBase",
   "Code": "Smart",
@@ -141,7 +170,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.11.0.0",
+  "Version": "4.12.27.0",
   "Widgets": [],
   "Versions": [
     {
