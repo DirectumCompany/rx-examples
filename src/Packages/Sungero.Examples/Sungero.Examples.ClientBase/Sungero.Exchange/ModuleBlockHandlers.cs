@@ -4,10 +4,6 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.ContractsExample.Shared
+namespace Sungero.Examples.Module.Exchange.Client.ExchangeBlocks
 {
-  public class ModuleFunctions
-  {
-
-  }
 }

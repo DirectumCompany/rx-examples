@@ -406,12 +406,27 @@
       "Name": "DocumentReviewBlock",
       "BaseGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
       "EntityType": "50e39d87-4fc6-4847-8bad-20847b9ba020",
+      "IconName": "DocumentReviewBlock.ico",
       "LayeredFromGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
       "Overridden": [
         "HandledEvents",
         "LayeredFromGuid",
         "IsGenerated"
-      ]
+      ],
+      "ProcessStagesDisplayMode": "Show"
+    },
+    {
+      "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
+      "NameGuid": "d6557872-d3fb-4ad7-acbc-8020f138d505",
+      "Name": "DocumentMultipleAddresseeReviewBlock",
+      "BaseGuid": "5447efc8-e0f0-4981-8e9c-39c877f9a5f7",
+      "EntityType": "4ef03457-8b42-4239-a3c5-d4d05e61f0b6",
+      "IconName": "DocumentMultipleAddresseeReviewBlock.ico",
+      "LayeredFromGuid": "5447efc8-e0f0-4981-8e9c-39c877f9a5f7",
+      "Overridden": [
+        "LayeredFromGuid"
+      ],
+      "ProcessStagesDisplayMode": "Show"
     },
     {
       "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
@@ -421,7 +436,8 @@
       "EntityType": "4ef03457-8b42-4239-a3c5-d4d05e61f0b6",
       "HandledEvents": [
         "DocumentReviewTaskBloockSungeroStartTask"
-      ]
+      ],
+      "ProcessStagesDisplayMode": "Show"
     }
   ],
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
@@ -474,7 +490,7 @@
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.RecordManagement",
   "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.11.0.0",
+  "Version": "4.12.27.0",
   "Widgets": [],
   "Versions": [
     {

@@ -106,16 +106,4 @@
 &lt;/body&gt;
 &lt;/html&gt;</value>
   </data>
-  <data name="OpenRecord1CErrorIsDelete" xml:space="preserve">
-    <value>The associated record in 1C system has been deleted.</value>
-  </data>
-  <data name="OpenRecord1CErrorNotExist" xml:space="preserve">
-    <value>The associated record in 1C system not exist.</value>
-  </data>
-  <data name="OpenRecord1CError" xml:space="preserve">
-    <value>An error occurred while receiving the associated 1C system record. Contact the administrator.</value>
-  </data>
-  <data name="OpenIncomingInvoice1CErrorNotFound" xml:space="preserve">
-    <value>Incoming invoice in 1C system not found.</value>
-  </data>
 </root>

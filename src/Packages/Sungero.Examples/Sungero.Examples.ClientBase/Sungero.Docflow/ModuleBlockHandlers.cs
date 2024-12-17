@@ -4,7 +4,10 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 
-namespace Sungero.ContractsExample.Client
+namespace Sungero.Examples.Module.Docflow.Client.DocflowBlocks
 {
+  partial class ApprovalTaskBlockSungeroHandlers
+  {
 
+  }
 }

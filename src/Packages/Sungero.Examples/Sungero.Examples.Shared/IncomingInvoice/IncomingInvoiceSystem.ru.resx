@@ -58,13 +58,4 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Action_Open1CEntitySungero" xml:space="preserve">
-    <value>Открыть в 1С</value>
-  </data>
-  <data name="Action_Open1CEntitySungeroHint" xml:space="preserve">
-    <value>Открыть запись в 1С</value>
-  </data>
-  <data name="Action_Open1CEntitySungeroDescription" xml:space="preserve">
-    <value>Открытие записи в 1С</value>
-  </data>
 </root>

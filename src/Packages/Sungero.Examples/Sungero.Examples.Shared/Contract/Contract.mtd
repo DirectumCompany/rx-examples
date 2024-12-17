@@ -3,16 +3,6 @@
   "NameGuid": "a91215d7-4fbf-4d69-954f-a14bce212b47",
   "Name": "Contract",
   "AccessRightsMode": "Both",
-  "Actions": [
-    {
-      "NameGuid": "a838c42f-a3f1-475a-b232-432adfa09da8",
-      "Name": "OpenEntity1CSungero",
-      "ActionArea": "Card",
-      "GenerateHandler": true,
-      "LargeIconName": "Action_OpenEntity1CSungero_large_a838c42fa3f1475ab232432adfa09da8.png",
-      "SmallIconName": "Action_OpenEntity1CSungero_small_a838c42fa3f1475ab232432adfa09da8.png"
-    }
-  ],
   "BaseGuid": "f37c7e63-b134-4446-9b5b-f8811f6c9666",
   "CanBeNavigationPropertyType": true,
   "CreationAreaMetadata": {
@@ -101,17 +91,7 @@
     "NameGuid": "1e44c34d-1398-48e7-a507-7b72e9ec8ba8",
     "Name": "RibbonCard",
     "Categories": [],
-    "Elements": [
-      {
-        "$type": "Sungero.Metadata.RibbonActionButtonMetadata, Sungero.Metadata",
-        "NameGuid": "16335dfd-6e58-4be4-b711-41b0b31d8493",
-        "Name": "OpenRecord1CSungeroSungero",
-        "ActionGuid": "a838c42f-a3f1-475a-b232-432adfa09da8",
-        "ButtonSize": "Large",
-        "Index": -1,
-        "ParentGuid": "2ed94346-ba89-4c52-9815-d18010d3a2ae"
-      }
-    ],
+    "Elements": [],
     "Groups": [],
     "IsAncestorMetadata": true,
     "Pages": [],
@@ -133,7 +113,7 @@
     },
     {
       "Type": "EntityMetadata",
-      "Number": 12
+      "Number": 13
     }
   ]
 }
