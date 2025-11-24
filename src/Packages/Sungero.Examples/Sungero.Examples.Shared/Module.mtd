@@ -75,7 +75,6 @@
       "PreviousItemId": "4f338f0b-3257-40dd-8d52-cd102c0e852b"
     }
   ],
-  "IconResourcesKeys": [],
   "Importance": "Medium",
   "InterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "InterfaceNamespace": "Sungero.Examples",
@@ -112,16 +111,16 @@
   "SharedAssemblyName": "Sungero.Examples.Shared",
   "SharedNamespace": "Sungero.Examples.Shared",
   "SpecialFolders": [],
-  "Version": "4.11.0.0",
+  "Version": "25.3.0.0",
   "Widgets": [],
   "Versions": [
     {
       "Type": "SolutionMetadata",
-      "Number": 8
+      "Number": 11
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 8
+      "Number": 11
     },
     {
       "Type": "DomainApi",

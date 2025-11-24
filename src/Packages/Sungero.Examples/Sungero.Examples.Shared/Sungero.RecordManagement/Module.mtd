@@ -402,29 +402,13 @@
   "Blocks": [
     {
       "$type": "Sungero.Metadata.AssignmentBlockMetadata, Sungero.Workflow.Shared",
-      "NameGuid": "795cd493-b578-4519-aa7c-72a354cdba19",
+      "NameGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
       "Name": "DocumentReviewBlock",
-      "BaseGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
       "EntityType": "50e39d87-4fc6-4847-8bad-20847b9ba020",
-      "IconName": "DocumentReviewBlock.ico",
-      "LayeredFromGuid": "d016139a-f237-4d19-b086-3950dfeeb47a",
+      "IsAncestorMetadata": true,
       "Overridden": [
         "HandledEvents",
-        "LayeredFromGuid",
         "IsGenerated"
-      ],
-      "ProcessStagesDisplayMode": "Show"
-    },
-    {
-      "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
-      "NameGuid": "d6557872-d3fb-4ad7-acbc-8020f138d505",
-      "Name": "DocumentMultipleAddresseeReviewBlock",
-      "BaseGuid": "5447efc8-e0f0-4981-8e9c-39c877f9a5f7",
-      "EntityType": "4ef03457-8b42-4239-a3c5-d4d05e61f0b6",
-      "IconName": "DocumentMultipleAddresseeReviewBlock.ico",
-      "LayeredFromGuid": "5447efc8-e0f0-4981-8e9c-39c877f9a5f7",
-      "Overridden": [
-        "LayeredFromGuid"
       ],
       "ProcessStagesDisplayMode": "Show"
     },
@@ -432,7 +416,6 @@
       "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
       "NameGuid": "139f7f74-0665-4058-88d7-a69718969613",
       "Name": "DocumentReviewTaskBloockSungero",
-      "BaseGuid": "af11beb2-61e1-453f-9c69-93b9f06355ec",
       "EntityType": "4ef03457-8b42-4239-a3c5-d4d05e61f0b6",
       "HandledEvents": [
         "DocumentReviewTaskBloockSungeroStartTask"
@@ -445,7 +428,6 @@
   "Code": "RecMan",
   "CompanyCode": "Sungero",
   "ExplorerTreeOrder": [],
-  "IconResourcesKeys": [],
   "Importance": "High",
   "IsVisible": false,
   "Jobs": [
@@ -488,18 +470,17 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.RecordManagement",
-  "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.12.27.0",
+  "Version": "25.3.0.48",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 8
+      "Number": 11
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 8
+      "Number": 11
     }
   ]
 }

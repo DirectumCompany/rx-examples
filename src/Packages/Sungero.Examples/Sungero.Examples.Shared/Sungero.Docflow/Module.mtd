@@ -371,7 +371,6 @@
       "$type": "Sungero.Metadata.TaskBlockMetadata, Sungero.Workflow.Shared",
       "NameGuid": "330ec121-d18e-4fc3-ba2e-cdbc4bd7ad90",
       "Name": "ApprovalTaskBlockSungero",
-      "BaseGuid": "af11beb2-61e1-453f-9c69-93b9f06355ec",
       "EntityType": "100950d0-03d2-44f0-9e31-f9c8dfdf3829",
       "HandledEvents": [
         "ApprovalTaskBlockSungeroStartTask"
@@ -387,7 +386,6 @@
   "HandledEvents": [
     "InitializingServer"
   ],
-  "IconResourcesKeys": [],
   "Importance": "Low",
   "IsolatedAreas": [],
   "IsolatedFunctions": [
@@ -500,16 +498,16 @@
     "RoleInitiatorDepartmentEmployees"
   ],
   "SpecialFolders": [],
-  "Version": "4.12.27.0",
+  "Version": "25.3.0.48",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 8
+      "Number": 11
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 8
+      "Number": 11
     }
   ]
 }

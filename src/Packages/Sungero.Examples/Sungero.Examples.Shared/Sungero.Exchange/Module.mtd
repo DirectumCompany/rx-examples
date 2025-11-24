@@ -49,10 +49,17 @@
   "Code": "ExCh",
   "CompanyCode": "Sungero",
   "ExplorerTreeOrder": [],
-  "IconResourcesKeys": [],
   "Importance": "Medium",
   "IsVisible": false,
   "Jobs": [
+    {
+      "NameGuid": "92f08127-0d93-422a-a992-eacaf6703cd9",
+      "Name": "CreateAndSendReceiptNotifications",
+      "Daily": "Repeat",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "TimePeriod": 10
+    },
     {
       "NameGuid": "86815fea-c9d8-4531-b90d-44100affbaa6",
       "Name": "GetHistoricalMessages",
@@ -114,18 +121,17 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
-  "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.12.27.0",
+  "Version": "25.3.0.48",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 8
+      "Number": 11
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 8
+      "Number": 11
     }
   ]
 }

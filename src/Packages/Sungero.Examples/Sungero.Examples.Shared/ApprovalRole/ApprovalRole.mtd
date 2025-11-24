@@ -19,8 +19,10 @@
     "IsAncestorMetadata": true,
     "Versions": []
   },
+  "FormViewUuid": "7b0f1b49-c61b-4dfb-b475-bbfa1aebec4f",
   "IconResourcesKeys": [],
   "LayeredFromGuid": "9f5b8596-f73a-498f-b1b1-219ed77bb031",
+  "ListViewUuid": "946e6eff-fd31-41f5-8d70-14a716152de2",
   "OperationsClass": "",
   "Properties": [
     {
