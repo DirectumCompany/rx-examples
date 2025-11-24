@@ -6,7 +6,7 @@ using Sungero.CoreEntities;
 
 namespace Sungero.Examples.Server
 {
-  public class ModuleJobs
+  public partial class ModuleJobs
   {
 
   }

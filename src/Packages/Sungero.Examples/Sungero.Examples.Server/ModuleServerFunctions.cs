@@ -10,7 +10,7 @@ using Sungero.Docflow;
 
 namespace Sungero.Examples.Server
 {
-  public class ModuleFunctions
+  public partial class ModuleFunctions
   {
     /// <summary>
     /// Создать входящее письмо (пример использования доп. классификатора).

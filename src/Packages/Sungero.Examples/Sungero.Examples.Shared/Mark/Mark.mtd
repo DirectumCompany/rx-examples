@@ -17,9 +17,11 @@
     "Controls": [],
     "IsAncestorMetadata": true
   },
+  "FormViewUuid": "d57afb6d-90dc-49df-acfd-d6b9d9d1ef58",
   "IconResourcesKeys": [],
   "IntegrationServiceName": "DocflowMark",
   "LayeredFromGuid": "26597cb5-1f9d-4175-85ad-fe7e6890e8bf",
+  "ListViewUuid": "a9096a46-d35b-4d0f-9f1f-757c9ef89b7c",
   "OperationsClass": "",
   "Properties": [
     {

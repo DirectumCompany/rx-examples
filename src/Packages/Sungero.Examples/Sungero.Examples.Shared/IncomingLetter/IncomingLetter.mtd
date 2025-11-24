@@ -18,11 +18,13 @@
     "Controls": [],
     "IsAncestorMetadata": true
   },
+  "FormViewUuid": "3e45fdd6-10f3-475f-bb18-a31f2665ac7a",
   "HandledEvents": [
     "ValidateFilterPanelClient"
   ],
   "IconResourcesKeys": [],
   "LayeredFromGuid": "8dd00491-8fd0-4a7a-9cf3-8b6dc2e6455d",
+  "ListViewUuid": "65b60d68-093b-42b2-ab61-e661d40618fb",
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",
   "Properties": [

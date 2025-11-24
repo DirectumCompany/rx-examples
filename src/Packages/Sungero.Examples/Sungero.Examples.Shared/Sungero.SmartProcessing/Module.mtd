@@ -92,19 +92,6 @@
     }
   ],
   "BaseGuid": "bb685d97-a673-42ea-8605-66889967467f",
-  "Blocks": [
-    {
-      "$type": "Sungero.Metadata.ScriptBlockMetadata, Sungero.Workflow.Shared",
-      "NameGuid": "05c34011-7df9-42a4-8a66-e2825878c055",
-      "Name": "AnalyzeDocTypeAndFactsRecognitionBlock",
-      "BaseGuid": "4cd54a46-361f-4a70-bc9d-6138384bdb0c",
-      "LayeredFromGuid": "4cd54a46-361f-4a70-bc9d-6138384bdb0c",
-      "Overridden": [
-        "LayeredFromGuid"
-      ],
-      "ProcessStagesDisplayMode": "Hide"
-    }
-  ],
   "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
   "ClientBaseNamespace": "Sungero.Examples.Module.SmartProcessing.ClientBase",
   "Code": "Smart",
@@ -113,7 +100,6 @@
   "HandledEvents": [
     "InitializingServer"
   ],
-  "IconResourcesKeys": [],
   "Importance": "Medium",
   "InitializationFunctions": [
     {
@@ -168,18 +154,17 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
-  "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "4.12.27.0",
+  "Version": "25.3.0.48",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 8
+      "Number": 11
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 8
+      "Number": 11
     }
   ]
 }

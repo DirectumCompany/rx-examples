@@ -41,3 +41,7 @@ _ConfigSettings.xml*
 AssemblyInfo.cs
 [bB]in/*
 _ConfigSettings.xml
+
+
+*.g.xml
+Libraries.json

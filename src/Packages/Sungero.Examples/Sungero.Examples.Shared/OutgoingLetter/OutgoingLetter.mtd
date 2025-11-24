@@ -18,8 +18,10 @@
     "Controls": [],
     "IsAncestorMetadata": true
   },
+  "FormViewUuid": "7224277e-774b-4fb8-9366-38f26a0741f2",
   "IconResourcesKeys": [],
   "LayeredFromGuid": "d1d2a452-7732-4ba8-b199-0a4dc78898ac",
+  "ListViewUuid": "ae913cb2-cfee-4baf-aa0e-487f4f87d733",
   "OpenCardByDefaultInCollection": true,
   "OperationsClass": "",
   "Properties": [
