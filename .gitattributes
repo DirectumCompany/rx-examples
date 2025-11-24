@@ -4,3 +4,6 @@
 # Declare files that will always have CRLF line endings on checkout.
 *.cs text eol=crlf
 *.mtd text eol=crlf
+
+
+**/ProcessKind/*.json merge=binary
