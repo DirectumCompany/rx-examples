@@ -77,7 +77,7 @@
       "IsAncestorMetadata": true,
       "MonthSchedule": "Monthly",
       "StartAt": "1753-01-01T00:00:00",
-      "TimePeriod": 10,
+      "TimePeriod": 5,
       "Versions": []
     },
     {
@@ -86,7 +86,6 @@
       "Daily": "Repeat",
       "IsAncestorMetadata": true,
       "MonthSchedule": "Monthly",
-      "StartAt": "1753-01-01T00:00:00",
       "TimePeriod": 10,
       "Versions": []
     },
@@ -122,7 +121,7 @@
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
   "SpecialFolders": [],
-  "Version": "25.3.0.48",
+  "Version": "26.1.0.4",
   "Widgets": [],
   "Versions": [
     {

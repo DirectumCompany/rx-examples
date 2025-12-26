@@ -1,0 +1,377 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "f57ba319-3afd-4f5c-82fb-cdb392748985",
+  "Name": "Company",
+  "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [
+    {
+      "NameGuid": "dbbabb31-4c23-4551-8687-c153d2051620",
+      "Name": "UpdateEmployeeName",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "6c8a3206-0062-4fc2-a690-6c590c9a7a4b",
+          "Name": "PersonId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "902fbd68-0673-4157-bc48-e949e8de4419",
+      "Name": "CheckTransferSubstitutedAccessRights",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "e0e4c95d-1bab-4779-8e42-48896a625fed",
+          "Name": "SessionId",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "ca1c9953-7903-4cf6-9cbd-df949975dcca",
+      "Name": "IncludeEmployeeInBusinessUnit",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "f13b90e9-1d97-4d4b-b9d5-0d94faf4c9bc",
+          "Name": "EmployeeId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "babed245-4d3f-45df-8c7a-9557aee497b9",
+      "Name": "ExcludeEmployeeFromBusinessUnit",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "8719c080-0ebb-4561-949e-2dc82d835afb",
+          "Name": "EntityId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "9915e138-b45c-4da0-be03-51b598117fb2",
+          "Name": "NewDepartmentId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "bf6533a4-1bbc-4a48-adc3-6b3c105487a9",
+          "Name": "OldBusinessUnitId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "f3e9a813-9a32-43b1-95de-2b86e94beb89",
+          "Name": "OldDepartmentId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "857ae65e-231b-4a92-9074-1b35eeb01e06",
+      "Name": "IncludeDepartmentEmployeesInBusinessUnit",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "6f3dbbcb-7090-42e3-b2d3-b901cd0697ce",
+          "Name": "OldHeadOfficeId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "a512e325-37fb-48f9-84aa-afa28b32c2f3",
+          "Name": "OldBusinessUnitId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "ea1c8e0b-e70c-4285-baaa-8730ea764ed6",
+          "Name": "DepartmentId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "6984587d-aeb8-4cbb-beea-9524ba2d064f",
+      "Name": "ExcludeDepartmentEmployeesFromBusinessUnit",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "229482c6-f1ef-4130-b036-f9298efd0ede",
+          "Name": "OldHeadOfficeId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "bdeb6bc6-ecd2-4b2a-9967-da0c0a8c1394",
+          "Name": "DepartmentId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "02b1135b-cea7-4737-8301-c745de61adb3",
+      "Name": "DisconnectUsersFromExternalApps",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 5,
+      "Parameters": [
+        {
+          "NameGuid": "43e0465d-f88b-470a-907d-6722c926463e",
+          "Name": "NotificationRecipientId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "c4918373-4cd3-4acd-988f-ae7f68918435",
+          "Name": "ExternalAppsIds",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "f98d44d6-b0c6-46d7-8a25-1cc266294707",
+          "Name": "UserIds",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "d1629e44-9d02-4c54-bb84-6d64c21998d1",
+      "Name": "UpdateUserDataInIdentityService",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 5,
+      "Parameters": [
+        {
+          "NameGuid": "0fb14648-0aed-4f22-a034-3cc902f3a26d",
+          "Name": "IsEmailUpdated",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "1e51f6b9-d5c9-4250-92a3-d89752ea5045",
+          "Name": "IsPhoneUpdated",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "56d92eb7-54dc-4230-8d70-c61a705240d3",
+          "Name": "IsFirstNameUpdated",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "8de022c8-6e55-417d-ba63-5ee032543003",
+          "Name": "IsMiddleNameUpdated",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "8e0fe5a0-8271-4f51-8e9b-a26633cdd71f",
+          "Name": "IsLoginUpdated",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "bd1c98d4-a0a8-4d81-a0ca-ce69e4e0bdc9",
+          "Name": "IsLastNameUpdated",
+          "ParameterType": "Boolean"
+        },
+        {
+          "NameGuid": "ccfa465d-227b-4d27-8848-072f3cbaebda",
+          "Name": "UserId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "e4a468a8-3f36-4b89-9199-80f9d158483d",
+      "Name": "ConnectUsersToExternalApps",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 5,
+      "Parameters": [
+        {
+          "NameGuid": "2a69f54b-09f2-42af-a355-ccac4f1b773c",
+          "Name": "UsersWithoutRequiredDataIds",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "46822e81-9157-4d2b-95c8-76997944a23e",
+          "Name": "NotificationRecipientId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "65fe081f-cc98-4162-bcae-5bb27517b27b",
+          "Name": "UserIdsToConnect",
+          "ParameterType": "String"
+        },
+        {
+          "NameGuid": "90b28056-fd55-4270-bbae-2075c54ca072",
+          "Name": "ExternalAppsIds",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
+      "NameGuid": "5cf20d2f-3e66-4e71-8481-5691ad1c9c6a",
+      "Name": "TransferEmployeeToDepartment",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "28630fab-6a1d-4243-90ef-a441c8698e3b",
+          "Name": "EmployeeId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "35fb4432-4f4b-48b8-9c98-a4311d08a00d",
+          "Name": "OldDepartmentId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "da290dbf-c361-46e8-833c-13a4f05c9910",
+      "Name": "TransferEmployeeToManagementUnit",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "MaxRetryCount": 1000,
+      "Parameters": [
+        {
+          "NameGuid": "6cdbda45-1e21-4ec2-b2a6-b45ea741cf49",
+          "Name": "EmployeeId",
+          "ParameterType": "LongInteger"
+        },
+        {
+          "NameGuid": "fb330bd7-5aec-43be-a613-a6623a69e657",
+          "Name": "OldManagementUnitId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    }
+  ],
+  "BaseGuid": "d534e107-a54d-48ec-85ff-bc44d731a82f",
+  "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
+  "ClientBaseNamespace": "Sungero.Examples.Module.Company.ClientBase",
+  "Code": "Company",
+  "CompanyCode": "Sungero",
+  "ExplorerTreeOrder": [],
+  "Importance": "Medium",
+  "IsVisible": false,
+  "Jobs": [
+    {
+      "NameGuid": "85325f8d-84bf-4006-95fd-dea727bfa9ce",
+      "Name": "DeleteObsoleteSystemSubstitutions",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00"
+    },
+    {
+      "NameGuid": "19bd3d33-1e2a-404b-a4e6-d100d3651c56",
+      "Name": "TransferSubstitutedAccessRights",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00"
+    },
+    {
+      "NameGuid": "00255a7f-4cc2-4189-9f1b-cb10852742a4",
+      "Name": "ExcludeEmployeesFromManagementUnits",
+      "Daily": "Custom",
+      "EndAt": "1753-01-01T05:00:00",
+      "IsAncestorMetadata": true,
+      "IsEnabled": false,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00",
+      "TimePeriod": 30
+    }
+  ],
+  "LayeredFromGuid": "d534e107-a54d-48ec-85ff-bc44d731a82f",
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.Examples.Module.Company",
+  "SpecialFolders": [
+    {
+      "NameGuid": "163d6b95-01e0-4da2-88b0-46ff0864a45d",
+      "Name": "ManagersAssistants",
+      "DisplayType": "Module",
+      "FolderViewUuid": "56e811a6-2698-4017-86aa-2cba74383750",
+      "IsAncestorMetadata": true,
+      "IsShow": false,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "8952b00b-f8bb-4dd7-a3c5-31328fda83b6",
+      "Name": "UsersConnection",
+      "DisplayType": "Module",
+      "FolderViewUuid": "77266bf4-6e10-4bc7-99e6-493fd21c6c84",
+      "IconPath": "UsersConnection_8952b00bf8bb4dd7a3c531328fda83b6.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "59629078-5ee7-4096-8a1e-b6dc2d736d1d",
+      "Name": "LegalOrganizationStructure",
+      "DisplayType": "Module",
+      "FolderViewUuid": "165eb703-df41-4157-b29b-59f614c46488",
+      "HierarchicalDataQueryMode": "AllLevels",
+      "HierarchyDisplayPropertyId": "869d1723-c5a9-410c-b7aa-73b1bcd9e812",
+      "HierarchyParentPropertyId": "fcab47ac-42ae-4472-94fb-5d7801ed2bd0",
+      "IsAncestorMetadata": true,
+      "IsHierarchicalView": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "5adcabd5-2720-46c0-9c28-9acebf14fefe",
+      "Name": "ManagementUnitOrganizationStructure",
+      "DisplayType": "Module",
+      "FolderViewUuid": "39aec5f1-bdf0-4553-afdb-6b46705dc2c0",
+      "HierarchicalDataQueryMode": "AllLevels",
+      "HierarchyDisplayPropertyId": "869d1723-c5a9-410c-b7aa-73b1bcd9e812",
+      "HierarchyParentPropertyId": "fcab47ac-42ae-4472-94fb-5d7801ed2bd0",
+      "IsAncestorMetadata": true,
+      "IsHierarchicalView": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    }
+  ],
+  "Version": "26.1.0.4",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 11
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 11
+    }
+  ]
+}

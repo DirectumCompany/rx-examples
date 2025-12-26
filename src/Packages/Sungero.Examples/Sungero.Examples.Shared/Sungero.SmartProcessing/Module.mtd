@@ -30,7 +30,7 @@
     {
       "NameGuid": "1e242010-c369-4d37-9f8d-83b9cd9bab10",
       "Name": "TrainClassifier",
-      "DelayPeriod": 10,
+      "DelayPeriod": 5,
       "DelayStrategy": "RegularDelayStrategy",
       "IsAncestorMetadata": true,
       "MaxRetryCount": 400,
@@ -144,7 +144,8 @@
       "Parameters": [
         {
           "Name": "documents",
-          "ParameterType": "System.Collections.Generic.IEnumerable<global::Sungero.Docflow.IOfficialDocument>"
+          "ParameterType": "global::System.Collections.Generic.IEnumerable<global::Sungero.Docflow.IOfficialDocument>",
+          "ParameterTypeFullName": "System.Collections.Generic.IEnumerable"
         }
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
@@ -155,7 +156,7 @@
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "SpecialFolders": [],
-  "Version": "25.3.0.48",
+  "Version": "26.1.0.4",
   "Widgets": [],
   "Versions": [
     {

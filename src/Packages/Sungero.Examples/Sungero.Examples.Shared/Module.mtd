@@ -73,6 +73,26 @@
     {
       "ItemId": "b56aed83-acab-494e-b40b-ec106d0682d1",
       "PreviousItemId": "4f338f0b-3257-40dd-8d52-cd102c0e852b"
+    },
+    {
+      "ItemId": "954cca72-a199-4e1f-8b7c-5f9ee54dfa40",
+      "PreviousItemId": "b56aed83-acab-494e-b40b-ec106d0682d1"
+    },
+    {
+      "ItemId": "1a634a86-6106-42a1-84f7-5011a01e2762",
+      "PreviousItemId": "954cca72-a199-4e1f-8b7c-5f9ee54dfa40"
+    },
+    {
+      "ItemId": "c6952216-f36f-4a1a-8c02-0e2cec529c7c",
+      "PreviousItemId": "1a634a86-6106-42a1-84f7-5011a01e2762"
+    },
+    {
+      "ItemId": "0432ed0d-5df2-406d-b1ae-33571783bd98",
+      "PreviousItemId": "c6952216-f36f-4a1a-8c02-0e2cec529c7c"
+    },
+    {
+      "ItemId": "0755496c-9794-443a-b84e-edd72cf5bb71",
+      "PreviousItemId": "0432ed0d-5df2-406d-b1ae-33571783bd98"
     }
   ],
   "Importance": "Medium",
@@ -92,8 +112,8 @@
         },
         {
           "Name": "responsible",
-          "ParameterType": "global::Sungero.Company.IEmployee",
-          "ParameterTypeFullName": "Sungero.Company.IEmployee, Sungero.Domain.Interfaces"
+          "ParameterType": "global::Sungero.Examples.IEmployee",
+          "ParameterTypeFullName": "Sungero.Examples.IEmployee, Sungero.Domain.Interfaces"
         }
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
