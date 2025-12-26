@@ -87,37 +87,6 @@
       "Versions": []
     }
   ],
-  "PublicFunctions": [
-    {
-      "Name": "SendNotificationToEmployee",
-      "IsRemote": true,
-      "Parameters": [
-        {
-          "Name": "acquaintanceTask",
-          "ParameterType": "global::Sungero.Examples.IAcquaintanceTask",
-          "ParameterTypeFullName": "Sungero.Examples.IAcquaintanceTask, Sungero.Domain.Interfaces"
-        },
-        {
-          "Name": "employee",
-          "ParameterType": "global::Sungero.Examples.IEmployee",
-          "ParameterTypeFullName": "Sungero.Examples.IEmployee, Sungero.Domain.Interfaces"
-        },
-        {
-          "Name": "subject",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        },
-        {
-          "Name": "text",
-          "ParameterType": "global::System.String",
-          "ParameterTypeFullName": "System.String"
-        }
-      ],
-      "Placement": "Shared",
-      "ReturnType": "void",
-      "ReturnTypeFullName": "System.Void"
-    }
-  ],
   "PublicStructures": [],
   "ResourcesKeys": [],
   "RibbonCardMetadata": {
