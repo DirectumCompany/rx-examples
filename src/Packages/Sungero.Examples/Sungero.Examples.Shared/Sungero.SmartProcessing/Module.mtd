@@ -161,11 +161,11 @@
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 11
+      "Number": 12
     }
   ]
 }

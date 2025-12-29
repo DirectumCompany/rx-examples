@@ -136,11 +136,11 @@
   "Versions": [
     {
       "Type": "SolutionMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "DomainApi",
