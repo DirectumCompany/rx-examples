@@ -470,17 +470,87 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.RecordManagement",
-  "SpecialFolders": [],
-  "Version": "25.3.0.48",
+  "SpecialFolders": [
+    {
+      "NameGuid": "c21fa108-1570-4155-8a0c-0d04957bc72b",
+      "Name": "ForExecution",
+      "DisplayType": "Inbox",
+      "FolderViewUuid": "b78c0eac-d750-436e-9ab2-615f2a96d1dc",
+      "IconPath": "ForExecution_c21fa108157041558a0c0d04957bc72b.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "IsViewSettingsByFolder": true,
+      "NeedShowMarkedCount": true,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "4b30b2be-330e-42bd-833c-7ecf19b32e12",
+      "Name": "ActionItems",
+      "DisplayType": "Outbox",
+      "FolderViewUuid": "cd3ea3d5-cd19-4d68-bd1d-a1c070731646",
+      "IconPath": "ActionItems_4b30b2be330e42bd833c7ecf19b32e12.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "IsViewSettingsByFolder": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "7d737a2b-cfc1-47d4-b475-01ed57f69bc0",
+      "Name": "DocumentsToReturn",
+      "DisplayType": "Module",
+      "FolderViewUuid": "f3d4cc52-6442-42be-9e98-7b28bb5cd210",
+      "IconPath": "DocumentsToReturn_7d737a2bcfc147d4b47501ed57f69bc0.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "fa95afab-924d-4bb3-b9cd-9cf1836fa272",
+      "Name": "OrdersCompanyDirectives",
+      "DisplayType": "Module",
+      "FolderViewUuid": "11e017e1-c693-4530-b40f-92fb4a3c5297",
+      "IconPath": "OrdersCompanyDirectives_fa95afab924d4bb3b9cd9cf1836fa272.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "a25a4fae-7bcf-4a52-99ad-f0392b5266cd",
+      "Name": "ActionItemsHierarchy",
+      "DisplayType": "Module",
+      "FolderViewUuid": "c1b58ab9-dfba-45eb-a235-aec462aa8bc4",
+      "HierarchyDisplayPropertyId": "11f0499b-7583-4f3e-9975-ee4eb9d7f61b",
+      "HierarchyParentPropertyId": "bd39f96d-8ad1-4a56-a384-ba7adbb0f343",
+      "IsAncestorMetadata": true,
+      "IsHierarchicalView": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    }
+  ],
+  "Version": "26.1.0.4",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 11
+      "Number": 12
     }
   ]
 }

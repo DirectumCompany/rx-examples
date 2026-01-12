@@ -266,6 +266,7 @@
           }
         ]
       },
+      "FolderViewUuid": "7e563677-601f-408e-b926-67e02bffb960",
       "HandledEvents": [
         "DataQueryServer",
         "ValidateFilterPanelClient"
@@ -274,19 +275,35 @@
       "IsShow": true,
       "Kind": "Computable",
       "NeedShowMarkedCount": false,
-      "OpenCardByDefault": true
+      "OpenCardByDefault": true,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "bd7ced8f-379e-4cda-9f18-a28193b8d53b",
+      "Name": "DocumentsToReturn",
+      "DisplayType": "Module",
+      "FolderViewUuid": "d3d20e5c-a79b-4d94-a995-b3f10859cb3e",
+      "IconPath": "DocumentsToReturn_bd7ced8f379e4cda9f18a28193b8d53b.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
     }
   ],
-  "Version": "25.3.0.48",
+  "Version": "26.1.0.4",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 11
+      "Number": 12
     }
   ]
 }

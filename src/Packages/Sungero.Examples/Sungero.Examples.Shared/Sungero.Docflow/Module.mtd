@@ -417,6 +417,13 @@
   "IsVisible": false,
   "Jobs": [
     {
+      "NameGuid": "486eaff5-ffe2-44ae-b5eb-256b8a4a7197",
+      "Name": "PrepareIndexingDataForFullTextSearch",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T20:00:00"
+    },
+    {
       "NameGuid": "bd4d35ec-198e-4868-9240-305c00653785",
       "Name": "DeleteMarkEditorSessions",
       "IsAncestorMetadata": true,
@@ -497,17 +504,57 @@
     "HtmlStampTemplateForSignatureCustom",
     "RoleInitiatorDepartmentEmployees"
   ],
-  "SpecialFolders": [],
-  "Version": "25.3.0.48",
+  "SpecialFolders": [
+    {
+      "NameGuid": "113427f5-1683-4bb8-980c-ba4bcef50e66",
+      "Name": "ApprovalRules",
+      "DisplayType": "Module",
+      "FolderViewUuid": "f9be56f5-4532-4b0d-97e7-3d9d461d6b66",
+      "IconPath": "ApprovalRules_113427f516834bb8980cba4bcef50e66.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": false,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "371c81c3-d2c8-4bfb-8e86-39470d456c62",
+      "Name": "StoragePolicy",
+      "DisplayType": "Module",
+      "FolderViewUuid": "4f785e57-969b-43a8-8f01-eb8afdf5b129",
+      "IconPath": "StoragePolicy_371c81c3d2c84bfb8e8639470d456c62.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": false,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "4edf28d5-32e2-440d-9f5c-138d99ad0324",
+      "Name": "PowerOfAttorneyList",
+      "DisplayType": "Module",
+      "FolderViewUuid": "df480760-a256-491a-b278-b3057ea81672",
+      "IconPath": "PowerOfAttorneyList_4edf28d532e2440d9f5c138d99ad0324.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    }
+  ],
+  "Version": "26.1.0.4",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 11
+      "Number": 12
     }
   ]
 }
