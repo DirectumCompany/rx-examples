@@ -11,7 +11,7 @@ namespace Sungero.Examples.Client
   {
     public virtual void RemindParticipants(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      Sungero.Examples.Module.RecordManagement.PublicFunctions.Module.RemindAcquaintanceTaskParticipants(_obj);
+      Functions.AcquaintanceTask.Remote.RemindParticipants(_obj);
     }
 
     public virtual bool CanRemindParticipants(Sungero.Domain.Client.CanExecuteActionArgs e)
