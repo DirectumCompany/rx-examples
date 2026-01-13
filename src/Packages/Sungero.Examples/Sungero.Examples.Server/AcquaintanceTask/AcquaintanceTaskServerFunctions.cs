@@ -72,8 +72,14 @@ namespace Sungero.Examples.Server
       }
       else if (channel == Sungero.Examples.Employee.NotificationChannel.SMS)
       {
-        Logger.Debug($"SendNotificationToEmployee. SMS sending not implemented");
-        // TODO: Реализовать отправку SMS
+        if (!string.IsNullOrEmpty(employee.Phone))
+        {
+          Sungero.Notifications.PublicFunctions.Module.SendSms(employee.Phone, text);
+        }
+        else
+        {
+          Logger.Debug($"SendNotificationToEmployee. Cannot send message to Employee={employee.Id} because of an empty phone");
+        }
       }
       else if (channel == Sungero.Examples.Employee.NotificationChannel.Omni)
       {
