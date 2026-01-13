@@ -4,6 +4,7 @@ using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
 using Sungero.Examples.AcquaintanceTask;
+using Sungero.Notifications;
 
 namespace Sungero.Examples.Server
 {
@@ -52,36 +53,38 @@ namespace Sungero.Examples.Server
       
       var channel = employee.NotificationChannel;
       
-      if (channel == null || channel == Sungero.Examples.Employee.NotificationChannel.DoNotNotify)
+      if (channel == null || channel == Examples.Employee.NotificationChannel.DoNotNotify)
       {
         Logger.Debug($"SendNotificationToEmployee. Cannot send message to Employee={employee.Id} because of his notify channel settings");
         return;
       }
       
       Logger.Debug($"SendNotificationToEmployee. Send message to Employee={employee.Id} via channel={channel.Value}");
-      if (channel == Sungero.Examples.Employee.NotificationChannel.Email)
+      if (channel == Examples.Employee.NotificationChannel.Email)
       {
         if (!string.IsNullOrEmpty(employee.Email))
         {
-          Sungero.Notifications.PublicFunctions.Module.SendEmail(employee.Email, subject, text);
+          var eMail = Notifications.PublicFunctions.Module.CreateEmailMessage(employee.Email, subject, text);
+          Notifications.PublicFunctions.Module.SendEmail(eMail);
         }
         else
         {
           Logger.Debug($"SendNotificationToEmployee. Cannot send message to Employee={employee.Id} because of an empty e-mail");
         }
       }
-      else if (channel == Sungero.Examples.Employee.NotificationChannel.SMS)
+      else if (channel == Examples.Employee.NotificationChannel.SMS)
       {
         if (!string.IsNullOrEmpty(employee.Phone))
         {
-          Sungero.Notifications.PublicFunctions.Module.SendSms(employee.Phone, text);
+          var sms = Notifications.PublicFunctions.Module.CreateSmsMessage(employee.Phone, text);
+          Notifications.PublicFunctions.Module.SendSms(sms);
         }
         else
         {
           Logger.Debug($"SendNotificationToEmployee. Cannot send message to Employee={employee.Id} because of an empty phone");
         }
       }
-      else if (channel == Sungero.Examples.Employee.NotificationChannel.Omni)
+      else if (channel == Examples.Employee.NotificationChannel.Omni)
       {
         Logger.Debug($"SendNotificationToEmployee. Omni sending not implemented");
         // TODO: Реализовать отправку через Омни
