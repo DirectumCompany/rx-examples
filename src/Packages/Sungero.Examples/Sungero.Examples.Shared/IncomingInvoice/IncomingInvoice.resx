@@ -215,4 +215,13 @@
   <data name="PaymentMarkName" xml:space="preserve">
     <value>Mark "Paid"</value>
   </data>
+  <data name="DocumentShouldBeApprovedOrPaidToOpenMarkEditor" xml:space="preserve">
+    <value>To edit marks on the invoice, it must be paid or its latest version must be approved.</value>
+  </data>
+  <data name="DocumentShouldBeApprovedOrPaidTitle" xml:space="preserve">
+    <value>The invoice is not signed and not paid.</value>
+  </data>
+  <data name="DocumentShouldBeApprovedOrPaid" xml:space="preserve">
+    <value>To convert the invoice to PDF, it must be paid or its last version must be approved.</value>
+  </data>
 </root>
