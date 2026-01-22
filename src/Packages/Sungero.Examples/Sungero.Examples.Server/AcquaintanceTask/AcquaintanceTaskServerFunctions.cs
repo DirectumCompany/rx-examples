@@ -64,7 +64,7 @@ namespace Sungero.Examples.Server
       {
         if (!string.IsNullOrEmpty(employee.Email))
         {
-          var eMail = Notifications.PublicFunctions.Module.CreateEmailMessage(employee.Email, subject, text);
+          var eMail = Notifications.PublicFunctions.Module.CreateEmailMessage(employee.Email, subject, text, false, "Sungero", "noreply@sungero.com", new List<string>(), new List<string>(), 0);
           Notifications.PublicFunctions.Module.SendEmail(eMail);
         }
         else
