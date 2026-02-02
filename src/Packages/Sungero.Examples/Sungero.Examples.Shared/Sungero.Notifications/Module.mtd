@@ -1,0 +1,47 @@
+{
+  "$type": "Sungero.Metadata.LayerModuleMetadata, Sungero.Metadata",
+  "NameGuid": "368a0052-b08f-4cf6-b740-5de0b37128a0",
+  "Name": "Notifications",
+  "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
+  "AsyncHandlers": [
+    {
+      "NameGuid": "100d5a0e-83e9-4778-abb1-a7aba81f3a97",
+      "Name": "WatchNotificationEntry",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "bd933961-6e1a-47e7-b3d6-aaccf9dc2a44",
+          "Name": "NotificationEntryId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    }
+  ],
+  "BaseGuid": "6d448959-ace0-4843-bb25-8246053b7198",
+  "ClientBaseAssemblyName": "Sungero.Examples.ClientBase",
+  "ClientBaseNamespace": "Sungero.Examples.Module.Notifications.ClientBase",
+  "Code": "Notif",
+  "CompanyCode": "Sungero",
+  "ExplorerTreeOrder": [],
+  "Importance": "Medium",
+  "IsVisible": false,
+  "LayeredFromGuid": "6d448959-ace0-4843-bb25-8246053b7198",
+  "PublicStructures": [],
+  "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
+  "ResourceInterfaceNamespace": "Sungero.Examples.Module.Notifications",
+  "SpecialFolders": [],
+  "Version": "0.0.1.0",
+  "Widgets": [],
+  "Versions": [
+    {
+      "Type": "LayerModuleMetadata",
+      "Number": 12
+    },
+    {
+      "Type": "ModuleMetadata",
+      "Number": 12
+    }
+  ]
+}
