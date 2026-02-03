@@ -121,7 +121,7 @@
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.Exchange",
   "SpecialFolders": [],
-  "Version": "26.1.0.6",
+  "Version": "26.1.0.11",
   "Widgets": [],
   "Versions": [
     {
