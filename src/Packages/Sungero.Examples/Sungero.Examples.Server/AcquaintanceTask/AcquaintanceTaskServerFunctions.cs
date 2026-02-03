@@ -58,31 +58,11 @@ namespace Sungero.Examples.Server
             }
 
             Logger.Debug($"SendNotificationToEmployee. Send message to Employee={employee.Id} via channel={channel.Value}");
-            //
             if (channel == Examples.Employee.NotificationChannel.Email)
             {
                 if (!string.IsNullOrEmpty(employee.Email))
                 {
-                    //заменить вызов
-                    var deliveryParameters = Sungero.Notifications.PublicFunctions.Module.CreateDefaultEmailDeliveryParameters();
-                    var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
-                    var extProps = new Dictionary<string, string>
-                    {
-                        { assignment.MainTask.Id.ToString(), notificationGuid.ToString() }
-                    };
-                    processingParameters.ExtendedProperties = extProps;
-                    var email = new Sungero.Notifications.Structures.Module.EmailMessage();
-                    email.Subject = subject;
-                    email.Text = text;
-                    email.Recipient = employee.Email;
-                    email.IsHtmlBody = false;
-                    email.SenderName = string.Empty;
-                    email.SenderAddress = string.Empty;
-                    email.CC = new List<string>();
-                    email.Bcc = new List<string>();
-                    email.Priority = 0;
-      
-                    Sungero.Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
+                    this.SendEmail(employee, subject, text, assignment, notificationGuid);
                 }
                 else
                 {
@@ -93,19 +73,7 @@ namespace Sungero.Examples.Server
             {
                 if (!string.IsNullOrEmpty(employee.Phone))
                 {
-                    //заменить вызов
-                    var deliveryParameters = Sungero.Notifications.PublicFunctions.Module.CreateDefaultSmsDeliveryParameters();
-                    var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
-                    var extProps = new Dictionary<string, string>
-                    {
-                        { assignment.MainTask.Id.ToString(), notificationGuid.ToString() }
-                    };
-                    processingParameters.ExtendedProperties = extProps;
-                    var smsMessage = new Sungero.Notifications.Structures.Module.SmsMessage();
-                    smsMessage.Recipient = employee.Phone;
-                    smsMessage.Text = text;
-                    //var sms = Notifications.PublicFunctions.Module.CreateSmsMessage(employee.Phone, text);
-                    Notifications.PublicFunctions.Module.SendSms(smsMessage, deliveryParameters, processingParameters);
+                    this.SendSms(employee, text, assignment, notificationGuid);
                 }
                 else
                 {
@@ -119,5 +87,41 @@ namespace Sungero.Examples.Server
             }
         }
 
+        private void SendSms(Sungero.Examples.IEmployee employee, string text,
+          Workflow.IAssignment assignment, Guid notificationGuid)
+        {
+            var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultSmsDeliveryParameters();
+            var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
+            processingParameters.ExtendedProperties = new Dictionary<string, string>
+            {
+               { assignment.MainTask.Id.ToString(), notificationGuid.ToString() }
+            };
+            var smsMessage = new Notifications.Structures.Module.SmsMessage();
+            smsMessage.Recipient = employee.Phone;
+            smsMessage.Text = text;
+            Notifications.PublicFunctions.Module.SendSms(smsMessage, deliveryParameters, processingParameters);
+        }
+
+        private void SendEmail(Sungero.Examples.IEmployee employee, string subject, string text,
+          Workflow.IAssignment assignment, Guid notificationGuid)
+        {
+            var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultEmailDeliveryParameters();
+            var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
+            processingParameters.ExtendedProperties = new Dictionary<string, string>
+            {
+               { assignment.MainTask.Id.ToString(), notificationGuid.ToString() }
+            };
+            var email = new Notifications.Structures.Module.EmailMessage();
+            email.Subject = subject;
+            email.Text = text;
+            email.Recipient = employee.Email;
+            email.IsHtmlBody = false;
+            email.SenderName = string.Empty;
+            email.SenderAddress = string.Empty;
+            email.CC = new List<string>();
+            email.Bcc = new List<string>();
+            email.Priority = 0;
+            Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
+        }
     }
 }
