@@ -20,7 +20,6 @@ namespace Sungero.Examples.Server
 
             Logger.Debug($"RemindParticipants. Found {incompleteAssignments.Count} incomplete assignments");
 
-            var sentCount = 0;
             var notificationGuid = Guid.NewGuid();
             foreach (var assignment in incompleteAssignments)
             {
@@ -31,10 +30,7 @@ namespace Sungero.Examples.Server
                 var subject = assignment.Subject;
                 var text = $"У вас невыполненное задание: {assignment.Subject}";
                 this.SendNotificationToEmployee(performer, subject, text, assignment, notificationGuid);
-                sentCount++;
             }
-
-            Logger.Debug($"RemindParticipants. Sent {sentCount} notifications");
         }
 
         /// <summary>

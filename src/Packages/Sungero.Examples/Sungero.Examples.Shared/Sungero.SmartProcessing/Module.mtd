@@ -145,7 +145,7 @@
         {
           "Name": "documents",
           "ParameterType": "global::System.Collections.Generic.IEnumerable<global::Sungero.Docflow.IOfficialDocument>",
-          "ParameterTypeFullName": "System.Collections.Generic.IEnumerable"
+          "ParameterTypeFullName": "System.Collections.Generic.IEnumerable`1[[Sungero.Docflow.IOfficialDocument, Sungero.Domain.Interfaces]]"
         }
       ],
       "ReturnType": "global::Sungero.Docflow.IOfficialDocument",
@@ -156,7 +156,7 @@
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "SpecialFolders": [],
-  "Version": "26.1.0.6",
+  "Version": "26.1.0.11",
   "Widgets": [],
   "Versions": [
     {
