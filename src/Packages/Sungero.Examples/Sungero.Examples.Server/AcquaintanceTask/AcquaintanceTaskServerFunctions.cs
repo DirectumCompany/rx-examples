@@ -59,7 +59,9 @@ namespace Sungero.Examples.Server
       {
         if (!string.IsNullOrEmpty(employee.Email))
         {
-          var eMail = Notifications.PublicFunctions.Module.CreateEmailMessage(employee.Email, subject, text, false, "", "", new List<string>(), new List<string>(), 0);
+          var splittedEmails = Sungero.Commons.PublicFunctions.Module.SplitEmails(employee.Email);
+          var addresses = string.Join(";", splittedEmails);
+          var eMail = Notifications.PublicFunctions.Module.CreateEmailMessage(addresses, subject, text, false, "", "", new List<string>(), new List<string>(), 0);
           Notifications.PublicFunctions.Module.SendEmail(eMail);
         }
         else
