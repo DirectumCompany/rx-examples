@@ -119,7 +119,9 @@ namespace Sungero.Examples.Server
       var email = new Notifications.Structures.Module.EmailMessage();
       email.Subject = subject;
       email.Text = text;
-      email.Recipient = employee.Email;
+      var splittedEmails = Sungero.Commons.PublicFunctions.Module.SplitEmails(employee.Email);
+      var addresses = string.Join(";", splittedEmails);
+      email.Recipient = addresses;
       email.IsHtmlBody = false;
       email.SenderName = string.Empty;
       email.SenderAddress = string.Empty;
