@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
+using Sungero.Notifications;
+using Sungero.Workflow;
 
 namespace Sungero.Examples.Server
 {
@@ -83,30 +85,37 @@ namespace Sungero.Examples.Server
       }
     }
 
-    private void SendSms(Sungero.Examples.IEmployee employee, string text,
-      Workflow.IAssignment assignment, Guid notificationGuid)
+    private void SendSms(IEmployee employee, string text, IAssignment assignment, Guid notificationGuid)
     {
       var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultSmsDeliveryParameters();
       var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
       processingParameters.ExtendedProperties = new Dictionary<string, string>
-            {
-               { assignment.MainTask.Id.ToString(), notificationGuid.ToString() }
-            };
+      {
+        { "AcquaintanceTaskId", assignment.MainTask.Id.ToString() },
+        { "MailingGuid", notificationGuid.ToString() }
+      };
       var smsMessage = new Notifications.Structures.Module.SmsMessage();
       smsMessage.Recipient = employee.Phone;
       smsMessage.Text = text;
-      Notifications.PublicFunctions.Module.SendSms(smsMessage, deliveryParameters, processingParameters);
+      var message = Notifications.PublicFunctions.Module.ConvertSmsMessageToMessage(smsMessage);
+      Notifications.PublicFunctions.Module.SendMessage(message, deliveryParameters, processingParameters);
     }
 
-    private void SendEmail(Sungero.Examples.IEmployee employee, string subject, string text,
-      Workflow.IAssignment assignment, Guid notificationGuid)
+    private void SendEmail(IEmployee employee, string subject, string text, IAssignment assignment, Guid notificationGuid)
     {
       var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultEmailDeliveryParameters();
       var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
+      processingParameters.Callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
+      processingParameters.Callback.Method = "CreateResultNotification";
+      processingParameters.Callback.Parameters = new Dictionary<string, string>
+      {
+        {"notificationGuid", notificationGuid.ToString() }
+      };
       processingParameters.ExtendedProperties = new Dictionary<string, string>
-            {
-               { assignment.MainTask.Id.ToString(), notificationGuid.ToString() }
-            };
+      {
+        { "AcquaintanceTaskId", assignment.MainTask.Id.ToString() },
+        { "MailingGuid", notificationGuid.ToString() }
+      };
       var email = new Notifications.Structures.Module.EmailMessage();
       email.Subject = subject;
       email.Text = text;
@@ -117,7 +126,38 @@ namespace Sungero.Examples.Server
       email.CC = new List<string>();
       email.Bcc = new List<string>();
       email.Priority = 0;
-      Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
+      var message = Notifications.PublicFunctions.Module.ConvertEmailMessageToMessage(email);
+      Notifications.PublicFunctions.Module.SendMessage(message, deliveryParameters, processingParameters);
+    }
+
+    private static void CreateResultNotification(string notificationGuid)
+    {
+      var entries = NotificationEntries.GetAll()
+        .Where(e => e.ExtendedProperties.Any(p => p.Value == notificationGuid)).ToList();
+      if (entries.Any(e => e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Posted
+          && e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Error))
+        return;
+
+      var notificationExtendedProperty = entries.FirstOrDefault().ExtendedProperties.FirstOrDefault();
+      var acquaintanceTask = RecordManagement.AcquaintanceTasks.Get(long.Parse(notificationExtendedProperty.Value));
+      var taskDate = acquaintanceTask.Created.Value.ToShortDateString();
+      var subject = Docflow.PublicFunctions.Module
+        .TrimQuotes($"Результат отправки уведомлений по задаче от {taskDate}: {acquaintanceTask.Subject}.");
+
+      var errorMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Error);
+      var postedMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Posted);
+      var notNotificatedCount = ((Workflow.Server.Task)acquaintanceTask).Assignments.Count(a
+        => Employees.As(a.Performer).NotificationChannel == Examples.Employee.NotificationChannel.DoNotNotify);
+
+      var activeText = Docflow.PublicFunctions.Module.
+        TrimQuotes($"Уведомление о задании от {taskDate} {Hyperlinks.Get(acquaintanceTask)} доставлено.\n\n" +
+                   $"Список:\n- Доставлено: {postedMessageCount} из {entries.Count}\n" +
+                   $"- Ошибок: {errorMessageCount}\n- Отключены уведомления: {notNotificatedCount}\n");
+      var task = SimpleTasks.CreateWithNotices(subject, acquaintanceTask.Author);
+      task.ActiveText = activeText;
+      task.Subject = subject;
+      task.Save();
+      task.Start();
     }
   }
 }
