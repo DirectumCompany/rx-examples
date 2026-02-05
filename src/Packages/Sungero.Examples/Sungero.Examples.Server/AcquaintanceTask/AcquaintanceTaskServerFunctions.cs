@@ -91,14 +91,13 @@ namespace Sungero.Examples.Server
       var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
-        { "AcquaintanceTaskId", assignment.MainTask.Id.ToString() },
-        { "MailingGuid", notificationGuid.ToString() }
+        { Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName, assignment.MainTask.Id.ToString() },
+        { Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName, notificationGuid.ToString() }
       };
       var smsMessage = new Notifications.Structures.Module.SmsMessage();
       smsMessage.Recipient = employee.Phone;
       smsMessage.Text = text;
-      var message = Notifications.PublicFunctions.Module.ConvertSmsMessageToMessage(smsMessage);
-      Notifications.PublicFunctions.Module.SendMessage(message, deliveryParameters, processingParameters);
+      Notifications.PublicFunctions.Module.SendSms(smsMessage, deliveryParameters, processingParameters);
     }
 
     private void SendEmail(IEmployee employee, string subject, string text, IAssignment assignment, Guid notificationGuid)
@@ -109,12 +108,13 @@ namespace Sungero.Examples.Server
       processingParameters.Callback.Method = "CreateResultNotification";
       processingParameters.Callback.Parameters = new Dictionary<string, string>
       {
-        {"notificationGuid", notificationGuid.ToString() }
+        {"MailingGuidParamName", Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName},
+        {"MailingGuidParamValue", notificationGuid.ToString() }
       };
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
-        { "AcquaintanceTaskId", assignment.MainTask.Id.ToString() },
-        { "MailingGuid", notificationGuid.ToString() }
+        { Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName, assignment.MainTask.Id.ToString() },
+        { Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName , notificationGuid.ToString() }
       };
       var email = new Notifications.Structures.Module.EmailMessage();
       email.Subject = subject;
@@ -128,29 +128,27 @@ namespace Sungero.Examples.Server
       email.CC = new List<string>();
       email.Bcc = new List<string>();
       email.Priority = 0;
-      var message = Notifications.PublicFunctions.Module.ConvertEmailMessageToMessage(email);
-      Notifications.PublicFunctions.Module.SendMessage(message, deliveryParameters, processingParameters);
+      Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
     }
 
-    private static void CreateResultNotification(string notificationGuid)
+    private static void CreateResultNotification(string mailingGuidParamName, string mailingGuid)
     {
       var entries = NotificationEntries.GetAll()
-        .Where(e => e.ExtendedProperties.Any(p => p.Value == notificationGuid)).ToList();
+        .Where(e => e.ExtendedProperties.Any(p => p.Name == mailingGuidParamName && p.Value == mailingGuid)).ToList();
       if (entries.Any(e => e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Posted
           && e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Error))
         return;
 
-      var notificationExtendedProperty = entries.FirstOrDefault().ExtendedProperties.FirstOrDefault();
-      var acquaintanceTask = RecordManagement.AcquaintanceTasks.Get(long.Parse(notificationExtendedProperty.Value));
-      var taskDate = acquaintanceTask.Created.Value.ToShortDateString();
-      var subject = Docflow.PublicFunctions.Module
-        .TrimQuotes($"Результат отправки уведомлений по задаче от {taskDate}: {acquaintanceTask.Subject}.");
-
+      var acquaintanceTaskId = entries.FirstOrDefault().ExtendedProperties
+        .FirstOrDefault(p => p.Name == Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName).Value;
+      var acquaintanceTask = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId));
+      var taskDate = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId)).Created.Value.ToShortDateString();
       var errorMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Error);
       var postedMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Posted);
       var notNotificatedCount = ((Workflow.Server.Task)acquaintanceTask).Assignments.Count(a
         => Employees.As(a.Performer).NotificationChannel == Examples.Employee.NotificationChannel.DoNotNotify);
 
+      var subject = Docflow.PublicFunctions.Module.TrimQuotes($"Результат отправки уведомлений по задаче от {taskDate}.");
       var activeText = Docflow.PublicFunctions.Module.
         TrimQuotes($"Уведомление о задании от {taskDate} {Hyperlinks.Get(acquaintanceTask)} доставлено.\n\n" +
                    $"Список:\n- Доставлено: {postedMessageCount} из {entries.Count}\n" +
