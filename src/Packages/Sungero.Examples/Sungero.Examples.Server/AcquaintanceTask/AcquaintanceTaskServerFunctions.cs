@@ -108,8 +108,7 @@ namespace Sungero.Examples.Server
       processingParameters.Callback.Method = "CreateResultNotification";
       processingParameters.Callback.Parameters = new Dictionary<string, string>
       {
-        {"MailingGuidParamName", Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName},
-        {"MailingGuidParamValue", notificationGuid.ToString() }
+        {Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName, notificationGuid.ToString() }
       };
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
@@ -131,10 +130,11 @@ namespace Sungero.Examples.Server
       Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
     }
 
-    private static void CreateResultNotification(string mailingGuidParamName, string mailingGuid)
+    private static void CreateResultNotification(string mailingGuid)
     {
       var entries = NotificationEntries.GetAll()
-        .Where(e => e.ExtendedProperties.Any(p => p.Name == mailingGuidParamName && p.Value == mailingGuid)).ToList();
+        .Where(e => e.ExtendedProperties.Any(p => p.Name == Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName 
+               && p.Value == mailingGuid)).ToList();
       if (entries.Any(e => e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Posted
           && e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Error))
         return;
