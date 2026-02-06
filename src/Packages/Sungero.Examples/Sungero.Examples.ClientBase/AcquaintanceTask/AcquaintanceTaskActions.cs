@@ -20,6 +20,5 @@ namespace Sungero.Examples.Client
     {
       return true;
     }
-
   }
 }
