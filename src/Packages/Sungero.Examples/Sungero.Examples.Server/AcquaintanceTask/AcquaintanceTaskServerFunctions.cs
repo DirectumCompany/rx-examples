@@ -13,8 +13,9 @@ namespace Sungero.Examples.Server
     /// <summary>
     /// Напомнить участникам о невыполненных заданиях.
     /// </summary>
+    /// <returns>Текст ошибки, если возникла.</returns>
     [Remote]
-    public virtual void RemindParticipants()
+    public virtual string RemindParticipants()
     {
       var incompleteAssignments = Sungero.Workflow.Assignments.GetAll()
         .Where(a => Equals(a.Task, _obj) && 
@@ -31,8 +32,55 @@ namespace Sungero.Examples.Server
         
         var subject = assignment.Subject;
         var text = $"У вас невыполненное задание: {assignment.Subject}";
-        this.SendNotificationToEmployee(performer, subject, text);
+        try
+        {
+          this.SendNotificationToEmployee(performer, subject, text);
+        }
+        catch (Exception ex)
+        {
+          Logger.Error(ex, $"RemindParticipants. Error while sending notification. Assignment={assignment.Id}, Employee={performer.Id}");
+          return this.GetServiceErrorMessage(ex.Message);
+        }
       }
+      
+      return string.Empty;
+    }
+    
+    /// <summary>
+    /// Получить текст ошибки из сообщения сервиса.
+    /// </summary>
+    /// <param name="errorText">Текст ошибки.</param>
+    /// <returns>Сообщение ошибки.</returns>
+    private string GetServiceErrorMessage(string errorText)
+    {
+      if (string.IsNullOrWhiteSpace(errorText))
+        return errorText;
+      
+      var jsonStart = errorText.IndexOf('{');
+      var jsonEnd = errorText.LastIndexOf('}');
+      if (jsonStart < 0 || jsonEnd <= jsonStart)
+        return errorText;
+      
+      var jsonText = errorText.Substring(jsonStart, jsonEnd - jsonStart + 1);
+      const string messageKey = "\"message\"";
+      var messageIndex = jsonText.IndexOf(messageKey, StringComparison.OrdinalIgnoreCase);
+      if (messageIndex < 0)
+        return errorText;
+      
+      var colonIndex = jsonText.IndexOf(':', messageIndex + messageKey.Length);
+      if (colonIndex < 0)
+        return errorText;
+      
+      var quoteStart = jsonText.IndexOf('"', colonIndex + 1);
+      if (quoteStart < 0)
+        return errorText;
+      
+      var quoteEnd = jsonText.IndexOf('"', quoteStart + 1);
+      if (quoteEnd <= quoteStart)
+        return errorText;
+      
+      var message = jsonText.Substring(quoteStart + 1, quoteEnd - quoteStart - 1);
+      return string.IsNullOrWhiteSpace(message) ? errorText : message;
     }
     
     /// <summary>

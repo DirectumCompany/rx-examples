@@ -11,7 +11,9 @@ namespace Sungero.Examples.Client
   {
     public virtual void RemindParticipants(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      Functions.AcquaintanceTask.Remote.RemindParticipants(_obj);
+      var error = Functions.AcquaintanceTask.Remote.RemindParticipants(_obj);
+      if (!string.IsNullOrWhiteSpace(error))
+        e.AddError(error);
     }
 
     public virtual bool CanRemindParticipants(Sungero.Domain.Client.CanExecuteActionArgs e)
