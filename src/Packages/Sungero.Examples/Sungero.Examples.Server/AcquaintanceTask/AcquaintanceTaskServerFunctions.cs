@@ -135,7 +135,7 @@ namespace Sungero.Examples.Server
         return;
 
       var acquaintanceTaskId = entries.FirstOrDefault().ExtendedProperties
-        .FirstOrDefault(p => p.Name == Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName)?.Value ?? 0;
+        .FirstOrDefault(p => p.Name == Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName)?.Value ?? "0";
       var acquaintanceTask = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId));
       var taskDate = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId)).Created.Value.ToShortDateString();
       var errorMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Error);
