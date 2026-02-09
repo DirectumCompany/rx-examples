@@ -121,7 +121,7 @@ namespace Sungero.Examples.Server
       var splittedEmails = Sungero.Commons.PublicFunctions.Module.SplitEmails(employee.Email);
       var addresses = string.Join(";", splittedEmails);
       email.Recipient = addresses;
-      email.Attachments = this.GetDocumentAttachments();
+      email.Attachments = this.GetTaskAttachments();
       Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
     }
 
@@ -129,54 +129,26 @@ namespace Sungero.Examples.Server
     /// Получить вложения документов для отправки по email.
     /// </summary>
     /// <returns>Список вложений.</returns>
-    private List<Sungero.Notifications.Structures.Module.IMailAttachment> GetDocumentAttachments()
+    private List<Sungero.Notifications.Structures.Module.IMailAttachment> GetTaskAttachments()
     {
       var attachments = new List<Sungero.Notifications.Structures.Module.IMailAttachment>();
       
       var mainDocument = _obj.DocumentGroup.OfficialDocuments.FirstOrDefault();
       if (mainDocument != null)
       {
-        var mainAttachment = this.CreateMailAttachment(mainDocument);
+        var mainAttachment = Notifications.PublicFunctions.Module.CreateMailAttachment(mainDocument);
         if (mainAttachment != null)
           attachments.Add(mainAttachment);
       }
       
       foreach (var addendum in _obj.AddendaGroup.OfficialDocuments)
       {
-        var addendumAttachment = this.CreateMailAttachment(addendum);
+        var addendumAttachment = Notifications.PublicFunctions.Module.CreateMailAttachment(addendum);
         if (addendumAttachment != null)
           attachments.Add(addendumAttachment);
       }
 
       return attachments;
-    }
-
-    /// <summary>
-    /// Создать почтовое вложение из документа.
-    /// </summary>
-    /// <param name="document">Документ.</param>
-    /// <returns>Почтовое вложение или null, если у документа нет версий.</returns>
-    private Sungero.Notifications.Structures.Module.IMailAttachment CreateMailAttachment(Sungero.Docflow.IOfficialDocument document)
-    {
-      if (document == null || !document.Versions.Any())
-        return null;
-
-      var version = document.LastVersion;
-      var attachment = Sungero.Notifications.Structures.Module.MailAttachment.Create();
-
-      using (var memory = new System.IO.MemoryStream())
-      {
-        using (var sourceStream = version.Body.Read())
-        {
-          sourceStream.CopyTo(memory);
-        }
-        attachment.Content = memory.ToArray();
-      }
-
-      var extension = version.BodyAssociatedApplication.Extension;
-      attachment.Name = string.Format("{0}.{1}", document.Name, extension);
-      attachment.MediaType = "application/octet-stream";
-      return attachment;
     }
 
     private static void CreateResultNotification(string mailingGuid)
