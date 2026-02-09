@@ -11,12 +11,20 @@ namespace Sungero.Examples.Client
   {
     public virtual void RemindParticipants(Sungero.Domain.Client.ExecuteActionArgs e)
     {
-      Functions.AcquaintanceTask.Remote.RemindParticipants(_obj);
+      try
+      {
+        Functions.AcquaintanceTask.Remote.RemindParticipants(_obj);
+      }
+      catch (Exception ex)
+      {
+        Dialogs.ShowMessage(ex.Message, MessageType.Error);
+      }
     }
 
     public virtual bool CanRemindParticipants(Sungero.Domain.Client.CanExecuteActionArgs e)
     {
       return true;
     }
+
   }
 }

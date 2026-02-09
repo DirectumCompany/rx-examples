@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
+using Sungero.CoreEntities;
+using Sungero.Examples.AcquaintanceTask;
 using Sungero.Notifications;
 using Sungero.Workflow;
 
@@ -19,22 +21,22 @@ namespace Sungero.Examples.Server
         .Where(a => Equals(a.Task, _obj) &&
                a.Status == Sungero.Workflow.AssignmentBase.Status.InProcess)
         .ToList();
-
+      
       Logger.Debug($"RemindParticipants. Found {incompleteAssignments.Count} incomplete assignments");
-
       var notificationGuid = Guid.NewGuid();
+      
       foreach (var assignment in incompleteAssignments)
       {
         var performer = Sungero.Examples.Employees.As(assignment.Performer);
         if (performer == null)
           continue;
-
+        
         var subject = assignment.Subject;
         var text = $"У вас невыполненное задание: {assignment.Subject}";
         this.SendNotificationToEmployee(performer, subject, text, assignment, notificationGuid);
       }
     }
-
+    
     /// <summary>
     /// Отправить уведомление сотруднику.
     /// </summary>
@@ -46,15 +48,15 @@ namespace Sungero.Examples.Server
     {
       if (employee == null)
         return;
-
+      
       var channel = employee.NotificationChannel;
-
+      
       if (channel == null || channel == Examples.Employee.NotificationChannel.DoNotNotify)
       {
         Logger.Debug($"SendNotificationToEmployee. Cannot send message to Employee={employee.Id} because of his notify channel settings");
         return;
       }
-
+      
       Logger.Debug($"SendNotificationToEmployee. Send message to Employee={employee.Id} via channel={channel.Value}");
       if (channel == Examples.Employee.NotificationChannel.Email)
       {
