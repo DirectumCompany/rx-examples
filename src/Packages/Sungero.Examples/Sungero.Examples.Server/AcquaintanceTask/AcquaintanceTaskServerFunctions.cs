@@ -174,8 +174,8 @@ namespace Sungero.Examples.Server
 
       var subject = Docflow.PublicFunctions.Module.TrimQuotes($"Результат отправки уведомлений по задаче от {taskDate}.");
       var activeText = Docflow.PublicFunctions.Module.
-        TrimQuotes($"Уведомление о задании от {taskDate} {Hyperlinks.Get(acquaintanceTask)} доставлено.\n\n" +
-                   $"Список:\n- Доставлено: {postedMessageCount} из {entries.Count}\n" +
+        TrimQuotes($"Уведомления о задании от {taskDate} {Hyperlinks.Get(acquaintanceTask)} отправлены.\n\n" +
+                   $"Список:\n- Отправлено: {postedMessageCount} из {entries.Count}\n" +
                    $"- Ошибок: {errorMessageCount}\n- Отключены уведомления: {notNotificatedCount}\n");
       var task = SimpleTasks.CreateWithNotices(subject, acquaintanceTask.Author);
       task.ActiveText = activeText;
