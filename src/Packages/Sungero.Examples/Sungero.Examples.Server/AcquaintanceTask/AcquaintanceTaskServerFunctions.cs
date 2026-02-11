@@ -123,7 +123,34 @@ namespace Sungero.Examples.Server
       var splittedEmails = Sungero.Commons.PublicFunctions.Module.SplitEmails(employee.Email);
       var addresses = string.Join(";", splittedEmails);
       email.Recipient = addresses;
+      email.Attachments = this.GetTaskAttachments();
       Notifications.PublicFunctions.Module.SendEmail(email, deliveryParameters, processingParameters);
+    }
+
+    /// <summary>
+    /// Получить вложения документов для отправки по email.
+    /// </summary>
+    /// <returns>Список вложений.</returns>
+    private List<Sungero.Notifications.Structures.Module.IMailAttachment> GetTaskAttachments()
+    {
+      var attachments = new List<Sungero.Notifications.Structures.Module.IMailAttachment>();
+      
+      var mainDocument = _obj.DocumentGroup.OfficialDocuments.FirstOrDefault();
+      if (mainDocument != null)
+      {
+        var mainAttachment = Notifications.PublicFunctions.Module.CreateMailAttachment(mainDocument);
+        if (mainAttachment != null)
+          attachments.Add(mainAttachment);
+      }
+      
+      foreach (var addendum in _obj.AddendaGroup.OfficialDocuments)
+      {
+        var addendumAttachment = Notifications.PublicFunctions.Module.CreateMailAttachment(addendum);
+        if (addendumAttachment != null)
+          attachments.Add(addendumAttachment);
+      }
+
+      return attachments;
     }
 
     private static void CreateResultNotification(string mailingGuid)
