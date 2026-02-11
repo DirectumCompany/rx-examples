@@ -159,16 +159,16 @@ namespace Sungero.Examples.Server
         .Where(e => e.ExtendedProperties.Any(p => p.Name == Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName &&
                                                   p.Value == mailingGuid))
         .ToList();
-      if (entries.Any(e => e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Posted &&
-                           e.ProcessingStatus != Notifications.NotificationEntry.ProcessingStatus.Error))
+      if (entries.Any(e => e.MessageStatus != Notifications.PublicConstants.NotificationEntry.MessageStatus.Delivered &&
+                           e.MessageStatus != Notifications.PublicConstants.NotificationEntry.MessageStatus.Error))
         return;
 
       var acquaintanceTaskId = entries.FirstOrDefault().ExtendedProperties
         .FirstOrDefault(p => p.Name == Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName)?.Value ?? "0";
       var acquaintanceTask = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId));
       var taskDate = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId)).Created.Value.ToShortDateString();
-      var errorMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Error);
-      var postedMessageCount = entries.Count(e => e.ProcessingStatus == Notifications.NotificationEntry.ProcessingStatus.Posted);
+      var errorMessageCount = entries.Count(e => e.MessageStatus == Notifications.PublicConstants.NotificationEntry.MessageStatus.Error);
+      var postedMessageCount = entries.Count(e => e.MessageStatus == Notifications.PublicConstants.NotificationEntry.MessageStatus.Delivered);
       var notNotificatedCount = ((Workflow.Server.Task)acquaintanceTask).Assignments
         .Count(a => Employees.As(a.Performer).NotificationChannel == Examples.Employee.NotificationChannel.DoNotNotify);
 
