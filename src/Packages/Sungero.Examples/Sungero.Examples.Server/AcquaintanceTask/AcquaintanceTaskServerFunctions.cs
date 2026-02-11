@@ -106,12 +106,14 @@ namespace Sungero.Examples.Server
     {
       var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultEmailDeliveryParameters();
       var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
-      processingParameters.Callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
-      processingParameters.Callback.Method = "CreateResultNotification";
-      processingParameters.Callback.Parameters = new Dictionary<string, string>
+      var callback = Notifications.PublicFunctions.Module.CreateDefaultCallback();
+      callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
+      callback.Method = "CreateResultNotification";
+      callback.Parameters = new Dictionary<string, string>()
       {
         { Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName, notificationGuid.ToString() }
       };
+      processingParameters.Callback = callback;
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
         { Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName, assignment.MainTask.Id.ToString() },
