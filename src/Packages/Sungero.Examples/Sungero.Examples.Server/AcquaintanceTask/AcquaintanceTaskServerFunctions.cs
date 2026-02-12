@@ -108,7 +108,7 @@ namespace Sungero.Examples.Server
       var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
       processingParameters.Callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
       processingParameters.Callback.Method = "CreateResultNotification";
-      processingParameters.Callback.Parameters = new Dictionary<string, string>()
+      processingParameters.Callback.Parameters = new Dictionary<string, string>
       {
         { Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName, notificationGuid.ToString() }
       };
