@@ -89,8 +89,8 @@ namespace Sungero.Examples.Server
 
     private void SendSms(IEmployee employee, string text, IAssignment assignment, Guid notificationGuid)
     {
-      var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultSmsDeliveryParameters();
-      var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
+      var deliveryParameters = Notifications.PublicFunctions.Module.CreateSmsDeliveryParameters();
+      var processingParameters = Notifications.PublicFunctions.Module.CreateProcessingParameters();
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
         { Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName, assignment.MainTask.Id.ToString() },
@@ -104,8 +104,8 @@ namespace Sungero.Examples.Server
 
     private void SendEmail(IEmployee employee, string subject, string text, IAssignment assignment, Guid notificationGuid)
     {
-      var deliveryParameters = Notifications.PublicFunctions.Module.CreateDefaultEmailDeliveryParameters();
-      var processingParameters = Notifications.PublicFunctions.Module.CreateDefaultProcessingParameters();
+      var deliveryParameters = Notifications.PublicFunctions.Module.CreateEmailDeliveryParameters();
+      var processingParameters = Notifications.PublicFunctions.Module.CreateProcessingParameters();
       processingParameters.Callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
       processingParameters.Callback.Method = "CreateResultNotification";
       processingParameters.Callback.Parameters = new Dictionary<string, string>
