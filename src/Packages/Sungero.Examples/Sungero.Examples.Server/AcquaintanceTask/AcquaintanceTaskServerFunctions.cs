@@ -153,8 +153,9 @@ namespace Sungero.Examples.Server
       return attachments;
     }
 
-    private static void CreateResultNotification(string mailingGuid)
+    private static void CreateResultNotification(IDictionary<string, string> parameters)
     {
+      var mailingGuid = parameters[Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName];
       var entries = NotificationEntries.GetAll()
         .Where(e => e.ExtendedProperties.Any(p => p.Name == Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName &&
                                                   p.Value == mailingGuid))
