@@ -21,6 +21,31 @@
     "Versions": []
   },
   "FormViewUuid": "0f89464f-0e99-41e0-b83c-382defbd7935",
+  "Functions": [
+    {
+      "Name": "GetContractualApprovedMarkAsHtml",
+      "ClassFullName": "Sungero.Examples.Server.ContractualDocumentFunctions",
+      "IsClrPublic": true,
+      "IsVirtual": true,
+      "Parameters": [
+        {
+          "Name": "versionId",
+          "ParameterType": "global::System.Int64",
+          "ParameterTypeFullName": "System.Int64"
+        }
+      ],
+      "ReturnType": "global::System.String",
+      "ReturnTypeFullName": "System.String"
+    },
+    {
+      "Name": "UpdateContractPaginalApproveMark",
+      "ClassFullName": "Sungero.Examples.Server.ContractualDocumentFunctions",
+      "IsClrPublic": true,
+      "IsVirtual": true,
+      "ReturnType": "void",
+      "ReturnTypeFullName": "System.Void"
+    }
+  ],
   "IconResourcesKeys": [],
   "IsAbstract": true,
   "LayeredFromGuid": "59079f7f-a326-4947-bbd6-0ae6dfb5f59b",
