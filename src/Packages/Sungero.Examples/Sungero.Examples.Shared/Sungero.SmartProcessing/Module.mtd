@@ -109,6 +109,7 @@
     }
   ],
   "IsolatedAreas": [],
+  "IsVisible": false,
   "Jobs": [
     {
       "NameGuid": "4289f5c9-eac2-4c51-8fab-8fdd917e6d73",
@@ -156,7 +157,7 @@
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
   "SpecialFolders": [],
-  "Version": "26.1.0.11",
+  "Version": "26.1.0.33",
   "Widgets": [],
   "Versions": [
     {

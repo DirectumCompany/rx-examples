@@ -5,6 +5,20 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "a3dfa571-586d-4982-88ba-b5c447c1dbbd",
+      "Name": "UpdateNonInteractiveUsersRoleMembers",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "3cd7bef8-bdaf-40ee-a1f3-cc8ef9459372",
+          "Name": "UserIds",
+          "ParameterType": "String"
+        }
+      ]
+    },
+    {
       "NameGuid": "dbbabb31-4c23-4551-8687-c153d2051620",
       "Name": "UpdateEmployeeName",
       "DelayPeriod": 15,
@@ -199,7 +213,7 @@
       "DelayPeriod": 15,
       "DelayStrategy": "ExponentialDelayStrategy",
       "IsAncestorMetadata": true,
-      "MaxRetryCount": 5,
+      "MaxRetryCount": 10,
       "Parameters": [
         {
           "NameGuid": "2a69f54b-09f2-42af-a355-ccac4f1b773c",
@@ -362,7 +376,7 @@
       ]
     }
   ],
-  "Version": "26.1.0.11",
+  "Version": "26.1.0.33",
   "Widgets": [],
   "Versions": [
     {
