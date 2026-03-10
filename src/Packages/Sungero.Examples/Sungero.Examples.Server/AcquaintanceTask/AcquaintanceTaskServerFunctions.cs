@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
-using Sungero.CoreEntities;
-using Sungero.Examples.AcquaintanceTask;
 using Sungero.Notifications;
+using Sungero.Notifications.PublicFunctions;
 using Sungero.Workflow;
 
 namespace Sungero.Examples.Server
@@ -91,6 +90,9 @@ namespace Sungero.Examples.Server
     {
       var deliveryParameters = Notifications.PublicFunctions.Module.CreateSmsDeliveryParameters();
       var processingParameters = Notifications.PublicFunctions.Module.CreateProcessingParameters();
+      processingParameters.TrackProcess = true;
+      processingParameters.StoreHistory = false;
+      processingParameters.EncryptData = true;
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
         { Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName, assignment.MainTask.Id.ToString() },
@@ -106,6 +108,9 @@ namespace Sungero.Examples.Server
     {
       var deliveryParameters = Notifications.PublicFunctions.Module.CreateEmailDeliveryParameters();
       var processingParameters = Notifications.PublicFunctions.Module.CreateProcessingParameters();
+      processingParameters.TrackProcess = true;
+      processingParameters.StoreHistory = false;
+      processingParameters.EncryptData = true;
       processingParameters.Callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
       processingParameters.Callback.Method = "CreateResultNotification";
       processingParameters.Callback.Parameters = new Dictionary<string, string>
@@ -157,15 +162,27 @@ namespace Sungero.Examples.Server
     {
       var mailingGuid = parameters[Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName];
       var entries = NotificationEntries.GetAll()
-        .Where(e => e.ExtendedProperties.Any(p => p.Name == Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName &&
+        .Where(e => e.CallbackProperties.Any(p => p.Key == Constants.RecordManagement.AcquaintanceTask.MailingGuidParamName &&
                                                   p.Value == mailingGuid))
         .ToList();
       if (entries.Any(e => e.MessageStatus != Notifications.PublicConstants.NotificationEntry.MessageStatus.Delivered &&
                            e.MessageStatus != Notifications.PublicConstants.NotificationEntry.MessageStatus.Error))
         return;
+        
+      var entry = entries.FirstOrDefault();
+      if (entry == null)
+        return;
 
-      var acquaintanceTaskId = entries.FirstOrDefault().ExtendedProperties
-        .FirstOrDefault(p => p.Name == Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName)?.Value ?? "0";
+      var acquaintanceTaskId = string.Empty;
+      if (entry.EncryptData == true)
+       acquaintanceTaskId = NotificationEntry
+          .GetDecryptedExtendedPropertyValue(entry, Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName);
+      else 
+        acquaintanceTaskId = entry.ExtendedProperties
+          .FirstOrDefault(p => p.Name == Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName)?.Value ?? string.Empty;
+      if (acquaintanceTaskId == string.Empty)
+        return;
+
       var acquaintanceTask = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId));
       var taskDate = RecordManagement.AcquaintanceTasks.Get(long.Parse(acquaintanceTaskId)).Created.Value.ToShortDateString();
       var errorMessageCount = entries.Count(e => e.MessageStatus == Notifications.PublicConstants.NotificationEntry.MessageStatus.Error);
