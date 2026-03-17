@@ -92,7 +92,7 @@ namespace Sungero.Examples.Server
       var processingParameters = Notifications.PublicFunctions.Module.CreateProcessingParameters();
       processingParameters.TrackProcess = true;
       processingParameters.StoreHistory = true;
-      processingParameters.EncryptData = true;
+      processingParameters.EncryptData = false;
       processingParameters.ExtendedProperties = new Dictionary<string, string>
       {
         { Constants.RecordManagement.AcquaintanceTask.AcquaintanceTaskIdParamName, assignment.MainTask.Id.ToString() },
@@ -110,7 +110,7 @@ namespace Sungero.Examples.Server
       var processingParameters = Notifications.PublicFunctions.Module.CreateProcessingParameters();
       processingParameters.TrackProcess = true;
       processingParameters.StoreHistory = true;
-      processingParameters.EncryptData = true;
+      processingParameters.EncryptData = false;
       processingParameters.Callback.ClassName = "Sungero.Examples.Server.AcquaintanceTaskFunctions";
       processingParameters.Callback.Method = "CreateResultNotification";
       processingParameters.Callback.Parameters = new Dictionary<string, string>
