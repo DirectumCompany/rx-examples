@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using Sungero.Notifications.Structures.Module;
 
 namespace Sungero.Examples.Module.Docflow.Server
 {
@@ -105,16 +104,18 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <returns>Текст запроса.</returns>
     public override string GetStoragePolicySettingsQuery(DateTime now)
     {
-      return string.Format(Docflow.Queries.Module.CreateStoragePolicySettings, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName, now.ToString("yyyy-MM-dd HH:mm:ss"));
+      return string.Format(Docflow.Queries.Module.CreateStoragePolicySettings, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName);
     }
     
     /// <summary>
-    /// Перекрытие. Получить запрос получения документов для перемещения.
+    /// Перекрытие. Получить запрос отбора документов для переноса в заданном диапазоне Id.
     /// </summary>
+    /// <param name="fromId">Нижняя граница диапазона Id (не включительно).</param>
+    /// <param name="batchUpperBoundId">Верхняя граница диапазона Id (включительно).</param>
     /// <returns>Текст запроса.</returns>
-    public override string GetDocumentsToTransferQuery()
+    public override string GetDocumentsToTransferWithIdRangeQuery(long fromId, long batchUpperBoundId)
     {
-      return string.Format(Docflow.Queries.Module.SelectDocumentsToTransfer, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName);
+      return string.Format(Docflow.Queries.Module.SelectDocumentsToTransferWithIdRange, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName, fromId, batchUpperBoundId);
     }
     
     /// <summary>
@@ -127,28 +128,6 @@ namespace Sungero.Examples.Module.Docflow.Server
       roles.Add(Sungero.Examples.ApprovalRole.Type.InitDepEmpl);
       
       return roles;
-    }
-
-    /// <summary>
-    /// Перекрытие. Добавить отслеживание отправки к параметрам обработки рассылки о новых и просроченных заданиях.
-    /// </summary>
-    /// <returns>Параметры обработки рассылки о новых и просроченных заданиях.</returns>
-    public override IProcessingParameters CreateAssignmentsMailingProcessingParameters()
-    {
-      var parameters = base.CreateAssignmentsMailingProcessingParameters();
-      parameters.TrackProcess = true;
-      return parameters;
-    }
-
-    /// <summary>
-    /// Перекрытие. Добавить отслеживание отправки к параметрам обработки рассылки со сводкой о заданиях.
-    /// </summary>
-    /// <returns>Параметры обработки рассылки со сводкой о заданиях.</returns>
-    public override IProcessingParameters CreateSummaryMailingProcessingParameters()
-    {
-      var parameters = base.CreateSummaryMailingProcessingParameters();
-      parameters.TrackProcess = true;
-      return parameters;
     }
   }
 }

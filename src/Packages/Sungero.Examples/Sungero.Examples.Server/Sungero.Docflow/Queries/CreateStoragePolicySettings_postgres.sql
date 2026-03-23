@@ -8,26 +8,26 @@ END $$;
 SELECT r.Storage, rdk.DocumentKind,
   CASE 
     WHEN r.DocDateType = 'DocumentDate' 
-    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
-    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+    THEN @now - r.DaysToMove * INTERVAL '1 day' 
+    ELSE @maxDate 
   END AS DocumentDate,
   CASE 
     WHEN r.DocDateType = 'Modified' 
-    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
-    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+    THEN @now - r.DaysToMove * INTERVAL '1 day' 
+    ELSE @maxDate 
   END AS Modified,
   CASE 
     WHEN r.DocDateType = 'LastRead' 
-    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
-    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
-  END AS LastRead,																			  
+    THEN @now - r.DaysToMove * INTERVAL '1 day' 
+    ELSE @maxDate 
+  END AS LastRead,
   CASE 
     WHEN r.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef' 
     THEN r.Priority 
     ELSE r.Priority + (SELECT COALESCE(MAX(r2.Priority), 0) FROM Sungero_Docflow_StoragePolicy r2 WHERE r2.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef') 
   END AS Priority,
   CASE 
-    WHEN COALESCE(r.NextRetention, '{1}') <= '{1}' 
+    WHEN COALESCE(r.NextRetention, @now) <= @now 
     THEN 1 
     ELSE 0
   END AS NeedRetention
@@ -41,18 +41,18 @@ INSERT INTO {0}
 SELECT r.Storage, rdk.Id,
   CASE 
     WHEN r.DocDateType = 'DocumentDate' 
-    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
-    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+    THEN @now - r.DaysToMove * INTERVAL '1 day' 
+    ELSE @maxDate 
   END AS DocumentDate,
   CASE 
     WHEN r.DocDateType = 'Modified' 
-    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
-    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+    THEN @now - r.DaysToMove * INTERVAL '1 day' 
+    ELSE @maxDate 
   END AS Modified,
   CASE 
     WHEN r.DocDateType = 'LastRead' 
-    THEN TO_TIMESTAMP('{1}','YYYY-MM-DD HH24:MI:SS') - r.DaysToMove * INTERVAL '1 day' 
-    ELSE TO_TIMESTAMP('2100-01-01 00:00:00.000','YYYY-MM-DD HH24:MI:SS') 
+    THEN @now - r.DaysToMove * INTERVAL '1 day' 
+    ELSE @maxDate 
   END AS LastRead,
   CASE 
     WHEN r.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef' 
@@ -60,7 +60,7 @@ SELECT r.Storage, rdk.Id,
     ELSE r.Priority + (SELECT COALESCE(MAX(r2.Priority), 0) FROM Sungero_Docflow_StoragePolicy r2 WHERE r2.Discriminator = '9fed5653-77e7-4543-b071-6586033907ef') 
   END AS Priority,
   CASE 
-    WHEN COALESCE(r.NextRetention, '{1}') <= '{1}' 
+    WHEN COALESCE(r.NextRetention, @now) <= @now 
     THEN 1 
     ELSE 0 
   END AS NeedRetention
@@ -69,3 +69,10 @@ SELECT r.Storage, rdk.Id,
     ON 1=1
     WHERE r.Status = 'Active'
       AND NOT EXISTS (SELECT 1 FROM Sungero_Docflow_SPolicyDocKind k WHERE k.StoragePolicy = r.Id);
+
+INSERT INTO {0}
+SELECT s.Id, rdk.Id, @maxDate, @maxDate, @maxDate, -1, 1
+  FROM Sungero_Core_Storage s
+  JOIN Sungero_Docflow_DocumentKind rdk
+    ON 1=1
+  WHERE s.IsDefault = TRUE;
