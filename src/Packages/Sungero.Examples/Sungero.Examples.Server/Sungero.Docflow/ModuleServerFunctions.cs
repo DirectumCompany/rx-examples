@@ -104,16 +104,18 @@ namespace Sungero.Examples.Module.Docflow.Server
     /// <returns>Текст запроса.</returns>
     public override string GetStoragePolicySettingsQuery(DateTime now)
     {
-      return string.Format(Docflow.Queries.Module.CreateStoragePolicySettings, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName, now.ToString("yyyy-MM-dd HH:mm:ss"));
+      return string.Format(Docflow.Queries.Module.CreateStoragePolicySettings, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName);
     }
     
     /// <summary>
-    /// Перекрытие. Получить запрос получения документов для перемещения.
+    /// Перекрытие. Получить запрос отбора документов для переноса в заданном диапазоне Id.
     /// </summary>
+    /// <param name="fromId">Нижняя граница диапазона Id (не включительно).</param>
+    /// <param name="batchUpperBoundId">Верхняя граница диапазона Id (включительно).</param>
     /// <returns>Текст запроса.</returns>
-    public override string GetDocumentsToTransferQuery()
+    public override string GetDocumentsToTransferWithIdRangeQuery(long fromId, long batchUpperBoundId)
     {
-      return string.Format(Docflow.Queries.Module.SelectDocumentsToTransfer, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName);
+      return string.Format(Docflow.Queries.Module.SelectDocumentsToTransferWithIdRange, Sungero.Docflow.Constants.Module.StoragePolicySettingsTableName, fromId, batchUpperBoundId);
     }
     
     /// <summary>
