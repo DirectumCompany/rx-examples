@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Sungero.Core;
 using Sungero.CoreEntities;
-using Sungero.Notifications.Structures.Module;
 
 namespace Sungero.Examples.Module.Docflow.Server
 {
@@ -129,28 +128,6 @@ namespace Sungero.Examples.Module.Docflow.Server
       roles.Add(Sungero.Examples.ApprovalRole.Type.InitDepEmpl);
       
       return roles;
-    }
-
-    /// <summary>
-    /// Перекрытие. Добавить отслеживание отправки к параметрам обработки рассылки о новых и просроченных заданиях.
-    /// </summary>
-    /// <returns>Параметры обработки рассылки о новых и просроченных заданиях.</returns>
-    public override IProcessingParameters CreateAssignmentsMailingProcessingParameters()
-    {
-      var parameters = base.CreateAssignmentsMailingProcessingParameters();
-      parameters.TrackProcess = true;
-      return parameters;
-    }
-
-    /// <summary>
-    /// Перекрытие. Добавить отслеживание отправки к параметрам обработки рассылки со сводкой о заданиях.
-    /// </summary>
-    /// <returns>Параметры обработки рассылки со сводкой о заданиях.</returns>
-    public override IProcessingParameters CreateSummaryMailingProcessingParameters()
-    {
-      var parameters = base.CreateSummaryMailingProcessingParameters();
-      parameters.TrackProcess = true;
-      return parameters;
     }
   }
 }
