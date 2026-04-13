@@ -5,6 +5,34 @@
   "AssociatedGuid": "15234f2e-0858-4733-a9cb-eaa6ed2b2a5e",
   "AsyncHandlers": [
     {
+      "NameGuid": "fd406838-77d8-4e99-a7e0-afe5b80c95ca",
+      "Name": "DownloadCounterpartyFPoA",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "c694c25f-7c0c-4e33-af38-358a5a747fa5",
+          "Name": "QueueItemId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
+      "NameGuid": "9ff9056c-d30f-4a18-a15f-d2cbbaae35f0",
+      "Name": "GrantAccessRightsResilient",
+      "DelayPeriod": 15,
+      "DelayStrategy": "ExponentialDelayStrategy",
+      "IsAncestorMetadata": true,
+      "Parameters": [
+        {
+          "NameGuid": "bd679b47-6be1-41f4-b250-f90ca1fd8221",
+          "Name": "QueueItemId",
+          "ParameterType": "LongInteger"
+        }
+      ]
+    },
+    {
       "NameGuid": "91e037c0-0ac9-412a-a283-1567d122af49",
       "Name": "PrepareDocumentBodyForMarkEditor",
       "DelayPeriod": 15,
@@ -417,6 +445,13 @@
   "IsVisible": false,
   "Jobs": [
     {
+      "NameGuid": "486eaff5-ffe2-44ae-b5eb-256b8a4a7197",
+      "Name": "PrepareIndexingDataForFullTextSearch",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T20:00:00"
+    },
+    {
       "NameGuid": "bd4d35ec-198e-4868-9240-305c00653785",
       "Name": "DeleteMarkEditorSessions",
       "IsAncestorMetadata": true,
@@ -497,17 +532,57 @@
     "HtmlStampTemplateForSignatureCustom",
     "RoleInitiatorDepartmentEmployees"
   ],
-  "SpecialFolders": [],
-  "Version": "25.3.0.48",
+  "SpecialFolders": [
+    {
+      "NameGuid": "113427f5-1683-4bb8-980c-ba4bcef50e66",
+      "Name": "ApprovalRules",
+      "DisplayType": "Module",
+      "FolderViewUuid": "47d93890-574d-4b4d-9eb2-2d45b2ed0202",
+      "IconPath": "ApprovalRules_113427f516834bb8980cba4bcef50e66.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": false,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "371c81c3-d2c8-4bfb-8e86-39470d456c62",
+      "Name": "StoragePolicy",
+      "DisplayType": "Module",
+      "FolderViewUuid": "36025753-025a-4367-9d11-99d72da01e75",
+      "IconPath": "StoragePolicy_371c81c3d2c84bfb8e8639470d456c62.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": false,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    },
+    {
+      "NameGuid": "4edf28d5-32e2-440d-9f5c-138d99ad0324",
+      "Name": "PowerOfAttorneyList",
+      "DisplayType": "Module",
+      "FolderViewUuid": "52961bee-7d0d-46f2-a1fe-071a52ec6a1d",
+      "IconPath": "PowerOfAttorneyList_4edf28d532e2440d9f5c138d99ad0324.ico",
+      "IsAncestorMetadata": true,
+      "IsShow": true,
+      "NeedShowMarkedCount": false,
+      "Overridden": [
+        "FolderViewUuid"
+      ]
+    }
+  ],
+  "Version": "26.1.0.53",
   "Widgets": [],
   "Versions": [
     {
       "Type": "LayerModuleMetadata",
-      "Number": 11
+      "Number": 12
     },
     {
       "Type": "ModuleMetadata",
-      "Number": 11
+      "Number": 12
     }
   ]
 }
