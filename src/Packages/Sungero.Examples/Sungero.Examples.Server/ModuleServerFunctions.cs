@@ -20,7 +20,7 @@ namespace Sungero.Examples.Server
     /// <returns>Входящее письмо.</returns>
     [Public]
     public virtual IOfficialDocument CreateIncomingLetter(IDocumentInfo documentInfo,
-                                                          IEmployee responsible)
+                                                          Sungero.Examples.IEmployee responsible)
     {
       // Входящее письмо.
       var document = RecordManagement.IncomingLetters.Create();

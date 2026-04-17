@@ -1,0 +1,15 @@
+{
+  "Button_Caption_c7c0354988494f7fb5ace7e180459311": {
+    "en-US": "Remind about acquaintance",
+    "ru-RU": "Напомнить о заданиях"
+  },
+  "Button_Description_c7c0354988494f7fb5ace7e180459311": {
+    "en-US": "Remind participants about document to acquaint",
+    "ru-RU": "Напомнить участникам об ознакомлении с документом"
+  },
+  "Description": {},
+  "Name": {
+    "en-US": "AcquaintanceTask",
+    "ru-RU": "Задача на ознакомление"
+  }
+}
