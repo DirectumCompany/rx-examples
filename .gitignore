@@ -45,3 +45,6 @@ _ConfigSettings.xml
 
 *.g.xml
 Libraries.json
+
+
+*.lscache
