@@ -63,7 +63,10 @@
 &lt;html xmlns="http://www.w3.org/1999/xhtml"&gt;
 &lt;head&gt;
 &lt;style type="text/css"&gt;
-.box1 {
+.mark-body {
+  margin: 0;
+}
+.mark-table {
   padding-left: 1.5px;
   padding-right: 1.5px;
   padding-top: 5px;
@@ -73,29 +76,54 @@
   width: 50mm;
   height: 17mm;
 }
-.small-td {
+.mark-cell {
   font-size: 6pt;
   line-height: 6pt;
 }
-.tg1{font-size:6pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;line-height:1;color: #6904db;white-space: pre-wrap}
-.tg2{font-size:8.25pt;font-family:Arial, "Segoe UI", Consolas, Calibri, monospace;text-align:center;line-height:1;color: #6904db;white-space: pre-wrap}
- 
+.mark-department-cell-text {
+  margin-left: 3.75px;
+  margin-right: 3.75px;
+  font-size: 8.25pt;
+  font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
+  text-align: center;
+  line-height: 1;
+  color: #6904db;
+  white-space: pre-wrap;
+}
+.mark-reg-number-cell-text {
+  margin-left: 1.5px;
+  margin-right:1.5px;
+  font-size: 6pt;
+  font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
+  line-height: 1;
+  color: #6904db;
+  white-space: pre-wrap;
+}
+.mark-reg-date-cell-text {
+  margin-left: 1.5px;
+  margin-right: 1.5px;
+  text-align: right;
+  font-size: 6pt;
+  font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
+  line-height: 1;
+  color: #6904db;
+  white-space: pre-wrap;
+}
 &lt;/style&gt;
 &lt;/head&gt;
-&lt;body style="margin: 0"&gt;
- 
-&lt;table class="box1"&gt;
+&lt;body class="mark-body"&gt;
+&lt;table class="mark-table"&gt;
 &lt;tr&gt;
-  &lt;td class="small-td" colspan="2"&gt;  
-    &lt;div class="tg2" style="margin-left:3.75px;margin-right:3.75px"&gt;{Department}&lt;/div&gt;
+  &lt;td class="mark-cell" colspan="2"&gt;  
+    &lt;div class="mark-department-cell-text"&gt;{Department}&lt;/div&gt;
   &lt;/td&gt;
 &lt;/tr&gt;
 &lt;tr&gt;
-  &lt;td class="small-td"&gt;
-    &lt;div class="tg1" style="margin-left:1.5px;margin-right:1.5px"&gt;Reg No {RegNumber}&lt;/div&gt;
+  &lt;td class="mark-cell"&gt;
+    &lt;div class="mark-reg-number-cell-text"&gt;Reg No {RegNumber}&lt;/div&gt;
   &lt;/td&gt;  
- &lt;td class="small-td"&gt;
-&lt;div class="tg1" style="margin-left:1.5px;margin-right:1.5px;text-align:right"&gt;{RegDate}&lt;/div&gt;
+ &lt;td class="mark-cell"&gt;
+&lt;div class="mark-reg-date-cell-text"&gt;{RegDate}&lt;/div&gt;
  &lt;/td&gt;
 &lt;/tr&gt;
 &lt;/table&gt;
