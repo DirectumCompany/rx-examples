@@ -69,7 +69,7 @@
 .mark-table {
   padding: 3px;
   border: 1px solid #d7d7d7;
-  border-color: #003f75;
+  border-color: #9400D3;
 }
 .mark-title-cell {
   font-size: 6pt;
@@ -82,20 +82,20 @@
   font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
   text-align: center;
   line-height: 8pt;
-  color: #003f75;
+  color: #9400D3;
 }
 .mark-cell {
   font-size: 8pt;
   font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
   line-height: 8pt;
-  color: #003f75;
+  color: #9400D3;
 }
 .mark-signatory-cell {
   font-weight: bold;
   font-size: 8pt;
   font-family: Arial, "Segoe UI", Consolas, Calibri, monospace;
   line-height: 8pt;
-  color: #003f75;
+  color: #9400D3;
 }
 &lt;/style&gt;
 &lt;/head&gt;
