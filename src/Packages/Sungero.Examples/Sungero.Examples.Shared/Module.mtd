@@ -101,6 +101,7 @@
   "IsolatedAssemblyName": "Sungero.Examples.Isolated",
   "IsolatedNamespace": "Sungero.Examples.Isolated",
   "OrderedSpecialFolders": [],
+  "OverrideSuffix": "Sungero",
   "PublicFunctions": [
     {
       "Name": "CreateIncomingLetter",
@@ -136,7 +137,7 @@
   "Versions": [
     {
       "Type": "SolutionMetadata",
-      "Number": 12
+      "Number": 13
     },
     {
       "Type": "ModuleMetadata",

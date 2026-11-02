@@ -1,0 +1,12 @@
+root = true
+
+[*.cs]
+charset = utf-8
+
+indent_style = space
+indent_size = 2
+tab_width = 2
+
+csharp_indent_block_contents = true
+csharp_indent_case_contents = true
+csharp_indent_case_contents_when_block = true

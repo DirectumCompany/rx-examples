@@ -58,9 +58,9 @@
       ],
       "IsAncestorMetadata": true,
       "Overridden": [
+        "EntityGuid",
         "HandledEvents",
-        "NeedPassEntityToLookupEvent",
-        "EntityGuid"
+        "NeedPassEntityToLookupEvent"
       ]
     },
     {

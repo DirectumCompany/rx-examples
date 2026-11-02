@@ -156,8 +156,9 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.SmartProcessing",
+  "ResourcesKeys": [],
   "SpecialFolders": [],
-  "Version": "26.2.0.28",
+  "Version": "26.3.0.38",
   "Widgets": [],
   "Versions": [
     {
