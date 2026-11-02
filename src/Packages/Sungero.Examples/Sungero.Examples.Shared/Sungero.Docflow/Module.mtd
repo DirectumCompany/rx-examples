@@ -445,6 +445,13 @@
   "IsVisible": false,
   "Jobs": [
     {
+      "NameGuid": "7969b46e-61f9-462b-bd24-29cacdc22cc1",
+      "Name": "CloseExpiredPowerOfAttorneysAndSignatureSettings",
+      "IsAncestorMetadata": true,
+      "MonthSchedule": "Monthly",
+      "StartAt": "1753-01-01T01:00:00"
+    },
+    {
       "NameGuid": "486eaff5-ffe2-44ae-b5eb-256b8a4a7197",
       "Name": "PrepareIndexingDataForFullTextSearch",
       "IsAncestorMetadata": true,
@@ -573,7 +580,7 @@
       ]
     }
   ],
-  "Version": "26.2.0.28",
+  "Version": "26.3.0.38",
   "Widgets": [],
   "Versions": [
     {

@@ -470,6 +470,7 @@
   "PublicStructures": [],
   "ResourceInterfaceAssemblyName": "Sungero.Domain.Interfaces",
   "ResourceInterfaceNamespace": "Sungero.Examples.Module.RecordManagement",
+  "ResourcesKeys": [],
   "SpecialFolders": [
     {
       "NameGuid": "c21fa108-1570-4155-8a0c-0d04957bc72b",
@@ -541,7 +542,7 @@
       ]
     }
   ],
-  "Version": "26.2.0.28",
+  "Version": "26.3.0.38",
   "Widgets": [],
   "Versions": [
     {
